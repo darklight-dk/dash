@@ -862,16 +862,19 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
       <span class="fw-label" id="fwSizeLabel">3px</span>
       <div class="fw-sep"></div>
       <span class="fw-label">ZOOM:</span>
-      <button class="fw-tool-btn" onclick="fwZoomOut()" title="Alejar" style="padding:4px 9px;font-size:14px">−</button>
-      <span class="fw-label" id="fwZoomLabel" style="font-size:11px;min-width:34px;text-align:center">100%</span>
-      <button class="fw-tool-btn" onclick="fwZoomIn()" title="Acercar" style="padding:4px 9px;font-size:14px">+</button>
+      <button class="fw-tool-btn" onclick="fwZoomOut()" style="padding:4px 9px;font-size:14px">−</button>
+      <span class="fw-label" id="fwZoomLabel" style="min-width:34px;text-align:center">100%</span>
+      <button class="fw-tool-btn" onclick="fwZoomIn()" style="padding:4px 9px;font-size:14px">+</button>
+      <div class="fw-sep"></div>
+      <button class="fw-tool-btn" id="fwUndoBtn" onclick="fwUndo()" title="Deshacer" style="padding:4px 10px;font-size:15px;opacity:.3">↩</button>
+      <button class="fw-tool-btn" id="fwRedoBtn" onclick="fwRedo()" title="Rehacer" style="padding:4px 10px;font-size:15px;opacity:.3">↪</button>
     </div>
     <!-- Content: scrollable area with canvas on top of text -->
     <div class="floatwin-content">
       <div class="fw-canvas-wrap" id="fwCanvasWrap">
         <div id="fwScrollArea">
           <div id="fwZoomInner">
-            <div id="fwContentLayer" style="display:flex;flex-direction:column;gap:14px">
+            <div id="fwContentLayer" style="display:flex;flex-direction:column;gap:14px;pointer-events:none">
               <div id="fwPanelLabel" style="
                 font-size:10px;letter-spacing:2px;text-transform:uppercase;
                 color:var(--teal);font-family:'DM Mono',monospace;font-weight:800;margin-bottom:2px
@@ -1143,10 +1146,28 @@ function selectAns(letter) {
 function goQ(dir) {
   const next = S.current + dir;
   if (next < 0 || next >= S.questions.length) return;
+  // Si la ventana flotante está abierta, guardar snapshot antes de cambiar
+  if ($('floatWinOv').classList.contains('show')) fwSaveSnapshot();
   S.current = next;
   if (S.current < S.navStart) S.navStart = S.current;
   if (S.current >= S.navStart + NAV_WIN) S.navStart = S.current - NAV_WIN + 1;
   renderQ(); renderNav();
+  // Si la ventana sigue abierta, actualizar contenido para la nueva pregunta
+  if ($('floatWinOv').classList.contains('show')) {
+    fwRenderPanel();
+    requestAnimationFrame(() => {
+      const layer = $('fwContentLayer');
+      fw.canvasH  = Math.max(layer.scrollHeight + 80, $('fwCanvasWrap').offsetHeight);
+      fwApplyZoom();
+      $('fwScrollArea').scrollTop = 0;
+      initCanvas($('fwCanvas'));
+      fwLoadSnapshot(() => {
+        const key = fwKey();
+        if (!fw.history[key] || fw.history[key].length === 0) fwPushHistory();
+        fwUpdateHistoryBtns();
+      });
+    });
+  }
 }
 
 function updateProg() {
@@ -1419,9 +1440,320 @@ let fw = {
   drawing: false,
   lastX: 0, lastY: 0,
   mode: 'pregunta',
-  zoom: 1,          // factor de zoom actual
-  canvasH: 1200,    // altura lógica del canvas (se ajusta al contenido)
+  zoom: 1,
+  canvasH: 1200,
+  // Persistencia: un ImageData guardado por pregunta (índice)
+  snapshots: {},   // { qIndex: { pregunta: dataURL, opciones: dataURL } }
+  // Historial undo/redo por modo
+  history: {},     // { 'qIndex-mode': [dataURL, ...] }
+  histIdx: {},     // { 'qIndex-mode': number }
 };
+
+// ── Clave única por pregunta+modo ──
+function fwKey() { return `${S.current}-${fw.mode}`; }
+
+// ── Guardar snapshot en historial (para undo) ──
+function fwPushHistory() {
+  const key    = fwKey();
+  const canvas = $('fwCanvas');
+  const dataURL = canvas.toDataURL();
+  if (!fw.history[key])  fw.history[key]  = [];
+  if (!fw.histIdx[key])  fw.histIdx[key]  = -1;
+  // Cortar futuros si habíamos deshecho
+  fw.history[key] = fw.history[key].slice(0, fw.histIdx[key] + 1);
+  fw.history[key].push(dataURL);
+  fw.histIdx[key] = fw.history[key].length - 1;
+  fwUpdateHistoryBtns();
+}
+
+// ── Deshacer ──
+function fwUndo() {
+  const key = fwKey();
+  if (!fw.history[key] || fw.histIdx[key] <= 0) return;
+  fw.histIdx[key]--;
+  fwRestoreFromHistory(key);
+}
+
+// ── Rehacer ──
+function fwRedo() {
+  const key = fwKey();
+  if (!fw.history[key] || fw.histIdx[key] >= fw.history[key].length - 1) return;
+  fw.histIdx[key]++;
+  fwRestoreFromHistory(key);
+}
+
+function fwRestoreFromHistory(key) {
+  const dataURL = fw.history[key][fw.histIdx[key]];
+  const canvas  = $('fwCanvas');
+  const ctx     = canvas.getContext('2d');
+  const img     = new Image();
+  img.onload = () => { ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(img,0,0); };
+  img.src = dataURL;
+  fwUpdateHistoryBtns();
+}
+
+function fwUpdateHistoryBtns() {
+  const key  = fwKey();
+  const idx  = fw.histIdx[key] ?? -1;
+  const len  = (fw.history[key] ?? []).length;
+  const undoBtn = $('fwUndoBtn');
+  const redoBtn = $('fwRedoBtn');
+  if (undoBtn) undoBtn.style.opacity = idx > 0 ? '1' : '0.3';
+  if (redoBtn) redoBtn.style.opacity = idx < len - 1 ? '1' : '0.3';
+}
+
+// ── Guardar canvas actual al cerrar o cambiar modo ──
+function fwSaveSnapshot() {
+  const canvas = $('fwCanvas');
+  if (!fw.snapshots[S.current]) fw.snapshots[S.current] = {};
+  fw.snapshots[S.current][fw.mode] = canvas.toDataURL();
+}
+
+// ── Restaurar snapshot guardado ──
+function fwLoadSnapshot(callback) {
+  const saved  = fw.snapshots[S.current]?.[fw.mode];
+  const canvas = $('fwCanvas');
+  const ctx    = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (saved) {
+    const img = new Image();
+    img.onload = () => { ctx.drawImage(img, 0, 0); callback?.(); };
+    img.src = saved;
+  } else {
+    callback?.();
+  }
+}
+
+// ── Limpiar canvas y reset historial del modo actual ──
+function clearCanvas() {
+  const canvas = $('fwCanvas');
+  canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+  const key = fwKey();
+  fw.history[key]  = [];
+  fw.histIdx[key]  = -1;
+  delete fw.snapshots[S.current]?.[fw.mode];
+  fwPushHistory();
+}
+
+// ── Limpiar canvas de una pregunta al navegar ──
+function fwClearQuestion(qIdx) {
+  delete fw.snapshots[qIdx];
+  delete fw.history[`${qIdx}-pregunta`];
+  delete fw.history[`${qIdx}-opciones`];
+  delete fw.histIdx[`${qIdx}-pregunta`];
+  delete fw.histIdx[`${qIdx}-opciones`];
+}
+
+// ── Zoom ──
+function fwApplyZoom() {
+  const z      = fw.zoom;
+  const wrap   = $('fwCanvasWrap');
+  const inner  = $('fwZoomInner');
+  const canvas = $('fwCanvas');
+  const layer  = $('fwContentLayer');
+  const logicW = wrap.offsetWidth / z;
+  const logicH = fw.canvasH;
+
+  inner.style.width  = logicW + 'px';
+  inner.style.height = logicH + 'px';
+  inner.style.transform = `scale(${z})`;
+  inner.style.transformOrigin = 'top left';
+
+  // Preserve drawing before resize
+  const prevURL = canvas.toDataURL();
+  canvas.width  = logicW;
+  canvas.height = logicH;
+  canvas.style.width  = logicW + 'px';
+  canvas.style.height = logicH + 'px';
+  layer.style.width     = logicW + 'px';
+  layer.style.minHeight = logicH + 'px';
+
+  const img = new Image();
+  img.onload = () => canvas.getContext('2d').drawImage(img, 0, 0);
+  img.src = prevURL;
+
+  $('fwZoomLabel').textContent = Math.round(z * 100) + '%';
+}
+
+function fwZoomIn()  { fw.zoom = Math.min(3, parseFloat((fw.zoom+0.25).toFixed(2))); fwApplyZoom(); }
+function fwZoomOut() { fw.zoom = Math.max(0.5, parseFloat((fw.zoom-0.25).toFixed(2))); fwApplyZoom(); }
+
+// ── Renderizar contenido del panel ──
+function fwRenderPanel() {
+  const q        = S.questions[S.current];
+  const letters  = ['A','B','C','D','E'];
+  const selected = S.answers[S.current];
+
+  if (fw.mode === 'pregunta') {
+    $('fwTitle').textContent = 'Pregunta ' + (S.current+1) + (q?.area ? '  ·  ' + q.area : '');
+    $('fwPanelLabel').textContent = 'PREGUNTA ' + (S.current+1);
+    const txt = q?.question || '—';
+    let imgHtml = '';
+    const imgEl = $('qImg');
+    if ($('qImgWrap').style.display !== 'none' && imgEl.src)
+      imgHtml = `<img src="${imgEl.src}" style="max-width:100%;border-radius:10px;border:1px solid var(--b2);margin-top:12px;display:block"/>`;
+    $('fwPanelText').innerHTML = txt.replace(/\n/g,'<br>') + imgHtml;
+
+  } else {
+    // OPCIONES — con botones clickeables para seleccionar (z-index sobre canvas)
+    $('fwTitle').textContent = 'Pregunta ' + (S.current+1) + '  ·  Opciones';
+    $('fwPanelLabel').textContent = 'OPCIONES  —  haz clic para seleccionar';
+    let html = '';
+    if (q?.options) {
+      q.options.forEach((opt, i) => {
+        const l     = letters[i];
+        const isSel = selected === l;
+        html += `<div onclick="fwSelectAnswer('${l}')" style="
+          display:flex;align-items:center;gap:12px;
+          padding:11px 14px;border-radius:10px;margin-bottom:8px;
+          border:1.5px solid ${isSel ? 'var(--teal)' : 'var(--b2)'};
+          background:${isSel ? 'rgba(240,253,250,.92)' : 'rgba(248,250,252,.92)'};
+          cursor:pointer;transition:all .15s;
+          pointer-events:auto;position:relative;z-index:10;
+          backdrop-filter:blur(0px)
+        " onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='${isSel?'var(--teal)':'var(--b2)'}'">
+          <span style="background:${isSel?'var(--teal)':'#e2e8f0'};color:${isSel?'#fff':'var(--muted)'};
+            border-radius:6px;padding:3px 9px;font-family:'DM Mono',monospace;
+            font-weight:700;font-size:13px;flex-shrink:0">${l}</span>
+          <span style="font-size:15px;font-weight:500;color:var(--text)">${opt}</span>
+        </div>`;
+      });
+    }
+    $('fwPanelText').innerHTML = html || '—';
+  }
+}
+
+// ── Seleccionar respuesta desde la ventana ──
+function fwSelectAnswer(letter) {
+  S.answers[S.current] = letter;
+  // Actualizar el examen principal también
+  document.querySelectorAll('#optsCont .opt-btn').forEach(b => {
+    b.classList.toggle('selected', b.dataset.letter === letter);
+  });
+  $('answeredCount').textContent = Object.keys(S.answers).length;
+  renderNav();
+  // Re-renderizar panel para reflejar selección
+  fwRenderPanel();
+}
+
+// ── Abrir ventana ──
+function openFloatWin(mode) {
+  fw.mode = mode;
+  fw.zoom = 1;
+
+  fwRenderPanel();
+
+  // En modo opciones el content layer necesita recibir clicks para seleccionar
+  // El canvas sigue encima para dibujar, pero las opciones tienen pointer-events:auto
+  // via CSS z-index en el fwPanelText divs (ver fwRenderPanel)
+  $('floatWinOv').classList.add('show');
+
+  requestAnimationFrame(() => {
+    const layer = $('fwContentLayer');
+    fw.canvasH  = Math.max(layer.scrollHeight + 80, $('fwCanvasWrap').offsetHeight);
+    fwApplyZoom();
+    $('fwScrollArea').scrollTop = 0;
+    initCanvas($('fwCanvas'));
+    fwLoadSnapshot(() => {
+      const key = fwKey();
+      if (!fw.history[key] || fw.history[key].length === 0) fwPushHistory();
+      fwUpdateHistoryBtns();
+    });
+  });
+}
+
+function closeFloatWin() {
+  fwSaveSnapshot();   // guardar antes de cerrar
+  $('floatWinOv').classList.remove('show');
+}
+function closeFWOnBg(e) { if (e.target === $('floatWinOv')) closeFloatWin(); }
+
+function toggleFWPanel() {
+  const layer = $('fwContentLayer');
+  layer.style.display = layer.style.display === 'none' ? 'flex' : 'none';
+}
+
+// ── Canvas eventos ──
+function initCanvas(canvas) {
+  const fresh = canvas.cloneNode(false); // cloneNode(false) = sin contenido
+  canvas.parentNode.replaceChild(fresh, canvas);
+  const c = $('fwCanvas');
+  c.style.cursor = fw.tool === 'eraser' ? 'cell' : 'crosshair';
+
+  c.addEventListener('mousedown',  e => { fw.drawing=true; const p=fwPos(e,c); fw.lastX=p.x; fw.lastY=p.y; });
+  c.addEventListener('mousemove',  e => { if(!fw.drawing)return; const p=fwPos(e,c); applyStroke(c.getContext('2d'),p); fw.lastX=p.x; fw.lastY=p.y; });
+  c.addEventListener('mouseup',    () => { if(fw.drawing){ fw.drawing=false; fwPushHistory(); } });
+  c.addEventListener('mouseleave', () => { if(fw.drawing){ fw.drawing=false; fwPushHistory(); } });
+  c.addEventListener('touchstart', e => { e.preventDefault(); fw.drawing=true; const p=fwTouchPos(e,c); fw.lastX=p.x; fw.lastY=p.y; }, {passive:false});
+  c.addEventListener('touchmove',  e => { e.preventDefault(); if(!fw.drawing)return; const p=fwTouchPos(e,c); applyStroke(c.getContext('2d'),p); fw.lastX=p.x; fw.lastY=p.y; }, {passive:false});
+  c.addEventListener('touchend',   () => { if(fw.drawing){ fw.drawing=false; fwPushHistory(); } });
+}
+
+function fwPos(e, canvas) {
+  const r=canvas.getBoundingClientRect();
+  return { x:(e.clientX-r.left)*(canvas.width/r.width), y:(e.clientY-r.top)*(canvas.height/r.height) };
+}
+function fwTouchPos(e, canvas) {
+  const r=canvas.getBoundingClientRect(), t=e.touches[0];
+  return { x:(t.clientX-r.left)*(canvas.width/r.width), y:(t.clientY-r.top)*(canvas.height/r.height) };
+}
+
+function applyStroke(ctx, p) {
+  ctx.beginPath();
+  if (fw.tool==='eraser') {
+    ctx.globalCompositeOperation='destination-out';
+    ctx.lineWidth=fw.size*5; ctx.strokeStyle='rgba(0,0,0,1)'; ctx.globalAlpha=1;
+  } else if (fw.tool==='marker') {
+    ctx.globalCompositeOperation='source-over';
+    ctx.lineWidth=fw.size*4; ctx.strokeStyle=fw.color; ctx.globalAlpha=0.45;
+  } else {
+    ctx.globalCompositeOperation='source-over';
+    ctx.lineWidth=fw.size; ctx.strokeStyle=fw.color; ctx.globalAlpha=1;
+  }
+  ctx.lineCap='round'; ctx.lineJoin='round';
+  ctx.moveTo(fw.lastX,fw.lastY); ctx.lineTo(p.x,p.y); ctx.stroke();
+  ctx.globalAlpha=1; ctx.globalCompositeOperation='source-over';
+}
+
+function setTool(t) {
+  fw.tool=t;
+  ['Pencil','Marker','Eraser'].forEach(id => $('tool'+id)?.classList.remove('active'));
+  $('tool'+t.charAt(0).toUpperCase()+t.slice(1)).classList.add('active');
+  $('fwCanvas').style.cursor = t==='eraser' ? 'cell' : 'crosshair';
+}
+
+function setColor(c) {
+  fw.color=c;
+  document.querySelectorAll('.fw-color-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.fw-color-btn').forEach(b => {
+    if(b.style.background===c||b.style.background===hexToRgb(c)) b.classList.add('active');
+  });
+}
+function hexToRgb(hex) {
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return `rgb(${r}, ${g}, ${b})`;
+}
+function setSize(v) { fw.size=Number(v); $('fwSizeLabel').textContent=v+'px'; }
+
+function saveCanvas() {
+  const src=$('fwCanvas');
+  const out=document.createElement('canvas');
+  out.width=src.width; out.height=src.height;
+  const ctx=out.getContext('2d');
+  ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,out.width,out.height);
+  ctx.drawImage(src,0,0);
+  const a=document.createElement('a');
+  a.download=`pizarron-q${S.current+1}.png`; a.href=out.toDataURL('image/png'); a.click();
+}
+
+// ── Draggable ──
+(function(){
+  let dragging=false, ox=0, oy=0;
+  const tb=$('fwTitlebar'), win=$('floatWin');
+  tb.addEventListener('mousedown', e=>{ dragging=true; const r=win.getBoundingClientRect(); ox=e.clientX-r.left; oy=e.clientY-r.top; win.style.position='fixed'; });
+  document.addEventListener('mousemove', e=>{ if(!dragging)return; win.style.left=(e.clientX-ox)+'px'; win.style.top=(e.clientY-oy)+'px'; win.style.margin='0'; });
+  document.addEventListener('mouseup',()=>dragging=false);
+})();
 
 // ── Zoom ──
 function fwApplyZoom() {
