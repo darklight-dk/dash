@@ -656,7 +656,7 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
             <div class="exam-card-icon">🧬</div>
             <div class="exam-card-info">
               <div class="exam-card-title">Simulacro EXANI-II<br>Premedicina 2026</div>
-              <div class="exam-card-sub">Ciencias de la Salud y Biología</div>
+              <div class="exam-card-sub">Premedicina · EXANI-II 2026</div>
             </div>
           </div>
           <div class="exam-card-tags">
@@ -936,6 +936,8 @@ const $  = id => document.getElementById(id);
 const show = id => {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   $(id).classList.add('active');
+  // Guardar pantalla actual en sesión (sobrevive F5, no cierra de pestaña)
+  try { sessionStorage.setItem('fw_screen', id); } catch(e){}
 };
 const load = (v, msg='', sub='') => {
   $('loadOv').className = v ? 'show' : '';
@@ -943,6 +945,20 @@ const load = (v, msg='', sub='') => {
   $('loadSub').textContent = sub;
 };
 const pad = n => String(n).padStart(2,'0');
+
+// ── Al cargar la página: ir al dashboard si ya había sesión activa ──
+(function() {
+  try {
+    const last = sessionStorage.getItem('fw_screen');
+    // Si tenía sesión y no estaba en medio de un examen, ir al dash
+    if (last === 'dashScreen') {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      $('dashScreen').classList.add('active');
+      $('userLabel').innerHTML = 'Invitado · <span>Aspirante</span>';
+      S.user = 'Invitado';
+    }
+  } catch(e){}
+})();
 
 // ══════════════════════════════════════════
 //  LOGIN
@@ -1451,6 +1467,89 @@ let fw = {
 
 // ── Clave única por pregunta+modo ──
 function fwKey() { return `${S.current}-${fw.mode}`; }
+
+// ── Renderizar contenido del panel ──
+function fwRenderPanel() {
+  const q        = S.questions[S.current];
+  const letters  = ['A','B','C','D','E'];
+  const selected = S.answers[S.current];
+
+  if (fw.mode === 'pregunta') {
+    $('fwTitle').textContent = 'Pregunta ' + (S.current+1) + (q?.area ? '  ·  ' + q.area : '');
+    $('fwPanelLabel').textContent = 'PREGUNTA ' + (S.current+1);
+    const txt = q?.question || '—';
+    let imgHtml = '';
+    const imgEl = $('qImg');
+    if ($('qImgWrap').style.display !== 'none' && imgEl.src && imgEl.src !== window.location.href)
+      imgHtml = `<img src="${imgEl.src}" style="max-width:100%;border-radius:10px;border:1px solid var(--b2);margin-top:12px;display:block"/>`;
+    $('fwPanelText').innerHTML = txt.replace(/\n/g,'<br>') + imgHtml;
+
+  } else {
+    $('fwTitle').textContent = 'Pregunta ' + (S.current+1) + '  ·  Opciones';
+    $('fwPanelLabel').textContent = 'OPCIONES — toca para seleccionar';
+    let html = '';
+    if (q?.options) {
+      q.options.forEach((opt, i) => {
+        const l = letters[i], isSel = selected === l;
+        html += `<div onclick="fwSelectAnswer('${l}')" style="
+          display:flex;align-items:center;gap:12px;padding:11px 14px;
+          border-radius:10px;margin-bottom:8px;cursor:pointer;
+          border:1.5px solid ${isSel?'var(--teal)':'var(--b2)'};
+          background:${isSel?'rgba(240,253,250,.95)':'rgba(248,250,252,.95)'};
+          position:relative;z-index:10;pointer-events:auto;transition:border-color .15s"
+          onmouseover="this.style.borderColor='var(--teal)'"
+          onmouseout="this.style.borderColor='${isSel?'var(--teal)':'var(--b2)'}'"
+        ><span style="background:${isSel?'var(--teal)':'#e2e8f0'};color:${isSel?'#fff':'var(--muted)'};
+          border-radius:6px;padding:3px 9px;font-family:'DM Mono',monospace;
+          font-weight:700;font-size:13px;flex-shrink:0">${l}</span>
+         <span style="font-size:15px;font-weight:500;color:var(--text)">${opt}</span></div>`;
+      });
+    }
+    $('fwPanelText').innerHTML = html || '—';
+  }
+}
+
+// ── Seleccionar respuesta desde la ventana flotante ──
+function fwSelectAnswer(letter) {
+  S.answers[S.current] = letter;
+  // Actualizar botones del examen principal
+  document.querySelectorAll('#optsCont .opt-btn').forEach(b =>
+    b.classList.toggle('selected', b.dataset.letter === letter)
+  );
+  $('answeredCount').textContent = Object.keys(S.answers).length;
+  renderNav();
+  fwRenderPanel(); // re-renderizar para reflejar selección
+}
+
+// ── Abrir ventana flotante ──
+function openFloatWin(mode) {
+  fw.mode = mode;
+  fw.zoom = 1;
+  fwRenderPanel();
+  $('floatWinOv').classList.add('show');
+  requestAnimationFrame(() => {
+    const layer = $('fwContentLayer');
+    fw.canvasH  = Math.max(layer.scrollHeight + 80, $('fwCanvasWrap').offsetHeight);
+    fwApplyZoom();
+    $('fwScrollArea').scrollTop = 0;
+    initCanvas($('fwCanvas'));
+    fwLoadSnapshot(() => {
+      const key = fwKey();
+      if (!fw.history[key] || fw.history[key].length === 0) fwPushHistory();
+      fwUpdateHistoryBtns();
+    });
+  });
+}
+
+function closeFloatWin() {
+  fwSaveSnapshot();
+  $('floatWinOv').classList.remove('show');
+}
+function closeFWOnBg(e) { if (e.target === $('floatWinOv')) closeFloatWin(); }
+function toggleFWPanel() {
+  const l = $('fwContentLayer');
+  l.style.display = l.style.display === 'none' ? 'flex' : 'none';
+}
 
 // ── Guardar snapshot en historial (para undo) ──
 function fwPushHistory() {
