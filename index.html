@@ -977,12 +977,6 @@ function doLogout() {
 // ══════════════════════════════════════════
 //  ZIP HANDLING
 // ══════════════════════════════════════════
-function handleDrop(e) {
-  e.preventDefault();
-  $('dropZone').classList.remove('drag');
-  if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
-}
-
 async function handleFile(file) {
   if (!file || !file.name.endsWith('.zip')) {
     showDashError('Solo se aceptan archivos <code>.zip</code>'); return;
@@ -1016,28 +1010,27 @@ async function handleFile(file) {
     for (const imgFile of imgFiles) {
       const blob = await imgFile.async('blob');
       const url  = URL.createObjectURL(blob);
-      // Key = just the filename (e.g. "pregunta32.jpg")
       const fname = imgFile.name.split('/').pop();
       S.images[fname] = url;
     }
 
-    // ── 3. Show meta ──
+    // ── 3. Set timer from meta and start directly ──
     const meta = data.meta || {};
-    const imgCount = data.questions.filter(q => q.image).length;
+    if (meta.tiempo_minutos) {
+      S.timerSecs = meta.tiempo_minutos * 60;
+    }
 
-    $('metaTitulo').textContent   = meta.titulo   || 'Examen sin título';
-    $('metaMateria').textContent  = meta.materia  || '';
-    $('metaTotal').textContent    = data.questions.length;
-    $('metaTiempo').textContent   = meta.tiempo_minutos ? `${meta.tiempo_minutos} min` : '4h 30m';
-    $('metaVer').textContent      = meta.version  || '—';
-    $('metaImgs').textContent     = imgCount > 0  ? `${imgCount} con imagen` : 'Sin imágenes';
-    $('metaImgs').style.color     = imgCount > 0  ? 'var(--teal)' : 'var(--muted)';
-
-    $('stepUpload').style.display = 'none';
-    $('stepReady').style.display  = 'flex';
+    startExam();
 
   } catch(e) {
     console.error(e);
+    // Reset card buttons
+    document.querySelectorAll('.exam-card-btn').forEach(b => {
+      if (!b.closest('[style*="pointer-events:none"]')) {
+        b.innerHTML = '▶ Iniciar examen';
+        b.style.pointerEvents = '';
+      }
+    });
     showDashError(`⚠️ Error al leer el ZIP:<br/><br/>${e.message}<br/><br/>
       Verifica que el ZIP contenga un archivo <code>preguntas.json</code> con el formato correcto.`);
   } finally {
@@ -1047,10 +1040,14 @@ async function handleFile(file) {
 
 function resetZip() {
   S.questions = []; S.images = {};
-  $('stepUpload').style.display = 'block';
-  $('stepReady').style.display  = 'none';
-  $('zipInput').value = '';
   hideDashError();
+  // Reset card buttons
+  document.querySelectorAll('.exam-card-btn').forEach(b => {
+    if (!b.closest('[style*="opacity"]')) {
+      b.innerHTML = '▶ Iniciar examen';
+      b.style.pointerEvents = '';
+    }
+  });
 }
 
 function showDashError(html) {
@@ -1063,8 +1060,9 @@ function hideDashError() { $('dashError').style.display = 'none'; }
 //  START EXAM
 // ══════════════════════════════════════════
 function startExam() {
+  const secs = S.timerSecs || TOTAL_SECS;   // preserve if set from meta
   S.answers = {}; S.current = 0; S.navStart = 0;
-  S.timerSecs = TOTAL_SECS; S.paused = false;
+  S.timerSecs = secs; S.paused = false;
   $('totalCount').textContent = S.questions.length;
   renderQ(); renderNav(); startTimer();
   show('examScreen');
