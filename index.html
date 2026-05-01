@@ -114,12 +114,77 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 }
 
 /* ── ADMIN TABS ── */
-.admin-tabs-bar{background:#fff;border-bottom:1px solid var(--b2);display:flex;padding:0 24px;flex-shrink:0}
-.admin-tab{background:none;border:none;border-bottom:3px solid transparent;padding:14px 20px;
-  font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;font-family:'Sora',sans-serif}
+.admin-tabs-bar{background:#fff;border-bottom:1px solid var(--b2);display:flex;padding:0 24px;flex-shrink:0;overflow-x:auto}
+.admin-tab{background:none;border:none;border-bottom:3px solid transparent;padding:14px 16px;
+  font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;font-family:'Sora',sans-serif;white-space:nowrap}
 .admin-tab:hover{color:var(--teal)}
 .admin-tab.active{color:var(--teal);border-bottom-color:var(--teal)}
-#adminBodyEdit,#adminBodyCreate{max-height:calc(100vh - 109px)}
+#adminBodyEdit,#adminBodyCreate,#adminBodyExport,#adminBodyStats,#adminBodyConfig{max-height:calc(100vh - 109px)}
+
+/* ── EXPORT TAB ── */
+#adminBodyExport{overflow-y:auto;padding:32px 40px;display:none;flex-direction:column;gap:20px}
+.exp-hero{background:linear-gradient(135deg,#0d9488,#065f46);border-radius:20px;padding:32px 36px;color:#fff;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.exp-hero-title{font-size:22px;font-weight:800;margin-bottom:6px}
+.exp-hero-sub{font-size:13px;opacity:.8;max-width:360px;line-height:1.5}
+.exp-hero-badge{background:rgba(255,255,255,.15);border-radius:12px;padding:12px 20px;text-align:center;backdrop-filter:blur(8px)}
+.exp-hero-num{font-size:36px;font-weight:900;line-height:1}
+.exp-hero-label{font-size:11px;letter-spacing:1.5px;opacity:.8;margin-top:2px}
+.exp-formats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.exp-format-card{background:#fff;border:2px solid var(--b2);border-radius:16px;padding:22px;cursor:pointer;transition:all .18s;text-align:center}
+.exp-format-card:hover{border-color:var(--teal);transform:translateY(-2px);box-shadow:0 8px 24px rgba(13,148,136,.15)}
+.exp-format-card.selected{border-color:var(--teal);background:rgba(13,148,136,.04)}
+.exp-format-icon{font-size:32px;margin-bottom:10px}
+.exp-format-name{font-size:15px;font-weight:800;color:var(--text)}
+.exp-format-desc{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.4}
+.exp-format-badge{display:inline-block;margin-top:8px;background:#f0fdf4;color:#16a34a;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700}
+.exp-options-card{background:#fff;border:1px solid var(--b2);border-radius:16px;padding:24px 28px}
+.exp-options-title{font-size:14px;font-weight:800;color:var(--text);margin-bottom:16px}
+.exp-check-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f1f5f9;cursor:pointer}
+.exp-check-row:last-child{border-bottom:none}
+.exp-check-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--teal);cursor:pointer}
+.exp-check-label{font-size:13px;color:var(--text);font-weight:500}
+.exp-check-sub{font-size:11px;color:var(--muted);margin-left:auto}
+.exp-preview{background:#0f172a;border-radius:14px;padding:20px 24px;font-family:'DM Mono',monospace;font-size:12px;color:#94a3b8;overflow-x:auto;max-height:200px;overflow-y:auto}
+.exp-preview .key{color:#7dd3fc}.exp-preview .str{color:#86efac}.exp-preview .num{color:#fbbf24}.exp-preview .bool{color:#f472b6}
+.btn-exp-go{background:linear-gradient(135deg,var(--teal),#065f46);color:#fff;border:none;border-radius:14px;padding:16px 32px;font-size:16px;font-weight:800;letter-spacing:1px;cursor:pointer;transition:all .2s;box-shadow:0 6px 20px rgba(13,148,136,.3);width:100%}
+.btn-exp-go:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(13,148,136,.4)}
+.btn-exp-go:active{transform:translateY(0)}
+.exp-speed-tag{display:flex;align-items:center;gap:6px;font-size:12px;color:#16a34a;font-weight:700;justify-content:center;margin-top:8px}
+
+/* ── STATS TAB ── */
+#adminBodyStats{overflow-y:auto;padding:32px 40px;display:none;flex-direction:column;gap:20px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px}
+.stat-card{background:#fff;border:1px solid var(--b2);border-radius:16px;padding:20px;text-align:center}
+.stat-card-num{font-size:30px;font-weight:900;color:var(--teal)}
+.stat-card-label{font-size:12px;color:var(--muted);margin-top:4px;letter-spacing:.5px}
+.area-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.area-bar-label{font-size:12px;color:var(--text);font-weight:600;min-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.area-bar-track{flex:1;background:#f1f5f9;border-radius:99px;height:8px;overflow:hidden}
+.area-bar-fill{height:100%;background:linear-gradient(90deg,var(--teal),#16a34a);border-radius:99px;transition:width .4s}
+.area-bar-count{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;min-width:24px;text-align:right}
+
+/* ── CONFIG TAB ── */
+#adminBodyConfig{overflow-y:auto;padding:32px 40px;display:none;flex-direction:column;gap:20px}
+.cfg-section{background:#fff;border:1px solid var(--b2);border-radius:16px;padding:24px 28px;display:flex;flex-direction:column;gap:16px}
+.cfg-section-title{font-size:14px;font-weight:800;color:var(--text);padding-bottom:12px;border-bottom:1px solid #f1f5f9}
+.cfg-row{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:8px 0}
+.cfg-row-info{flex:1}
+.cfg-row-label{font-size:13px;font-weight:600;color:var(--text)}
+.cfg-row-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.toggle-switch{position:relative;width:42px;height:24px;flex-shrink:0}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:#cbd5e1;border-radius:99px;cursor:pointer;transition:.2s}
+.toggle-slider:before{content:'';position:absolute;width:18px;height:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.toggle-switch input:checked+.toggle-slider{background:var(--teal)}
+.toggle-switch input:checked+.toggle-slider:before{transform:translateX(18px)}
+.btn-cfg-danger{background:none;border:1px solid var(--red);color:var(--red);border-radius:10px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;font-family:'Sora',sans-serif}
+.btn-cfg-danger:hover{background:rgba(220,38,38,.06)}
+.btn-cfg-action{background:none;border:1px solid var(--teal);color:var(--teal);border-radius:10px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;font-family:'Sora',sans-serif}
+.btn-cfg-action:hover{background:rgba(13,148,136,.06)}
+
+@media(max-width:600px){
+  #adminBodyExport,#adminBodyStats,#adminBodyConfig{padding:16px}
+}
 
 /* ── EXAM BUILDER ── */
 .builder-section{background:#fff;border:1px solid var(--b2);border-radius:16px;padding:24px 28px;display:flex;flex-direction:column;gap:16px}
@@ -139,6 +204,13 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .btn-add-question{background:var(--teal);color:#fff;border:none;border-radius:10px;padding:10px 20px;
   font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Sora',sans-serif}
 .btn-add-question:hover{background:#0f766e;transform:translateY(-1px)}
+.btn-import-question{background:#fff;color:var(--teal);border:1.5px solid var(--teal);border-radius:10px;padding:10px 18px;
+  font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Sora',sans-serif;display:flex;align-items:center;gap:6px}
+.btn-import-question:hover{background:rgba(13,148,136,.07);transform:translateY(-1px)}
+.import-result-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;
+  border-radius:12px;padding:12px 24px;font-size:14px;font-weight:600;z-index:9999;
+  box-shadow:0 8px 32px rgba(0,0,0,.3);animation:toastIn .25s ease;pointer-events:none}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 .builder-q-list{display:flex;flex-direction:column;gap:8px}
 .builder-empty{color:var(--muted);font-size:14px;text-align:center;padding:32px 0}
 .builder-q-item{background:var(--card);border:1px solid var(--b2);border-radius:10px;
@@ -926,8 +998,11 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
 
   <!-- Tabs -->
   <div class="admin-tabs-bar">
-    <button class="admin-tab active" id="tabEdit" onclick="switchAdminTab('edit')">📋 Editar examen cargado</button>
-    <button class="admin-tab" id="tabCreate" onclick="switchAdminTab('create')">✏️ Crear nuevo examen</button>
+    <button class="admin-tab active" id="tabEdit" onclick="switchAdminTab('edit')">📋 Editar examen</button>
+    <button class="admin-tab" id="tabCreate" onclick="switchAdminTab('create')">✏️ Crear examen</button>
+    <button class="admin-tab" id="tabExport" onclick="switchAdminTab('export')">⚡ Exportar preguntas</button>
+    <button class="admin-tab" id="tabStats" onclick="switchAdminTab('stats')">📊 Estadísticas</button>
+    <button class="admin-tab" id="tabConfig" onclick="switchAdminTab('config')">⚙️ Configuración</button>
   </div>
 
   <!-- ── TAB: EDITAR ── -->
@@ -1003,7 +1078,11 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
     <div class="builder-section">
       <div class="builder-section-header">
         <div class="builder-section-title">❓ Preguntas <span class="builder-q-badge" id="bldQCount">0</span></div>
-        <button class="btn-add-question" onclick="openQuestionEditor(-1)">+ Agregar pregunta</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-import-question" onclick="triggerImportQuestions()" title="Importar desde JSON o TXT">📥 Importar</button>
+          <input type="file" id="importQFile" accept=".json,.txt,.csv" style="display:none" onchange="handleImportQuestions(this)">
+          <button class="btn-add-question" onclick="openQuestionEditor(-1)">+ Agregar pregunta</button>
+        </div>
       </div>
       <div id="bldQList" class="builder-q-list">
         <div class="builder-empty" id="bldEmpty">No hay preguntas todavía. ¡Agrega la primera con el botón de arriba!</div>
@@ -1059,6 +1138,193 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
     <div class="qed-footer">
       <button class="qed-btn-cancel" onclick="$('qedOverlay').classList.remove('show')">Cancelar</button>
       <button class="qed-btn-save" onclick="saveQuestion()">✅ Guardar pregunta</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TAB: EXPORTAR PREGUNTAS ── -->
+<div class="admin-body" id="adminBodyExport" style="display:none">
+  <div class="exp-hero">
+    <div>
+      <div class="exp-hero-title">⚡ Exportar preguntas</div>
+      <div class="exp-hero-sub">Descarga instantánea en el formato que necesites. Sin esperas.</div>
+    </div>
+    <div class="exp-hero-badge">
+      <div class="exp-hero-num" id="expTotalCount">0</div>
+      <div class="exp-hero-label">PREGUNTAS</div>
+    </div>
+  </div>
+
+  <div id="expNoExam" style="display:none;text-align:center;padding:40px 0;color:var(--muted)">
+    <div style="font-size:48px;margin-bottom:12px">📂</div>
+    <div style="font-size:16px;font-weight:700;color:var(--text)">No hay examen cargado</div>
+    <div style="font-size:13px;margin-top:6px">Carga un examen ZIP desde el Dashboard para exportar sus preguntas</div>
+  </div>
+
+  <div id="expContent">
+    <!-- Formato -->
+    <div style="font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.5px;margin-bottom:8px">SELECCIONA FORMATO</div>
+    <div class="exp-formats">
+      <div class="exp-format-card selected" onclick="selectExpFormat('json',this)" id="fmtJson">
+        <div class="exp-format-icon">📄</div>
+        <div class="exp-format-name">JSON</div>
+        <div class="exp-format-desc">Formato nativo del sistema. Incluye todo: opciones, respuesta, área, explicación e imágenes.</div>
+        <div class="exp-format-badge">Recomendado</div>
+      </div>
+      <div class="exp-format-card" onclick="selectExpFormat('csv',this)" id="fmtCsv">
+        <div class="exp-format-icon">📊</div>
+        <div class="exp-format-name">CSV</div>
+        <div class="exp-format-desc">Compatible con Excel, Google Sheets. Una pregunta por fila con todas sus columnas.</div>
+        <div class="exp-format-badge">Excel / Sheets</div>
+      </div>
+      <div class="exp-format-card" onclick="selectExpFormat('txt',this)" id="fmtTxt">
+        <div class="exp-format-icon">📝</div>
+        <div class="exp-format-name">TXT</div>
+        <div class="exp-format-desc">Texto plano legible. Ideal para imprimir o compartir por WhatsApp / correo.</div>
+        <div class="exp-format-badge">Legible</div>
+      </div>
+      <div class="exp-format-card" onclick="selectExpFormat('md',this)" id="fmtMd">
+        <div class="exp-format-icon">🗒️</div>
+        <div class="exp-format-name">Markdown</div>
+        <div class="exp-format-desc">Formato estructurado para Notion, Obsidian o documentación técnica.</div>
+        <div class="exp-format-badge">Notion / Obsidian</div>
+      </div>
+    </div>
+
+    <!-- Opciones -->
+    <div class="exp-options-card">
+      <div class="exp-options-title">⚙️ Opciones de exportación</div>
+      <label class="exp-check-row">
+        <input type="checkbox" id="expIncludeAnswers" checked onchange="updateExpPreview()">
+        <span class="exp-check-label">Incluir respuestas correctas</span>
+        <span class="exp-check-sub">Recomendado</span>
+      </label>
+      <label class="exp-check-row">
+        <input type="checkbox" id="expIncludeExpl" checked onchange="updateExpPreview()">
+        <span class="exp-check-label">Incluir explicaciones</span>
+        <span class="exp-check-sub">Más completo</span>
+      </label>
+      <label class="exp-check-row">
+        <input type="checkbox" id="expIncludeArea" checked onchange="updateExpPreview()">
+        <span class="exp-check-label">Incluir área temática</span>
+        <span class="exp-check-sub">Metadatos</span>
+      </label>
+      <label class="exp-check-row">
+        <input type="checkbox" id="expIncludeMeta" checked onchange="updateExpPreview()">
+        <span class="exp-check-label">Incluir metadatos del examen</span>
+        <span class="exp-check-sub">Título, tiempo, versión</span>
+      </label>
+    </div>
+
+    <!-- Preview -->
+    <div>
+      <div style="font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.5px;margin-bottom:8px">VISTA PREVIA</div>
+      <div class="exp-preview" id="expPreview">Selecciona un formato para ver la vista previa...</div>
+    </div>
+
+    <!-- Botón exportar -->
+    <div>
+      <button class="btn-exp-go" onclick="doExportQuestions()">⚡ Descargar ahora</button>
+      <div class="exp-speed-tag">⚡ Descarga instantánea — generado en el navegador, sin servidor</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── TAB: ESTADÍSTICAS ── -->
+<div class="admin-body" id="adminBodyStats" style="display:none">
+  <div class="admin-title" style="padding:0 0 4px">📊 Estadísticas del examen</div>
+  <div id="statsNoExam" style="display:none;text-align:center;padding:60px 0;color:var(--muted)">
+    <div style="font-size:48px;margin-bottom:12px">📂</div>
+    <div style="font-size:16px;font-weight:700;color:var(--text)">No hay examen cargado</div>
+    <div style="font-size:13px;margin-top:6px">Carga un examen ZIP para ver sus estadísticas</div>
+  </div>
+  <div id="statsContent">
+    <div class="stats-grid" id="statsCards"></div>
+    <div style="background:#fff;border:1px solid var(--b2);border-radius:16px;padding:24px 28px">
+      <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:20px">Distribución por área temática</div>
+      <div id="statsAreaBars"></div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--b2);border-radius:16px;padding:24px 28px">
+      <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:16px">Distribución de opciones</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap" id="statsAnswerDist"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── TAB: CONFIGURACIÓN ── -->
+<div class="admin-body" id="adminBodyConfig" style="display:none">
+  <div class="admin-title" style="padding:0 0 4px">⚙️ Configuración</div>
+
+  <div class="cfg-section">
+    <div class="cfg-section-title">🎨 Apariencia</div>
+    <div class="cfg-row">
+      <div class="cfg-row-info">
+        <div class="cfg-row-label">Mostrar números de pregunta</div>
+        <div class="cfg-row-sub">Muestra Q1, Q2... al lado de cada pregunta en el examen</div>
+      </div>
+      <label class="toggle-switch"><input type="checkbox" id="cfgShowNums" checked onchange="saveCfg()"><span class="toggle-slider"></span></label>
+    </div>
+    <div class="cfg-row">
+      <div class="cfg-row-info">
+        <div class="cfg-row-label">Animaciones de transición</div>
+        <div class="cfg-row-sub">Efectos al cambiar de pregunta (desactivar mejora el rendimiento)</div>
+      </div>
+      <label class="toggle-switch"><input type="checkbox" id="cfgAnimations" checked onchange="saveCfg()"><span class="toggle-slider"></span></label>
+    </div>
+  </div>
+
+  <div class="cfg-section">
+    <div class="cfg-section-title">⏱️ Examen</div>
+    <div class="cfg-row">
+      <div class="cfg-row-info">
+        <div class="cfg-row-label">Alertas de tiempo</div>
+        <div class="cfg-row-sub">Notificar cuando queden 30 y 10 minutos</div>
+      </div>
+      <label class="toggle-switch"><input type="checkbox" id="cfgTimeAlerts" checked onchange="saveCfg()"><span class="toggle-slider"></span></label>
+    </div>
+    <div class="cfg-row">
+      <div class="cfg-row-info">
+        <div class="cfg-row-label">Confirmar antes de finalizar</div>
+        <div class="cfg-row-sub">Pedir confirmación antes de entregar el examen</div>
+      </div>
+      <label class="toggle-switch"><input type="checkbox" id="cfgConfirmFinish" checked onchange="saveCfg()"><span class="toggle-slider"></span></label>
+    </div>
+    <div class="cfg-row">
+      <div class="cfg-row-info">
+        <div class="cfg-row-label">Guardar progreso automáticamente</div>
+        <div class="cfg-row-sub">Recuperar sesión si el navegador se cierra</div>
+      </div>
+      <label class="toggle-switch"><input type="checkbox" id="cfgAutoSave" checked onchange="saveCfg()"><span class="toggle-slider"></span></label>
+    </div>
+  </div>
+
+  <div class="cfg-section">
+    <div class="cfg-section-title">🔐 Acceso de administrador</div>
+    <div class="cfg-row">
+      <div class="cfg-row-info">
+        <div class="cfg-row-label">Usuarios registrados</div>
+        <div class="cfg-row-sub" id="cfgUserCount">Cargando...</div>
+      </div>
+      <button class="btn-cfg-action" onclick="showUserList()">Ver lista</button>
+    </div>
+    <div id="cfgUserList" style="display:none;margin-top:8px;background:#f8fafc;border-radius:10px;padding:12px 16px;display:none;flex-direction:column;gap:6px"></div>
+  </div>
+
+  <div class="cfg-section">
+    <div class="cfg-section-title">🗑️ Datos y caché</div>
+    <div class="cfg-row">
+      <div class="cfg-row-info">
+        <div class="cfg-row-label">Limpiar examen cargado</div>
+        <div class="cfg-row-sub">Elimina el examen de la memoria actual</div>
+      </div>
+      <button class="btn-cfg-danger" onclick="clearLoadedExam()">Limpiar</button>
+    </div>
+    <div class="cfg-row">
+      <div class="cfg-row-info">
+        <div class="cfg-row-label">Borrar configuración</div>
+        <div class="cfg-row-sub">Restaura todos los ajustes a su valor predeterminado</div>
+      </div>
+      <button class="btn-cfg-danger" onclick="resetConfig()">Restablecer</button>
     </div>
   </div>
 </div>
@@ -2522,14 +2788,474 @@ const LETTERS = ['A','B','C','D'];
 
 // ── Cambiar de tab ──
 function switchAdminTab(tab) {
-  $('tabEdit').classList.toggle('active',   tab === 'edit');
-  $('tabCreate').classList.toggle('active', tab === 'create');
-  $('adminBodyEdit').style.display   = tab === 'edit'   ? 'flex' : 'none';
-  $('adminBodyCreate').style.display = tab === 'create' ? 'flex' : 'none';
-  if (tab === 'create') renderExamBuilder();
+  ['edit','create','export','stats','config'].forEach(t => {
+    const key  = t.charAt(0).toUpperCase() + t.slice(1);
+    const btn  = $('tab' + key);
+    const body = $('adminBody' + key);
+    if (btn)  btn.classList.toggle('active', t === tab);
+    if (body) {
+      if (t === tab) {
+        body.style.display        = 'flex';
+        body.style.flexDirection  = 'column';
+      } else {
+        body.style.display = 'none';
+      }
+    }
+  });
+  if (tab === 'create')  renderExamBuilder();
+  if (tab === 'export')  initExportTab();
+  if (tab === 'stats')   initStatsTab();
+  if (tab === 'config')  initConfigTab();
 }
 
-// ── Sincronizar vista del builder ──
+// ══════════════════════════════════════════════
+// ⚡ EXPORTAR PREGUNTAS
+// ══════════════════════════════════════════════
+let _expFormat = 'json';
+
+function selectExpFormat(fmt, el) {
+  _expFormat = fmt;
+  document.querySelectorAll('.exp-format-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  updateExpPreview();
+}
+
+function initExportTab() {
+  const qs = S.questions || [];
+  $('expTotalCount').textContent = qs.length;
+  const hasExam = qs.length > 0;
+  $('expNoExam').style.display  = hasExam ? 'none' : '';
+  $('expContent').style.display = hasExam ? 'flex' : 'none';
+  if (hasExam) { $('expContent').style.flexDirection = 'column'; $('expContent').style.gap = '16px'; }
+  updateExpPreview();
+}
+
+function getExpOptions() {
+  return {
+    answers: $('expIncludeAnswers').checked,
+    expl:    $('expIncludeExpl').checked,
+    area:    $('expIncludeArea').checked,
+    meta:    $('expIncludeMeta').checked,
+  };
+}
+
+function updateExpPreview() {
+  const qs  = S.questions || [];
+  if (!qs.length) return;
+  const opt = getExpOptions();
+  const q   = qs[0];
+  const pre = $('expPreview');
+  if (_expFormat === 'json') {
+    const sample = buildJsonExport(qs.slice(0,1), opt);
+    const raw = JSON.stringify(sample, null, 2);
+    pre.innerHTML = syntaxHighlightJson(raw.slice(0, 600) + (raw.length > 600 ? '\n  ...' : ''));
+  } else if (_expFormat === 'csv') {
+    const rows = buildCsvExport(qs.slice(0,2), opt).split('\n').slice(0,3).join('\n');
+    pre.textContent = rows;
+  } else if (_expFormat === 'txt') {
+    pre.textContent = buildTxtExport(qs.slice(0,1), opt).slice(0, 400) + '...';
+  } else if (_expFormat === 'md') {
+    pre.textContent = buildMdExport(qs.slice(0,1), opt).slice(0, 400) + '...';
+  }
+}
+
+function syntaxHighlightJson(str) {
+  return str
+    .replace(/("(?:[^"\\]|\\.)*")\s*:/g, '<span class="key">$1</span>:')
+    .replace(/:\s*("(?:[^"\\]|\\.)*")/g, ': <span class="str">$1</span>')
+    .replace(/:\s*(\d+)/g, ': <span class="num">$1</span>')
+    .replace(/:\s*(true|false|null)/g, ': <span class="bool">$1</span>');
+}
+
+function buildJsonExport(qs, opt) {
+  const out = { questions: qs.map((q, i) => {
+    const o = { id: i+1, question: q.question || q.text, options: q.options };
+    if (opt.answers) o.answer = q.answer;
+    if (opt.area && q.area) o.area = q.area;
+    if (opt.expl && q.explanation) o.explanation = q.explanation;
+    if (q.image) o.image = q.image;
+    return o;
+  })};
+  if (opt.meta && S.meta) out.meta = S.meta;
+  return out;
+}
+
+function buildCsvExport(qs, opt) {
+  const cols = ['id','question','option_a','option_b','option_c','option_d'];
+  if (opt.answers) cols.push('answer');
+  if (opt.area)    cols.push('area');
+  if (opt.expl)    cols.push('explanation');
+  const esc = v => `"${String(v||'').replace(/"/g,'""')}"`;
+  const rows = [cols.join(',')];
+  qs.forEach((q, i) => {
+    const opts = q.options || [];
+    const row  = [i+1, q.question||q.text, opts[0]||'', opts[1]||'', opts[2]||'', opts[3]||''];
+    if (opt.answers) row.push(q.answer || '');
+    if (opt.area)    row.push(q.area || '');
+    if (opt.expl)    row.push(q.explanation || '');
+    rows.push(row.map(esc).join(','));
+  });
+  return rows.join('\n');
+}
+
+function buildTxtExport(qs, opt) {
+  let out = '';
+  if (opt.meta && S.meta) {
+    out += `═══════════════════════════════════\n`;
+    out += `  ${S.meta.titulo || 'Examen'}\n`;
+    if (S.meta.materia) out += `  ${S.meta.materia}\n`;
+    if (S.meta.tiempo_minutos) out += `  Tiempo: ${S.meta.tiempo_minutos} min\n`;
+    out += `═══════════════════════════════════\n\n`;
+  }
+  qs.forEach((q, i) => {
+    out += `Q${i+1}. ${q.question || q.text}\n`;
+    if (opt.area && q.area) out += `   [${q.area}]\n`;
+    (q.options||[]).forEach((o, j) => {
+      const ltr = String.fromCharCode(65+j);
+      out += `   ${ltr}) ${o}\n`;
+    });
+    if (opt.answers) out += `   ✓ Respuesta: ${q.answer}\n`;
+    if (opt.expl && q.explanation) out += `   💡 ${q.explanation}\n`;
+    out += '\n';
+  });
+  return out;
+}
+
+function buildMdExport(qs, opt) {
+  let out = '';
+  if (opt.meta && S.meta) {
+    out += `# ${S.meta.titulo || 'Examen'}\n\n`;
+    if (S.meta.materia)        out += `**Materia:** ${S.meta.materia}  \n`;
+    if (S.meta.tiempo_minutos) out += `**Tiempo:** ${S.meta.tiempo_minutos} min  \n`;
+    if (S.meta.version)        out += `**Versión:** ${S.meta.version}  \n`;
+    out += '\n---\n\n';
+  }
+  qs.forEach((q, i) => {
+    out += `## Pregunta ${i+1}\n\n`;
+    if (opt.area && q.area) out += `> 📌 **Área:** ${q.area}\n\n`;
+    out += `${q.question || q.text}\n\n`;
+    (q.options||[]).forEach((o, j) => {
+      const ltr = String.fromCharCode(65+j);
+      const mark = (opt.answers && q.answer === ltr) ? ' ✅' : '';
+      out += `- **${ltr})** ${o}${mark}\n`;
+    });
+    if (opt.expl && q.explanation) {
+      out += `\n> 💡 **Explicación:** ${q.explanation}\n`;
+    }
+    out += '\n---\n\n';
+  });
+  return out;
+}
+
+function doExportQuestions() {
+  const qs  = S.questions || [];
+  if (!qs.length) return;
+  const opt = getExpOptions();
+  const ts  = new Date().toISOString().slice(0,10);
+  const base = (S.meta && S.meta.titulo ? S.meta.titulo.toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,30) : 'preguntas') + '-' + ts;
+
+  let content, filename, mime;
+
+  if (_expFormat === 'json') {
+    content  = JSON.stringify(buildJsonExport(qs, opt), null, 2);
+    filename = base + '.json';
+    mime     = 'application/json';
+  } else if (_expFormat === 'csv') {
+    content  = buildCsvExport(qs, opt);
+    filename = base + '.csv';
+    mime     = 'text/csv;charset=utf-8;';
+  } else if (_expFormat === 'txt') {
+    content  = buildTxtExport(qs, opt);
+    filename = base + '.txt';
+    mime     = 'text/plain';
+  } else if (_expFormat === 'md') {
+    content  = buildMdExport(qs, opt);
+    filename = base + '.md';
+    mime     = 'text/markdown';
+  }
+
+  const blob = new Blob([content], { type: mime });
+  const a    = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ══════════════════════════════════════════════
+// 📊 ESTADÍSTICAS
+// ══════════════════════════════════════════════
+function initStatsTab() {
+  const qs = S.questions || [];
+  const hasExam = qs.length > 0;
+  $('statsNoExam').style.display  = hasExam ? 'none' : '';
+  $('statsContent').style.display = hasExam ? 'flex' : 'none';
+  if (hasExam) { $('statsContent').style.flexDirection = 'column'; $('statsContent').style.gap = '16px'; }
+  if (!hasExam) return;
+
+  // Cards
+  const areas = [...new Set(qs.map(q => q.area).filter(Boolean))];
+  const withImg  = qs.filter(q => q.image || q.imageName).length;
+  const withExpl = qs.filter(q => q.explanation).length;
+  const avgOpts  = (qs.reduce((s,q) => s + (q.options||[]).length, 0) / qs.length).toFixed(1);
+
+  $('statsCards').innerHTML = [
+    ['🔢', qs.length, 'PREGUNTAS'],
+    ['🗂️', areas.length || '—', 'ÁREAS'],
+    ['🖼️', withImg, 'CON IMAGEN'],
+    ['💡', withExpl, 'CON EXPLICACIÓN'],
+    ['📝', avgOpts, 'OPC. PROMEDIO'],
+    ['⏱️', S.meta ? S.meta.tiempo_minutos + ' min' : '—', 'TIEMPO'],
+  ].map(([icon, num, label]) => `
+    <div class="stat-card">
+      <div style="font-size:24px">${icon}</div>
+      <div class="stat-card-num">${num}</div>
+      <div class="stat-card-label">${label}</div>
+    </div>`).join('');
+
+  // Area bars
+  const areaCounts = {};
+  qs.forEach(q => { const a = q.area || 'Sin área'; areaCounts[a] = (areaCounts[a]||0)+1; });
+  const sorted = Object.entries(areaCounts).sort((a,b) => b[1]-a[1]);
+  const max = sorted[0]?.[1] || 1;
+  $('statsAreaBars').innerHTML = sorted.map(([area, count]) => `
+    <div class="area-bar-row">
+      <div class="area-bar-label" title="${area}">${area}</div>
+      <div class="area-bar-track"><div class="area-bar-fill" style="width:${(count/max*100).toFixed(0)}%"></div></div>
+      <div class="area-bar-count">${count}</div>
+    </div>`).join('');
+
+  // Answer distribution
+  const ansCount = {};
+  qs.forEach(q => { const a = q.answer||'?'; ansCount[a] = (ansCount[a]||0)+1; });
+  $('statsAnswerDist').innerHTML = Object.entries(ansCount).sort().map(([ltr, cnt]) => `
+    <div style="background:#f8fafc;border:1px solid var(--b2);border-radius:12px;padding:12px 20px;text-align:center;min-width:80px">
+      <div style="font-size:22px;font-weight:900;color:var(--teal)">${ltr}</div>
+      <div style="font-size:20px;font-weight:700;color:var(--text)">${cnt}</div>
+      <div style="font-size:11px;color:var(--muted)">${(cnt/qs.length*100).toFixed(0)}%</div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════
+// ⚙️ CONFIGURACIÓN
+// ══════════════════════════════════════════════
+const CFG_KEY = 'exani_dash_cfg';
+
+function loadCfg() {
+  try { return JSON.parse(localStorage.getItem(CFG_KEY)) || {}; } catch { return {}; }
+}
+function saveCfg() {
+  const cfg = {
+    showNums:      $('cfgShowNums').checked,
+    animations:    $('cfgAnimations').checked,
+    timeAlerts:    $('cfgTimeAlerts').checked,
+    confirmFinish: $('cfgConfirmFinish').checked,
+    autoSave:      $('cfgAutoSave').checked,
+  };
+  localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
+}
+function initConfigTab() {
+  const cfg = loadCfg();
+  if ($('cfgShowNums'))      $('cfgShowNums').checked      = cfg.showNums      !== false;
+  if ($('cfgAnimations'))    $('cfgAnimations').checked    = cfg.animations    !== false;
+  if ($('cfgTimeAlerts'))    $('cfgTimeAlerts').checked    = cfg.timeAlerts    !== false;
+  if ($('cfgConfirmFinish')) $('cfgConfirmFinish').checked = cfg.confirmFinish !== false;
+  if ($('cfgAutoSave'))      $('cfgAutoSave').checked      = cfg.autoSave      !== false;
+
+  // User count
+  try {
+    const users = JSON.parse(localStorage.getItem('exani_users') || 'null');
+    if (users && typeof users === 'object') {
+      const count = Object.keys(users).length;
+      $('cfgUserCount').textContent = `${count} usuario(s) registrado(s)`;
+    } else {
+      $('cfgUserCount').textContent = 'Modo demo activo';
+    }
+  } catch { $('cfgUserCount').textContent = 'No disponible'; }
+}
+function showUserList() {
+  const el = $('cfgUserList');
+  if (el.style.display === 'flex') { el.style.display = 'none'; return; }
+  try {
+    const users = JSON.parse(localStorage.getItem('exani_users') || 'null');
+    if (users && typeof users === 'object') {
+      const entries = Object.keys(users);
+      el.innerHTML = entries.length
+        ? entries.map(u => `<div style="font-size:13px;font-family:'DM Mono',monospace;padding:4px 0;color:var(--text)">👤 ${u}</div>`).join('')
+        : `<div style="font-size:13px;color:var(--muted)">Sin usuarios registrados</div>`;
+    } else {
+      el.innerHTML = `<div style="font-size:13px;color:var(--muted)">Modo demo — sin base de usuarios local</div>`;
+    }
+  } catch {
+    el.innerHTML = `<div style="font-size:13px;color:var(--muted)">No disponible</div>`;
+  }
+  el.style.display = 'flex';
+  el.style.flexDirection = 'column';
+}
+function clearLoadedExam() {
+  if (!confirm('¿Eliminar el examen cargado de la memoria? No borra el archivo ZIP.')) return;
+  S.questions = []; S.meta = null; S.rawZip = null; S.fileName = null;
+  alert('Examen eliminado de la memoria. Recarga el Dashboard.');
+}
+function resetConfig() {
+  if (!confirm('¿Restaurar toda la configuración a sus valores predeterminados?')) return;
+  localStorage.removeItem(CFG_KEY);
+  initConfigTab();
+}
+
+// ══════════════════════════════════════════════
+// 📥 IMPORTAR PREGUNTAS
+// ══════════════════════════════════════════════
+function triggerImportQuestions() {
+  $('importQFile').value = '';
+  $('importQFile').click();
+}
+
+async function handleImportQuestions(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const ext  = file.name.split('.').pop().toLowerCase();
+  const text = await file.text();
+  let imported = [];
+
+  try {
+    if (ext === 'json') {
+      imported = parseImportJson(text);
+    } else if (ext === 'csv') {
+      imported = parseImportCsv(text);
+    } else if (ext === 'txt') {
+      imported = parseImportTxt(text);
+    } else {
+      showToast('❌ Formato no soportado. Usa JSON, CSV o TXT');
+      return;
+    }
+  } catch(e) {
+    showToast('❌ Error al leer el archivo: ' + e.message);
+    return;
+  }
+
+  if (!imported.length) {
+    showToast('⚠️ No se encontraron preguntas en el archivo');
+    return;
+  }
+
+  const prev = EB.questions.length;
+  EB.questions.push(...imported);
+  renderBuilderQList();
+  updateBuilderExportBtn();
+  showToast(`✅ ${imported.length} pregunta(s) importada(s) — Total: ${EB.questions.length}`);
+}
+
+function parseImportJson(text) {
+  const data = JSON.parse(text);
+  // Acepta array directo, { questions:[...] }, o { meta, questions:[...] }
+  const arr = Array.isArray(data) ? data
+    : Array.isArray(data.questions) ? data.questions
+    : null;
+  if (!arr) throw new Error('No se encontró un array de preguntas');
+  return arr.map(q => normalizeImportedQ(q)).filter(Boolean);
+}
+
+function parseImportCsv(text) {
+  const rows = text.trim().split('\n');
+  if (rows.length < 2) return [];
+  const header = parseCsvRow(rows[0]).map(h => h.toLowerCase().trim());
+  const qi = header.findIndex(h => h.includes('question') || h.includes('pregunta') || h.includes('text'));
+  if (qi === -1) throw new Error('No se encontró columna de pregunta (question/pregunta/text)');
+  const oaIdx = header.findIndex(h => h === 'option_a' || h === 'opcion_a' || h === 'a');
+  const obIdx = header.findIndex(h => h === 'option_b' || h === 'opcion_b' || h === 'b');
+  const ocIdx = header.findIndex(h => h === 'option_c' || h === 'opcion_c' || h === 'c');
+  const odIdx = header.findIndex(h => h === 'option_d' || h === 'opcion_d' || h === 'd');
+  const ansIdx  = header.findIndex(h => h.includes('answer') || h.includes('respuesta'));
+  const areaIdx = header.findIndex(h => h.includes('area') || h.includes('área'));
+  const explIdx = header.findIndex(h => h.includes('expl') || h.includes('explic'));
+
+  return rows.slice(1).map(row => {
+    const cols = parseCsvRow(row);
+    const question = cols[qi]?.trim();
+    if (!question) return null;
+    const opts = [oaIdx,obIdx,ocIdx,odIdx].map(i => i>=0 ? (cols[i]||'').trim() : '').filter(Boolean);
+    if (opts.length < 2) return null;
+    return {
+      text:        question,
+      options:     opts,
+      answerIdx:   ansIdx >= 0 ? Math.max(0, 'ABCD'.indexOf((cols[ansIdx]||'A').trim().toUpperCase())) : 0,
+      area:        areaIdx >= 0 ? (cols[areaIdx]||'').trim() : '',
+      explanation: explIdx >= 0 ? (cols[explIdx]||'').trim() : '',
+    };
+  }).filter(Boolean);
+}
+
+function parseCsvRow(row) {
+  const res = []; let cur = ''; let inQ = false;
+  for (let i = 0; i < row.length; i++) {
+    const c = row[i];
+    if (c === '"') { if (inQ && row[i+1] === '"') { cur += '"'; i++; } else { inQ = !inQ; } }
+    else if (c === ',' && !inQ) { res.push(cur); cur = ''; }
+    else cur += c;
+  }
+  res.push(cur);
+  return res;
+}
+
+function parseImportTxt(text) {
+  // Intenta detectar patrón: "1. Pregunta\nA) ...\nB) ...\nRespuesta: A"
+  const blocks = text.trim().split(/\n\s*\n/);
+  const results = [];
+  for (const block of blocks) {
+    const lines = block.trim().split('\n').map(l => l.trim()).filter(Boolean);
+    if (lines.length < 3) continue;
+    // Primera línea = pregunta (quitar número inicial si lo hay)
+    const questionLine = lines[0].replace(/^[\d]+[\.\)]\s*/, '').trim();
+    if (!questionLine) continue;
+    const opts = [];
+    let answerIdx = 0;
+    let explanation = '';
+    for (let i = 1; i < lines.length; i++) {
+      const l = lines[i];
+      const optMatch = l.match(/^([A-Da-d])[\.\)]\s+(.+)/);
+      if (optMatch) { opts.push(optMatch[2].trim()); continue; }
+      const ansMatch = l.match(/^(?:respuesta|answer|✓)[:\s]+([A-Da-d])/i);
+      if (ansMatch) { answerIdx = 'abcd'.indexOf(ansMatch[1].toLowerCase()); continue; }
+      const explMatch = l.match(/^(?:💡|explicación|explanation)[:\s]+(.+)/i);
+      if (explMatch) { explanation = explMatch[1].trim(); }
+    }
+    if (opts.length >= 2) {
+      results.push({ text: questionLine, options: opts, answerIdx: Math.max(0, answerIdx), area: '', explanation });
+    }
+  }
+  return results;
+}
+
+function normalizeImportedQ(q) {
+  const text = q.question || q.text || q.pregunta;
+  if (!text) return null;
+  const options = q.options || q.opciones || [];
+  if (options.length < 2) return null;
+  const answer  = (q.answer || q.respuesta || 'A').toString().trim().toUpperCase();
+  const answerIdx = Math.max(0, 'ABCD'.indexOf(answer));
+  return {
+    text,
+    options,
+    answerIdx,
+    area:        q.area || '',
+    explanation: q.explanation || q.explicacion || '',
+    imageName:   q.image || q.imageName || null,
+    imageDataUrl:null,
+  };
+}
+
+function showToast(msg) {
+  const old = document.querySelector('.import-result-toast');
+  if (old) old.remove();
+  const el = document.createElement('div');
+  el.className = 'import-result-toast';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => { el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(()=>el.remove(), 300); }, 3000);
+}
+
+
 function renderExamBuilder() {
   updateTimePreview();
   renderBuilderQList();
