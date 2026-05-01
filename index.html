@@ -1523,6 +1523,10 @@ function fwSelectAnswer(letter) {
 
 // ── Abrir ventana flotante ──
 function openFloatWin(mode) {
+  // Si la ventana ya está abierta en otro modo, guardar el dibujo actual antes de cambiar
+  if ($('floatWinOv').classList.contains('show') && fw.mode !== mode) {
+    fwSaveSnapshot();
+  }
   fw.mode = mode;
   fw.zoom = 1;
   fwRenderPanel();
@@ -1533,8 +1537,10 @@ function openFloatWin(mode) {
     fwApplyZoom();
     $('fwScrollArea').scrollTop = 0;
     initCanvas($('fwCanvas'));
+    // Cargar dibujo del modo actual (limpia el canvas antes internamente)
     fwLoadSnapshot(() => {
       const key = fwKey();
+      if (fw.histIdx[key] == null) fw.histIdx[key] = -1;
       if (!fw.history[key] || fw.history[key].length === 0) fwPushHistory();
       fwUpdateHistoryBtns();
     });
@@ -1556,8 +1562,9 @@ function fwPushHistory() {
   const key    = fwKey();
   const canvas = $('fwCanvas');
   const dataURL = canvas.toDataURL();
-  if (!fw.history[key])  fw.history[key]  = [];
-  if (!fw.histIdx[key])  fw.histIdx[key]  = -1;
+  if (!fw.history[key]) fw.history[key] = [];
+  // Bug fix: no usar !fw.histIdx porque 0 es falsy — usar ??
+  if (fw.histIdx[key] == null) fw.histIdx[key] = -1;
   // Cortar futuros si habíamos deshecho
   fw.history[key] = fw.history[key].slice(0, fw.histIdx[key] + 1);
   fw.history[key].push(dataURL);
@@ -1608,11 +1615,12 @@ function fwSaveSnapshot() {
   fw.snapshots[S.current][fw.mode] = canvas.toDataURL();
 }
 
-// ── Restaurar snapshot guardado ──
+// ── Restaurar snapshot guardado (siempre limpia primero) ──
 function fwLoadSnapshot(callback) {
   const saved  = fw.snapshots[S.current]?.[fw.mode];
   const canvas = $('fwCanvas');
   const ctx    = canvas.getContext('2d');
+  // Siempre limpiar — evita que el dibujo del modo anterior se filtre
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   if (saved) {
     const img = new Image();
@@ -1706,11 +1714,19 @@ function initCanvas(canvas) {
   }, sig);
 
   canvas.addEventListener('mouseup', () => {
-    if (fw.drawing) { fw.drawing = false; fwPushHistory(); }
+    if (fw.drawing) {
+      fw.drawing = false;
+      fwClearMarker();
+      fwPushHistory();
+    }
   }, sig);
 
   canvas.addEventListener('mouseleave', () => {
-    if (fw.drawing) { fw.drawing = false; fwPushHistory(); }
+    if (fw.drawing) {
+      fw.drawing = false;
+      fwClearMarker();
+      fwPushHistory();
+    }
   }, sig);
 
   canvas.addEventListener('touchstart', e => {
@@ -1734,7 +1750,7 @@ function initCanvas(canvas) {
   }, { ...sig, passive: false });
 
   canvas.addEventListener('touchend', () => {
-    if (fw.drawing) { fw.drawing = false; fwPushHistory(); }
+    if (fw.drawing) { fw.drawing = false; fwClearMarker(); fwPushHistory(); }
   }, sig);
 }
 
@@ -1753,13 +1769,20 @@ function fwTouchPos(e, canvas) {
   };
 }
 
-// drawSegment: lápiz=beginPath cada segmento, marcador=path continuo, borrador=destination-out
+function fwClearMarker() {
+  if (fw.markerCanvas) {
+    const mctx = fw.markerCanvas.getContext('2d');
+    mctx.clearRect(0, 0, fw.markerCanvas.width, fw.markerCanvas.height);
+  }
+}
+
+// drawSegment:
 function drawSegment(ctx, p) {
   ctx.lineCap = 'round'; ctx.lineJoin = 'round';
 
   if (fw.tool === 'eraser') {
     ctx.globalCompositeOperation = 'destination-out';
-    ctx.lineWidth = fw.size * 5;
+    ctx.lineWidth   = fw.size * 5;
     ctx.strokeStyle = 'rgba(0,0,0,1)';
     ctx.globalAlpha = 1;
     ctx.beginPath();
@@ -1769,23 +1792,35 @@ function drawSegment(ctx, p) {
     ctx.globalCompositeOperation = 'source-over';
 
   } else if (fw.tool === 'marker') {
-    // Path continuo abierto desde mousedown — NO llamamos beginPath aquí
-    // Así el trazo es una línea suave semitransparente, no puntos acumulados
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.lineWidth = fw.size * 5;
-    ctx.strokeStyle = fw.color;
+    // Técnica offscreen: acumular el trazo en un canvas temporal opaco,
+    // luego pintarlo sobre el principal con opacity. Así no se acumulan manchas.
+    if (!fw.markerCanvas) {
+      fw.markerCanvas = document.createElement('canvas');
+    }
+    const mc = fw.markerCanvas;
+    if (mc.width !== ctx.canvas.width || mc.height !== ctx.canvas.height) {
+      mc.width  = ctx.canvas.width;
+      mc.height = ctx.canvas.height;
+    }
+    const mctx = mc.getContext('2d');
+    mctx.lineCap = 'round'; mctx.lineJoin = 'round';
+    mctx.lineWidth   = fw.size * 5;
+    mctx.strokeStyle = fw.color;
+    mctx.globalAlpha = 1;
+    mctx.beginPath();
+    mctx.moveTo(fw.lastX, fw.lastY);
+    mctx.lineTo(p.x, p.y);
+    mctx.stroke();
+    // Pintar el canvas temporal sobre el principal con opacidad reducida
     ctx.globalAlpha = 0.35;
-    ctx.lineTo(p.x, p.y);
-    ctx.stroke();
-    // Mover el "cursor" sin cerrar el path
-    ctx.beginPath();
-    ctx.moveTo(p.x, p.y);
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.drawImage(mc, 0, 0);
     ctx.globalAlpha = 1;
 
   } else {
-    // Lápiz — opaco, beginPath en cada segmento
+    // Lápiz — opaco normal
     ctx.globalCompositeOperation = 'source-over';
-    ctx.lineWidth = fw.size;
+    ctx.lineWidth   = fw.size;
     ctx.strokeStyle = fw.color;
     ctx.globalAlpha = 1;
     ctx.beginPath();
