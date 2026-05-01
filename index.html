@@ -60,6 +60,163 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .btn-sm:hover{border-color:var(--teal);color:var(--teal)}
 .btn-danger{border-color:var(--red)!important;color:var(--red)!important}
 .btn-danger:hover{background:rgba(220,38,38,.06)!important}
+.btn-admin{border-color:var(--teal)!important;color:var(--teal)!important;font-weight:600;gap:4px}
+.btn-admin:hover{background:rgba(13,148,136,.08)!important}
+.btn-secondary{border-color:var(--b2);color:var(--muted)}
+.btn-secondary:hover{border-color:var(--teal);color:var(--teal)}
+
+/* ── ADMIN PANEL ── */
+#adminScreen{background:var(--dark)}
+.admin-badge{background:var(--teal);color:#fff;font-size:9px;letter-spacing:2px;
+  padding:2px 8px;border-radius:4px;font-weight:700;text-transform:uppercase;margin-left:8px;vertical-align:middle}
+.admin-body{flex:1;padding:32px 40px;display:flex;flex-direction:column;gap:24px;overflow-y:auto;max-height:calc(100vh - 60px)}
+.admin-header-row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.admin-title{font-size:22px;font-weight:800;color:var(--text)}
+.admin-sub{color:var(--muted);font-size:14px;margin-top:4px}
+.admin-edit-count{background:var(--teal);color:#fff;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700}
+.btn-download-zip{background:linear-gradient(135deg,var(--teal),#065f46);color:#fff;border:none;
+  border-radius:10px;padding:11px 22px;font-size:14px;font-weight:700;cursor:pointer;
+  transition:all .2s;opacity:.4;pointer-events:none}
+.btn-download-zip.active{opacity:1;pointer-events:auto}
+.btn-download-zip.active:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(13,148,136,.3)}
+.admin-empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;gap:12px;padding:60px 0}
+.admin-empty-icon{font-size:52px}
+.admin-empty-title{font-size:20px;font-weight:800}
+.admin-empty-sub{color:var(--muted);font-size:14px;max-width:420px;line-height:1.6}
+.admin-q-list{display:flex;flex-direction:column;gap:12px;padding-bottom:32px}
+.admin-q-card{background:#fff;border:1px solid var(--b2);border-radius:14px;padding:18px 20px;
+  display:flex;align-items:flex-start;gap:16px;transition:border-color .2s}
+.admin-q-card:hover{border-color:var(--teal)}
+.admin-q-card.has-edit{border-color:var(--teal);background:rgba(13,148,136,.02)}
+.admin-q-num{background:var(--card);border-radius:8px;padding:8px 12px;font-size:13px;
+  font-weight:800;color:var(--teal);min-width:44px;text-align:center;font-family:'DM Mono',monospace;
+  border:1px solid rgba(13,148,136,.2);flex-shrink:0}
+.admin-q-body{flex:1;display:flex;flex-direction:column;gap:8px;min-width:0}
+.admin-q-text{font-size:14px;color:var(--text);font-weight:500;line-height:1.5;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.admin-q-area{font-size:11px;color:var(--muted);letter-spacing:.5px;font-family:'DM Mono',monospace}
+.admin-q-img-row{display:flex;align-items:center;gap:10px;margin-top:4px;flex-wrap:wrap}
+.admin-img-thumb{width:64px;height:48px;object-fit:cover;border-radius:6px;border:1px solid var(--b2)}
+.admin-img-label{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace}
+.admin-img-label.new{color:var(--teal);font-weight:700}
+.admin-img-remove{background:none;border:1px solid var(--red);color:var(--red);border-radius:6px;
+  padding:3px 10px;font-size:12px;cursor:pointer;transition:all .15s}
+.admin-img-remove:hover{background:rgba(220,38,38,.06)}
+.btn-assign-img{background:none;border:1.5px dashed var(--teal);color:var(--teal);border-radius:8px;
+  padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;flex-shrink:0}
+.btn-assign-img:hover{background:rgba(13,148,136,.07)}
+.btn-assign-img.has-img{border-style:solid;background:rgba(13,148,136,.05)}
+@media(max-width:640px){
+  .admin-body{padding:16px}
+  .admin-header-row{flex-direction:column}
+  .admin-q-card{flex-wrap:wrap}
+}
+
+/* ── ADMIN TABS ── */
+.admin-tabs-bar{background:#fff;border-bottom:1px solid var(--b2);display:flex;padding:0 24px;flex-shrink:0}
+.admin-tab{background:none;border:none;border-bottom:3px solid transparent;padding:14px 20px;
+  font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;font-family:'Sora',sans-serif}
+.admin-tab:hover{color:var(--teal)}
+.admin-tab.active{color:var(--teal);border-bottom-color:var(--teal)}
+#adminBodyEdit,#adminBodyCreate{max-height:calc(100vh - 109px)}
+
+/* ── EXAM BUILDER ── */
+.builder-section{background:#fff;border:1px solid var(--b2);border-radius:16px;padding:24px 28px;display:flex;flex-direction:column;gap:16px}
+.builder-section-title{font-size:15px;font-weight:800;color:var(--text);letter-spacing:.3px}
+.builder-section-header{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.builder-form{display:flex;flex-direction:column;gap:14px}
+.builder-row{display:flex;gap:14px;flex-wrap:wrap}
+.builder-field{display:flex;flex-direction:column;gap:6px;flex:1;min-width:120px}
+.builder-label{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase}
+.builder-input{border:1px solid var(--b2);border-radius:8px;padding:10px 14px;font-size:14px;
+  font-family:'Sora',sans-serif;color:var(--text);outline:none;transition:border-color .15s;background:#fff}
+.builder-input:focus{border-color:var(--teal)}
+.builder-time-preview{background:var(--card);border-radius:8px;padding:10px 14px;font-size:13px;
+  color:var(--teal);font-weight:700;font-family:'DM Mono',monospace;white-space:nowrap}
+.builder-q-badge{background:var(--teal);color:#fff;border-radius:20px;padding:2px 10px;font-size:12px;
+  font-weight:700;margin-left:8px}
+.btn-add-question{background:var(--teal);color:#fff;border:none;border-radius:10px;padding:10px 20px;
+  font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Sora',sans-serif}
+.btn-add-question:hover{background:#0f766e;transform:translateY(-1px)}
+.builder-q-list{display:flex;flex-direction:column;gap:8px}
+.builder-empty{color:var(--muted);font-size:14px;text-align:center;padding:32px 0}
+.builder-q-item{background:var(--card);border:1px solid var(--b2);border-radius:10px;
+  padding:14px 16px;display:flex;align-items:center;gap:12px;transition:border-color .15s}
+.builder-q-item:hover{border-color:var(--teal)}
+.builder-q-item-num{background:#fff;border:1px solid rgba(13,148,136,.2);color:var(--teal);
+  border-radius:6px;padding:4px 10px;font-size:12px;font-weight:800;font-family:'DM Mono',monospace;flex-shrink:0}
+.builder-q-item-body{flex:1;min-width:0}
+.builder-q-item-text{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.builder-q-item-meta{font-size:11px;color:var(--muted);margin-top:2px;font-family:'DM Mono',monospace}
+.builder-q-item-actions{display:flex;gap:6px;flex-shrink:0}
+.builder-q-btn{background:none;border:1px solid var(--b2);border-radius:6px;padding:5px 10px;
+  font-size:12px;cursor:pointer;transition:all .15s;color:var(--muted)}
+.builder-q-btn:hover{border-color:var(--teal);color:var(--teal)}
+.builder-q-btn.danger:hover{border-color:var(--red);color:var(--red)}
+.builder-q-btn.move{padding:5px 8px;font-size:14px}
+.builder-export-bar{display:flex;justify-content:space-between;align-items:center;gap:16px;
+  background:#fff;border:1px solid var(--b2);border-radius:16px;padding:20px 28px;flex-wrap:wrap}
+.builder-export-info{font-size:13px;color:var(--muted)}
+.btn-export-new{background:linear-gradient(135deg,var(--teal),#065f46);color:#fff;border:none;
+  border-radius:10px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;
+  transition:all .2s;font-family:'Sora',sans-serif;opacity:.4;pointer-events:none}
+.btn-export-new.ready{opacity:1;pointer-events:auto}
+.btn-export-new.ready:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(13,148,136,.3)}
+
+/* ── QUESTION EDITOR MODAL ── */
+.qed-overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(4px);
+  z-index:9999;display:none;align-items:center;justify-content:center;padding:20px}
+.qed-overlay.show{display:flex}
+.qed-modal{background:#fff;border-radius:20px;width:100%;max-width:640px;max-height:90vh;
+  display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,.2)}
+.qed-header{padding:20px 24px;border-bottom:1px solid var(--b2);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.qed-title{font-size:16px;font-weight:800}
+.qed-close{background:none;border:none;font-size:18px;color:var(--muted);cursor:pointer;padding:4px 8px;
+  border-radius:6px;transition:all .15s}
+.qed-close:hover{background:var(--card);color:var(--text)}
+.qed-body{padding:20px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:16px}
+.qed-field{display:flex;flex-direction:column;gap:6px}
+.qed-label{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase}
+.qed-textarea,.qed-input{border:1px solid var(--b2);border-radius:8px;padding:10px 14px;
+  font-size:14px;font-family:'Sora',sans-serif;color:var(--text);outline:none;transition:border-color .15s;
+  resize:vertical;background:#fff}
+.qed-textarea:focus,.qed-input:focus{border-color:var(--teal)}
+.qed-options-list{display:flex;flex-direction:column;gap:8px;margin-bottom:8px}
+.qed-option-row{display:flex;align-items:center;gap:8px}
+.qed-option-letter{background:var(--card);border:1px solid var(--b2);border-radius:6px;
+  width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:13px;font-family:'DM Mono',monospace;flex-shrink:0;color:var(--muted)}
+.qed-option-letter.correct{background:rgba(13,148,136,.1);border-color:var(--teal);color:var(--teal)}
+.qed-option-input{flex:1;border:1px solid var(--b2);border-radius:8px;padding:8px 12px;
+  font-size:13px;font-family:'Sora',sans-serif;color:var(--text);outline:none;transition:border-color .15s}
+.qed-option-input:focus{border-color:var(--teal)}
+.btn-correct{background:none;border:1px solid var(--b2);border-radius:6px;padding:5px 8px;
+  font-size:13px;cursor:pointer;transition:all .15s;color:var(--muted);flex-shrink:0}
+.btn-correct:hover{border-color:var(--teal);color:var(--teal)}
+.btn-correct.active{background:rgba(13,148,136,.1);border-color:var(--teal);color:var(--teal)}
+.btn-rm-opt{background:none;border:1px solid transparent;border-radius:6px;padding:5px 7px;
+  font-size:13px;cursor:pointer;transition:all .15s;color:var(--muted);flex-shrink:0}
+.btn-rm-opt:hover{border-color:var(--red);color:var(--red)}
+.btn-add-opt{background:none;border:1.5px dashed var(--b2);color:var(--muted);border-radius:8px;
+  padding:8px 16px;font-size:13px;cursor:pointer;transition:all .15s;font-family:'Sora',sans-serif}
+.btn-add-opt:hover{border-color:var(--teal);color:var(--teal)}
+.qed-img-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.qed-footer{padding:16px 24px;border-top:1px solid var(--b2);display:flex;justify-content:flex-end;
+  gap:10px;flex-shrink:0}
+.qed-btn-cancel{background:none;border:1px solid var(--b2);border-radius:8px;padding:10px 20px;
+  font-size:14px;cursor:pointer;color:var(--muted);font-family:'Sora',sans-serif;transition:all .15s}
+.qed-btn-cancel:hover{border-color:var(--teal);color:var(--teal)}
+.qed-btn-save{background:linear-gradient(135deg,var(--teal),#065f46);color:#fff;border:none;
+  border-radius:8px;padding:10px 22px;font-size:14px;font-weight:700;cursor:pointer;
+  font-family:'Sora',sans-serif;transition:all .2s}
+.qed-btn-save:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(13,148,136,.3)}
+@media(max-width:640px){
+  .builder-row{flex-direction:column}
+  .qed-modal{max-height:95vh}
+  .admin-tabs-bar{padding:0 12px}
+  .admin-tab{padding:12px 14px;font-size:13px}
+}
 .dash-body{flex:1;display:flex;flex-direction:column;align-items:center;
   justify-content:center;padding:48px 24px;gap:28px}
 .dash-title{text-align:center}
@@ -668,6 +825,7 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
     <div class="logo-sm"><span style="color:var(--teal)">EXANI</span><span style="color:var(--green)">-DASH</span></div>
     <div style="display:flex;gap:10px;align-items:center">
       <div class="user-chip">👤 <span id="userLabel"></span></div>
+      <button id="btnAdminPanel" class="btn-sm btn-admin" style="display:none" onclick="openAdmin()">⚙️ Admin</button>
       <button class="btn-sm btn-danger" onclick="doLogout()">Salir</button>
     </div>
   </div>
@@ -755,6 +913,156 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
   </div>
 </div>
 
+<!-- ADMIN PANEL -->
+<div id="adminScreen" class="screen" style="flex-direction:column">
+  <div class="topbar">
+    <div class="logo-sm"><span style="color:var(--teal)">EXANI</span><span style="color:var(--green)">-DASH</span> <span class="admin-badge">ADMIN</span></div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <div class="user-chip">⚙️ <span id="adminUserLabel"></span></div>
+      <button class="btn-sm btn-secondary" onclick="closeAdmin()">← Dashboard</button>
+      <button class="btn-sm btn-danger" onclick="doLogout()">Salir</button>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="admin-tabs-bar">
+    <button class="admin-tab active" id="tabEdit" onclick="switchAdminTab('edit')">📋 Editar examen cargado</button>
+    <button class="admin-tab" id="tabCreate" onclick="switchAdminTab('create')">✏️ Crear nuevo examen</button>
+  </div>
+
+  <!-- ── TAB: EDITAR ── -->
+  <div class="admin-body" id="adminBodyEdit">
+    <div class="admin-header-row">
+      <div>
+        <div class="admin-title">Editar examen cargado</div>
+        <div class="admin-sub" id="adminSubtitle">Carga un examen en el Dashboard para editar sus preguntas</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <div class="admin-edit-count" id="adminEditCount" style="display:none">0 ediciones</div>
+        <button class="btn-download-zip" id="btnDownloadZip" onclick="downloadModifiedZip()" disabled>
+          💾 Descargar ZIP con cambios
+        </button>
+      </div>
+    </div>
+
+    <div id="adminNoExam" class="admin-empty-state">
+      <div class="admin-empty-icon">📂</div>
+      <div class="admin-empty-title">No hay examen cargado</div>
+      <div class="admin-empty-sub">Ve al Dashboard e inicia un examen primero. Una vez cargado, regresa aquí para editar las imágenes de cada pregunta.</div>
+      <button class="btn-sm btn-secondary" onclick="closeAdmin()" style="margin-top:16px">← Ir al Dashboard</button>
+    </div>
+
+    <div id="adminQList" class="admin-q-list" style="display:none"></div>
+  </div>
+
+  <!-- ── TAB: CREAR ── -->
+  <div class="admin-body" id="adminBodyCreate" style="display:none">
+
+    <!-- Metadata -->
+    <div class="builder-section">
+      <div class="builder-section-title">📝 Información del examen</div>
+      <div class="builder-form">
+        <div class="builder-row">
+          <div class="builder-field" style="flex:2">
+            <label class="builder-label">Título *</label>
+            <input id="bldTitulo" class="builder-input" placeholder="ej. Simulacro EXANI-II Premedicina 2027" oninput="updateBuilderExportBtn()"/>
+          </div>
+          <div class="builder-field" style="flex:1">
+            <label class="builder-label">Versión</label>
+            <input id="bldVersion" class="builder-input" placeholder="ej. 2027-A"/>
+          </div>
+        </div>
+        <div class="builder-row">
+          <div class="builder-field" style="flex:2">
+            <label class="builder-label">Materia / Subtítulo</label>
+            <input id="bldMateria" class="builder-input" placeholder="ej. Ciencias de la Salud y Biología"/>
+          </div>
+          <div class="builder-field" style="flex:1">
+            <label class="builder-label">Área / Etiqueta</label>
+            <input id="bldAreaTag" class="builder-input" placeholder="ej. Premedicina"/>
+          </div>
+        </div>
+        <div class="builder-row">
+          <div class="builder-field">
+            <label class="builder-label">⏱ Tiempo (horas)</label>
+            <input id="bldHoras" class="builder-input" type="number" min="0" max="12" value="4" style="width:100px" oninput="updateTimePreview()"/>
+          </div>
+          <div class="builder-field">
+            <label class="builder-label">⏱ Tiempo (minutos)</label>
+            <input id="bldMins" class="builder-input" type="number" min="0" max="59" value="30" style="width:100px" oninput="updateTimePreview()"/>
+          </div>
+          <div class="builder-field" style="flex:1">
+            <label class="builder-label">&nbsp;</label>
+            <div class="builder-time-preview" id="bldTimePreview">= 270 min (4:30 h)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Questions -->
+    <div class="builder-section">
+      <div class="builder-section-header">
+        <div class="builder-section-title">❓ Preguntas <span class="builder-q-badge" id="bldQCount">0</span></div>
+        <button class="btn-add-question" onclick="openQuestionEditor(-1)">+ Agregar pregunta</button>
+      </div>
+      <div id="bldQList" class="builder-q-list">
+        <div class="builder-empty" id="bldEmpty">No hay preguntas todavía. ¡Agrega la primera con el botón de arriba!</div>
+      </div>
+    </div>
+
+    <!-- Export bar -->
+    <div class="builder-export-bar">
+      <div class="builder-export-info" id="bldExportInfo">Necesitas al menos un título y una pregunta</div>
+      <button class="btn-export-new" id="btnExportNew" onclick="exportNewExamZip()">
+        💾 Exportar ZIP del examen
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- QUESTION EDITOR MODAL -->
+<div class="qed-overlay" id="qedOverlay" onclick="closeQEditorOnBg(event)">
+  <div class="qed-modal" id="qedModal">
+    <div class="qed-header">
+      <div class="qed-title" id="qedTitle">Nueva pregunta</div>
+      <button class="qed-close" onclick="$('qedOverlay').classList.remove('show')">✕</button>
+    </div>
+    <div class="qed-body">
+      <div class="qed-field">
+        <label class="qed-label">Texto de la pregunta *</label>
+        <textarea id="qedText" class="qed-textarea" placeholder="Escribe la pregunta aquí..." rows="3"></textarea>
+      </div>
+      <div class="qed-field">
+        <label class="qed-label">Área / Tema</label>
+        <input id="qedArea" class="qed-input" placeholder="ej. Fisiología, Anatomía…"/>
+      </div>
+      <div class="qed-field">
+        <label class="qed-label">Opciones de respuesta * <span style="color:var(--muted);font-weight:400;font-size:12px">(selecciona la correcta con ✅)</span></label>
+        <div id="qedOptions" class="qed-options-list"></div>
+        <button class="btn-add-opt" id="btnAddOpt" onclick="addOptionField()">+ Agregar opción</button>
+      </div>
+      <div class="qed-field">
+        <label class="qed-label">Explicación / Retroalimentación</label>
+        <textarea id="qedExpl" class="qed-textarea" placeholder="Explica por qué la respuesta es correcta..." rows="3"></textarea>
+      </div>
+      <div class="qed-field">
+        <label class="qed-label">Imagen (opcional)</label>
+        <div class="qed-img-row">
+          <button class="btn-assign-img" id="btnQedImg" onclick="pickQEditorImage()">📷 Agregar imagen</button>
+          <span id="qedImgLabel" class="admin-img-label"></span>
+          <button id="btnQedImgRemove" class="admin-img-remove" style="display:none" onclick="removeQEditorImage()">✕ Quitar</button>
+        </div>
+        <img id="qedImgPreview" style="display:none;max-width:260px;border-radius:8px;margin-top:10px;border:1px solid var(--b2)" alt=""/>
+      </div>
+    </div>
+    <div class="qed-footer">
+      <button class="qed-btn-cancel" onclick="$('qedOverlay').classList.remove('show')">Cancelar</button>
+      <button class="qed-btn-save" onclick="saveQuestion()">✅ Guardar pregunta</button>
+    </div>
+  </div>
+</div>
+
 <!-- EXAM -->
 <div id="examScreen" class="screen">
   <div class="exam-header">
@@ -835,6 +1143,7 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
     </div>
     <div class="review-grid" id="reviewGrid"></div>
     <button class="btn-exit" onclick="exitToLogin()">Volver al inicio</button>
+    <button class="btn-exit" id="btnResultsAdmin" style="display:none;background:var(--teal);color:#fff;border:none;margin-top:8px" onclick="openAdmin()">⚙️ Editar imágenes del examen</button>
   </div>
 </div>
 
@@ -958,10 +1267,11 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
 // ══════════════════════════════════════════
 //  AUTH
 // ══════════════════════════════════════════
+// Usuarios con contraseña real — solo estos tienen acceso verificado
 const USERS = {
-  Admin456:    'Administrador',
-  Filtrado777: 'Tutor / Revisor',
-  Aspirante:   'Aspirante',
+  Acselito:    { pass: 'donni25',   role: 'Administrador' },
+  Admin456:    { pass: 'Admin456',  role: 'Administrador' },
+  Filtrado777: { pass: 'Filt777',   role: 'Tutor / Revisor' },
 };
 const TOTAL_SECS = 4*3600+30*60;
 const NAV_WIN = 10;
@@ -971,15 +1281,19 @@ const NAV_WIN = 10;
 // ══════════════════════════════════════════
 let S = {
   user: null,
-  questions: [],   // parsed from JSON
-  images: {},      // { 'pregunta32.jpg': 'data:image/...base64...' }
-  answers: {},     // { index: 'A'|'B'|'C'|'D' }
+  role: null,          // 'Administrador' | 'Tutor / Revisor' | 'Aspirante'
+  questions: [],
+  images: {},          // { 'pregunta32.jpg': blobURL }
+  answers: {},
   current: 0,
   navStart: 0,
   timerSecs: TOTAL_SECS,
   timerInt: null,
   running: false,
   paused: false,
+  rawZip: null,        // JSZip instance — se guarda para poder re-exportar
+  currentExamMeta: null, // meta del examen cargado
+  adminEdits: {},      // { questionIndex: { imageName, dataUrl } }
 };
 
 // ══════════════════════════════════════════
@@ -1023,12 +1337,27 @@ function doLogin() {
   const u = $('inpUser').value.trim();
   const p = $('inpPass').value;
   const card = document.querySelector('.login-card');
-  // Acepta cualquier combinación con mínimo 3 caracteres en usuario y contraseña
-  if (u.length >= 3 && p.length >= 3) {
+
+  // ── Verificar credenciales ──
+  let role = null;
+  if (USERS[u]) {
+    // Usuario nombrado: requiere contraseña exacta
+    if (USERS[u].pass === p) {
+      role = USERS[u].role;
+    }
+  } else if (u.length >= 3 && p.length >= 3) {
+    // Usuario genérico (Aspirante)
+    role = 'Aspirante';
+  }
+
+  if (role) {
     S.user = u;
-    const role = USERS[u] || 'Aspirante';
+    S.role = role;
     $('userLabel').innerHTML = `${u} · <span>${role}</span>`;
     $('loginErr').style.display = 'none';
+    // Mostrar botón admin solo para administradores
+    const adminBtn = $('btnAdminPanel');
+    if (adminBtn) adminBtn.style.display = role === 'Administrador' ? 'flex' : 'none';
     show('dashScreen');
   } else {
     $('loginErr').style.display = 'block';
@@ -1039,8 +1368,9 @@ function doLogin() {
 
 function doLogout() {
   stopTimer();
-  S = { user:null, questions:[], images:{}, answers:{}, current:0, navStart:0,
-        timerSecs:TOTAL_SECS, timerInt:null, running:false, paused:false };
+  S = { user:null, role:null, questions:[], images:{}, answers:{}, current:0, navStart:0,
+        timerSecs:TOTAL_SECS, timerInt:null, running:false, paused:false,
+        rawZip:null, currentExamMeta:null, adminEdits:{} };
   $('inpUser').value = ''; $('inpPass').value = '';
   resetZip();
   show('loginScreen');
@@ -1071,6 +1401,8 @@ async function handleFile(file) {
     if (!data.questions?.length) throw new Error('El JSON no contiene preguntas.');
 
     S.questions = data.questions;
+    S.currentExamMeta = data.meta || {};
+    S.rawZip = zip;  // guardar para re-exportar desde admin
 
     // ── 2. Load all images from images/ folder ──
     const imgFiles = Object.values(zip.files).filter(f =>
@@ -1373,9 +1705,20 @@ function showResults() {
   $('reviewGrid').innerHTML = html;
 
   show('resultsScreen');
+  // Mostrar botón admin en resultados si corresponde
+  const adminResBtn = $('btnResultsAdmin');
+  if (adminResBtn) adminResBtn.style.display = S.role === 'Administrador' ? '' : 'none';
 }
 
-function exitToLogin() { stopTimer(); show('loginScreen'); }
+function exitToLogin() {
+  stopTimer();
+  if (S.user) {
+    // Mantener sesión — volver al dashboard
+    show('dashScreen');
+  } else {
+    show('loginScreen');
+  }
+}
 
 // ══════════════════════════════════════════
 //  EXPLANATION MODAL
@@ -1924,6 +2267,641 @@ function saveCanvas() {
   a.download = `pizarron-q${S.current+1}.png`;
   a.href = out.toDataURL('image/png');
   a.click();
+}
+
+// ══════════════════════════════════════════
+//  ADMIN PANEL
+// ══════════════════════════════════════════
+
+function openAdmin() {
+  if (S.role !== 'Administrador') return;
+  $('adminUserLabel').textContent = `${S.user} · Administrador`;
+  renderAdminPanel();
+  show('adminScreen');
+}
+
+function closeAdmin() {
+  show('dashScreen');
+}
+
+function renderAdminPanel() {
+  const hasExam = S.questions.length > 0;
+  $('adminNoExam').style.display  = hasExam ? 'none'  : 'flex';
+  $('adminQList').style.display   = hasExam ? 'flex'  : 'none';
+
+  if (!hasExam) {
+    $('adminSubtitle').textContent = 'Carga un examen en el Dashboard primero';
+    updateAdminEditCount();
+    return;
+  }
+
+  const meta = S.currentExamMeta || {};
+  $('adminSubtitle').textContent =
+    `${meta.titulo || 'Examen'} · ${S.questions.length} preguntas`;
+
+  const list = $('adminQList');
+  list.innerHTML = '';
+
+  S.questions.forEach((q, idx) => {
+    const edit    = S.adminEdits[idx];
+    const origImg = q.image ? S.images[q.image] : null;
+    const newImg  = edit ? edit.dataUrl : null;
+
+    const card = document.createElement('div');
+    card.className = 'admin-q-card' + (edit ? ' has-edit' : '');
+    card.id = `adminCard_${idx}`;
+
+    // Número
+    const num = document.createElement('div');
+    num.className = 'admin-q-num';
+    num.textContent = `Q${q.id || (idx + 1)}`;
+
+    // Cuerpo
+    const body = document.createElement('div');
+    body.className = 'admin-q-body';
+
+    const area = document.createElement('div');
+    area.className = 'admin-q-area';
+    area.textContent = q.area || 'General';
+
+    const text = document.createElement('div');
+    text.className = 'admin-q-text';
+    text.textContent = q.question;
+
+    // Fila de imágenes
+    const imgRow = document.createElement('div');
+    imgRow.className = 'admin-q-img-row';
+
+    // Imagen original
+    if (origImg && !newImg) {
+      const t = document.createElement('img');
+      t.className = 'admin-img-thumb'; t.src = origImg; t.alt = '';
+      const l = document.createElement('span');
+      l.className = 'admin-img-label';
+      l.textContent = `📎 ${q.image}`;
+      imgRow.appendChild(t); imgRow.appendChild(l);
+    }
+
+    // Imagen nueva (admin edit)
+    if (newImg) {
+      const t = document.createElement('img');
+      t.className = 'admin-img-thumb'; t.src = newImg; t.alt = '';
+      const l = document.createElement('span');
+      l.className = 'admin-img-label new';
+      l.textContent = `✅ ${edit.imageName}`;
+      const rm = document.createElement('button');
+      rm.className = 'admin-img-remove';
+      rm.textContent = '✕ Quitar';
+      rm.onclick = () => removeAdminImage(idx);
+      imgRow.appendChild(t); imgRow.appendChild(l); imgRow.appendChild(rm);
+    }
+
+    if (!origImg && !newImg) {
+      const l = document.createElement('span');
+      l.className = 'admin-img-label';
+      l.textContent = 'Sin imagen';
+      imgRow.appendChild(l);
+    }
+
+    body.appendChild(area);
+    body.appendChild(text);
+    body.appendChild(imgRow);
+
+    // Botón asignar imagen
+    const btn = document.createElement('button');
+    btn.className = 'btn-assign-img' + (newImg ? ' has-img' : '');
+    btn.innerHTML = newImg ? '🔄 Cambiar imagen' : '📷 Agregar imagen';
+    btn.onclick = () => pickImageForQuestion(idx);
+
+    card.appendChild(num);
+    card.appendChild(body);
+    card.appendChild(btn);
+    list.appendChild(card);
+  });
+
+  updateAdminEditCount();
+}
+
+function pickImageForQuestion(qIdx) {
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = 'image/*';
+  inp.onchange = async e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const dataUrl = await fileToDataUrl(file);
+    // Nombre de archivo: preguntaX.ext
+    const ext  = file.name.split('.').pop().toLowerCase() || 'jpg';
+    const name = `pregunta${(S.questions[qIdx].id || (qIdx + 1))}.${ext}`;
+    S.adminEdits[qIdx] = { imageName: name, dataUrl };
+    renderAdminPanel();
+  };
+  inp.click();
+}
+
+function removeAdminImage(qIdx) {
+  delete S.adminEdits[qIdx];
+  renderAdminPanel();
+}
+
+function fileToDataUrl(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+function updateAdminEditCount() {
+  const count = Object.keys(S.adminEdits).length;
+  const counter = $('adminEditCount');
+  const btn     = $('btnDownloadZip');
+
+  if (count === 0) {
+    counter.style.display = 'none';
+    btn.disabled = true;
+    btn.classList.remove('active');
+  } else {
+    counter.style.display = '';
+    counter.textContent   = count === 1 ? '1 edición' : `${count} ediciones`;
+    btn.disabled = false;
+    btn.classList.add('active');
+  }
+}
+
+async function downloadModifiedZip() {
+  if (!S.rawZip || !S.questions.length) return;
+
+  const btn = $('btnDownloadZip');
+  const orig = btn.textContent;
+  btn.textContent = '⏳ Generando…';
+  btn.disabled = true;
+  btn.classList.remove('active');
+
+  try {
+    // Clonar el ZIP
+    const newZip = new JSZip();
+
+    // Copiar todos los archivos excepto preguntas.json e imágenes que vamos a reemplazar
+    const replacedImages = new Set(Object.values(S.adminEdits).map(e => e.imageName));
+
+    for (const [path, file] of Object.entries(S.rawZip.files)) {
+      if (file.dir) continue;
+      const fname = path.split('/').pop();
+
+      if (/preguntas\.json$/i.test(path)) continue; // lo reconstruimos
+      if (replacedImages.has(fname)) continue;       // lo reemplazamos
+
+      const blob = await file.async('uint8array');
+      newZip.file(path, blob);
+    }
+
+    // Construir preguntas.json modificado
+    const updatedQuestions = S.questions.map((q, idx) => {
+      if (S.adminEdits[idx]) {
+        return { ...q, image: S.adminEdits[idx].imageName };
+      }
+      return { ...q };
+    });
+
+    const meta = S.currentExamMeta || {};
+    const updatedJson = JSON.stringify({ meta, questions: updatedQuestions }, null, 2);
+
+    // Detectar ruta original del json para mantener estructura de carpetas
+    const origJsonPath = Object.keys(S.rawZip.files).find(p =>
+      !S.rawZip.files[p].dir && /preguntas\.json$/i.test(p)
+    ) || 'preguntas.json';
+    const basePath = origJsonPath.includes('/') ? origJsonPath.split('/').slice(0,-1).join('/') + '/' : '';
+
+    newZip.file(origJsonPath, updatedJson);
+
+    // Agregar imágenes nuevas
+    for (const [qIdx, edit] of Object.entries(S.adminEdits)) {
+      const base64 = edit.dataUrl.split(',')[1];
+      newZip.file(`${basePath}images/${edit.imageName}`, base64, { base64: true });
+    }
+
+    // Generar y descargar
+    const blob = await newZip.generateAsync({
+      type: 'blob',
+      compression: 'DEFLATE',
+      compressionOptions: { level: 6 }
+    });
+
+    const examTitle = (meta.titulo || 'examen').toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const ts = new Date().toISOString().slice(0,10);
+    const a  = document.createElement('a');
+    a.href     = URL.createObjectURL(blob);
+    a.download = `${examTitle}-editado-${ts}.zip`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+
+  } catch(err) {
+    console.error('Error generando ZIP:', err);
+    alert('Error al generar el ZIP: ' + err.message);
+  } finally {
+    btn.textContent = orig;
+    btn.disabled = false;
+    btn.classList.add('active');
+  }
+}
+
+// ══════════════════════════════════════════
+//  EXAM BUILDER
+// ══════════════════════════════════════════
+
+let EB = {
+  questions: [],   // [{ text, area, options:['...','...'], answerIdx:0, explanation, imageName, imageDataUrl }]
+  editingIdx: -1,  // -1 = nueva pregunta
+  qEditorImg: null // { imageName, dataUrl } | null
+};
+
+const LETTERS = ['A','B','C','D'];
+
+// ── Cambiar de tab ──
+function switchAdminTab(tab) {
+  $('tabEdit').classList.toggle('active',   tab === 'edit');
+  $('tabCreate').classList.toggle('active', tab === 'create');
+  $('adminBodyEdit').style.display   = tab === 'edit'   ? 'flex' : 'none';
+  $('adminBodyCreate').style.display = tab === 'create' ? 'flex' : 'none';
+  if (tab === 'create') renderExamBuilder();
+}
+
+// ── Sincronizar vista del builder ──
+function renderExamBuilder() {
+  updateTimePreview();
+  renderBuilderQList();
+  updateBuilderExportBtn();
+}
+
+function updateTimePreview() {
+  const h = parseInt($('bldHoras').value) || 0;
+  const m = parseInt($('bldMins').value)  || 0;
+  const total = h * 60 + m;
+  $('bldTimePreview').textContent = `= ${total} min (${h}:${String(m).padStart(2,'0')} h)`;
+}
+
+// ── Render lista de preguntas del builder ──
+function renderBuilderQList() {
+  const list  = $('bldQList');
+  const empty = $('bldEmpty');
+  const badge = $('bldQCount');
+  badge.textContent = EB.questions.length;
+  empty.style.display = EB.questions.length === 0 ? '' : 'none';
+
+  // Borrar items anteriores (mantener el empty div)
+  [...list.children].forEach(c => { if (c !== empty) c.remove(); });
+
+  EB.questions.forEach((q, idx) => {
+    const item = document.createElement('div');
+    item.className = 'builder-q-item';
+
+    const num = document.createElement('div');
+    num.className = 'builder-q-item-num';
+    num.textContent = `Q${idx + 1}`;
+
+    const body = document.createElement('div');
+    body.className = 'builder-q-item-body';
+    const txt = document.createElement('div');
+    txt.className = 'builder-q-item-text';
+    txt.textContent = q.text || '(Sin texto)';
+    const meta = document.createElement('div');
+    meta.className = 'builder-q-item-meta';
+    const opts  = q.options.length;
+    const hasImg = q.imageName ? '🖼' : '';
+    meta.textContent = `${q.area || 'Sin área'} · ${opts} opciones · ✅ ${LETTERS[q.answerIdx] || '?'} ${hasImg}`;
+    body.appendChild(txt);
+    body.appendChild(meta);
+
+    const actions = document.createElement('div');
+    actions.className = 'builder-q-item-actions';
+
+    const btnUp = document.createElement('button');
+    btnUp.className = 'builder-q-btn move'; btnUp.textContent = '↑';
+    btnUp.title = 'Subir'; btnUp.disabled = idx === 0;
+    btnUp.onclick = () => moveBuilderQuestion(idx, -1);
+
+    const btnDn = document.createElement('button');
+    btnDn.className = 'builder-q-btn move'; btnDn.textContent = '↓';
+    btnDn.title = 'Bajar'; btnDn.disabled = idx === EB.questions.length - 1;
+    btnDn.onclick = () => moveBuilderQuestion(idx, 1);
+
+    const btnEdit = document.createElement('button');
+    btnEdit.className = 'builder-q-btn';
+    btnEdit.textContent = '✏️ Editar';
+    btnEdit.onclick = () => openQuestionEditor(idx);
+
+    const btnDel = document.createElement('button');
+    btnDel.className = 'builder-q-btn danger';
+    btnDel.textContent = '🗑 Eliminar';
+    btnDel.onclick = () => deleteBuilderQuestion(idx);
+
+    actions.appendChild(btnUp);
+    actions.appendChild(btnDn);
+    actions.appendChild(btnEdit);
+    actions.appendChild(btnDel);
+
+    item.appendChild(num);
+    item.appendChild(body);
+    item.appendChild(actions);
+    list.appendChild(item);
+  });
+
+  updateBuilderExportBtn();
+}
+
+function moveBuilderQuestion(idx, dir) {
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= EB.questions.length) return;
+  const tmp = EB.questions[idx];
+  EB.questions[idx] = EB.questions[newIdx];
+  EB.questions[newIdx] = tmp;
+  renderBuilderQList();
+}
+
+function deleteBuilderQuestion(idx) {
+  if (!confirm(`¿Eliminar la pregunta ${idx + 1}?`)) return;
+  EB.questions.splice(idx, 1);
+  renderBuilderQList();
+}
+
+// ── Abrir editor de pregunta ──
+function openQuestionEditor(idx) {
+  EB.editingIdx = idx;
+  EB.qEditorImg = null;
+
+  $('qedTitle').textContent = idx === -1
+    ? `Nueva pregunta (Q${EB.questions.length + 1})`
+    : `Editando pregunta Q${idx + 1}`;
+
+  if (idx === -1) {
+    // Nueva pregunta — valores por defecto
+    $('qedText').value = '';
+    $('qedArea').value = '';
+    $('qedExpl').value = '';
+    buildOptionFields([{text:'',correct:true},{text:'',correct:false},{text:'',correct:false}]);
+    clearQEditorImage();
+  } else {
+    // Editar existente
+    const q = EB.questions[idx];
+    $('qedText').value = q.text || '';
+    $('qedArea').value = q.area || '';
+    $('qedExpl').value = q.explanation || '';
+    const opts = q.options.map((o, i) => ({ text: o, correct: i === q.answerIdx }));
+    buildOptionFields(opts);
+    if (q.imageName && q.imageDataUrl) {
+      EB.qEditorImg = { imageName: q.imageName, dataUrl: q.imageDataUrl };
+      showQEditorImage(q.imageName, q.imageDataUrl);
+    } else {
+      clearQEditorImage();
+    }
+  }
+
+  $('qedOverlay').classList.add('show');
+  setTimeout(() => $('qedText').focus(), 100);
+}
+
+// ── Construir campos de opciones ──
+function buildOptionFields(optsData) {
+  const container = $('qedOptions');
+  container.innerHTML = '';
+  optsData.forEach((o, i) => addOptionField(o.text, o.correct));
+  updateAddOptBtn();
+}
+
+function addOptionField(text = '', isCorrect = false) {
+  const container = $('qedOptions');
+  const idx = container.children.length;
+  if (idx >= 4) return; // máximo 4
+
+  const row = document.createElement('div');
+  row.className = 'qed-option-row';
+
+  const letter = document.createElement('div');
+  letter.className = 'qed-option-letter' + (isCorrect ? ' correct' : '');
+  letter.textContent = LETTERS[idx];
+
+  const inp = document.createElement('input');
+  inp.className = 'qed-option-input';
+  inp.placeholder = `Opción ${LETTERS[idx]}…`;
+  inp.value = text;
+
+  const btnOk = document.createElement('button');
+  btnOk.className = 'btn-correct' + (isCorrect ? ' active' : '');
+  btnOk.title = 'Marcar como respuesta correcta';
+  btnOk.textContent = isCorrect ? '✅' : '⬜';
+  btnOk.type = 'button';
+  btnOk.onclick = () => setCorrectOption(idx);
+
+  const btnRm = document.createElement('button');
+  btnRm.className = 'btn-rm-opt';
+  btnRm.title = 'Eliminar opción';
+  btnRm.textContent = '✕';
+  btnRm.type = 'button';
+  btnRm.onclick = () => removeOptionField(row);
+
+  row.appendChild(letter);
+  row.appendChild(inp);
+  row.appendChild(btnOk);
+  row.appendChild(btnRm);
+  container.appendChild(row);
+  updateAddOptBtn();
+}
+
+function removeOptionField(row) {
+  const container = $('qedOptions');
+  if (container.children.length <= 2) {
+    alert('Debe haber al menos 2 opciones.'); return;
+  }
+  row.remove();
+  // Rebuild letters & state
+  [...container.children].forEach((r, i) => {
+    r.querySelector('.qed-option-letter').textContent = LETTERS[i];
+    r.querySelector('.qed-option-input').placeholder   = `Opción ${LETTERS[i]}…`;
+  });
+  // Si la correcta era la eliminada, marcar la primera
+  const anyCorrect = [...container.children].some(r => r.querySelector('.btn-correct').classList.contains('active'));
+  if (!anyCorrect) setCorrectOption(0);
+  updateAddOptBtn();
+}
+
+function setCorrectOption(idx) {
+  const container = $('qedOptions');
+  [...container.children].forEach((r, i) => {
+    const btn = r.querySelector('.btn-correct');
+    const ltr = r.querySelector('.qed-option-letter');
+    const active = i === idx;
+    btn.classList.toggle('active', active);
+    btn.textContent = active ? '✅' : '⬜';
+    ltr.classList.toggle('correct', active);
+  });
+}
+
+function updateAddOptBtn() {
+  const container = $('qedOptions');
+  $('btnAddOpt').style.display = container.children.length >= 4 ? 'none' : '';
+}
+
+// ── Imagen en el editor de pregunta ──
+function pickQEditorImage() {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*';
+  inp.onchange = async e => {
+    const file = e.target.files[0]; if (!file) return;
+    const dataUrl = await fileToDataUrl(file);
+    const ext  = file.name.split('.').pop().toLowerCase() || 'jpg';
+    const qNum = EB.editingIdx === -1 ? EB.questions.length + 1 : EB.editingIdx + 1;
+    const name = `pregunta${qNum}.${ext}`;
+    EB.qEditorImg = { imageName: name, dataUrl };
+    showQEditorImage(name, dataUrl);
+  };
+  inp.click();
+}
+
+function showQEditorImage(name, dataUrl) {
+  $('qedImgLabel').textContent   = name;
+  $('qedImgLabel').className     = 'admin-img-label new';
+  $('qedImgPreview').src         = dataUrl;
+  $('qedImgPreview').style.display = '';
+  $('btnQedImgRemove').style.display = '';
+  $('btnQedImg').textContent = '🔄 Cambiar imagen';
+}
+
+function clearQEditorImage() {
+  EB.qEditorImg = null;
+  $('qedImgLabel').textContent = '';
+  $('qedImgLabel').className   = 'admin-img-label';
+  $('qedImgPreview').style.display = 'none';
+  $('qedImgPreview').src = '';
+  $('btnQedImgRemove').style.display = 'none';
+  $('btnQedImg').textContent = '📷 Agregar imagen';
+}
+
+function removeQEditorImage() { clearQEditorImage(); }
+
+function closeQEditorOnBg(e) {
+  if (e.target === $('qedOverlay')) $('qedOverlay').classList.remove('show');
+}
+
+// ── Guardar pregunta desde el modal ──
+function saveQuestion() {
+  const text = $('qedText').value.trim();
+  if (!text) { alert('Escribe el texto de la pregunta.'); $('qedText').focus(); return; }
+
+  const container = $('qedOptions');
+  const rows = [...container.children];
+  if (rows.length < 2) { alert('Agrega al menos 2 opciones.'); return; }
+
+  const options   = rows.map(r => r.querySelector('.qed-option-input').value.trim());
+  const emptyOpts = options.some(o => !o);
+  if (emptyOpts) { alert('Todas las opciones deben tener texto.'); return; }
+
+  const correctRow = rows.findIndex(r => r.querySelector('.btn-correct').classList.contains('active'));
+  const answerIdx  = correctRow === -1 ? 0 : correctRow;
+
+  const q = {
+    text,
+    area:        $('qedArea').value.trim(),
+    options,
+    answerIdx,
+    explanation: $('qedExpl').value.trim(),
+    imageName:   EB.qEditorImg ? EB.qEditorImg.imageName   : null,
+    imageDataUrl:EB.qEditorImg ? EB.qEditorImg.dataUrl      : null,
+  };
+
+  if (EB.editingIdx === -1) {
+    EB.questions.push(q);
+  } else {
+    EB.questions[EB.editingIdx] = q;
+  }
+
+  $('qedOverlay').classList.remove('show');
+  renderBuilderQList();
+}
+
+// ── Botón de exportar ──
+function updateBuilderExportBtn() {
+  const titulo = ($('bldTitulo') && $('bldTitulo').value.trim()) || '';
+  const ready  = titulo.length > 0 && EB.questions.length > 0;
+  const btn    = $('btnExportNew');
+  if (!btn) return;
+  btn.classList.toggle('ready', ready);
+  const info = $('bldExportInfo');
+  if (!ready) {
+    info.textContent = titulo ? `Agrega al menos 1 pregunta para exportar` : 'Necesitas un título y al menos 1 pregunta';
+  } else {
+    info.textContent = `${EB.questions.length} pregunta(s) lista(s) para exportar`;
+  }
+}
+
+// ── Exportar nuevo examen como ZIP ──
+async function exportNewExamZip() {
+  const titulo = $('bldTitulo').value.trim();
+  if (!titulo || !EB.questions.length) return;
+
+  const btn = $('btnExportNew');
+  const orig = btn.textContent;
+  btn.textContent = '⏳ Generando…';
+  btn.classList.remove('ready');
+
+  try {
+    const h     = parseInt($('bldHoras').value) || 0;
+    const m     = parseInt($('bldMins').value)  || 0;
+    const total = h * 60 + m;
+
+    const meta = {
+      titulo,
+      materia:         $('bldMateria').value.trim()  || '',
+      area:            $('bldAreaTag').value.trim()  || '',
+      total_preguntas: EB.questions.length,
+      tiempo_minutos:  total,
+      version:         $('bldVersion').value.trim()  || '',
+    };
+
+    const questions = EB.questions.map((q, i) => ({
+      id:          i + 1,
+      question:    q.text,
+      options:     q.options,
+      answer:      LETTERS[q.answerIdx] || 'A',
+      area:        q.area || '',
+      explanation: q.explanation || '',
+      ...(q.imageName ? { image: q.imageName } : {}),
+    }));
+
+    const zip = new JSZip();
+    const folder = zip.folder('images');
+
+    // Agregar imágenes de preguntas
+    for (const q of EB.questions) {
+      if (q.imageName && q.imageDataUrl) {
+        const base64 = q.imageDataUrl.split(',')[1];
+        folder.file(q.imageName, base64, { base64: true });
+      }
+    }
+
+    zip.file('preguntas.json', JSON.stringify({ meta, questions }, null, 2));
+
+    const blob = await zip.generateAsync({
+      type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 }
+    });
+
+    const slug = titulo.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'').slice(0,40);
+    const ts   = new Date().toISOString().slice(0,10);
+    const a    = document.createElement('a');
+    a.href     = URL.createObjectURL(blob);
+    a.download = `${slug}-${ts}.zip`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+
+  } catch(err) {
+    console.error(err);
+    alert('Error al generar el ZIP: ' + err.message);
+  } finally {
+    btn.textContent = orig;
+    btn.classList.add('ready');
+  }
 }
 
 </script>
