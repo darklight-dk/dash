@@ -907,74 +907,14 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
     <div class="exams-section">
       <div class="exams-section-title">
         <h2>📚 Exámenes disponibles</h2>
-        <span class="est-badge">Listos para iniciar</span>
+        <span class="est-badge" id="examsBadge">Cargando…</span>
       </div>
-      <div class="exams-grid">
-
-        <!-- Simulacro Premedicina 2026 -->
-        <div class="exam-card" onclick="loadBuiltinExam('premedicina2026')">
-          <span class="exam-card-new">NUEVO</span>
-          <div class="exam-card-head">
-            <div class="exam-card-icon">🧬</div>
-            <div class="exam-card-info">
-              <div class="exam-card-title">Simulacro EXANI-II<br>Premedicina 2026</div>
-              <div class="exam-card-sub">Premedicina · EXANI-II 2026</div>
-            </div>
-          </div>
-          <div class="exam-card-tags">
-            <span class="exam-tag teal">Premedicina</span>
-            <span class="exam-tag">EXANI-II</span>
-            <span class="exam-tag">2026-A</span>
-          </div>
-          <div class="exam-card-stats">
-            <div class="ec-stat"><div class="ec-val">50</div><div class="ec-lbl">Preguntas</div></div>
-            <div class="ec-stat"><div class="ec-val">4:30</div><div class="ec-lbl">Horas</div></div>
-            <div class="ec-stat"><div class="ec-val">6</div><div class="ec-lbl">Imágenes</div></div>
-          </div>
-          <button class="exam-card-btn">▶ Iniciar examen</button>
+      <div class="exams-grid" id="examsGrid">
+        <!-- Generado dinámicamente desde exams/catalog.json -->
+        <div style="grid-column:1/-1;text-align:center;padding:40px 0;color:var(--muted)">
+          <div style="font-size:32px;margin-bottom:8px">⏳</div>
+          <div style="font-size:14px">Cargando catálogo de exámenes…</div>
         </div>
-
-        <!-- Redacción Indirecta Vol. I -->
-        <div class="exam-card" onclick="loadBuiltinExam('redaccionVol1')">
-          <span class="exam-card-new">NUEVO</span>
-          <div class="exam-card-head">
-            <div class="exam-card-icon">✍️</div>
-            <div class="exam-card-info">
-              <div class="exam-card-title">Redacción Indirecta<br>Vol. I — 2026</div>
-              <div class="exam-card-sub">Redacción · EXANI-II 2026</div>
-            </div>
-          </div>
-          <div class="exam-card-tags">
-            <span class="exam-tag teal">Redacción</span>
-            <span class="exam-tag">EXANI-II</span>
-            <span class="exam-tag">2026-A</span>
-          </div>
-          <div class="exam-card-stats">
-            <div class="ec-stat"><div class="ec-val">30</div><div class="ec-lbl">Preguntas</div></div>
-            <div class="ec-stat"><div class="ec-val">0:40</div><div class="ec-lbl">Horas</div></div>
-            <div class="ec-stat"><div class="ec-val">0</div><div class="ec-lbl">Imágenes</div></div>
-          </div>
-          <button class="exam-card-btn">▶ Iniciar examen</button>
-        </div>
-        <!-- placeholder removed --><div class="exam-card" style="display:none">
-          <div class="exam-card-head">
-            <div class="exam-card-icon" style="opacity:.4">📘</div>
-            <div class="exam-card-info">
-              <div class="exam-card-title" style="color:var(--muted)">Próximamente…</div>
-              <div class="exam-card-sub">Más simulacros en camino</div>
-            </div>
-          </div>
-          <div class="exam-card-tags">
-            <span class="exam-tag">En preparación</span>
-          </div>
-          <div class="exam-card-stats">
-            <div class="ec-stat"><div class="ec-val" style="color:var(--muted)">—</div><div class="ec-lbl">Preguntas</div></div>
-            <div class="ec-stat"><div class="ec-val" style="color:var(--muted)">—</div><div class="ec-lbl">Horas</div></div>
-            <div class="ec-stat"><div class="ec-val" style="color:var(--muted)">—</div><div class="ec-lbl">Imágenes</div></div>
-          </div>
-          <button class="exam-card-btn" style="background:#e2e8f0;color:var(--muted)">🔒 No disponible</button>
-        </div>
-
       </div>
     </div>
 
@@ -1093,7 +1033,7 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
     <div class="builder-export-bar">
       <div class="builder-export-info" id="bldExportInfo">Necesitas al menos un título y una pregunta</div>
       <button class="btn-export-new" id="btnExportNew" onclick="exportNewExamZip()">
-        💾 Exportar ZIP del examen
+        📦 Exportar exams-update.zip
       </button>
     </div>
 
@@ -2074,38 +2014,101 @@ function cEq(){
 
 
 // ══════════════════════════════════════════
-//  EXÁMENES INTEGRADOS — carga por ruta local
+//  CATÁLOGO DINÁMICO — lee exams/catalog.json
 // ══════════════════════════════════════════
-const BUILTIN_EXAMS = {
-  premedicina2026: {
-    path: 'exams/simulacro-2026.zip',
-    filename: 'simulacro-2026.zip'
-  },
-  redaccionVol1: {
-    path: 'exams/redaccion-indirecta-vol1.zip',
-    filename: 'redaccion-indirecta-vol1.zip'
-  }
-};
+let CATALOG = [];   // se llena al cargar
 
-async function loadBuiltinExam(key) {
-  const exam = BUILTIN_EXAMS[key];
-  if (!exam) return;
-  // Show loading state on the card button
-  const btns = document.querySelectorAll('.exam-card-btn');
-  btns.forEach(b => { b.textContent = '⏳ Cargando…'; b.style.pointerEvents='none'; });
+async function loadCatalog() {
+  const grid  = $('examsGrid');
+  const badge = $('examsBadge');
   try {
-    const resp = await fetch(exam.path);
-    if (!resp.ok) throw new Error('No se pudo cargar: ' + exam.path);
-    const blob = await resp.blob();
-    const file = new File([blob], exam.filename, {type:'application/zip'});
-    await handleFile(file);
+    const resp = await fetch('exams/catalog.json?_=' + Date.now());
+    if (!resp.ok) throw new Error('No se encontró catalog.json');
+    CATALOG = await resp.json();
+    renderExamCards();
+    badge.textContent = `${CATALOG.length} disponible${CATALOG.length !== 1 ? 's' : ''}`;
   } catch(e) {
-    btns.forEach(b => { b.textContent = '▶ Iniciar examen'; b.style.pointerEvents=''; });
-    alert('⚠️ Error al cargar el examen.\n\nAsegúrate de abrir el HTML desde un servidor local (Live Server) o que el archivo ZIP esté en la carpeta exams/.');
+    // Fallback silencioso: muestra mensaje amigable
+    grid.innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:48px 24px;color:var(--muted)">
+        <div style="font-size:40px;margin-bottom:12px">📂</div>
+        <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px">No se encontró el catálogo</div>
+        <div style="font-size:13px;line-height:1.6;max-width:340px;margin:0 auto">
+          Asegúrate de abrir desde un servidor local y que exista<br>
+          <code style="background:#f1f5f9;padding:2px 8px;border-radius:6px;font-size:12px">exams/catalog.json</code>
+        </div>
+      </div>`;
+    badge.textContent = '0 disponibles';
   }
 }
 
+function renderExamCards() {
+  const grid = $('examsGrid');
+  if (!CATALOG.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:14px">No hay exámenes en el catálogo todavía.</div>`;
+    return;
+  }
+  grid.innerHTML = CATALOG.map((ex, idx) => {
+    const horas = ex.horas || minutosToHoras(ex.tiempo_minutos || 0);
+    const tags  = (ex.tags || []).map((t, i) =>
+      `<span class="exam-tag${i===0?' teal':''}">${t}</span>`).join('');
+    const imgCount = ex.imagenes ?? ex.images ?? 0;
+    return `
+      <div class="exam-card" onclick="loadCatalogExam(${idx})">
+        ${ex.nuevo ? '<span class="exam-card-new">NUEVO</span>' : ''}
+        <div class="exam-card-head">
+          <div class="exam-card-icon">${ex.icono || '📄'}</div>
+          <div class="exam-card-info">
+            <div class="exam-card-title">${ex.titulo}</div>
+            <div class="exam-card-sub">${ex.materia || ex.subtitulo || ''}</div>
+          </div>
+        </div>
+        <div class="exam-card-tags">${tags}</div>
+        <div class="exam-card-stats">
+          <div class="ec-stat"><div class="ec-val">${ex.preguntas ?? ex.total_preguntas ?? '?'}</div><div class="ec-lbl">Preguntas</div></div>
+          <div class="ec-stat"><div class="ec-val">${horas}</div><div class="ec-lbl">Horas</div></div>
+          <div class="ec-stat"><div class="ec-val">${imgCount}</div><div class="ec-lbl">Imágenes</div></div>
+        </div>
+        <button class="exam-card-btn">▶ Iniciar examen</button>
+      </div>`;
+  }).join('');
+}
+
+function minutosToHoras(min) {
+  const h = Math.floor(min / 60);
+  const m = String(min % 60).padStart(2, '0');
+  return `${h}:${m}`;
+}
+
+async function loadCatalogExam(idx) {
+  const ex = CATALOG[idx];
+  if (!ex) return;
+  const path = ex.path || `exams/${ex.archivo || ex.file}`;
+  const btns = document.querySelectorAll('.exam-card-btn');
+  btns.forEach(b => { b.textContent = '⏳ Cargando…'; b.style.pointerEvents = 'none'; });
+  try {
+    const resp = await fetch(path);
+    if (!resp.ok) throw new Error('No se pudo cargar: ' + path);
+    const blob = await resp.blob();
+    const name = path.split('/').pop();
+    const file = new File([blob], name, { type: 'application/zip' });
+    await handleFile(file);
+  } catch(e) {
+    btns.forEach(b => { b.textContent = '▶ Iniciar examen'; b.style.pointerEvents = ''; });
+    alert('⚠️ Error al cargar el examen.\n\nAsegúrate de abrir el HTML desde un servidor local (Live Server) y que el ZIP esté en la ruta indicada en catalog.json.');
+  }
+}
+
+// Compat: loadBuiltinExam ya no se usa pero se mantiene por si acaso
+function loadBuiltinExam(key) {
+  const map = { premedicina2026: 0, redaccionVol1: 1 };
+  const idx = map[key];
+  if (idx !== undefined) loadCatalogExam(idx);
+}
+
+
 buildCalc();
+loadCatalog();   // carga exams/catalog.json y renderiza las tarjetas
 
 // ══════════════════════════════════════════
 //  BLOQUEAR CLICK DERECHO (como EXANI real)
@@ -3567,59 +3570,87 @@ async function exportNewExamZip() {
   const titulo = $('bldTitulo').value.trim();
   if (!titulo || !EB.questions.length) return;
 
-  const btn = $('btnExportNew');
+  const btn  = $('btnExportNew');
   const orig = btn.textContent;
   btn.textContent = '⏳ Generando…';
   btn.classList.remove('ready');
 
   try {
-    const h     = parseInt($('bldHoras').value) || 0;
-    const m     = parseInt($('bldMins').value)  || 0;
-    const total = h * 60 + m;
+    const h       = parseInt($('bldHoras').value)   || 0;
+    const m       = parseInt($('bldMins').value)    || 0;
+    const total   = h * 60 + m;
+    const area    = $('bldAreaTag').value.trim()    || '';
+    const ver     = $('bldVersion').value.trim()    || '';
+    const materia = $('bldMateria').value.trim()    || '';
 
-    const meta = {
-      titulo,
-      materia:         $('bldMateria').value.trim()  || '',
-      area:            $('bldAreaTag').value.trim()  || '',
+    const slug = titulo.toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'').slice(0,40);
+    const ts         = new Date().toISOString().slice(0,10);
+    const zipFileName = `${slug}-${ts}.zip`;
+
+    // ── 1. ZIP del examen ──────────────────────────────
+    const meta = { titulo, materia, area,
       total_preguntas: EB.questions.length,
-      tiempo_minutos:  total,
-      version:         $('bldVersion').value.trim()  || '',
-    };
+      tiempo_minutos: total, version: ver };
 
     const questions = EB.questions.map((q, i) => ({
-      id:          i + 1,
-      question:    q.text,
-      options:     q.options,
-      answer:      LETTERS[q.answerIdx] || 'A',
-      area:        q.area || '',
-      explanation: q.explanation || '',
+      id: i+1, question: q.text, options: q.options,
+      answer: LETTERS[q.answerIdx] || 'A',
+      area: q.area || '', explanation: q.explanation || '',
       ...(q.imageName ? { image: q.imageName } : {}),
     }));
 
-    const zip = new JSZip();
-    const folder = zip.folder('images');
-
-    // Agregar imágenes de preguntas
+    const examZip   = new JSZip();
+    const imgFolder = examZip.folder('images');
     for (const q of EB.questions) {
       if (q.imageName && q.imageDataUrl) {
-        const base64 = q.imageDataUrl.split(',')[1];
-        folder.file(q.imageName, base64, { base64: true });
+        imgFolder.file(q.imageName, q.imageDataUrl.split(',')[1], { base64: true });
       }
     }
-
-    zip.file('preguntas.json', JSON.stringify({ meta, questions }, null, 2));
-
-    const blob = await zip.generateAsync({
+    examZip.file('preguntas.json', JSON.stringify({ meta, questions }, null, 2));
+    const examBlob = await examZip.generateAsync({
       type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 }
     });
 
-    const slug = titulo.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'').slice(0,40);
-    const ts   = new Date().toISOString().slice(0,10);
+    // ── 2. catalog.json actualizado ────────────────────
+    const newEntry = {
+      titulo, materia,
+      icono:          guessIcon(area || materia),
+      tags:           buildTags(area, ver),
+      preguntas:      EB.questions.length,
+      horas:          minutosToHoras(total),
+      imagenes:       EB.questions.filter(q => q.imageName).length,
+      tiempo_minutos: total, version: ver,
+      path:           `exams/${zipFileName}`,
+      nuevo: true, agregado: ts,
+    };
+    const updatedCatalog = [
+      ...CATALOG.filter(e => e.path !== newEntry.path),
+      newEntry,
+    ];
+    const catalogJson = JSON.stringify(updatedCatalog, null, 2);
+
+    // ── 3. exams-update.zip ────────────────────────────
+    const updateZip = new JSZip();
+    updateZip.file('catalog.json', catalogJson);
+    updateZip.file(zipFileName, await examBlob.arrayBuffer());
+    const updateBlob = await updateZip.generateAsync({
+      type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 }
+    });
+
+    // ── 4. Descargar ───────────────────────────────────
     const a    = document.createElement('a');
-    a.href     = URL.createObjectURL(blob);
-    a.download = `${slug}-${ts}.zip`;
+    a.href     = URL.createObjectURL(updateBlob);
+    a.download = `exams-update-${ts}.zip`;
     a.click();
     URL.revokeObjectURL(a.href);
+
+    // Reflejar en el dashboard sin recargar
+    CATALOG = updatedCatalog;
+    renderExamCards();
+    $('examsBadge').textContent = `${CATALOG.length} disponible${CATALOG.length !== 1 ? 's' : ''}`;
+    showToast(`✅ exams-update-${ts}.zip listo — extrae en tu carpeta exams/ y recarga`);
 
   } catch(err) {
     console.error(err);
@@ -3628,6 +3659,25 @@ async function exportNewExamZip() {
     btn.textContent = orig;
     btn.classList.add('ready');
   }
+}
+
+function guessIcon(text) {
+  const t = (text || '').toLowerCase();
+  if (t.includes('bio') || t.includes('medic') || t.includes('salud')) return '🧬';
+  if (t.includes('mat') || t.includes('calc'))  return '📐';
+  if (t.includes('fís') || t.includes('quím'))  return '⚗️';
+  if (t.includes('redac') || t.includes('lect')) return '✍️';
+  if (t.includes('hist') || t.includes('geo'))  return '🌎';
+  if (t.includes('ing'))                         return '🇺🇸';
+  return '📄';
+}
+
+function buildTags(area, version) {
+  const tags = [];
+  if (area)    tags.push(area);
+  tags.push('EXANI-II');
+  if (version) tags.push(version);
+  return tags;
 }
 
 </script>
