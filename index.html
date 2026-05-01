@@ -141,48 +141,94 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .nav-btn.has-img::after{content:'🖼';position:absolute;top:-6px;right:-4px;font-size:9px}
 
 /* question */
-.exam-body{flex:1;display:flex;justify-content:center;padding:28px 20px}
-.q-wrap{max-width:960px;width:100%}
-.q-meta{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+.exam-body{flex:1;display:flex;justify-content:center;padding:20px 32px}
+.q-wrap{max-width:1100px;width:100%;display:flex;flex-direction:column;gap:16px}
+.q-meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 
-/* ── TWO-COLUMN LAYOUT ── */
-.q-columns{display:grid;grid-template-columns:1fr 1fr;gap:0;
-  border:1px solid var(--b2);border-radius:16px;overflow:hidden;
-  background:var(--panel);box-shadow:0 2px 10px rgba(0,0,0,.05)}
-.q-col-left{padding:28px 28px;border-right:1px solid var(--b2);
-  display:flex;flex-direction:column;gap:16px}
-.q-col-right{padding:28px 24px;display:flex;flex-direction:column;
-  justify-content:center;gap:10px;background:#fafcfc}
-.q-col-header{display:flex;align-items:center;gap:10px;
-  padding-bottom:14px;border-bottom:2px solid var(--teal);margin-bottom:4px}
-.q-col-label{font-size:13px;font-weight:800;letter-spacing:1.5px;
-  text-transform:uppercase;color:var(--teal);font-family:'DM Mono',monospace}
-.q-area{background:var(--card);color:var(--muted);border-radius:6px;
-  padding:3px 10px;font-size:11px;font-family:'DM Mono',monospace}
-.q-text{font-size:17px;line-height:1.8;font-weight:500;color:var(--text)}
+/* ── TWO-COLUMN LAYOUT — EXANI style ── */
+.q-columns{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:32px;align-items:start
+}
+/* Each column is a plain card */
+.q-col-left,.q-col-right{
+  background:#ffffff;border:1px solid #e2e8f0;
+  border-radius:12px;padding:28px 28px 16px;
+  display:flex;flex-direction:column;min-height:320px
+}
+.q-col-header{
+  display:flex;align-items:center;gap:10px;
+  padding-bottom:12px;border-bottom:2px solid var(--teal);margin-bottom:16px
+}
+.q-col-label{
+  font-size:12px;font-weight:800;letter-spacing:2px;
+  text-transform:uppercase;color:var(--teal);font-family:'DM Mono',monospace
+}
+.q-area{
+  background:#f0fdfa;color:var(--teal);border-radius:6px;
+  padding:2px 9px;font-size:11px;font-family:'DM Mono',monospace;font-weight:700
+}
+.q-text{font-size:16px;line-height:1.8;font-weight:400;color:#1e293b;flex:1}
 
-.q-img-wrap{border-radius:10px;overflow:hidden;
-  border:1px solid var(--b2);background:#111827;text-align:center}
-.q-img-wrap img{max-width:100%;max-height:440px;object-fit:contain;display:block;margin:0 auto}
+.q-img-wrap{
+  border-radius:10px;overflow:hidden;margin-top:16px;
+  border:1px solid var(--b2);background:#f8fafc;text-align:center
+}
+.q-img-wrap img{max-width:100%;max-height:400px;object-fit:contain;display:block;margin:0 auto}
 .q-img-err{padding:20px;color:var(--muted);font-size:13px;font-family:'DM Mono',monospace}
 
-.options{display:flex;flex-direction:column;gap:8px}
-.opt-btn{background:var(--panel);border:2px solid var(--b2);border-radius:10px;
-  padding:13px 16px;text-align:left;display:flex;align-items:center;gap:14px;
-  color:var(--text);font-size:15px;transition:all .2s;width:100%}
-.opt-btn:hover{border-color:var(--teal);background:#f0fdfa}
-.opt-btn.selected{background:#f0fdfa;border-color:var(--teal);color:var(--teal)}
-.opt-letter{background:var(--card);color:var(--muted);border-radius:8px;
-  padding:4px 10px;font-family:'DM Mono',monospace;font-weight:700;font-size:14px;
-  min-width:34px;text-align:center;flex-shrink:0;transition:all .2s;border:1px solid var(--b2)}
-.opt-btn.selected .opt-letter{background:var(--teal);color:#ffffff;border-color:var(--teal)}
-.q-nav-btns{display:flex;justify-content:space-between;margin-top:20px;gap:12px}
-.btn-prev,.btn-next{border:none;border-radius:12px;padding:13px 30px;
-  font-size:15px;font-weight:700;letter-spacing:.5px;transition:all .2s}
-.btn-prev{background:var(--card);color:var(--muted);border:1px solid var(--b2)}
-.btn-prev:hover{background:var(--b2);color:var(--text)}
+/* ── OPTIONS — radio style like EXANI ── */
+.options{display:flex;flex-direction:column;gap:6px;flex:1}
+.opt-btn{
+  background:transparent;border:none;border-radius:0;
+  padding:9px 4px;text-align:left;display:flex;align-items:center;gap:14px;
+  color:#1e293b;font-size:15px;transition:color .15s;width:100%;
+  border-bottom:1px solid #f1f5f9;cursor:pointer
+}
+.opt-btn:last-child{border-bottom:none}
+.opt-btn:hover{color:var(--teal)}
+.opt-btn.selected{color:var(--teal)}
+/* Radio circle */
+.opt-letter{
+  width:20px;height:20px;border-radius:50%;
+  border:2px solid #94a3b8;background:#ffffff;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:all .2s;position:relative
+}
+.opt-btn:hover .opt-letter{border-color:var(--teal)}
+.opt-btn.selected .opt-letter{
+  border-color:var(--teal);background:var(--teal)
+}
+/* Letter label next to radio */
+.opt-label-letter{
+  font-family:'DM Mono',monospace;font-weight:700;font-size:13px;
+  color:#64748b;min-width:20px;flex-shrink:0;transition:color .15s
+}
+.opt-btn:hover .opt-label-letter,.opt-btn.selected .opt-label-letter{color:var(--teal)}
+.opt-text{flex:1;line-height:1.5}
+
+/* ── FLOAT WIN BUTTON — square blue, bottom of col ── */
+.fw-col-footer{
+  margin-top:auto;padding-top:16px;
+  display:flex;justify-content:flex-start
+}
+.btn-float-win{
+  display:inline-flex;align-items:center;gap:7px;
+  background:#0ea5e9;border:none;border-radius:8px;
+  padding:7px 14px;color:#ffffff;
+  font-size:11px;font-weight:700;letter-spacing:.3px;
+  cursor:pointer;transition:background .15s
+}
+.btn-float-win:hover{background:#0284c7}
+.btn-float-win .fw-icon{font-size:12px}
+
+.q-nav-btns{display:flex;justify-content:space-between;gap:12px}
+.btn-prev,.btn-next{border:none;border-radius:10px;padding:12px 28px;
+  font-size:14px;font-weight:700;letter-spacing:.3px;cursor:pointer;transition:all .2s}
+.btn-prev{background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0}
+.btn-prev:hover{background:#e2e8f0;color:var(--text)}
 .btn-prev:disabled,.btn-next:disabled{opacity:.3;cursor:not-allowed}
-.btn-next{background:linear-gradient(135deg,var(--teal),#065f46);color:#ffffff}
+.btn-next{background:linear-gradient(135deg,var(--teal),#0369a1);color:#ffffff}
 .btn-next:hover{transform:translateY(-1px)}
 
 /* overlays */
@@ -294,24 +340,6 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
 
 /* ── NAV BAR CENTERED ── */
 .nav-bar{justify-content:center;flex-wrap:wrap}
-
-/* ── BOTÓN VENTANA FLOTANTE ── */
-.btn-float-win{
-  display:inline-flex;align-items:center;gap:4px;
-  margin-top:auto;padding:4px 10px;
-  background:none;border:none;
-  color:var(--muted);font-size:10px;font-weight:600;
-  letter-spacing:.3px;cursor:pointer;transition:color .15s;
-  align-self:flex-end
-}
-.btn-float-win:hover{color:var(--teal)}
-.btn-float-win .fw-icon{font-size:11px}
-.q-col-left{position:relative}
-.q-col-right{position:relative}
-.fw-col-footer{
-  display:flex;justify-content:flex-end;
-  padding-top:10px;border-top:1px solid var(--b2);margin-top:auto
-}
 
 /* ── VENTANA FLOTANTE PIZARRÓN ── */
 .floatwin-overlay{
@@ -584,12 +612,11 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
 
   /* Question area */
   .exam-body{padding:12px 10px}
-  .q-columns{grid-template-columns:1fr;border-radius:12px}
-  .q-col-left{padding:18px 16px;border-right:none;border-bottom:1px solid var(--b2)}
-  .q-col-right{padding:16px 14px;background:var(--panel)}
+  .q-columns{grid-template-columns:1fr;gap:12px}
+  .q-col-left,.q-col-right{padding:18px 16px}
   .q-text{font-size:15px;line-height:1.65}
-  .opt-btn{padding:12px 14px;font-size:14px;gap:12px;min-height:50px}
-  .opt-letter{min-width:36px;padding:6px 8px;font-size:13px}
+  .opt-btn{padding:10px 4px;font-size:14px;gap:10px}
+  .opt-letter{width:18px;height:18px}
   .q-nav-btns{margin-top:14px;gap:8px}
   .btn-prev,.btn-next{padding:11px 18px;font-size:14px}
 
@@ -1132,7 +1159,11 @@ function renderQ() {
     const selected = S.answers[S.current] === letter;
     const btn = document.createElement('button');
     btn.className = 'opt-btn' + (selected ? ' selected' : '');
-    btn.innerHTML = `<span class="opt-letter">${letter}</span><span>${opt}</span>`;
+    btn.dataset.letter = letter;
+    btn.innerHTML = `
+      <span class="opt-letter"></span>
+      <span class="opt-label-letter">${letter})</span>
+      <span class="opt-text">${opt}</span>`;
     btn.onclick = () => selectAns(letter);
     cont.appendChild(btn);
   });
@@ -1518,7 +1549,7 @@ function fwSelectAnswer(letter) {
   );
   $('answeredCount').textContent = Object.keys(S.answers).length;
   renderNav();
-  fwRenderPanel(); // re-renderizar para reflejar selección
+  fwRenderPanel();
 }
 
 // ── Abrir ventana flotante ──
