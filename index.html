@@ -3429,7 +3429,6 @@ function moveBuilderQuestion(idx, dir) {
 }
 
 function deleteBuilderQuestion(idx) {
-  if (!confirm(`¿Eliminar la pregunta ${idx + 1}?`)) return;
   EB.questions.splice(idx, 1);
   renderBuilderQList();
 }
