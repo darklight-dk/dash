@@ -1,0 +1,30 @@
+[
+  {
+    "titulo": "Simulacro EXANI-II Premedicina 2026",
+    "materia": "Ciencias de la Salud y Biología",
+    "icono": "🧬",
+    "tags": ["Premedicina", "EXANI-II", "2026-A"],
+    "preguntas": 50,
+    "horas": "4:30",
+    "imagenes": 6,
+    "tiempo_minutos": 270,
+    "version": "2026-A",
+    "path": "exams/simulacro-2026.zip",
+    "nuevo": true,
+    "agregado": "2026-04-26"
+  },
+  {
+    "titulo": "Redacción Indirecta Vol. I — 2026",
+    "materia": "Redacción e Interpretación de Textos",
+    "icono": "✍️",
+    "tags": ["Redacción", "EXANI-II", "2026-A"],
+    "preguntas": 30,
+    "horas": "0:40",
+    "imagenes": 0,
+    "tiempo_minutos": 40,
+    "version": "2026-A",
+    "path": "exams/redaccion-indirecta-vol1.zip",
+    "nuevo": true,
+    "agregado": "2026-04-28"
+  }
+]
