@@ -1564,6 +1564,7 @@ function doLogin() {
     // Mostrar botón admin solo para administradores
     const adminBtn = $('btnAdminPanel');
     if (adminBtn) adminBtn.style.display = role === 'Administrador' ? 'flex' : 'none';
+    renderExamCards(); // re-render para mostrar/ocultar botón "Editar examen" según rol
     show('dashScreen');
   } else {
     $('loginErr').style.display = 'block';
@@ -2070,6 +2071,7 @@ function renderExamCards() {
           <div class="ec-stat"><div class="ec-val">${imgCount}</div><div class="ec-lbl">Imágenes</div></div>
         </div>
         <button class="exam-card-btn">▶ Iniciar examen</button>
+        ${S.role === 'Administrador' ? `<button class="exam-card-btn" style="background:linear-gradient(135deg,#0f766e,#0e7490);margin-top:6px;font-size:12px;padding:9px" onclick="event.stopPropagation();editCatalogExam(${idx})">✏️ Editar examen</button>` : ''}
       </div>`;
   }).join('');
 }
@@ -2096,6 +2098,82 @@ async function loadCatalogExam(idx) {
   } catch(e) {
     btns.forEach(b => { b.textContent = '▶ Iniciar examen'; b.style.pointerEvents = ''; });
     alert('⚠️ Error al cargar el examen.\n\nAsegúrate de abrir el HTML desde un servidor local (Live Server) y que el ZIP esté en la ruta indicada en catalog.json.');
+  }
+}
+
+// ── Editar examen desde catálogo (solo admin) ──
+async function editCatalogExam(idx) {
+  if (S.role !== 'Administrador') return;
+  const ex = CATALOG[idx];
+  if (!ex) return;
+  const examPath = ex.path || ('exams/' + (ex.archivo || ex.file));
+
+  const editBtns = document.querySelectorAll('.exam-card-btn');
+  editBtns.forEach(b => {
+    if (b.textContent.includes('Editar')) { b.textContent = '⏳ Cargando…'; b.style.pointerEvents = 'none'; }
+  });
+
+  try {
+    const resp = await fetch(examPath);
+    if (!resp.ok) throw new Error('No se pudo cargar: ' + examPath);
+    const zip = await JSZip.loadAsync(await resp.arrayBuffer());
+
+    const jsonFile = Object.values(zip.files).find(f => !f.dir && f.name.match(/preguntas\.json$/i));
+    if (!jsonFile) throw new Error('No se encontro preguntas.json en el ZIP.');
+
+    const data = JSON.parse(await jsonFile.async('string'));
+    if (!data.questions || !data.questions.length) throw new Error('El JSON no contiene preguntas.');
+
+    // Cargar imágenes como dataURLs
+    const imgMap = {};
+    const imgFiles = Object.values(zip.files).filter(f => !f.dir && f.name.match(/\.(jpe?g|png|gif|webp|svg)$/i));
+    for (const imgFile of imgFiles) {
+      const b64 = await imgFile.async('base64');
+      const ext = imgFile.name.split('.').pop().toLowerCase();
+      const mime = ext === 'svg' ? 'image/svg+xml' : ext === 'png' ? 'image/png' : 'image/jpeg';
+      imgMap[imgFile.name.split('/').pop()] = 'data:' + mime + ';base64,' + b64;
+    }
+
+    // Precarga el builder (EB) con los datos del examen
+    const meta = data.meta || {};
+    EB.questions = data.questions.map(function(q) {
+      var answerIdx = Math.max(0, LETTERS.indexOf((q.answer || 'A').toUpperCase()));
+      var imgName = q.image || null;
+      return {
+        text:         q.question || '',
+        area:         q.area || '',
+        options:      q.options || [],
+        answerIdx:    answerIdx,
+        explanation:  q.explanation || '',
+        imageName:    imgName,
+        imageDataUrl: (imgName && imgMap[imgName]) ? imgMap[imgName] : null,
+      };
+    });
+
+    // Rellenar campos de metadata del builder
+    var totalMins = meta.tiempo_minutos || 0;
+    var bh = Math.floor(totalMins / 60);
+    var bm = totalMins % 60;
+    $('bldTitulo').value  = meta.titulo  || ex.titulo  || '';
+    $('bldVersion').value = meta.version || ex.version || '';
+    $('bldMateria').value = meta.materia || ex.materia || '';
+    $('bldAreaTag').value = meta.area    || (ex.tags && ex.tags[0]) || '';
+    $('bldHoras').value   = bh;
+    $('bldMins').value    = bm;
+    updateTimePreview();
+    renderBuilderQList();
+
+    // Abrir panel admin en tab "Crear examen" (que ahora actua como editor completo)
+    openAdmin();
+    switchAdminTab('create');
+    showToast('✏️ ' + data.questions.length + ' preguntas cargadas — edita y exporta el ZIP');
+
+  } catch(e) {
+    alert('Error al cargar el examen para editar:\n\n' + e.message);
+  } finally {
+    editBtns.forEach(b => {
+      if (b.textContent.includes('Cargando')) { b.textContent = '✏️ Editar examen'; b.style.pointerEvents = ''; }
+    });
   }
 }
 
