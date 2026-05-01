@@ -150,8 +150,17 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
   display:grid;grid-template-columns:1fr 1fr;
   gap:32px;align-items:start
 }
-.q-col-right{padding:28px 28px 20px;display:flex;flex-direction:column;
-  min-height:480px;background:#ffffff;border:1px solid #e2e8f0;border-radius:12px}
+/* Each column is a plain card */
+.q-col-left{
+  background:#ffffff;border:1px solid #e2e8f0;
+  border-radius:12px;padding:28px 28px 20px;
+  display:flex;flex-direction:column;min-height:480px
+}
+.q-col-right{
+  background:#ffffff;border:1px solid #e2e8f0;
+  border-radius:12px;padding:28px 28px 20px;
+  display:flex;flex-direction:column;min-height:480px
+}
 .q-col-header{
   display:flex;align-items:center;gap:10px;
   padding-bottom:12px;border-bottom:2px solid var(--teal);margin-bottom:16px
@@ -209,14 +218,14 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
   display:flex;justify-content:flex-start
 }
 .btn-float-win{
-  display:inline-flex;align-items:center;gap:7px;
-  background:#0ea5e9;border:none;border-radius:8px;
-  padding:8px 16px;color:#ffffff;
-  font-size:12px;font-weight:700;letter-spacing:.3px;
+  display:inline-flex;align-items:center;gap:5px;
+  background:#0ea5e9;border:none;border-radius:6px;
+  padding:5px 11px;color:#ffffff;
+  font-size:11px;font-weight:600;letter-spacing:.2px;
   cursor:pointer;transition:background .15s
 }
 .btn-float-win:hover{background:#0284c7}
-.btn-float-win .fw-icon{font-size:13px}
+.btn-float-win .fw-icon{font-size:11px}
 
 .q-nav-btns{display:flex;justify-content:space-between;gap:12px}
 .btn-prev,.btn-next{border:none;border-radius:10px;padding:12px 28px;
