@@ -704,8 +704,29 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
           <button class="exam-card-btn">▶ Iniciar examen</button>
         </div>
 
-        <!-- Próximamente placeholder -->
-        <div class="exam-card" style="opacity:.5;pointer-events:none;cursor:default">
+        <!-- Redacción Indirecta Vol. I -->
+        <div class="exam-card" onclick="loadBuiltinExam('redaccionVol1')">
+          <span class="exam-card-new">NUEVO</span>
+          <div class="exam-card-head">
+            <div class="exam-card-icon">✍️</div>
+            <div class="exam-card-info">
+              <div class="exam-card-title">Redacción Indirecta<br>Vol. I — 2026</div>
+              <div class="exam-card-sub">Redacción · EXANI-II 2026</div>
+            </div>
+          </div>
+          <div class="exam-card-tags">
+            <span class="exam-tag teal">Redacción</span>
+            <span class="exam-tag">EXANI-II</span>
+            <span class="exam-tag">2026-A</span>
+          </div>
+          <div class="exam-card-stats">
+            <div class="ec-stat"><div class="ec-val">30</div><div class="ec-lbl">Preguntas</div></div>
+            <div class="ec-stat"><div class="ec-val">0:40</div><div class="ec-lbl">Horas</div></div>
+            <div class="ec-stat"><div class="ec-val">0</div><div class="ec-lbl">Imágenes</div></div>
+          </div>
+          <button class="exam-card-btn">▶ Iniciar examen</button>
+        </div>
+        <!-- placeholder removed --><div class="exam-card" style="display:none">
           <div class="exam-card-head">
             <div class="exam-card-icon" style="opacity:.4">📘</div>
             <div class="exam-card-info">
@@ -1450,6 +1471,10 @@ const BUILTIN_EXAMS = {
   premedicina2026: {
     path: 'exams/simulacro-2026.zip',
     filename: 'simulacro-2026.zip'
+  },
+  redaccionVol1: {
+    path: 'exams/redaccion-indirecta-vol1.zip',
+    filename: 'redaccion-indirecta-vol1.zip'
   }
 };
 
