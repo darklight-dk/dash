@@ -150,12 +150,8 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
   display:grid;grid-template-columns:1fr 1fr;
   gap:32px;align-items:start
 }
-/* Each column is a plain card */
-.q-col-left,.q-col-right{
-  background:#ffffff;border:1px solid #e2e8f0;
-  border-radius:12px;padding:28px 28px 16px;
-  display:flex;flex-direction:column;min-height:320px
-}
+.q-col-right{padding:28px 28px 20px;display:flex;flex-direction:column;
+  min-height:480px;background:#ffffff;border:1px solid #e2e8f0;border-radius:12px}
 .q-col-header{
   display:flex;align-items:center;gap:10px;
   padding-bottom:12px;border-bottom:2px solid var(--teal);margin-bottom:16px
@@ -207,20 +203,20 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .opt-btn:hover .opt-label-letter,.opt-btn.selected .opt-label-letter{color:var(--teal)}
 .opt-text{flex:1;line-height:1.5}
 
-/* ── FLOAT WIN BUTTON — square blue, bottom of col ── */
+/* ── FLOAT WIN BUTTON — square blue, pinned to bottom of col ── */
 .fw-col-footer{
-  margin-top:auto;padding-top:16px;
+  margin-top:auto;padding-top:20px;
   display:flex;justify-content:flex-start
 }
 .btn-float-win{
   display:inline-flex;align-items:center;gap:7px;
   background:#0ea5e9;border:none;border-radius:8px;
-  padding:7px 14px;color:#ffffff;
-  font-size:11px;font-weight:700;letter-spacing:.3px;
+  padding:8px 16px;color:#ffffff;
+  font-size:12px;font-weight:700;letter-spacing:.3px;
   cursor:pointer;transition:background .15s
 }
 .btn-float-win:hover{background:#0284c7}
-.btn-float-win .fw-icon{font-size:12px}
+.btn-float-win .fw-icon{font-size:13px}
 
 .q-nav-btns{display:flex;justify-content:space-between;gap:12px}
 .btn-prev,.btn-next{border:none;border-radius:10px;padding:12px 28px;
