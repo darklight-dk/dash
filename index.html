@@ -130,6 +130,64 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .profile-dd-item.danger{color:#dc2626}
 .profile-dd-item.danger:hover{background:#fef2f2}
 .profile-dd-divider{height:1px;background:#f1f5f9;margin:4px 0}
+
+/* ── RANKING TOPBAR BTN ── */
+.ranking-topbar-btn{background:linear-gradient(135deg,#f59e0b,#d97706);border:none;
+  border-radius:20px;padding:6px 14px;color:#fff;font-size:13px;font-weight:700;
+  cursor:pointer;transition:all .2s;display:none;align-items:center;gap:6px;flex-shrink:0;
+  box-shadow:0 2px 8px rgba(245,158,11,.3)}
+.ranking-topbar-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(245,158,11,.45)}
+
+/* ── PROFILE VIEWER MODAL ── */
+.pview-overlay{position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:500;
+  display:none;align-items:center;justify-content:center;backdrop-filter:blur(5px)}
+.pview-overlay.show{display:flex}
+.pview-modal{background:#fff;border-radius:24px;width:min(340px,90vw);padding:32px 28px;
+  box-shadow:0 24px 64px rgba(0,0,0,.18);position:relative;animation:fadeUp .2s ease}
+.pview-avatar-wrap{width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,var(--teal),#065f46);
+  color:#fff;font-size:30px;font-weight:800;display:flex;align-items:center;justify-content:center;
+  margin:0 auto 14px;overflow:hidden;flex-shrink:0}
+.pview-avatar-wrap img{width:100%;height:100%;object-fit:cover}
+.pview-uname{font-size:20px;font-weight:800;text-align:center;color:var(--text)}
+.pview-role-pill{display:inline-block;background:rgba(13,148,136,.12);color:var(--teal);
+  border-radius:20px;padding:3px 12px;font-size:11px;font-weight:700;letter-spacing:.3px;margin-top:6px}
+.pview-socials{display:flex;flex-direction:column;gap:8px;margin-top:20px}
+.pview-social-link{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;
+  border:1.5px solid var(--b2);text-decoration:none;color:var(--text);font-size:13px;font-weight:600;
+  transition:all .15s;word-break:break-all}
+.pview-social-link:hover{border-color:var(--teal);background:#f0fdf8;color:var(--teal)}
+.pview-social-icon{font-size:18px;flex-shrink:0}
+.pview-no-socials{text-align:center;color:var(--muted);font-size:13px;padding:14px 0;line-height:1.6}
+.pview-close{position:absolute;top:14px;right:16px;background:none;border:none;
+  font-size:20px;color:var(--muted);cursor:pointer;padding:2px 7px;border-radius:8px;line-height:1}
+.pview-close:hover{color:var(--text);background:#f1f5f9}
+.pview-center{text-align:center}
+
+/* ── MY PROFILE EDITOR ── */
+.myp-overlay{position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:500;
+  display:none;align-items:center;justify-content:center;backdrop-filter:blur(5px)}
+.myp-overlay.show{display:flex}
+.myp-modal{background:#fff;border-radius:24px;width:min(380px,92vw);padding:32px 28px;
+  box-shadow:0 24px 64px rgba(0,0,0,.18);animation:fadeUp .2s ease}
+.myp-title{font-size:17px;font-weight:800;color:var(--text);margin-bottom:6px}
+.myp-sub{font-size:12px;color:var(--muted);margin-bottom:22px}
+.myp-field{display:flex;flex-direction:column;gap:5px;margin-bottom:13px}
+.myp-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;
+  display:flex;align-items:center;gap:6px}
+.myp-inp{border:1.5px solid var(--b2);border-radius:10px;padding:9px 12px;
+  font-size:13px;font-family:'Sora',sans-serif;outline:none;transition:border .15s;
+  width:100%;box-sizing:border-box;color:var(--text)}
+.myp-inp:focus{border-color:var(--teal)}
+.myp-inp::placeholder{color:#94a3b8}
+.myp-actions{display:flex;gap:10px;margin-top:20px}
+.myp-save{flex:1;background:linear-gradient(135deg,var(--teal),#065f46);color:#fff;
+  border:none;border-radius:12px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .15s}
+.myp-save:hover{opacity:.9}
+.myp-cancel{background:none;border:1.5px solid var(--b2);border-radius:12px;
+  padding:12px 18px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s}
+.myp-cancel:hover{border-color:var(--text);color:var(--text)}
+.myp-saved{font-size:12px;color:var(--teal);font-weight:700;text-align:center;margin-top:8px;display:none}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 .btn-sm{background:transparent;border:1px solid var(--b2);border-radius:8px;
   padding:9px 18px;color:var(--muted);font-size:13px;transition:all .15s}
 .btn-sm:hover{border-color:var(--teal);color:var(--teal)}
@@ -1075,7 +1133,7 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
   <div class="grid-bg"></div><div class="glow"></div>
   <div class="login-card">
     <div class="logo">
-      <div class="logo-text"><span class="e">EXANI</span><span class="d">-DASH</span></div>
+      <div class="logo-text"><span class="e">DASH</span></div>
       <div class="logo-sub">Plataforma de Evaluación</div>
     </div>
 
@@ -1192,8 +1250,9 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
 <!-- DASHBOARD -->
 <div id="dashScreen" class="screen">
   <div class="topbar">
-    <div class="logo-sm"><span style="color:var(--teal)">EXANI</span><span style="color:var(--green)">-DASH</span></div>
+    <div class="logo-sm"><span style="color:var(--teal)">DASH</span></div>
     <div style="display:flex;gap:10px;align-items:center">
+      <button class="ranking-topbar-btn" id="rankingTopbarBtn" onclick="openRanking()">🏆 Ranking</button>
       <div class="profile-btn" id="profileBtn" onclick="toggleProfileMenu(this)">
         <div class="profile-avatar-initials" id="profileAvatarSmall">?</div>
         <div class="profile-info">
@@ -1210,6 +1269,7 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
               <span class="profile-dd-role-badge" id="profileDDRole">—</span>
             </div>
           </div>
+          <div class="profile-dd-item" onclick="openMyProfile();closeProfileMenu()">👤 Mi Perfil</div>
           <div class="profile-dd-item" id="ddAdminItem" style="display:none" onclick="openAdmin();closeProfileMenu()">⚙️ Panel Admin</div>
           <div class="profile-dd-divider"></div>
           <div class="profile-dd-item danger" onclick="doLogout()">🚪 Cerrar sesión</div>
@@ -1245,7 +1305,7 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
 <!-- ADMIN PANEL -->
 <div id="adminScreen" class="screen" style="flex-direction:column">
   <div class="topbar">
-    <div class="logo-sm"><span style="color:var(--teal)">EXANI</span><span style="color:var(--green)">-DASH</span> <span class="admin-badge">ADMIN</span></div>
+    <div class="logo-sm"><span style="color:var(--teal)">DASH</span> <span class="admin-badge">ADMIN</span></div>
     <div style="display:flex;gap:10px;align-items:center">
       <div class="profile-btn" onclick="toggleProfileMenu(this)">
         <div class="profile-avatar-initials" id="profileAvatarSmallAdmin">?</div>
@@ -1620,7 +1680,7 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
         <div class="timer-digits" id="timerDigits">04:30:00</div>
         <div class="timer-bar"><div class="timer-fill" id="timerFill" style="width:0%"></div></div>
       </div>
-      <div class="logo-sm"><span style="color:var(--teal)">EXANI</span><span style="color:var(--green)">-DASH</span></div>
+      <div class="logo-sm"><span style="color:var(--teal)">DASH</span></div>
     </div>
     <div class="ctrl-group">
       <button class="btn-ctrl btn-calc" onclick="toggleCalc()">🧮 CALCULADORA</button>
@@ -1925,8 +1985,8 @@ function _enterDash(user, role, picture, email) {
 function doLogout() {
   stopTimer();
   stopChat();
-  const rfab = $('rankingFab');
-  if (rfab) rfab.style.display = 'none';
+  const rfab = $('rankingFab'); if (rfab) rfab.style.display = 'none';
+  const rtbLogout = $('rankingTopbarBtn'); if (rtbLogout) rtbLogout.style.display = 'none';
   closeRanking();
   localStorage.removeItem('exani_session');
   S = { user:null, role:null, googlePicture:null, googleEmail:'', questions:[], images:{}, answers:{}, current:0, navStart:0,
@@ -2040,8 +2100,8 @@ function finishGoogleLogin(role) {
   show('dashScreen');
   initChat();
   // Mostrar ranking FAB solo para Google users
-  const rfab = $('rankingFab');
-  if (rfab) rfab.style.display = S.googleEmail ? 'flex' : 'none';
+  const rfab = $('rankingFab'); if (rfab) rfab.style.display = 'none';
+  const rtbBtn = $('rankingTopbarBtn'); if (rtbBtn) rtbBtn.style.display = 'flex';
 }
 
 // ══════════════════════════════════════════
@@ -4754,7 +4814,7 @@ function appendChatMsg(msg) {
   const time = msg.ts ? new Date(msg.ts).toLocaleTimeString('es-MX', {hour:'2-digit',minute:'2-digit'}) : '';
 
   wrap.innerHTML = `
-    <div class="chat-msg-header">
+    <div class="chat-msg-header" style="cursor:pointer" onclick="openProfileView('${escapeHTML(msg.name||'')}','${escapeHTML(msg.role||'')}','${escapeHTML(msg.picture||'')}')">
       ${!isMine ? avatarHTML : ''}
       <span class="chat-msg-name">${escapeHTML(msg.name || 'Anónimo')}</span>
       ${isMine ? avatarHTML : ''}
@@ -4815,6 +4875,9 @@ window.toggleProfanityFilter = function() {
 window.clearChatMessages = async function() {
   if (S.role !== 'Administrador') return;
   if (!confirm('¿Limpiar todo el chat? No se puede deshacer.')) return;
+  // Limpiar DOM inmediatamente
+  const container = document.getElementById('chatMessages');
+  if (container) container.innerHTML = '';
   await remove(msgsRef);
   push(msgsRef, { system: true, text: 'Chat limpiado por un administrador.', ts: Date.now() });
 };
@@ -4870,6 +4933,109 @@ window.updateProfileUI = function() {
   if (adminBar) adminBar.classList.toggle('visible', S.role === 'Administrador');
 };
 
+// ── Perfil: ver usuario del chat ──
+window.openProfileView = async function(username, role, picture) {
+  const overlay = document.getElementById('pviewOverlay');
+  const avatarEl = document.getElementById('pviewAvatar');
+  const nameEl   = document.getElementById('pviewName');
+  const roleEl   = document.getElementById('pviewRole');
+  const socialsEl = document.getElementById('pviewSocials');
+  const noSocials = document.getElementById('pviewNoSocials');
+
+  nameEl.textContent = username;
+  roleEl.textContent = role || 'Aspirante';
+
+  // Avatar
+  avatarEl.innerHTML = '';
+  if (picture) {
+    const img = document.createElement('img');
+    img.src = picture; img.alt = username;
+    img.onerror = () => { avatarEl.textContent = (username||'?').slice(0,2).toUpperCase(); };
+    avatarEl.appendChild(img);
+  } else {
+    avatarEl.textContent = (username||'?').slice(0,2).toUpperCase();
+  }
+
+  // Reset socials
+  socialsEl.innerHTML = '<div class="pview-no-socials" id="pviewNoSocials">Cargando…</div>';
+
+  overlay.classList.add('show');
+
+  // Fetch socials from Firebase
+  try {
+    const snap = await new Promise(res => {
+      const socialsQuery = ref(db, 'userSocials/' + encodeURIComponent(username));
+      onValue(socialsQuery, res, { onlyOnce: true });
+    });
+    const socials = snap.exists() ? snap.val() : {};
+    const links = [
+      { key: 'x',  icon: '𝕏', label: 'X / Twitter' },
+      { key: 'ig', icon: '📸', label: 'Instagram'  },
+      { key: 'tt', icon: '🎵', label: 'TikTok'     },
+    ].filter(l => socials[l.key]);
+
+    socialsEl.innerHTML = '';
+    if (links.length === 0) {
+      socialsEl.innerHTML = '<div class="pview-no-socials">Sin redes sociales configuradas.</div>';
+    } else {
+      links.forEach(l => {
+        const a = document.createElement('a');
+        a.className = 'pview-social-link';
+        a.href = socials[l.key]; a.target = '_blank'; a.rel = 'noopener noreferrer';
+        a.innerHTML = `<span class="pview-social-icon">${l.icon}</span>${escapeHTML(socials[l.key])}`;
+        socialsEl.appendChild(a);
+      });
+    }
+  } catch(e) {
+    socialsEl.innerHTML = '<div class="pview-no-socials">Error al cargar perfil.</div>';
+  }
+};
+
+window.closePView = function(e) {
+  if (e.target === document.getElementById('pviewOverlay'))
+    document.getElementById('pviewOverlay').classList.remove('show');
+};
+
+// ── Mi Perfil: editar redes ──
+window.openMyProfile = async function() {
+  if (!S.user) return;
+  const overlay = document.getElementById('mypOverlay');
+  document.getElementById('mypSaved').style.display = 'none';
+  document.getElementById('mypX').value  = '';
+  document.getElementById('mypIG').value = '';
+  document.getElementById('mypTT').value = '';
+
+  overlay.classList.add('show');
+
+  try {
+    const snap = await new Promise(res => {
+      onValue(ref(db, 'userSocials/' + encodeURIComponent(S.user)), res, { onlyOnce: true });
+    });
+    if (snap.exists()) {
+      const d = snap.val();
+      document.getElementById('mypX').value  = d.x  || '';
+      document.getElementById('mypIG').value = d.ig || '';
+      document.getElementById('mypTT').value = d.tt || '';
+    }
+  } catch(e) {}
+};
+
+window.saveMyProfile = async function() {
+  if (!S.user) return;
+  const x  = document.getElementById('mypX').value.trim();
+  const ig = document.getElementById('mypIG').value.trim();
+  const tt = document.getElementById('mypTT').value.trim();
+  await set(ref(db, 'userSocials/' + encodeURIComponent(S.user)), { x, ig, tt });
+  const saved = document.getElementById('mypSaved');
+  saved.style.display = 'block';
+  setTimeout(() => { saved.style.display = 'none'; }, 2500);
+};
+
+window.closeMypOverlay = function(e) {
+  if (e.target === document.getElementById('mypOverlay'))
+    document.getElementById('mypOverlay').classList.remove('show');
+};
+
 // ── Sign out de Firebase Auth ──
 window._fbSignOut = async function() {
   try { await signOut(auth); } catch(e) {}
@@ -4881,6 +5047,46 @@ window.addEventListener('beforeunload', () => {
   if (myPresenceRef) set(myPresenceRef, null);
 });
 </script>
+
+<!-- PROFILE VIEWER MODAL -->
+<div class="pview-overlay" id="pviewOverlay" onclick="closePView(event)">
+  <div class="pview-modal">
+    <button class="pview-close" onclick="document.getElementById('pviewOverlay').classList.remove('show')">✕</button>
+    <div class="pview-avatar-wrap" id="pviewAvatar">?</div>
+    <div class="pview-center">
+      <div class="pview-uname" id="pviewName">—</div>
+      <div><span class="pview-role-pill" id="pviewRole">—</span></div>
+    </div>
+    <div class="pview-socials" id="pviewSocials">
+      <div class="pview-no-socials" id="pviewNoSocials">Sin redes sociales configuradas.</div>
+    </div>
+  </div>
+</div>
+
+<!-- MY PROFILE EDITOR MODAL -->
+<div class="myp-overlay" id="mypOverlay" onclick="closeMypOverlay(event)">
+  <div class="myp-modal">
+    <div class="myp-title">👤 Mi Perfil</div>
+    <div class="myp-sub">Agrega tus redes sociales. Serán visibles para otros usuarios.</div>
+    <div class="myp-field">
+      <label class="myp-label">𝕏 X / Twitter</label>
+      <input class="myp-inp" id="mypX" placeholder="https://x.com/tu_usuario" type="url"/>
+    </div>
+    <div class="myp-field">
+      <label class="myp-label">📸 Instagram</label>
+      <input class="myp-inp" id="mypIG" placeholder="https://instagram.com/tu_usuario" type="url"/>
+    </div>
+    <div class="myp-field">
+      <label class="myp-label">🎵 TikTok</label>
+      <input class="myp-inp" id="mypTT" placeholder="https://tiktok.com/@tu_usuario" type="url"/>
+    </div>
+    <div class="myp-actions">
+      <button class="myp-cancel" onclick="document.getElementById('mypOverlay').classList.remove('show')">Cancelar</button>
+      <button class="myp-save" onclick="saveMyProfile()">Guardar</button>
+    </div>
+    <div class="myp-saved" id="mypSaved">✓ Guardado correctamente</div>
+  </div>
+</div>
 
 </body>
 </html>
