@@ -343,6 +343,64 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 }
 .dash-body{flex:1;display:flex;flex-direction:column;align-items:center;
   justify-content:center;padding:48px 24px;gap:28px}
+/* ── CHAT MUNDIAL ── */
+.chat-fab{position:fixed;bottom:24px;right:24px;width:56px;height:56px;
+  background:linear-gradient(135deg,var(--teal),#065f46);border:none;border-radius:50%;
+  color:#fff;font-size:24px;cursor:pointer;box-shadow:0 4px 20px rgba(13,148,136,.4);
+  z-index:300;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.chat-fab:hover{transform:scale(1.1);box-shadow:0 6px 28px rgba(13,148,136,.5)}
+.chat-fab-badge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;
+  border-radius:50%;width:20px;height:20px;font-size:11px;font-weight:800;
+  display:none;align-items:center;justify-content:center;border:2px solid #fff}
+.chat-panel{position:fixed;bottom:90px;right:24px;width:340px;height:480px;
+  background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.15);
+  z-index:299;display:flex;flex-direction:column;overflow:hidden;
+  border:1px solid var(--b2);opacity:0;transform:translateY(16px) scale(.97);
+  transition:all .2s;pointer-events:none}
+.chat-panel.show{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+.chat-header{background:linear-gradient(135deg,var(--teal),#065f46);padding:14px 16px;
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.chat-header-title{color:#fff;font-size:14px;font-weight:800;display:flex;align-items:center;gap:8px}
+.chat-online-dot{width:8px;height:8px;background:#4ade80;border-radius:50%;animation:pulse-dot 2s infinite}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.7;transform:scale(1.2)}}
+.chat-online-count{color:rgba(255,255,255,.8);font-size:11px;font-weight:600}
+.chat-close{background:none;border:none;color:rgba(255,255,255,.8);font-size:18px;cursor:pointer;
+  padding:2px 6px;border-radius:6px;transition:color .15s}
+.chat-close:hover{color:#fff}
+.chat-messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;
+  scroll-behavior:smooth}
+.chat-messages::-webkit-scrollbar{width:4px}
+.chat-messages::-webkit-scrollbar-thumb{background:#e2e8f0;border-radius:4px}
+.chat-msg{display:flex;flex-direction:column;gap:2px;max-width:85%}
+.chat-msg.mine{align-self:flex-end;align-items:flex-end}
+.chat-msg.theirs{align-self:flex-start;align-items:flex-start}
+.chat-msg-header{display:flex;align-items:center;gap:6px}
+.chat-msg-avatar{width:20px;height:20px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.chat-msg-avatar-initials{width:20px;height:20px;border-radius:50%;
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;
+  font-size:8px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.chat-msg-name{font-size:11px;font-weight:700;color:var(--muted)}
+.chat-msg-bubble{padding:8px 12px;border-radius:14px;font-size:13px;line-height:1.4;word-break:break-word}
+.chat-msg.mine .chat-msg-bubble{background:linear-gradient(135deg,var(--teal),#0891b2);color:#fff;
+  border-bottom-right-radius:4px}
+.chat-msg.theirs .chat-msg-bubble{background:#f1f5f9;color:var(--text);border-bottom-left-radius:4px}
+.chat-msg-time{font-size:10px;color:var(--muted);padding:0 4px}
+.chat-system{text-align:center;font-size:11px;color:var(--muted);padding:4px 0;font-style:italic}
+.chat-input-bar{padding:10px 12px;border-top:1px solid #f1f5f9;display:flex;gap:8px;flex-shrink:0;background:#fff}
+.chat-input{flex:1;border:1.5px solid var(--b2);border-radius:20px;padding:8px 14px;
+  font-size:13px;font-family:'Sora',sans-serif;outline:none;transition:border .15s;resize:none;
+  max-height:80px;overflow-y:auto}
+.chat-input:focus{border-color:var(--teal)}
+.chat-send{background:linear-gradient(135deg,var(--teal),#065f46);border:none;border-radius:50%;
+  width:36px;height:36px;color:#fff;font-size:16px;cursor:pointer;flex-shrink:0;
+  transition:all .15s;display:flex;align-items:center;justify-content:center}
+.chat-send:hover{transform:scale(1.08)}
+.chat-login-prompt{flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:8px;color:var(--muted);font-size:13px;padding:20px}
+@media(max-width:480px){
+  .chat-panel{width:calc(100vw - 32px);right:16px;bottom:80px}
+  .chat-fab{bottom:16px;right:16px}
+}
 .dash-title{text-align:center}
 .dash-title h1{font-size:28px;font-weight:800}
 .dash-title p{color:var(--muted);margin-top:8px;font-size:15px}
@@ -945,6 +1003,32 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
       Continuar con Google
     </button>
     <div class="login-footer">Acceso restringido · Sistema local</div>
+  </div>
+</div>
+
+<!-- CHAT MUNDIAL -->
+<button class="chat-fab" onclick="toggleChat()" id="chatFab" style="display:none">
+  💬
+  <span class="chat-fab-badge" id="chatBadge"></span>
+</button>
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-header">
+    <div>
+      <div class="chat-header-title">
+        <span class="chat-online-dot"></span>
+        💬 Chat Mundial
+      </div>
+      <div class="chat-online-count" id="chatOnlineCount"></div>
+    </div>
+    <button class="chat-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="chat-system">Conectando…</div>
+  </div>
+  <div class="chat-input-bar">
+    <textarea class="chat-input" id="chatInput" placeholder="Escribe un mensaje…" rows="1"
+      onkeydown="chatKeydown(event)" oninput="autoResizeChat(this)"></textarea>
+    <button class="chat-send" onclick="sendChatMsg()">➤</button>
   </div>
 </div>
 
@@ -1681,6 +1765,7 @@ function doLogin() {
     if (adminBtn) adminBtn.style.display = role === 'Administrador' ? 'flex' : 'none';
     renderExamCards(); // re-render para mostrar/ocultar botón "Editar examen" según rol
     show('dashScreen');
+    initChat();
   } else {
     $('loginErr').style.display = 'block';
     card.style.animation = 'none';
@@ -1690,6 +1775,7 @@ function doLogin() {
 
 function doLogout() {
   stopTimer();
+  stopChat();
   S = { user:null, role:null, googlePicture:null, googleEmail:'', questions:[], images:{}, answers:{}, current:0, navStart:0,
         timerSecs:TOTAL_SECS, timerInt:null, running:false, paused:false,
         rawZip:null, currentExamMeta:null, adminEdits:{} };
@@ -1793,6 +1879,7 @@ function finishGoogleLogin(role) {
   if (adminBtn) adminBtn.style.display = role === 'Administrador' ? 'flex' : 'none';
   renderExamCards();
   show('dashScreen');
+  initChat();
 }
 
 // ══════════════════════════════════════════
@@ -2474,6 +2561,177 @@ function loadBuiltinExam(key) {
   if (idx !== undefined) loadCatalogExam(idx);
 }
 
+
+// ══════════════════════════════════════════
+//  CHAT MUNDIAL — Firebase Realtime Database
+// ══════════════════════════════════════════
+const FB_URL = 'https://exani-dash-adeff-default-rtdb.firebaseio.com';
+const CHAT_REF = FB_URL + '/chat/messages';
+const MAX_MSGS = 80;
+let chatOpen = false;
+let chatLastKey = null;
+let chatUnread = 0;
+let chatListener = null;
+
+function toggleChat() {
+  chatOpen = !chatOpen;
+  const panel = $('chatPanel');
+  panel.classList.toggle('show', chatOpen);
+  if (chatOpen) {
+    chatUnread = 0;
+    updateChatBadge();
+    setTimeout(() => scrollChatBottom(), 100);
+    $('chatInput').focus();
+  }
+}
+
+function updateChatBadge() {
+  const badge = $('chatBadge');
+  if (!badge) return;
+  if (chatUnread > 0 && !chatOpen) {
+    badge.textContent = chatUnread > 9 ? '9+' : chatUnread;
+    badge.style.display = 'flex';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function scrollChatBottom() {
+  const el = $('chatMessages');
+  if (el) el.scrollTop = el.scrollHeight;
+}
+
+function autoResizeChat(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 80) + 'px';
+}
+
+function chatKeydown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendChatMsg();
+  }
+}
+
+function renderChatMsg(key, msg, isNew) {
+  const container = $('chatMessages');
+  if (!container) return;
+  // Quitar "Conectando..." si existe
+  const connecting = container.querySelector('.chat-system');
+  if (connecting && connecting.textContent === 'Conectando…') connecting.remove();
+
+  const isMine = S.user && msg.user === S.user;
+  const time = new Date(msg.ts).toLocaleTimeString('es-MX', { hour:'2-digit', minute:'2-digit' });
+  const initials = (msg.user || '?').slice(0,2).toUpperCase();
+
+  // Avatar
+  const avatarHTML = msg.picture
+    ? `<img class="chat-msg-avatar" src="${msg.picture}" onerror="this.style.display='none'">`
+    : `<div class="chat-msg-avatar-initials">${initials}</div>`;
+
+  const div = document.createElement('div');
+  div.className = 'chat-msg ' + (isMine ? 'mine' : 'theirs');
+  div.dataset.key = key;
+  div.innerHTML = `
+    ${!isMine ? `<div class="chat-msg-header">${avatarHTML}<span class="chat-msg-name">${msg.user}</span></div>` : ''}
+    <div class="chat-msg-bubble">${escapeHtml(msg.text)}</div>
+    <div class="chat-msg-time">${isMine ? '✓ ' : ''}${time}</div>
+  `;
+  container.appendChild(div);
+
+  if (isNew) {
+    scrollChatBottom();
+    if (!chatOpen && !isMine) {
+      chatUnread++;
+      updateChatBadge();
+    }
+  }
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+async function sendChatMsg() {
+  if (!S.user) { alert('Tenés que estar logueado para chatear.'); return; }
+  const input = $('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  input.style.height = 'auto';
+
+  const msg = {
+    user:    S.user,
+    text:    text,
+    ts:      Date.now(),
+    picture: S.googlePicture || null,
+    role:    S.role || 'Aspirante',
+  };
+
+  try {
+    await fetch(CHAT_REF + '.json', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(msg),
+    });
+  } catch(e) {
+    showToast('❌ Error al enviar el mensaje');
+  }
+}
+
+async function initChat() {
+  // Mostrar FAB solo si está logueado
+  const fab = $('chatFab');
+  if (fab) fab.style.display = 'flex';
+
+  // Cargar últimos mensajes via REST
+  try {
+    const res = await fetch(CHAT_REF + '.json?orderBy="ts"&limitToLast=' + MAX_MSGS);
+    const data = await res.json();
+    if (data && typeof data === 'object') {
+      const msgs = Object.entries(data).sort((a,b) => a[1].ts - b[1].ts);
+      msgs.forEach(([key, msg]) => {
+        chatLastKey = key;
+        renderChatMsg(key, msg, false);
+      });
+      scrollChatBottom();
+    } else {
+      $('chatMessages').innerHTML = '<div class="chat-system">¡Sé el primero en escribir! 👋</div>';
+    }
+  } catch(e) {
+    $('chatMessages').innerHTML = '<div class="chat-system">Sin conexión al chat</div>';
+    return;
+  }
+
+  // Polling cada 3 segundos para nuevos mensajes (más simple que SSE para GitHub Pages)
+  if (chatListener) clearInterval(chatListener);
+  chatListener = setInterval(async () => {
+    try {
+      const url = chatLastKey
+        ? CHAT_REF + '.json?orderBy="$key"&startAfter="' + chatLastKey + '"&limitToLast=20'
+        : CHAT_REF + '.json?orderBy="ts"&limitToLast=5';
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data && typeof data === 'object') {
+        const msgs = Object.entries(data).sort((a,b) => a[1].ts - b[1].ts);
+        msgs.forEach(([key, msg]) => {
+          if (key !== chatLastKey && !document.querySelector('[data-key="'+key+'"]')) {
+            chatLastKey = key;
+            renderChatMsg(key, msg, true);
+          }
+        });
+      }
+    } catch {}
+  }, 3000);
+}
+
+function stopChat() {
+  if (chatListener) { clearInterval(chatListener); chatListener = null; }
+  const fab = $('chatFab');
+  if (fab) fab.style.display = 'none';
+  chatOpen = false;
+  $('chatPanel')?.classList.remove('show');
+}
 
 buildCalc();
 loadCatalog();   // carga exams/catalog.json y renderiza las tarjetas
@@ -4065,5 +4323,178 @@ function buildTags(area, version) {
 }
 
 </script>
+<!-- FIREBASE SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, push, onChildAdded, onValue, serverTimestamp, query, limitToLast, set, onDisconnect }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD08Hrh7p2arUArqmN558QCZa-u-D5iUwU",
+  authDomain: "exani-dash-adeff.firebaseapp.com",
+  projectId: "exani-dash-adeff",
+  storageBucket: "exani-dash-adeff.firebasestorage.app",
+  messagingSenderId: "378624076231",
+  appId: "1:378624076231:web:bcd916d9aded67ff80d1e2",
+  databaseURL: "https://exani-dash-adeff-default-rtdb.firebaseio.com"
+};
+
+const fbApp  = initializeApp(firebaseConfig);
+const db     = getDatabase(fbApp);
+const msgsRef = ref(db, 'chat/messages');
+const presRef = ref(db, 'chat/presence');
+
+let chatOpen      = false;
+let unreadCount   = 0;
+let firstLoad     = true;
+let myPresenceRef = null;
+
+// ── Presencia ──
+function registerPresence() {
+  if (!S.user) return;
+  myPresenceRef = ref(db, 'chat/presence/' + encodeURIComponent(S.user));
+  set(myPresenceRef, { name: S.user, online: true, ts: Date.now() });
+  onDisconnect(myPresenceRef).remove();
+}
+
+// Contar online
+onValue(presRef, snap => {
+  const count = snap.exists() ? Object.keys(snap.val()).length : 0;
+  const el = document.getElementById('chatOnlineCount');
+  if (el) el.textContent = count > 0 ? count + ' online' : '';
+});
+
+// ── Escuchar mensajes (últimos 80) ──
+const recentQ = query(msgsRef, limitToLast(80));
+onChildAdded(recentQ, snap => {
+  const msg = snap.val();
+  if (!msg) return;
+  appendChatMsg(msg);
+  if (!chatOpen && !firstLoad) {
+    unreadCount++;
+    const badge = document.getElementById('chatBadge');
+    if (badge) {
+      badge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+      badge.style.display = 'flex';
+    }
+  }
+  if (firstLoad) {
+    // Al terminar la carga inicial, scroll al fondo
+    setTimeout(() => {
+      const msgs = document.getElementById('chatMessages');
+      if (msgs) msgs.scrollTop = msgs.scrollHeight;
+      firstLoad = false;
+    }, 200);
+  }
+});
+
+// ── Renderizar mensaje ──
+function appendChatMsg(msg) {
+  const container = document.getElementById('chatMessages');
+  if (!container) return;
+
+  // Quitar "Conectando..."
+  const connecting = container.querySelector('.chat-system');
+  if (connecting && connecting.textContent === 'Conectando…') connecting.remove();
+
+  if (msg.system) {
+    const div = document.createElement('div');
+    div.className = 'chat-system';
+    div.textContent = msg.text;
+    container.appendChild(div);
+    scrollChat();
+    return;
+  }
+
+  const isMine = S.user && msg.name === S.user;
+  const wrap   = document.createElement('div');
+  wrap.className = 'chat-msg ' + (isMine ? 'mine' : 'theirs');
+
+  const initials = (msg.name || '?').slice(0,2).toUpperCase();
+  const avatarHTML = msg.picture
+    ? `<img class="chat-msg-avatar" src="${msg.picture}" alt="" onerror="this.style.display='none'">`
+    : `<div class="chat-msg-avatar-initials">${initials}</div>`;
+
+  const time = msg.ts ? new Date(msg.ts).toLocaleTimeString('es-MX', {hour:'2-digit',minute:'2-digit'}) : '';
+
+  wrap.innerHTML = `
+    <div class="chat-msg-header">
+      ${!isMine ? avatarHTML : ''}
+      <span class="chat-msg-name">${escapeHTML(msg.name || 'Anónimo')}</span>
+      ${isMine ? avatarHTML : ''}
+    </div>
+    <div class="chat-msg-bubble">${escapeHTML(msg.text || '')}</div>
+    <div class="chat-msg-time">${time}</div>`;
+
+  container.appendChild(wrap);
+  if (chatOpen) scrollChat();
+}
+
+function scrollChat() {
+  const msgs = document.getElementById('chatMessages');
+  if (msgs) msgs.scrollTop = msgs.scrollHeight;
+}
+
+function escapeHTML(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Enviar mensaje ──
+window.sendChatMsg = function() {
+  if (!S.user) { alert('Iniciá sesión para chatear.'); return; }
+  const input = document.getElementById('chatInput');
+  const text  = (input.value || '').trim();
+  if (!text) return;
+  if (text.length > 300) { alert('Máximo 300 caracteres.'); return; }
+
+  push(msgsRef, {
+    name:    S.user,
+    role:    S.role    || 'Aspirante',
+    picture: S.googlePicture || null,
+    text,
+    ts: Date.now(),
+  });
+
+  input.value = '';
+  input.style.height = 'auto';
+};
+
+// ── Toggle chat ──
+window.toggleChat = function() {
+  chatOpen = !chatOpen;
+  const panel = document.getElementById('chatPanel');
+  const fab   = document.getElementById('chatFab');
+  if (!panel || !fab) return;
+  panel.classList.toggle('show', chatOpen);
+  fab.textContent = chatOpen ? '✕' : '💬';
+  // Agregar badge de vuelta si hay no leídos
+  const badge = document.getElementById('chatBadge');
+  if (chatOpen) {
+    unreadCount = 0;
+    if (badge) badge.style.display = 'none';
+    setTimeout(scrollChat, 100);
+    // Registrar presencia al abrir
+    if (S.user && !myPresenceRef) registerPresence();
+  }
+  // Re-append badge inside fab
+  if (badge) fab.appendChild(badge);
+};
+
+// Registrar presencia cuando el usuario se loguea
+const _origUpdateProfileUI = window.updateProfileUI;
+window.updateProfileUI = function() {
+  _origUpdateProfileUI && _origUpdateProfileUI();
+  if (S.user) setTimeout(registerPresence, 500);
+};
+
+// Limpiar presencia al salir
+const _origDoLogout = window.doLogout;
+window.doLogout = function() {
+  if (myPresenceRef) set(myPresenceRef, null);
+  myPresenceRef = null;
+  _origDoLogout && _origDoLogout();
+};
+</script>
+
 </body>
 </html>
