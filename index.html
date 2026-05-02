@@ -1759,6 +1759,7 @@ function doLogin() {
     S.role = role;
     S.googlePicture = null;
     S.googleEmail   = '';
+    localStorage.setItem('exani_session', JSON.stringify({ user: u, role, googlePicture: null, googleEmail: '' }));
     $('loginErr').style.display = 'none';
     updateProfileUI();
     // Mostrar botón admin solo para administradores
@@ -1777,6 +1778,7 @@ function doLogin() {
 function doLogout() {
   stopTimer();
   stopChat();
+  localStorage.removeItem('exani_session');
   S = { user:null, role:null, googlePicture:null, googleEmail:'', questions:[], images:{}, answers:{}, current:0, navStart:0,
         timerSecs:TOTAL_SECS, timerInt:null, running:false, paused:false,
         rawZip:null, currentExamMeta:null, adminEdits:{} };
@@ -1875,6 +1877,9 @@ function finishGoogleLogin(role) {
   S.role = role;
   S.googlePicture = _googleProfile.picture || null;
   S.googleEmail   = _googleProfile.email   || '';
+  localStorage.setItem('exani_session', JSON.stringify({
+    user: S.user, role, googlePicture: S.googlePicture, googleEmail: S.googleEmail
+  }));
   updateProfileUI();
   const adminBtn = $('btnAdminPanel');
   if (adminBtn) adminBtn.style.display = role === 'Administrador' ? 'flex' : 'none';
@@ -2670,11 +2675,18 @@ async function sendChatMsg() {
   };
 
   try {
-    await fetch(CHAT_REF + '.json', {
+    const res = await fetch(CHAT_REF + '.json', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(msg),
     });
+    const data = await res.json();
+    // Registrar la key devuelta por Firebase para que el polling no lo duplique
+    if (data && data.name) {
+      chatLastKey = data.name;
+      // Renderizar localmente con esa key real
+      renderChatMsg(data.name, msg, true);
+    }
   } catch(e) {
     showToast('❌ Error al enviar el mensaje');
   }
@@ -2716,8 +2728,10 @@ async function initChat() {
       if (data && typeof data === 'object') {
         const msgs = Object.entries(data).sort((a,b) => a[1].ts - b[1].ts);
         msgs.forEach(([key, msg]) => {
-          if (key !== chatLastKey && !document.querySelector('[data-key="'+key+'"]')) {
-            chatLastKey = key;
+          // Actualizar siempre chatLastKey aunque ya exista el mensaje
+          if (key > (chatLastKey || '')) chatLastKey = key;
+          // Solo renderizar si no está ya en el DOM
+          if (!document.querySelector('[data-key="' + key + '"]')) {
             renderChatMsg(key, msg, true);
           }
         });
@@ -2736,6 +2750,28 @@ function stopChat() {
 
 buildCalc();
 loadCatalog();   // carga exams/catalog.json y renderiza las tarjetas
+
+// ── Restaurar sesión si existe ──
+(function restoreSession() {
+  try {
+    const saved = localStorage.getItem('exani_session');
+    if (!saved) return;
+    const sess = JSON.parse(saved);
+    if (!sess.user || !sess.role) return;
+    S.user          = sess.user;
+    S.role          = sess.role;
+    S.googlePicture = sess.googlePicture || null;
+    S.googleEmail   = sess.googleEmail   || '';
+    updateProfileUI();
+    const adminBtn = $('btnAdminPanel');
+    if (adminBtn) adminBtn.style.display = sess.role === 'Administrador' ? 'flex' : 'none';
+    renderExamCards();
+    show('dashScreen');
+    initChat();
+  } catch(e) {
+    localStorage.removeItem('exani_session');
+  }
+})();
 
 // ══════════════════════════════════════════
 //  BLOQUEAR CLICK DERECHO (como EXANI real)
