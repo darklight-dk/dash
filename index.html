@@ -688,9 +688,36 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .btn-next{background:linear-gradient(135deg,var(--teal),#0369a1);color:#ffffff}
 .btn-next:hover{transform:translateY(-1px)}
 
-/* overlays */
+/* ── Mobile exam bottom bar ── */
+.mobile-exam-bar{
+  display:none;position:fixed;bottom:0;left:0;right:0;z-index:150;
+  background:rgba(255,255,255,.97);border-top:1px solid rgba(58,173,169,.25);
+  backdrop-filter:blur(12px);padding:10px 16px 18px;
+  gap:10px;align-items:center;justify-content:space-between;
+  box-shadow:0 -4px 20px rgba(13,148,136,.12)
+}
+.mob-bar-btn{
+  flex:1;padding:11px 0;border-radius:12px;border:none;font-family:'Sora',sans-serif;
+  font-size:13px;font-weight:700;cursor:pointer;transition:all .15s
+}
+.mob-prev{background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0}
+.mob-prev:disabled{opacity:.35;cursor:not-allowed}
+.mob-next{background:linear-gradient(135deg,#0d9488,#0369a1);color:#fff}
+.mob-next:disabled{opacity:.35;cursor:not-allowed}
+.mob-bar-chat{
+  position:relative;width:52px;height:52px;border-radius:50%;border:none;
+  background:linear-gradient(135deg,#0d9488,#065f46);color:#fff;
+  font-size:22px;cursor:pointer;flex-shrink:0;
+  box-shadow:0 4px 14px rgba(13,148,136,.4);transition:transform .15s
+}
+.mob-bar-chat:active{transform:scale(.92)}
+.mob-chat-badge{
+  position:absolute;top:-3px;right:-3px;background:#ef4444;color:#fff;
+  border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:800;
+  display:flex;align-items:center;justify-content:center
+}
 .overlay{position:fixed;inset:0;background:rgba(15,23,42,.7);display:none;
-  align-items:center;justify-content:center;z-index:200;flex-direction:column;
+  align-items:center;justify-content:center;z-index:9999;flex-direction:column;
   gap:20px;backdrop-filter:blur(8px)}
 .overlay.show{display:flex}
 .ov-card{background:var(--panel);border-radius:20px;padding:40px;
@@ -1059,70 +1086,95 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
   .meta-grid{grid-template-columns:1fr 1fr;gap:8px}
   .btn-start{padding:16px 32px;font-size:16px}
 
-  /* Exam header: compact single row */
+  /* ── Exam header: UNA sola fila compacta ── */
   .exam-header{
-    padding:0;gap:0;flex-direction:column;align-items:stretch;
+    padding:0;gap:0;flex-direction:row;align-items:center;flex-wrap:nowrap;
     background:linear-gradient(160deg,#e8faf8 0%,#d0f0ed 100%);
     border-bottom:2px solid rgba(58,173,169,.25);
-    box-shadow:0 3px 14px rgba(58,173,169,.18)
+    box-shadow:0 3px 14px rgba(58,173,169,.18);
+    padding:6px 10px;justify-content:space-between
   }
-  /* Top strip: suspender | pausar | progreso */
-  .exam-header .ctrl-group:nth-child(1){
-    order:2;padding:7px 14px;gap:8px;
-    justify-content:space-between;align-items:center;
-    background:rgba(58,173,169,.08);border-top:1px solid rgba(58,173,169,.18)
-  }
-  /* Timer strip: centered, prominent */
+  /* Ocultar grupo 1 (suspender/pausar) y grupo 3 (calc/flechas) del header */
+  .exam-header .ctrl-group:nth-child(1){ display:none }
+  .exam-header .ctrl-group:nth-child(3){ display:none }
+  /* Solo mostrar timer + progreso en el header */
   .exam-header .ctrl-group:nth-child(2){
-    order:1;padding:12px 16px;justify-content:space-between;align-items:center
+    order:1;padding:0;justify-content:space-between;align-items:center;
+    width:100%;flex-direction:row
   }
-  /* Calc + arrows strip */
-  .exam-header .ctrl-group:nth-child(3){
-    order:3;padding:7px 14px;gap:8px;
-    justify-content:space-between;align-items:center;
-    background:rgba(58,173,169,.05);border-top:1px solid rgba(58,173,169,.15)
-  }
-  .logo-sm{font-size:15px;letter-spacing:1px;color:#1a1a2e!important}
+  .logo-sm{font-size:13px;letter-spacing:1px;color:#1a1a2e!important}
   .logo-sm span{color:#3AADA9!important}
   .logo-sm span:last-child{color:#0d9488!important}
   .timer-box{
     background:rgba(58,173,169,.12);border:2px solid rgba(58,173,169,.45);
-    border-radius:12px;min-width:auto;padding:6px 16px;flex:1;max-width:165px
+    border-radius:10px;min-width:auto;padding:4px 12px;flex:none
   }
-  .timer-digits{font-size:22px;letter-spacing:3px;color:#0f766e}
+  .timer-digits{font-size:18px;letter-spacing:2px;color:#0f766e}
   .timer-bar{display:none}
   .timer-box.warn{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.4)}
   .timer-box.warn .timer-digits{color:#dc2626}
-  .btn-ctrl{
-    padding:7px 13px;font-size:11px;font-weight:700;
-    border-color:rgba(58,173,169,.35)!important;color:#0f766e!important;
-    background:rgba(58,173,169,.1)!important;border-radius:9px
-  }
-  .btn-ctrl:hover{background:rgba(58,173,169,.2)!important}
-  .btn-suspend{border-color:rgba(239,68,68,.4)!important;color:#dc2626!important;background:rgba(239,68,68,.07)!important}
-  .btn-pause{border-color:rgba(245,158,11,.45)!important;color:#b45309!important;background:rgba(245,158,11,.08)!important}
-  .btn-pause.paused{border-color:rgba(58,173,169,.5)!important;color:#0f766e!important;background:rgba(58,173,169,.12)!important}
-  .btn-calc{font-size:10px!important}
-  .btn-nav-arrow{
-    background:rgba(58,173,169,.15)!important;border-color:rgba(58,173,169,.5)!important;
-    color:#0f766e!important;min-width:40px;font-size:16px
-  }
   .progress-chip{
     background:rgba(58,173,169,.12);border:1px solid rgba(58,173,169,.3);
-    color:#0f766e;font-size:12px;font-weight:700;padding:5px 12px;border-radius:8px
+    color:#0f766e;font-size:12px;font-weight:700;padding:4px 10px;border-radius:8px
   }
 
-  /* Nav bar */
-  .nav-bar{padding:6px 10px;gap:3px}
-  .nav-btn{padding:5px 7px;font-size:12px;min-width:30px}
+  /* Nav bar: compacto */
+  .nav-bar{padding:4px 8px;gap:2px;flex-shrink:0;flex-wrap:wrap}
+  .nav-btn{padding:4px 6px;font-size:11px;min-width:26px}
 
-  /* Question area */
-  .exam-body{padding:12px 10px;padding-bottom:90px}
-  /* Chat FAB más arriba en móvil para no tapar botones */
-  .chat-fab{bottom:16px;right:16px}
+  /* Barra inferior: añadir suspender, pausar y calculadora */
+  .mobile-exam-bar{padding:8px 12px 16px;gap:6px;flex-wrap:wrap}
+  .mob-bar-controls{
+    display:flex;width:100%;gap:6px;justify-content:center;
+    padding-bottom:6px;border-bottom:1px solid rgba(58,173,169,.15)
+  }
+  .mob-ctrl-btn{
+    flex:1;padding:7px 4px;border-radius:10px;border:none;
+    font-family:'Sora',sans-serif;font-size:11px;font-weight:700;cursor:pointer
+  }
+  .mob-ctrl-suspend{background:rgba(239,68,68,.1);color:#dc2626;border:1px solid rgba(239,68,68,.3)}
+  .mob-ctrl-pause{background:rgba(245,158,11,.1);color:#b45309;border:1px solid rgba(245,158,11,.3)}
+  .mob-ctrl-calc{background:rgba(58,173,169,.1);color:#0f766e;border:1px solid rgba(58,173,169,.3)}
+
+  /* ── Mobile scroll fixes ── */
+  html,body{height:100%;overflow:auto}
+  .screen{height:auto;min-height:100vh;overflow:visible}
+  /* Exam needs fixed layout to keep header sticky */
+  #examScreen{height:100dvh;overflow:hidden;flex-direction:column}
+  #examScreen{height:100dvh;overflow:hidden;flex-direction:column}
+  .exam-header{position:relative;flex-shrink:0}
+  .nav-bar{flex-shrink:0;flex-wrap:wrap}
+  .exam-body{
+    flex:1;
+    display:block;
+    overflow-y:auto;
+    padding:12px 10px;
+    padding-bottom:130px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .q-wrap{max-width:100%;}
+  .q-col-left,.q-col-right{min-height:unset}
+  /* Hide desktop nav buttons - mobile bar handles them */
+  .q-nav-btns{display:none}
+  /* Results: scrollable full page */
+  #resultsScreen{
+    height:auto;min-height:100vh;overflow-y:auto;
+    padding:16px 12px 100px;
+    align-items:stretch
+  }
+  .res-card{width:100%;box-sizing:border-box;max-width:100%}
+  .review-grid{max-height:none}
+  /* Dashboard scroll */
+  #dashScreen{height:auto;min-height:100vh;overflow:visible}
+  /* Mobile exam bar visible */
+  .mobile-exam-bar{display:flex}
+  /* Hide regular chat FAB during exam (mobile bar has it) */
+  #examScreen.active ~ .chat-fab{display:none!important}
+  /* Chat panel position */
   .chat-panel{width:calc(100vw - 32px);right:16px;bottom:80px}
+  .chat-fab{bottom:16px;right:16px}
   .q-columns{grid-template-columns:1fr;gap:12px}
-  .q-col-left,.q-col-right{padding:18px 16px}
+  .q-col-left,.q-col-right{padding:18px 16px;min-height:unset}
   .q-text{font-size:15px;line-height:1.65}
   .opt-btn{padding:10px 4px;font-size:14px;gap:10px}
   .opt-letter{width:18px;height:18px}
@@ -1744,12 +1796,46 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
           </div>
         </div>
       </div>
-      <div class="q-nav-btns">
+      <div class="q-nav-btns" id="qNavBtns">
         <button class="btn-prev" id="btnPrev" onclick="goQ(-1)">◀ Anterior</button>
         <button class="btn-next" id="btnNext" onclick="goQ(1)">Siguiente ▶</button>
       </div>
     </div>
   </div>
+</div>
+
+<!-- MOBILE BOTTOM NAV BAR (solo visible en móvil durante el examen) -->
+<div class="mobile-exam-bar" id="mobileExamBar" style="display:none">
+  <div class="mob-bar-controls">
+    <button class="mob-ctrl-btn mob-ctrl-suspend" onclick="showSuspend()">⛔ Suspender</button>
+    <button class="mob-ctrl-btn mob-ctrl-pause" id="mobPauseBtn" onclick="togglePause()">⏸ Pausar</button>
+    <button class="mob-ctrl-btn mob-ctrl-calc" onclick="toggleCalc()">🧮 Calc</button>
+  </div>
+  <button class="mob-bar-btn mob-prev" onclick="goQ(-1)" id="mobPrev">◀ Anterior</button>
+  <button class="mob-bar-chat" onclick="toggleChat()" id="mobChatBtn">
+    <span id="mobChatBadge" class="mob-chat-badge" style="display:none"></span>
+    💬
+  </button>
+  <button class="mob-bar-btn mob-next" onclick="goQ(1)" id="mobNext">Siguiente ▶</button>
+</div><!-- end mobileExamBar -->
+
+<!-- OVERLAYS - fixed sobre todo, fuera del flujo -->
+<div class="overlay" id="suspendOv">
+  <div class="ov-card" style="border:1px solid var(--red)">
+    <div class="ov-icon">⚠️</div>
+    <div class="ov-title">¿Terminar el examen?</div>
+    <div class="ov-sub">Se calificarán las respuestas dadas hasta ahora.</div>
+    <div class="ov-btns">
+      <button class="btn-cancel" onclick="hideSuspend()">Cancelar</button>
+      <button class="btn-end" onclick="finishExam()">Terminar</button>
+    </div>
+  </div>
+</div>
+<div class="overlay" id="pauseOv">
+  <div class="pi">⏸</div>
+  <div class="pl">Examen en pausa</div>
+  <div class="ps">El cronómetro está detenido</div>
+  <button class="btn-resume" onclick="togglePause()">▶ Continuar examen</button>
 </div>
 
 <!-- RESULTS -->
@@ -1770,25 +1856,6 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
     <button class="btn-exit" style="background:linear-gradient(135deg,#f59e0b,#d97706);margin-top:10px" onclick="openRanking()">🏆 Ver ranking global</button>
     <button class="btn-exit" id="btnResultsAdmin" style="display:none;background:var(--teal);color:#fff;border:none;margin-top:8px" onclick="openAdmin()">⚙️ Editar imágenes del examen</button>
   </div>
-</div>
-
-<!-- OVERLAYS -->
-<div class="overlay" id="suspendOv">
-  <div class="ov-card" style="border:1px solid var(--red)">
-    <div class="ov-icon">⚠️</div>
-    <div class="ov-title">¿Terminar el examen?</div>
-    <div class="ov-sub">Se calificarán las respuestas dadas hasta ahora.</div>
-    <div class="ov-btns">
-      <button class="btn-cancel" onclick="hideSuspend()">Cancelar</button>
-      <button class="btn-end" onclick="finishExam()">Terminar</button>
-    </div>
-  </div>
-</div>
-<div class="overlay" id="pauseOv">
-  <div class="pi">⏸</div>
-  <div class="pl">Examen en pausa</div>
-  <div class="ps">El cronómetro está detenido</div>
-  <button class="btn-resume" onclick="togglePause()">▶ Continuar examen</button>
 </div>
 
 <!-- EXPLANATION MODAL -->
@@ -1929,7 +1996,13 @@ const $  = id => document.getElementById(id);
 const show = id => {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   $(id).classList.add('active');
-  // Guardar pantalla actual en sesión (sobrevive F5, no cierra de pestaña)
+  // Ocultar barra móvil y restaurar FAB si salimos del examen
+  const mobileBar = document.getElementById('mobileExamBar');
+  const chatFabEl = document.getElementById('chatFab');
+  if (id !== 'examScreen') {
+    if (mobileBar) mobileBar.style.display = 'none';
+    if (chatFabEl && chatFabEl._wasVisible !== false) chatFabEl.style.display = '';
+  }
   try { sessionStorage.setItem('fw_screen', id); } catch(e){}
 };
 const load = (v, msg='', sub='') => {
@@ -2294,6 +2367,14 @@ function startExam() {
   S.timerSecs = secs; S.paused = false;
   $('totalCount').textContent = S.questions.length;
   renderQ(); renderNav(); startTimer();
+  // Mostrar barra móvil durante el examen
+  const isMobile = window.innerWidth <= 600;
+  const mobileBar = document.getElementById('mobileExamBar');
+  const chatFabEl = document.getElementById('chatFab');
+  if (isMobile && mobileBar) {
+    mobileBar.style.display = 'flex';
+    if (chatFabEl) chatFabEl.style.display = 'none'; // ocultar FAB flotante en móvil
+  }
   show('examScreen');
 }
 
@@ -2354,16 +2435,34 @@ function renderQ() {
   $('btnPrev').disabled = S.current === 0;
   const isLast = S.current === total - 1;
   const nextBtn = $('btnNext');
+
+  // Sincronizar barra móvil
+  const mobPrev = $('mobPrev');
+  const mobNext = $('mobNext');
+  if (mobPrev) mobPrev.disabled = S.current === 0;
+
   if (isLast) {
     nextBtn.disabled = false;
     nextBtn.textContent = 'Ver resultados ✓';
     nextBtn.style.background = 'linear-gradient(135deg,#16a34a,#065f46)';
     nextBtn.onclick = () => { stopTimer(); showResults(); };
+    if (mobNext) {
+      mobNext.textContent = '✓ Resultados';
+      mobNext.style.background = 'linear-gradient(135deg,#16a34a,#065f46)';
+      mobNext.onclick = () => { stopTimer(); showResults(); };
+      mobNext.disabled = false;
+    }
   } else {
     nextBtn.textContent = 'Siguiente ▶';
     nextBtn.style.background = '';
     nextBtn.onclick = () => goQ(1);
     nextBtn.disabled = false;
+    if (mobNext) {
+      mobNext.textContent = 'Siguiente ▶';
+      mobNext.style.background = '';
+      mobNext.onclick = () => goQ(1);
+      mobNext.disabled = false;
+    }
   }
   updateProg();
 }
@@ -2371,6 +2470,14 @@ function renderQ() {
 function selectAns(letter) {
   S.answers[S.current] = letter;
   renderQ(); renderNav();
+  // Auto-scroll al botón siguiente en móvil
+  if (window.innerWidth <= 600) {
+    const bar = document.getElementById('mobileExamBar');
+    if (bar) bar.scrollIntoView ? null : null; // barra fija, no necesita scroll
+    // Scroll al fondo del exam-body para mostrar el botón de escritorio también
+    const body = document.querySelector('.exam-body');
+    if (body) setTimeout(() => { body.scrollTop = body.scrollHeight; }, 80);
+  }
 }
 
 function goQ(dir) {
@@ -2444,8 +2551,14 @@ function renderNav() {
 // ══════════════════════════════════════════
 //  SUSPEND / PAUSE
 // ══════════════════════════════════════════
-const showSuspend = () => $('suspendOv').classList.add('show');
-const hideSuspend = () => $('suspendOv').classList.remove('show');
+const showSuspend = () => {
+  $('suspendOv').classList.add('show');
+  document.body.style.overflow = 'hidden';
+};
+const hideSuspend = () => {
+  $('suspendOv').classList.remove('show');
+  document.body.style.overflow = '';
+};
 
 function togglePause() {
   S.paused = !S.paused;
@@ -2453,15 +2566,17 @@ function togglePause() {
   if (S.paused) {
     stopTimer();
     $('pauseOv').classList.add('show');
+    document.body.style.overflow = 'hidden';
     btn.classList.add('paused'); btn.textContent = '▶ REANUDAR';
   } else {
     $('pauseOv').classList.remove('show');
+    document.body.style.overflow = '';
     btn.classList.remove('paused'); btn.textContent = '⏸ PAUSAR';
     startTimer();
   }
 }
 
-function finishExam() { hideSuspend(); stopTimer(); showResults(); }
+function finishExam() { hideSuspend(); stopTimer(); document.body.style.overflow = ''; showResults(); }
 
 // ══════════════════════════════════════════
 //  TIMER
