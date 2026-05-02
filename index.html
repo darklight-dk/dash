@@ -4629,12 +4629,26 @@ const firebaseConfig = {
   databaseURL: "https://exani-dash-adeff-default-rtdb.firebaseio.com"
 };
 
-const fbApp  = initializeApp(firebaseConfig);
-const db     = getDatabase(fbApp);
-const auth   = getAuth(fbApp);
-const msgsRef = ref(db, 'chat/messages');
-const presRef = ref(db, 'chat/presence');
+const fbApp   = initializeApp(firebaseConfig);
+const db      = getDatabase(fbApp);
+const auth    = getAuth(fbApp);
+const msgsRef  = ref(db, 'chat/messages');
+const presRef  = ref(db, 'chat/presence');
 const usersRef = ref(db, 'users');
+
+// ── Escuchar estado de autenticación Firebase (mantiene auth vivo al refrescar) ──
+onAuthStateChanged(auth, (firebaseUser) => {
+  // Si Firebase Auth tiene sesión pero el app no la tiene cargada aún, no hacemos nada
+  // Solo usamos esto para confirmar que auth está listo cuando se guarda el perfil
+  if (firebaseUser) {
+    // Sesión Firebase activa — guardar referencia global
+    window._fbCurrentUser = firebaseUser;
+  } else {
+    window._fbCurrentUser = null;
+  }
+});
+
+
 
 // ── Convierte username a email ficticio para Firebase Auth ──
 async function loadUserProfile(uid) {
@@ -5080,7 +5094,6 @@ window.saveMyProfile = async function() {
   ['mypIG','mypTT'].forEach(id => { document.getElementById(id).classList.remove('myp-inp-err'); });
 
   let valid = true;
-
   if (!_validateSocialURL(ig, ['instagram.com', 'www.instagram.com'])) {
     document.getElementById('mypIGErr').style.display = 'block';
     document.getElementById('mypIG').classList.add('myp-inp-err');
@@ -5098,7 +5111,6 @@ window.saveMyProfile = async function() {
   btn.textContent = 'Guardando…';
 
   try {
-    // Firebase rechaza set() con objeto vacío; siempre guardamos al menos un campo marcador
     const payload = { _updated: Date.now() };
     if (desc) payload.desc = desc;
     if (ig)   payload.ig   = ig;
