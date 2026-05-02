@@ -513,8 +513,7 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
   justify-content:center;gap:8px;color:var(--muted);font-size:13px;padding:20px}
 @media(max-width:480px){
   .chat-panel{width:calc(100vw - 32px);right:16px;bottom:80px}
-  .chat-fab{bottom:16px;right:16px}
-}
+  .chat-fab{bottom:16px;right:16px}}
 .dash-title{text-align:center}
 .dash-title h1{font-size:28px;font-weight:800}
 .dash-title p{color:var(--muted);margin-top:8px;font-size:15px}
@@ -1118,7 +1117,10 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
   .nav-btn{padding:5px 7px;font-size:12px;min-width:30px}
 
   /* Question area */
-  .exam-body{padding:12px 10px}
+  .exam-body{padding:12px 10px;padding-bottom:90px}
+  /* Chat FAB más arriba en móvil para no tapar botones */
+  .chat-fab{bottom:16px;right:16px}
+  .chat-panel{width:calc(100vw - 32px);right:16px;bottom:80px}
   .q-columns{grid-template-columns:1fr;gap:12px}
   .q-col-left,.q-col-right{padding:18px 16px}
   .q-text{font-size:15px;line-height:1.65}
@@ -5045,9 +5047,20 @@ window.openProfileView = async function(username, role, picture) {
       descEl.style.display = 'block';
     }
 
+    // Función para mostrar @usuario en vez de URL completa
+    function socialDisplay(url) {
+      try {
+        const u = new URL(url);
+        const parts = u.pathname.replace(/\/+$/, '').split('/').filter(Boolean);
+        const last = parts[parts.length - 1] || '';
+        const handle = last.startsWith('@') ? last : '@' + last;
+        return handle;
+      } catch { return url; }
+    }
+
     const links = [
       { key: 'ig', label: 'Instagram', icon: 'https://cdn-icons-png.flaticon.com/512/2111/2111463.png', bg: '' },
-      { key: 'tt', label: 'TikTok',    icon: 'https://cdn-icons-png.flaticon.com/512/3046/3046121.png', bg: '#000' },
+      { key: 'tt', label: 'TikTok',    icon: 'https://cdn-icons-png.flaticon.com/512/3669/3669950.png', bg: '' },
     ].filter(l => socials[l.key]);
 
     socialsEl.innerHTML = '';
@@ -5059,7 +5072,7 @@ window.openProfileView = async function(username, role, picture) {
         a.className = 'pview-social-link';
         a.href = socials[l.key]; a.target = '_blank'; a.rel = 'noopener noreferrer';
         const imgStyle = l.bg ? `background:${l.bg};border-radius:5px;padding:2px;` : '';
-        a.innerHTML = `<img class="myp-social-icon" src="${l.icon}" alt="${l.label}" style="${imgStyle}"/>${escapeHTML(socials[l.key])}`;
+        a.innerHTML = `<img class="myp-social-icon" src="${l.icon}" alt="${l.label}" style="${imgStyle}"/>${escapeHTML(socialDisplay(socials[l.key]))}`;
         socialsEl.appendChild(a);
       });
     }
@@ -5205,7 +5218,7 @@ window.addEventListener('beforeunload', () => {
     </div>
     <div class="myp-field">
       <label class="myp-label">
-        <img class="myp-social-icon" src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" alt="TikTok" style="background:#000;border-radius:5px;padding:2px"/>
+        <img class="myp-social-icon" src="https://cdn-icons-png.flaticon.com/512/3669/3669950.png" alt="TikTok"/>
         TikTok
       </label>
       <input class="myp-inp" id="mypTT" placeholder="https://tiktok.com/@tu_usuario" type="url"/>
