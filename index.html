@@ -92,7 +92,7 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .google-role-btn:hover{border-color:#0d9488;color:#0d9488;background:rgba(13,148,136,.04)}
 
 /* ── DASH ── */
-#dashScreen{flex-direction:column;overflow-y:auto}
+#dashScreen{flex-direction:column}
 .topbar{background:rgba(255,255,255,.97);border-bottom:1px solid var(--b2);
   padding:14px 28px;display:flex;justify-content:space-between;align-items:center;
   position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);box-shadow:0 1px 3px rgba(0,0,0,.06)}
@@ -367,26 +367,15 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .dash-body{flex:1;display:flex;flex-direction:column;align-items:center;
   padding:48px 24px;gap:28px;overflow-y:auto;min-height:0}
 /* ── CHAT MUNDIAL ── */
-.chat-fab{position:fixed;bottom:24px;left:24px;width:56px;height:56px;
+.chat-fab{position:fixed;bottom:24px;right:24px;width:56px;height:56px;
   background:linear-gradient(135deg,var(--teal),#065f46);border:none;border-radius:50%;
   color:#fff;font-size:24px;cursor:pointer;box-shadow:0 4px 20px rgba(13,148,136,.4);
   z-index:300;transition:all .2s;display:flex;align-items:center;justify-content:center}
 .chat-fab:hover{transform:scale(1.1);box-shadow:0 6px 28px rgba(13,148,136,.5)}
-.chat-admin-bar{display:none;align-items:center;gap:6px;padding:6px 12px;
-  background:rgba(220,38,38,.06);border-bottom:1px solid rgba(220,38,38,.12)}
-.chat-admin-bar.visible{display:flex}
-.btn-chat-admin{background:none;border:1px solid rgba(220,38,38,.4);color:#dc2626;
-  border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;transition:.15s}
-.btn-chat-admin:hover{background:rgba(220,38,38,.08)}
-.chat-admin-label{font-size:11px;color:#dc2626;font-weight:600;flex:1}
-.chat-msg-del{background:none;border:none;color:#94a3b8;font-size:11px;cursor:pointer;
-  padding:2px 6px;border-radius:4px;opacity:0;transition:.15s;flex-shrink:0}
-.chat-msg:hover .chat-msg-del{opacity:1}
-.chat-msg-del:hover{background:rgba(220,38,38,.1);color:#dc2626}
 .chat-fab-badge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;
   border-radius:50%;width:20px;height:20px;font-size:11px;font-weight:800;
   display:none;align-items:center;justify-content:center;border:2px solid #fff}
-.chat-panel{position:fixed;bottom:90px;left:24px;width:340px;height:480px;
+.chat-panel{position:fixed;bottom:90px;right:24px;width:340px;height:480px;
   background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.15);
   z-index:299;display:flex;flex-direction:column;overflow:hidden;
   border:1px solid var(--b2);opacity:0;transform:translateY(16px) scale(.97);
@@ -433,7 +422,7 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
   justify-content:center;gap:8px;color:var(--muted);font-size:13px;padding:20px}
 @media(max-width:480px){
   .chat-panel{width:calc(100vw - 32px);right:16px;bottom:80px}
-  .chat-fab{bottom:16px;left:16px}
+  .chat-fab{bottom:16px;right:16px}
 }
 .dash-title{text-align:center}
 .dash-title h1{font-size:28px;font-weight:800}
@@ -650,8 +639,8 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .cb.fn{background:#e2e8f0;border-color:var(--b2)}
 
 /* results */
-#resultsScreen{flex-direction:column;align-items:center;justify-content:center;
-  background:var(--dark);padding:40px 20px}
+#resultsScreen{flex-direction:column;align-items:center;justify-content:flex-start;
+  background:var(--dark);padding:40px 20px;overflow-y:auto}
 .res-card{background:var(--panel);border-radius:24px;padding:48px;
   max-width:600px;width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.1)}
 .res-card.pass{border:2px solid var(--teal);box-shadow:0 0 64px rgba(13,148,136,.1)}
@@ -713,12 +702,12 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .ranking-date{font-size:10px;color:var(--muted);margin-top:2px}
 .ranking-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:14px}
 .ranking-loading{text-align:center;padding:40px;color:var(--muted)}
-.ranking-fab{position:fixed;bottom:90px;left:24px;width:48px;height:48px;
+.ranking-fab{position:fixed;bottom:90px;right:24px;width:48px;height:48px;
   background:linear-gradient(135deg,#f59e0b,#d97706);border:none;border-radius:50%;
   color:#fff;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(245,158,11,.4);
   z-index:300;transition:all .2s;display:none;align-items:center;justify-content:center}
 .ranking-fab:hover{transform:scale(1.1)}
-@media(max-width:480px){.ranking-fab{bottom:80px;left:16px}}
+@media(max-width:480px){.ranking-fab{bottom:80px;right:16px}}
 
 /* loading */
 #loadOv{position:fixed;inset:0;background:rgba(248,250,252,.94);display:none;
@@ -1149,10 +1138,6 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
       <div class="chat-online-count" id="chatOnlineCount"></div>
     </div>
     <button class="chat-close" onclick="toggleChat()">✕</button>
-  </div>
-  <div class="chat-admin-bar" id="chatAdminBar">
-    <span class="chat-admin-label">⚙️ Modo Admin</span>
-    <button class="btn-chat-admin" onclick="clearAllChat()">🗑 Limpiar todo</button>
   </div>
   <div class="chat-messages" id="chatMessages">
     <div class="chat-system">Conectando…</div>
@@ -4527,7 +4512,7 @@ function buildTags(area, version) {
 <!-- FIREBASE SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, onChildAdded, onValue, serverTimestamp, query, limitToLast, set, onDisconnect, remove }
+import { getDatabase, ref, push, onChildAdded, onValue, serverTimestamp, query, limitToLast, set, onDisconnect }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import {
   getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
@@ -4694,7 +4679,7 @@ const recentQ = query(msgsRef, limitToLast(80));
 onChildAdded(recentQ, snap => {
   const msg = snap.val();
   if (!msg) return;
-  appendChatMsg(msg, snap.key);
+  appendChatMsg(msg);
   if (!chatOpen && !firstLoad) {
     unreadCount++;
     const badge = document.getElementById('chatBadge');
@@ -4714,7 +4699,7 @@ onChildAdded(recentQ, snap => {
 });
 
 // ── Renderizar mensaje ──
-function appendChatMsg(msg, snapKey) {
+function appendChatMsg(msg) {
   const container = document.getElementById('chatMessages');
   if (!container) return;
 
@@ -4732,10 +4717,8 @@ function appendChatMsg(msg, snapKey) {
   }
 
   const isMine = S.user && msg.name === S.user;
-  const isAdmin = S.role === 'Administrador';
   const wrap   = document.createElement('div');
   wrap.className = 'chat-msg ' + (isMine ? 'mine' : 'theirs');
-  if (snapKey) wrap.dataset.key = snapKey;
 
   const initials = (msg.name || '?').slice(0,2).toUpperCase();
   const avatarHTML = msg.picture
@@ -4743,14 +4726,12 @@ function appendChatMsg(msg, snapKey) {
     : `<div class="chat-msg-avatar-initials">${initials}</div>`;
 
   const time = msg.ts ? new Date(msg.ts).toLocaleTimeString('es-MX', {hour:'2-digit',minute:'2-digit'}) : '';
-  const delBtn = (isAdmin && snapKey) ? `<button class="chat-msg-del" onclick="deleteChatMsg('${snapKey}',this)" title="Eliminar">✕</button>` : '';
 
   wrap.innerHTML = `
     <div class="chat-msg-header">
       ${!isMine ? avatarHTML : ''}
       <span class="chat-msg-name">${escapeHTML(msg.name || 'Anónimo')}</span>
       ${isMine ? avatarHTML : ''}
-      ${delBtn}
     </div>
     <div class="chat-msg-bubble">${escapeHTML(msg.text || '')}</div>
     <div class="chat-msg-time">${time}</div>`;
@@ -4758,27 +4739,6 @@ function appendChatMsg(msg, snapKey) {
   container.appendChild(wrap);
   if (chatOpen) scrollChat();
 }
-
-// ── Admin: eliminar mensaje individual ──
-window.deleteChatMsg = async function(key, btn) {
-  if (S.role !== 'Administrador') return;
-  try {
-    await set(ref(db, 'chat/messages/' + key), null);
-    const wrap = btn.closest('.chat-msg');
-    if (wrap) wrap.remove();
-  } catch(e) { console.error('Error al eliminar:', e); }
-};
-
-// ── Admin: limpiar todo el chat ──
-window.clearAllChat = async function() {
-  if (S.role !== 'Administrador') return;
-  if (!confirm('¿Limpiar TODO el chat? Esta acción no se puede deshacer.')) return;
-  try {
-    await set(ref(db, 'chat/messages'), null);
-    const container = document.getElementById('chatMessages');
-    if (container) container.innerHTML = '<div class="chat-system">🗑 Chat limpiado por un administrador.</div>';
-  } catch(e) { alert('Error al limpiar el chat: ' + e.message); }
-};
 
 function scrollChat() {
   const msgs = document.getElementById('chatMessages');
@@ -4823,10 +4783,8 @@ window.toggleChat = function() {
     unreadCount = 0;
     if (badge) badge.style.display = 'none';
     setTimeout(scrollChat, 100);
+    // Registrar presencia al abrir
     if (S.user && !myPresenceRef) registerPresence();
-    // Mostrar barra admin si corresponde
-    const adminBar = document.getElementById('chatAdminBar');
-    if (adminBar) adminBar.classList.toggle('visible', S.role === 'Administrador');
   }
   // Re-append badge inside fab
   if (badge) fab.appendChild(badge);
