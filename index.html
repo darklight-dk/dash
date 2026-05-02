@@ -4737,7 +4737,7 @@ function buildTags(area, version) {
 <!-- FIREBASE SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, onChildAdded, onValue, serverTimestamp, query, limitToLast, set, onDisconnect, remove }
+import { getDatabase, ref, push, onChildAdded, onChildRemoved, onValue, serverTimestamp, query, limitToLast, set, onDisconnect, remove }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import {
   getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
@@ -4937,6 +4937,12 @@ onChildAdded(recentQ, snap => {
   }
 });
 
+// ── Eliminación en tiempo real para todos ──
+onChildRemoved(ref(db, 'chat/messages'), snap => {
+  const wrap = document.querySelector(`[data-msg-key="${snap.key}"]`);
+  if (wrap) wrap.remove();
+});
+
 // ── Renderizar mensaje ──
 function appendChatMsg(msg, key) {
   const container = document.getElementById('chatMessages');
@@ -4976,10 +4982,12 @@ function appendChatMsg(msg, key) {
     <div class="chat-msg-header" style="cursor:pointer" onclick="openProfileView('${escapeHTML(msg.name||'')}','${escapeHTML(msg.role||'')}','${escapeHTML(msg.picture||'')}')">
       ${!isMine ? avatarHTML : ''}
       <span class="${nameClass}">${escapeHTML(msg.name || 'Anónimo')}${badge}</span>
-      ${deleteBtn}
       ${isMine ? avatarHTML : ''}
     </div>
-    <div class="chat-msg-bubble">${escapeHTML(filterProfanity(msg.text || ''))}</div>
+    <div style="display:flex;align-items:flex-start;gap:4px">
+      <div class="chat-msg-bubble">${escapeHTML(filterProfanity(msg.text || ''))}</div>
+      ${deleteBtn}
+    </div>
     <div class="chat-msg-time">${time}</div>`;
 
   container.appendChild(wrap);
