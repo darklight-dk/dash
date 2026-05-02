@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>EXANI-DASH</title>
+<title>DASH</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -409,6 +409,21 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .chat-msg.theirs .chat-msg-bubble{background:#f1f5f9;color:var(--text);border-bottom-left-radius:4px}
 .chat-msg-time{font-size:10px;color:var(--muted);padding:0 4px}
 .chat-system{text-align:center;font-size:11px;color:var(--muted);padding:4px 0;font-style:italic}
+.chat-admin-bar{display:none;padding:7px 12px;border-bottom:1px solid #e2e8f0;background:#f0fdf8;
+  align-items:center;justify-content:space-between;gap:8px;flex-shrink:0}
+.chat-admin-bar.visible{display:flex}
+.chat-admin-label{font-size:10px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:.8px}
+.chat-clear-btn{font-size:10px;font-weight:700;padding:3px 9px;border-radius:7px;
+  border:1.5px solid var(--red);color:var(--red);background:none;cursor:pointer;transition:all .15s;flex-shrink:0}
+.chat-clear-btn:hover{background:rgba(220,38,38,.08)}
+.chat-filter-wrap{display:flex;align-items:center;gap:5px;cursor:pointer;user-select:none}
+.chat-filter-pill{width:30px;height:16px;border-radius:8px;background:#cbd5e1;position:relative;
+  transition:background .2s;flex-shrink:0}
+.chat-filter-pill::after{content:'';position:absolute;top:2px;left:2px;width:12px;height:12px;
+  border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+.chat-filter-pill.on{background:var(--teal)}
+.chat-filter-pill.on::after{transform:translateX(14px)}
+.chat-filter-label{font-size:10px;font-weight:700;color:var(--text)}
 .chat-input-bar{padding:10px 12px;border-top:1px solid #f1f5f9;display:flex;gap:8px;flex-shrink:0;background:#fff}
 .chat-input{flex:1;border:1.5px solid var(--b2);border-radius:20px;padding:8px 14px;
   font-size:13px;font-family:'Sora',sans-serif;outline:none;transition:border .15s;resize:none;
@@ -1079,7 +1094,7 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
         <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
         Continuar con Google
       </button>
-      <div class="login-footer">EXANI-DASH · Sistema de Evaluación</div>
+      <div class="login-footer">DASH · Sistema de Evaluación</div>
     </div>
 
     <!-- ── FORM REGISTRO ── -->
@@ -1133,11 +1148,22 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
     <div>
       <div class="chat-header-title">
         <span class="chat-online-dot"></span>
-        💬 Chat Mundial
+        💬 Chat-Dash
       </div>
       <div class="chat-online-count" id="chatOnlineCount"></div>
     </div>
     <button class="chat-close" onclick="toggleChat()">✕</button>
+  </div>
+  <!-- Barra admin (solo visible para Administrador) -->
+  <div class="chat-admin-bar" id="chatAdminBar">
+    <span class="chat-admin-label">⚙️ Modo Admin</span>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="chat-filter-wrap" onclick="toggleProfanityFilter()" title="Activar/desactivar filtro de groserías">
+        <div class="chat-filter-pill" id="filterPill"></div>
+        <span class="chat-filter-label" id="filterLabel">Groserías</span>
+      </div>
+      <button class="chat-clear-btn" onclick="clearChatMessages()">🗑 Limpiar</button>
+    </div>
   </div>
   <div class="chat-messages" id="chatMessages">
     <div class="chat-system">Conectando…</div>
@@ -4512,7 +4538,7 @@ function buildTags(area, version) {
 <!-- FIREBASE SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, onChildAdded, onValue, serverTimestamp, query, limitToLast, set, onDisconnect }
+import { getDatabase, ref, push, onChildAdded, onValue, serverTimestamp, query, limitToLast, set, onDisconnect, remove }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import {
   getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
@@ -4733,7 +4759,7 @@ function appendChatMsg(msg) {
       <span class="chat-msg-name">${escapeHTML(msg.name || 'Anónimo')}</span>
       ${isMine ? avatarHTML : ''}
     </div>
-    <div class="chat-msg-bubble">${escapeHTML(msg.text || '')}</div>
+    <div class="chat-msg-bubble">${escapeHTML(filterProfanity(msg.text || ''))}</div>
     <div class="chat-msg-time">${time}</div>`;
 
   container.appendChild(wrap);
@@ -4748,6 +4774,50 @@ function scrollChat() {
 function escapeHTML(str) {
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+
+// ── Filtro de groserías ──
+let profanityFilterOn = false;
+const PALABROTAS = [
+  'puto','puta','putos','putas','verga','vergas','vergon','vergona',
+  'chinga','chingada','chingadas','chingado','chingados','chingarse',
+  'pendejo','pendeja','pendejos','pendejas',
+  'cabron','cabrón','cabrona','cabrones','cabronas',
+  'mierda','mierdas','joto','jotos','culero','culera','culeros','culeras',
+  'mamada','mamadas','mamón','mamon','mamonas','pinche','pinches',
+  'pene','culo','culón','culon','culos','wey','güey','guey',
+  'hijo de puta','hija de puta','putazo','putazos','chinguen',
+  'ojete','ojetes','naco','naca','nacos','nacas','putilla','coño',
+];
+function filterProfanity(text) {
+  if (!profanityFilterOn) return text;
+  let r = text;
+  PALABROTAS.forEach(w => {
+    const re = new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'gi');
+    r = r.replace(re, m => m[0] + '*'.repeat(Math.max(m.length - 1, 2)));
+  });
+  return r;
+}
+
+// Escuchar estado del filtro desde Firebase (sync para todos)
+onValue(ref(db, 'chat/settings/profanityFilter'), snap => {
+  profanityFilterOn = snap.exists() ? !!snap.val() : false;
+  const pill  = document.getElementById('filterPill');
+  const label = document.getElementById('filterLabel');
+  if (pill)  pill.classList.toggle('on', profanityFilterOn);
+  if (label) label.textContent = profanityFilterOn ? 'Groserías: ON' : 'Groserías: OFF';
+});
+
+window.toggleProfanityFilter = function() {
+  if (S.role !== 'Administrador') return;
+  set(ref(db, 'chat/settings/profanityFilter'), !profanityFilterOn);
+};
+
+window.clearChatMessages = async function() {
+  if (S.role !== 'Administrador') return;
+  if (!confirm('¿Limpiar todo el chat? No se puede deshacer.')) return;
+  await remove(msgsRef);
+  push(msgsRef, { system: true, text: 'Chat limpiado por un administrador.', ts: Date.now() });
+};
 
 // ── Enviar mensaje ──
 window.sendChatMsg = function() {
@@ -4795,6 +4865,9 @@ const _origUpdateProfileUI = window.updateProfileUI;
 window.updateProfileUI = function() {
   _origUpdateProfileUI && _origUpdateProfileUI();
   if (S.user) setTimeout(registerPresence, 500);
+  // Mostrar barra admin en chat si es Administrador
+  const adminBar = document.getElementById('chatAdminBar');
+  if (adminBar) adminBar.classList.toggle('visible', S.role === 'Administrador');
 };
 
 // ── Sign out de Firebase Auth ──
