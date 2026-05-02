@@ -76,6 +76,37 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .logo-sm{font-size:22px;font-weight:900;letter-spacing:1px}
 .user-chip{background:var(--card);border-radius:8px;padding:7px 16px;color:var(--muted);font-size:13px;border:1px solid var(--b2)}
 .user-chip span{color:var(--teal)}
+/* ── PROFILE MENU ── */
+.profile-btn{display:flex;align-items:center;gap:9px;background:var(--card);border:1.5px solid var(--b2);
+  border-radius:40px;padding:5px 14px 5px 5px;cursor:pointer;transition:all .18s;position:relative}
+.profile-btn:hover{border-color:var(--teal);box-shadow:0 2px 12px rgba(13,148,136,.12)}
+.profile-avatar{width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid #e2e8f0;flex-shrink:0}
+.profile-avatar-initials{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--teal),#065f46);
+  color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.profile-info{display:flex;flex-direction:column;line-height:1.2}
+.profile-name{font-size:13px;font-weight:700;color:var(--text);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.profile-role{font-size:11px;color:var(--teal);font-weight:600}
+.profile-chevron{font-size:10px;color:var(--muted);margin-left:2px;transition:transform .2s}
+.profile-btn.open .profile-chevron{transform:rotate(180deg)}
+.profile-dropdown{position:absolute;top:calc(100% + 8px);right:0;background:#fff;border:1px solid var(--b2);
+  border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.12);min-width:220px;z-index:200;
+  overflow:hidden;opacity:0;transform:translateY(-8px) scale(.97);
+  transition:all .18s;pointer-events:none}
+.profile-dropdown.show{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+.profile-dd-header{padding:16px 18px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:12px}
+.profile-dd-avatar{width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid #e2e8f0;flex-shrink:0}
+.profile-dd-avatar-initials{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--teal),#065f46);
+  color:#fff;font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.profile-dd-name{font-size:14px;font-weight:800;color:var(--text)}
+.profile-dd-email{font-size:11px;color:var(--muted);margin-top:2px}
+.profile-dd-role-badge{display:inline-block;margin-top:4px;background:rgba(13,148,136,.1);color:var(--teal);
+  border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;letter-spacing:.3px}
+.profile-dd-item{display:flex;align-items:center;gap:10px;padding:11px 18px;font-size:13px;
+  font-weight:600;color:var(--text);cursor:pointer;transition:background .12s}
+.profile-dd-item:hover{background:#f8fafc}
+.profile-dd-item.danger{color:#dc2626}
+.profile-dd-item.danger:hover{background:#fef2f2}
+.profile-dd-divider{height:1px;background:#f1f5f9;margin:4px 0}
 .btn-sm{background:transparent;border:1px solid var(--b2);border-radius:8px;
   padding:9px 18px;color:var(--muted);font-size:13px;transition:all .15s}
 .btn-sm:hover{border-color:var(--teal);color:var(--teal)}
@@ -87,10 +118,10 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .btn-secondary:hover{border-color:var(--teal);color:var(--teal)}
 
 /* ── ADMIN PANEL ── */
-#adminScreen{background:var(--dark)}
+#adminScreen{background:var(--bg);display:flex;flex-direction:column;height:100vh;overflow:hidden}
 .admin-badge{background:var(--teal);color:#fff;font-size:9px;letter-spacing:2px;
   padding:2px 8px;border-radius:4px;font-weight:700;text-transform:uppercase;margin-left:8px;vertical-align:middle}
-.admin-body{flex:1;padding:32px 40px;display:flex;flex-direction:column;gap:24px;overflow-y:auto;max-height:calc(100vh - 60px)}
+.admin-body{flex:1;padding:32px 40px;display:flex;flex-direction:column;gap:24px;overflow-y:auto;min-height:0}
 .admin-header-row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
 .admin-title{font-size:22px;font-weight:800;color:var(--text)}
 .admin-sub{color:var(--muted);font-size:14px;margin-top:4px}
@@ -140,7 +171,7 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
   font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;font-family:'Sora',sans-serif;white-space:nowrap}
 .admin-tab:hover{color:var(--teal)}
 .admin-tab.active{color:var(--teal);border-bottom-color:var(--teal)}
-#adminBodyEdit,#adminBodyCreate,#adminBodyExport,#adminBodyStats,#adminBodyConfig{max-height:calc(100vh - 109px)}
+#adminBodyEdit,#adminBodyCreate,#adminBodyExport,#adminBodyStats,#adminBodyConfig{min-height:0;flex:1}
 
 /* ── EXPORT TAB ── */
 #adminBodyExport{overflow-y:auto;padding:32px 40px;display:none;flex-direction:column;gap:20px}
@@ -925,7 +956,8 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
     <div class="google-role-email" id="grEmail"></div>
     <div class="google-role-title">¿Con qué rol ingresás?</div>
     <button class="google-role-btn" onclick="finishGoogleLogin('Aspirante')">📚 Aspirante</button>
-    <button class="google-role-btn" onclick="finishGoogleLogin('Tutor / Revisor')">🎓 Tutor / Revisor</button>
+    <button class="google-role-btn" onclick="finishGoogleLogin('Estudiante')">🎒 Estudiante</button>
+    <button class="google-role-btn" onclick="finishGoogleLogin('Profesor')">👨‍🏫 Profesor</button>
     <button id="grAdminBtn" class="google-role-btn" style="display:none;border-color:#0d9488;color:#0d9488" onclick="finishGoogleLogin('Administrador')">⚙️ Administrador</button>
   </div>
 </div>
@@ -935,9 +967,28 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
   <div class="topbar">
     <div class="logo-sm"><span style="color:var(--teal)">EXANI</span><span style="color:var(--green)">-DASH</span></div>
     <div style="display:flex;gap:10px;align-items:center">
-      <div class="user-chip">👤 <span id="userLabel"></span></div>
+      <div class="profile-btn" id="profileBtn" onclick="toggleProfileMenu(this)">
+        <div class="profile-avatar-initials" id="profileAvatarSmall">?</div>
+        <div class="profile-info">
+          <div class="profile-name" id="profileNameSmall">—</div>
+          <div class="profile-role" id="profileRoleSmall">—</div>
+        </div>
+        <span class="profile-chevron">▼</span>
+        <div class="profile-dropdown" id="profileDropdown">
+          <div class="profile-dd-header">
+            <div class="profile-dd-avatar-initials" id="profileAvatarBig">?</div>
+            <div>
+              <div class="profile-dd-name" id="profileDDName">—</div>
+              <div class="profile-dd-email" id="profileDDEmail"></div>
+              <span class="profile-dd-role-badge" id="profileDDRole">—</span>
+            </div>
+          </div>
+          <div class="profile-dd-item" id="ddAdminItem" style="display:none" onclick="openAdmin();closeProfileMenu()">⚙️ Panel Admin</div>
+          <div class="profile-dd-divider"></div>
+          <div class="profile-dd-item danger" onclick="doLogout()">🚪 Cerrar sesión</div>
+        </div>
+      </div>
       <button id="btnAdminPanel" class="btn-sm btn-admin" style="display:none" onclick="openAdmin()">⚙️ Admin</button>
-      <button class="btn-sm btn-danger" onclick="doLogout()">Salir</button>
     </div>
   </div>
   <div class="dash-body">
@@ -969,7 +1020,28 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
   <div class="topbar">
     <div class="logo-sm"><span style="color:var(--teal)">EXANI</span><span style="color:var(--green)">-DASH</span> <span class="admin-badge">ADMIN</span></div>
     <div style="display:flex;gap:10px;align-items:center">
-      <div class="user-chip">⚙️ <span id="adminUserLabel"></span></div>
+      <div class="profile-btn" onclick="toggleProfileMenu(this)">
+        <div class="profile-avatar-initials" id="profileAvatarSmallAdmin">?</div>
+        <div class="profile-info">
+          <div class="profile-name" id="profileNameSmallAdmin">—</div>
+          <div class="profile-role" id="profileRoleSmallAdmin">—</div>
+        </div>
+        <span class="profile-chevron">▼</span>
+        <div class="profile-dropdown">
+          <div class="profile-dd-header">
+            <div class="profile-dd-avatar-initials" id="profileAvatarBigAdmin">?</div>
+            <div>
+              <div class="profile-dd-name" id="profileDDNameAdmin">—</div>
+              <div class="profile-dd-email" id="profileDDEmailAdmin"></div>
+              <span class="profile-dd-role-badge" id="profileDDRoleAdmin">—</span>
+            </div>
+          </div>
+          <div class="profile-dd-divider"></div>
+          <div class="profile-dd-item" onclick="closeAdmin();closeProfileMenu()">← Dashboard</div>
+          <div class="profile-dd-divider"></div>
+          <div class="profile-dd-item danger" onclick="doLogout()">🚪 Cerrar sesión</div>
+        </div>
+      </div>
       <button class="btn-sm btn-secondary" onclick="closeAdmin()">← Dashboard</button>
       <button class="btn-sm btn-danger" onclick="doLogout()">Salir</button>
     </div>
@@ -1527,6 +1599,8 @@ const NAV_WIN = 10;
 let S = {
   user: null,
   role: null,          // 'Administrador' | 'Tutor / Revisor' | 'Aspirante'
+  googlePicture: null,
+  googleEmail: '',
   questions: [],
   images: {},          // { 'pregunta32.jpg': blobURL }
   answers: {},
@@ -1598,8 +1672,10 @@ function doLogin() {
   if (role) {
     S.user = u;
     S.role = role;
-    $('userLabel').innerHTML = `${u} · <span>${role}</span>`;
+    S.googlePicture = null;
+    S.googleEmail   = '';
     $('loginErr').style.display = 'none';
+    updateProfileUI();
     // Mostrar botón admin solo para administradores
     const adminBtn = $('btnAdminPanel');
     if (adminBtn) adminBtn.style.display = role === 'Administrador' ? 'flex' : 'none';
@@ -1614,7 +1690,7 @@ function doLogin() {
 
 function doLogout() {
   stopTimer();
-  S = { user:null, role:null, questions:[], images:{}, answers:{}, current:0, navStart:0,
+  S = { user:null, role:null, googlePicture:null, googleEmail:'', questions:[], images:{}, answers:{}, current:0, navStart:0,
         timerSecs:TOTAL_SECS, timerInt:null, running:false, paused:false,
         rawZip:null, currentExamMeta:null, adminEdits:{} };
   $('inpUser').value = ''; $('inpPass').value = '';
@@ -1631,7 +1707,7 @@ function doLogout() {
 // ══════════════════════════════════════════
 const GOOGLE_CLIENT_ID = '134270865403-ibnn6k5qfu3h9v4sbudc0d566o0okf0v.apps.googleusercontent.com';
 // Emails que tienen acceso de Administrador (agregá los que quieras)
-const ADMIN_EMAILS = ['acselito@gmail.com'];
+const ADMIN_EMAILS = ['acselito@gmail.com', 'donniaxel55@gmail.com'];
 
 let _googleProfile = null;
 
@@ -1710,12 +1786,90 @@ function finishGoogleLogin(role) {
   $('googleRoleModal').style.display = 'none';
   S.user = _googleProfile.name;
   S.role = role;
-  $('userLabel').innerHTML = `${_googleProfile.name} · <span>${role}</span>`;
-  $('adminUserLabel') && ($('adminUserLabel').innerHTML = `${_googleProfile.name} · <span>${role}</span>`);
+  S.googlePicture = _googleProfile.picture || null;
+  S.googleEmail   = _googleProfile.email   || '';
+  updateProfileUI();
   const adminBtn = $('btnAdminPanel');
   if (adminBtn) adminBtn.style.display = role === 'Administrador' ? 'flex' : 'none';
   renderExamCards();
   show('dashScreen');
+}
+
+// ══════════════════════════════════════════
+//  PROFILE MENU
+// ══════════════════════════════════════════
+function updateProfileUI() {
+  const name  = S.user  || '—';
+  const role  = S.role  || '—';
+  const email = S.googleEmail || '';
+  const pic   = S.googlePicture || null;
+  const initials = name.slice(0,2).toUpperCase();
+
+  function setAvatar(smallId, bigId, imgClass) {
+    const small = $(smallId);
+    const big   = $(bigId);
+    if (!small || !big) return;
+    if (pic) {
+      // Reemplazar el div de iniciales por una imagen real
+      const mkImg = (id) => {
+        const img = document.createElement('img');
+        img.src = pic; img.alt = name;
+        img.className = imgClass;
+        img.id = id;
+        img.onerror = () => { img.style.display='none'; };
+        return img;
+      };
+      small.parentNode.replaceChild(mkImg(smallId), small);
+      big.parentNode.replaceChild(mkImg(bigId), big);
+    } else {
+      small.textContent = initials;
+      big.textContent   = initials;
+    }
+  }
+
+  setAvatar('profileAvatarSmall',      'profileAvatarBig',      'profile-avatar');
+  setAvatar('profileAvatarSmallAdmin', 'profileAvatarBigAdmin', 'profile-dd-avatar');
+
+  ['profileNameSmall','profileNameSmallAdmin'].forEach(id => { if ($(id)) $(id).textContent = name; });
+  ['profileRoleSmall','profileRoleSmallAdmin'].forEach(id => { if ($(id)) $(id).textContent = role; });
+  ['profileDDName','profileDDNameAdmin'].forEach(id => { if ($(id)) $(id).textContent = name; });
+  ['profileDDEmail','profileDDEmailAdmin'].forEach(id => { if ($(id)) $(id).textContent = email; });
+  ['profileDDRole','profileDDRoleAdmin'].forEach(id => { if ($(id)) $(id).textContent = role; });
+
+  // Mostrar opción Admin en dropdown solo si es admin
+  const ddAdmin = $('ddAdminItem');
+  if (ddAdmin) ddAdmin.style.display = role === 'Administrador' ? 'flex' : 'none';
+  // userLabel legacy (puede que algo lo use)
+  if ($('userLabel')) $('userLabel').innerHTML = `${name} · <span>${role}</span>`;
+  if ($('adminUserLabel')) $('adminUserLabel').innerHTML = `${name} · <span>${role}</span>`;
+}
+
+function toggleProfileMenu(btn) {
+  const dd = btn.querySelector('.profile-dropdown');
+  if (!dd) return;
+  // Cerrar otros abiertos
+  document.querySelectorAll('.profile-dropdown.show').forEach(d => {
+    if (d !== dd) { d.classList.remove('show'); d.closest('.profile-btn')?.classList.remove('open'); }
+  });
+  const isOpen = dd.classList.toggle('show');
+  btn.classList.toggle('open', isOpen);
+  if (isOpen) {
+    // Cerrar al hacer clic fuera
+    setTimeout(() => {
+      document.addEventListener('click', closeProfileOnOutside, { once: true });
+    }, 0);
+  }
+}
+
+function closeProfileOnOutside(e) {
+  if (!e.target.closest('.profile-btn')) closeProfileMenu();
+}
+
+function closeProfileMenu() {
+  document.querySelectorAll('.profile-dropdown.show').forEach(d => {
+    d.classList.remove('show');
+    d.closest('.profile-btn')?.classList.remove('open');
+  });
 }
 
 // ══════════════════════════════════════════
@@ -3295,19 +3449,36 @@ function showUserList() {
   if (el.style.display === 'flex') { el.style.display = 'none'; return; }
   try {
     const users = JSON.parse(localStorage.getItem('exani_users') || 'null');
-    if (users && typeof users === 'object') {
-      const entries = Object.keys(users);
-      el.innerHTML = entries.length
-        ? entries.map(u => `<div style="font-size:13px;font-family:'DM Mono',monospace;padding:4px 0;color:var(--text)">👤 ${u}</div>`).join('')
-        : `<div style="font-size:13px;color:var(--muted)">Sin usuarios registrados</div>`;
+    const entries = users && typeof users === 'object' ? Object.keys(users) : [];
+
+    if (entries.length) {
+      el.innerHTML = entries.map((u, i) => {
+        const censored = u.slice(0,2) + '●'.repeat(Math.max(2, u.length - 2));
+        return `<div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid #f1f5f9">
+          <span style="font-size:13px;font-family:'DM Mono',monospace;color:var(--text);flex:1" id="uname_${i}" data-real="${u}" data-censored="${censored}" data-hidden="true">${censored}</span>
+          <button onclick="toggleUsername(${i})" id="ueye_${i}" title="Mostrar/ocultar"
+            style="background:none;border:none;cursor:pointer;font-size:15px;padding:2px 6px;color:var(--muted);border-radius:6px;transition:color .15s"
+            onmouseover="this.style.color='#0d9488'" onmouseout="this.style.color='var(--muted)'">👁</button>
+        </div>`;
+      }).join('');
     } else {
-      el.innerHTML = `<div style="font-size:13px;color:var(--muted)">Modo demo — sin base de usuarios local</div>`;
+      el.innerHTML = `<div style="font-size:13px;color:var(--muted)">Sin usuarios registrados</div>`;
     }
   } catch {
-    el.innerHTML = `<div style="font-size:13px;color:var(--muted)">No disponible</div>`;
+    el.innerHTML = `<div style="font-size:13px;color:var(--muted)">Modo demo — sin base de usuarios local</div>`;
   }
   el.style.display = 'flex';
   el.style.flexDirection = 'column';
+}
+
+function toggleUsername(i) {
+  const span = $('uname_' + i);
+  const btn  = $('ueye_'  + i);
+  if (!span) return;
+  const hidden = span.dataset.hidden === 'true';
+  span.textContent   = hidden ? span.dataset.real     : span.dataset.censored;
+  span.dataset.hidden = hidden ? 'false' : 'true';
+  btn.textContent    = hidden ? '🙈' : '👁';
 }
 function clearLoadedExam() {
   if (!confirm('¿Eliminar el examen cargado de la memoria? No borra el archivo ZIP.')) return;
