@@ -2778,37 +2778,135 @@ async function loadCatalog() {
   }
 }
 
+// ── Secciones de Premedicina ──
+const EXAM_SECTIONS = [
+  {
+    id: 'premedicina',
+    label: '🧬 Premedicina',
+    color: '#0d9488',
+    match: ex => {
+      const t = ((ex.titulo||'')+(ex.materia||'')+(ex.tags||[]).join('')).toLowerCase();
+      return t.includes('premedicina') || t.includes('biolog') || t.includes('ciencias de la salud') || t.includes('anatomia') || t.includes('fisiolog');
+    }
+  },
+  {
+    id: 'redaccion',
+    label: '✍️ Redacción Indirecta',
+    color: '#7c3aed',
+    match: ex => {
+      const t = ((ex.titulo||'')+(ex.materia||'')+(ex.tags||[]).join('')).toLowerCase();
+      return t.includes('redac');
+    }
+  },
+  {
+    id: 'matematicas',
+    label: '📐 Matemáticas',
+    color: '#2563eb',
+    match: ex => {
+      const t = ((ex.titulo||'')+(ex.materia||'')+(ex.tags||[]).join('')).toLowerCase();
+      return t.includes('matem') || t.includes('pensamiento mat') || t.includes('calc') || t.includes('algebra') || t.includes('aritm');
+    }
+  },
+  {
+    id: 'comprension',
+    label: '📖 Comprensión Lectora',
+    color: '#d97706',
+    coming: true,
+    match: ex => {
+      const t = ((ex.titulo||'')+(ex.materia||'')+(ex.tags||[]).join('')).toLowerCase();
+      return t.includes('comprens') || t.includes('lectura') || t.includes('lector');
+    }
+  },
+];
+
+function buildExamCardHTML(ex, idx) {
+  const horas = ex.horas || minutosToHoras(ex.tiempo_minutos || 0);
+  const tags  = (ex.tags || []).map((t, i) =>
+    `<span class="exam-tag${i===0?' teal':''}">${t}</span>`).join('');
+  const imgCount = ex.imagenes ?? ex.images ?? 0;
+  return `
+    <div class="exam-card">
+      ${ex.nuevo ? '<span class="exam-card-new">NUEVO</span>' : ''}
+      <div class="exam-card-head">
+        <div class="exam-card-icon">${ex.icono || '📄'}</div>
+        <div class="exam-card-info">
+          <div class="exam-card-title">${ex.titulo}</div>
+          <div class="exam-card-sub">${ex.materia || ex.subtitulo || ''}</div>
+        </div>
+      </div>
+      <div class="exam-card-tags">${tags}</div>
+      <div class="exam-card-stats">
+        <div class="ec-stat"><div class="ec-val">${ex.preguntas ?? ex.total_preguntas ?? '?'}</div><div class="ec-lbl">Preguntas</div></div>
+        <div class="ec-stat"><div class="ec-val">${horas}</div><div class="ec-lbl">Horas</div></div>
+        <div class="ec-stat"><div class="ec-val">${imgCount}</div><div class="ec-lbl">Imágenes</div></div>
+      </div>
+      <button class="exam-card-btn" onclick="event.stopPropagation();loadCatalogExam(${idx})">▶ Iniciar examen</button>
+      ${S.role === 'Administrador' ? `<button class="exam-card-btn" style="background:linear-gradient(135deg,#0f766e,#0e7490);margin-top:6px;font-size:12px;padding:9px" onclick="event.stopPropagation();editCatalogExam(${idx})">✏️ Editar examen</button>` : ''}
+    </div>`;
+}
+
 function renderExamCards() {
   const grid = $('examsGrid');
   if (!CATALOG.length) {
     grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:14px">No hay exámenes en el catálogo todavía.</div>`;
     return;
   }
-  grid.innerHTML = CATALOG.map((ex, idx) => {
-    const horas = ex.horas || minutosToHoras(ex.tiempo_minutos || 0);
-    const tags  = (ex.tags || []).map((t, i) =>
-      `<span class="exam-tag${i===0?' teal':''}">${t}</span>`).join('');
-    const imgCount = ex.imagenes ?? ex.images ?? 0;
-    return `
-      <div class="exam-card">
-        ${ex.nuevo ? '<span class="exam-card-new">NUEVO</span>' : ''}
-        <div class="exam-card-head">
-          <div class="exam-card-icon">${ex.icono || '📄'}</div>
-          <div class="exam-card-info">
-            <div class="exam-card-title">${ex.titulo}</div>
-            <div class="exam-card-sub">${ex.materia || ex.subtitulo || ''}</div>
-          </div>
+
+  // Clasificar exámenes en secciones
+  const used = new Set();
+  let html = '';
+
+  EXAM_SECTIONS.forEach(section => {
+    const sectionExams = CATALOG
+      .map((ex, idx) => ({ ex, idx }))
+      .filter(({ ex, idx }) => !used.has(idx) && section.match(ex));
+
+    // Marcar como usados
+    sectionExams.forEach(({ idx }) => used.add(idx));
+
+    // Si es "próximamente" y no hay exámenes en esa sección
+    if (section.coming && sectionExams.length === 0) {
+      html += `
+        <div class="section-header" style="grid-column:1/-1;display:flex;align-items:center;gap:12px;margin:8px 0 4px">
+          <div style="font-size:16px;font-weight:800;color:${section.color};letter-spacing:.3px">${section.label}</div>
+          <span style="background:rgba(217,119,6,.1);color:#d97706;border:1px solid rgba(217,119,6,.3);border-radius:20px;font-size:10px;font-weight:800;padding:2px 10px;letter-spacing:1px">PRÓXIMAMENTE</span>
+          <div style="flex:1;height:1px;background:var(--b2)"></div>
         </div>
-        <div class="exam-card-tags">${tags}</div>
-        <div class="exam-card-stats">
-          <div class="ec-stat"><div class="ec-val">${ex.preguntas ?? ex.total_preguntas ?? '?'}</div><div class="ec-lbl">Preguntas</div></div>
-          <div class="ec-stat"><div class="ec-val">${horas}</div><div class="ec-lbl">Horas</div></div>
-          <div class="ec-stat"><div class="ec-val">${imgCount}</div><div class="ec-lbl">Imágenes</div></div>
-        </div>
-        <button class="exam-card-btn" onclick="event.stopPropagation();loadCatalogExam(${idx})">▶ Iniciar examen</button>
-        ${S.role === 'Administrador' ? `<button class="exam-card-btn" style="background:linear-gradient(135deg,#0f766e,#0e7490);margin-top:6px;font-size:12px;padding:9px" onclick="event.stopPropagation();editCatalogExam(${idx})">✏️ Editar examen</button>` : ''}
+        <div style="grid-column:1/-1;background:#fffbeb;border:1.5px dashed #fcd34d;border-radius:16px;padding:28px 24px;text-align:center;margin-bottom:8px">
+          <div style="font-size:32px;margin-bottom:8px">📖</div>
+          <div style="font-size:14px;font-weight:700;color:#92400e">Próximamente disponible</div>
+          <div style="font-size:12px;color:#b45309;margin-top:4px">Estamos preparando los exámenes de esta sección</div>
+        </div>`;
+      return;
+    }
+
+    if (sectionExams.length === 0) return;
+
+    html += `
+      <div class="section-header" style="grid-column:1/-1;display:flex;align-items:center;gap:12px;margin:8px 0 4px">
+        <div style="font-size:16px;font-weight:800;color:${section.color};letter-spacing:.3px">${section.label}</div>
+        <div style="flex:1;height:1px;background:var(--b2)"></div>
       </div>`;
-  }).join('');
+    sectionExams.forEach(({ ex, idx }) => {
+      html += buildExamCardHTML(ex, idx);
+    });
+  });
+
+  // Exámenes que no cayeron en ninguna sección
+  const others = CATALOG
+    .map((ex, idx) => ({ ex, idx }))
+    .filter(({ idx }) => !used.has(idx));
+
+  if (others.length > 0) {
+    html += `
+      <div class="section-header" style="grid-column:1/-1;display:flex;align-items:center;gap:12px;margin:8px 0 4px">
+        <div style="font-size:16px;font-weight:800;color:var(--muted);letter-spacing:.3px">📄 Otros exámenes</div>
+        <div style="flex:1;height:1px;background:var(--b2)"></div>
+      </div>`;
+    others.forEach(({ ex, idx }) => { html += buildExamCardHTML(ex, idx); });
+  }
+
+  grid.innerHTML = html;
 }
 
 function minutosToHoras(min) {
@@ -2963,7 +3061,7 @@ let rankingTab = 'global';
 
 async function saveScoreToRanking(pct, ok, total) {
   if (!S.user) return;
-  const examTitle = S.currentExamMeta?.titulo || 'Examen';
+  const examTitle = (S.currentExamMeta?.titulo || S.meta?.titulo || 'Examen sin nombre').trim();
   // Usar username como clave si no hay email Google
   const safeKey = S.googleEmail
     ? S.googleEmail.replace(/[.#$[\]]/g, '_')
@@ -2987,14 +3085,12 @@ async function saveScoreToRanking(pct, ok, total) {
         body: JSON.stringify(entry),
       });
     }
-    // Historial personal solo si tiene email Google
-    if (S.googleEmail) {
-      await fetch(FB_URL + '/history/' + safeKey + '.json', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(entry),
-      });
-    }
+    // Historial para todos los usuarios (no solo Google)
+    await fetch(FB_URL + '/history/' + safeKey + '.json', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(entry),
+    });
   } catch(e) { console.warn('Ranking save error', e); }
 }
 
@@ -3034,47 +3130,97 @@ async function loadRankingGlobal() {
 async function loadRankingByExam() {
   $('rankingBody').innerHTML = '<div class="ranking-loading">⏳ Cargando…</div>';
   try {
-    const data = await fetch(RANKING_REF + '.json').then(r => r.json());
-    if (!data) { $('rankingBody').innerHTML = '<div class="ranking-empty">Sin datos aún</div>'; return; }
-    const all = Object.values(data);
-    // Agrupar por examen
+    // Obtener tanto el ranking global como el historial completo
+    const [rankData, histData] = await Promise.all([
+      fetch(RANKING_REF + '.json').then(r => r.json()).catch(() => null),
+      fetch(FB_URL + '/history.json').then(r => r.json()).catch(() => null),
+    ]);
+
+    // Recolectar todas las entradas (del historial si existe, sino del ranking)
+    const all = [];
+
+    if (histData) {
+      // histData = { userKey: { entryKey: {user, exam, pct, ts, ...}, ... }, ... }
+      Object.values(histData).forEach(userHistory => {
+        if (typeof userHistory === 'object') {
+          Object.values(userHistory).forEach(entry => {
+            if (entry && entry.user && entry.exam && entry.pct != null) {
+              all.push(entry);
+            }
+          });
+        }
+      });
+    }
+
+    // Si no hay historial, usar ranking
+    if (all.length === 0 && rankData) {
+      Object.values(rankData).forEach(e => {
+        if (e && e.user && e.exam && e.pct != null) all.push(e);
+      });
+    }
+
+    if (!all.length) {
+      $('rankingBody').innerHTML = '<div class="ranking-empty">😔 Sin datos aún. ¡Termina un examen para aparecer aquí!</div>';
+      return;
+    }
+
+    // Agrupar por examen, quedar con el MEJOR resultado por usuario por examen
     const byExam = {};
     all.forEach(e => {
-      if (!byExam[e.exam]) byExam[e.exam] = [];
-      byExam[e.exam].push(e);
+      const examKey = (e.exam || 'Sin nombre').trim();
+      if (!byExam[examKey]) byExam[examKey] = {};
+      const userKey = e.email || e.user;
+      const prev = byExam[examKey][userKey];
+      if (!prev || e.pct > prev.pct) {
+        byExam[examKey][userKey] = e;
+      }
     });
+
+    // Ordenar exámenes alfabéticamente
+    const examNames = Object.keys(byExam).sort();
+
     let html = '';
-    Object.entries(byExam).forEach(([exam, entries]) => {
-      entries.sort((a,b) => b.pct - a.pct);
-      html += `<div style="font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;
+    examNames.forEach(exam => {
+      const entries = Object.values(byExam[exam]).sort((a,b) => b.pct - a.pct);
+      html += `<div style="font-size:12px;font-weight:800;color:var(--teal);text-transform:uppercase;
         letter-spacing:.5px;margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid #f1f5f9">${exam}</div>`;
-      html += entries.slice(0,5).map((e,i) => rankingRowHTML(e, i)).join('');
+      html += entries.slice(0,10).map((e,i) => rankingRowHTML(e, i)).join('');
     });
+
     $('rankingBody').innerHTML = html || '<div class="ranking-empty">Sin datos aún</div>';
-  } catch { $('rankingBody').innerHTML = '<div class="ranking-empty">❌ Error</div>'; }
+  } catch(err) {
+    console.error('Ranking byExam error', err);
+    $('rankingBody').innerHTML = '<div class="ranking-empty">❌ Error al cargar</div>';
+  }
 }
 
 async function loadRankingMine() {
   $('rankingBody').innerHTML = '<div class="ranking-loading">⏳ Cargando…</div>';
-  if (!S.googleEmail) {
-    $('rankingBody').innerHTML = '<div class="ranking-empty">🔒 Solo disponible para usuarios con Google</div>';
+  if (!S.user) {
+    $('rankingBody').innerHTML = '<div class="ranking-empty">🔒 Inicia sesión para ver tu historial</div>';
     return;
   }
   try {
-    const safeEmail = S.googleEmail.replace(/[.#$[\]]/g, '_');
-    const data = await fetch(FB_URL + '/history/' + safeEmail + '.json').then(r => r.json());
-    if (!data) { $('rankingBody').innerHTML = '<div class="ranking-empty">Aún no tenés exámenes completados 📚</div>'; return; }
+    const safeKey = S.googleEmail
+      ? S.googleEmail.replace(/[.#$[\]]/g, '_')
+      : 'u_' + S.user.toLowerCase().replace(/[^a-z0-9]/g, '_');
+    const data = await fetch(FB_URL + '/history/' + safeKey + '.json').then(r => r.json());
+    if (!data) { $('rankingBody').innerHTML = '<div class="ranking-empty">Aún no tienes exámenes completados 📚<br><span style="font-size:12px;color:var(--muted)">¡Termina un examen para ver tu historial!</span></div>'; return; }
     const entries = Object.values(data).sort((a,b) => b.ts - a.ts);
     let html = `<div style="font-size:12px;font-weight:800;color:var(--muted);margin-bottom:12px">TUS ÚLTIMOS ${Math.min(entries.length,20)} EXÁMENES</div>`;
     html += entries.slice(0,20).map(e => {
-      const date = new Date(e.ts).toLocaleDateString('es-MX', {day:'numeric',month:'short',year:'numeric'});
+      const examName = (e.exam && e.exam !== 'undefined') ? e.exam : 'Examen sin nombre';
+      const date = e.ts ? new Date(e.ts).toLocaleDateString('es-MX', {day:'numeric',month:'short',year:'numeric'}) : '—';
       const col = e.pct >= 60 ? 'var(--teal)' : 'var(--red)';
+      const pct = e.pct != null ? e.pct : 0;
+      const ok = e.ok ?? '—';
+      const total = e.total ?? '—';
       return `<div class="ranking-row">
         <div style="flex:1">
-          <div style="font-size:13px;font-weight:700;color:var(--text)">${e.exam}</div>
-          <div style="font-size:11px;color:var(--muted)">${date} · ${e.ok}/${e.total} correctas</div>
+          <div style="font-size:13px;font-weight:700;color:var(--text)">${examName}</div>
+          <div style="font-size:11px;color:var(--muted)">${date} · ${ok}/${total} correctas</div>
         </div>
-        <div style="font-size:18px;font-weight:900;color:${col};font-family:'DM Mono',monospace">${e.pct}%</div>
+        <div style="font-size:18px;font-weight:900;color:${col};font-family:'DM Mono',monospace">${pct}%</div>
       </div>`;
     }).join('');
     $('rankingBody').innerHTML = html;
@@ -3100,11 +3246,12 @@ function renderRankingList(entries) {
 }
 
 function rankingRowHTML(e, i, isMe) {
-  if (!e || !e.user || !e.pct) return ''; // skip entradas corruptas
+  if (!e || !e.user || e.pct == null) return ''; // skip entradas corruptas
   const medals = ['🥇','🥈','🥉'];
   const posClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
   const pos = i < 3 ? medals[i] : `#${i+1}`;
   const date = e.ts ? new Date(e.ts).toLocaleDateString('es-MX', {day:'numeric',month:'short'}) : '—';
+  const examName = (e.exam && e.exam !== 'undefined') ? e.exam : 'Examen';
   const avatarHTML = e.picture
     ? `<img class="ranking-avatar" src="${e.picture}" onerror="this.style.display='none'">`
     : `<div class="ranking-avatar-initials">${(e.user||'?').slice(0,2).toUpperCase()}</div>`;
@@ -3113,7 +3260,7 @@ function rankingRowHTML(e, i, isMe) {
     ${avatarHTML}
     <div class="ranking-info">
       <div class="ranking-name">${e.user}${isMe ? ' 👈' : ''}</div>
-      <div class="ranking-exam">${e.exam || '—'}</div>
+      <div class="ranking-exam">${examName}</div>
     </div>
     <div class="ranking-score">
       <div class="ranking-pct">${e.pct}%</div>
