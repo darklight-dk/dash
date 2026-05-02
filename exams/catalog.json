@@ -52,5 +52,23 @@
     "path": "exams/exani-ii-redaccion-indirecta-2026-05-01.zip",
     "nuevo": true,
     "agregado": "2026-05-01"
+  },
+  {
+    "titulo": "REDACCIÓN INDIRECTA Vol II",
+    "materia": "redacción indirecta",
+    "icono": "📄",
+    "tags": [
+      "Simulador",
+      "EXANI-II",
+      "2026"
+    ],
+    "preguntas": 30,
+    "horas": "0:40",
+    "imagenes": 0,
+    "tiempo_minutos": 40,
+    "version": "2026",
+    "path": "exams/redaccion-indirecta-vol-ii-2026-05-02.zip",
+    "nuevo": true,
+    "agregado": "2026-05-02"
   }
 ]
