@@ -470,6 +470,11 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
   background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;
   font-size:8px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .chat-msg-name{font-size:11px;font-weight:700;color:var(--muted)}
+.chat-msg-name.admin-name{color:#b45309;font-weight:800}
+.chat-verified-badge{display:inline-flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border-radius:50%;
+  width:13px;height:13px;font-size:8px;margin-left:3px;vertical-align:middle;flex-shrink:0;
+  box-shadow:0 1px 3px rgba(245,158,11,.4);position:relative;top:-0.5px}
 .chat-msg-bubble{padding:8px 12px;border-radius:14px;font-size:13px;line-height:1.4;word-break:break-word}
 .chat-msg.mine .chat-msg-bubble{background:linear-gradient(135deg,var(--teal),#0891b2);color:#fff;
   border-bottom-right-radius:4px}
@@ -4822,10 +4827,14 @@ function appendChatMsg(msg) {
 
   const time = msg.ts ? new Date(msg.ts).toLocaleTimeString('es-MX', {hour:'2-digit',minute:'2-digit'}) : '';
 
+  const isAdminMsg = msg.role === 'Administrador';
+  const nameClass  = isAdminMsg ? 'chat-msg-name admin-name' : 'chat-msg-name';
+  const badge      = isAdminMsg ? '<span class="chat-verified-badge" title="Administrador">✓</span>' : '';
+
   wrap.innerHTML = `
     <div class="chat-msg-header" style="cursor:pointer" onclick="openProfileView('${escapeHTML(msg.name||'')}','${escapeHTML(msg.role||'')}','${escapeHTML(msg.picture||'')}')">
       ${!isMine ? avatarHTML : ''}
-      <span class="chat-msg-name">${escapeHTML(msg.name || 'Anónimo')}</span>
+      <span class="${nameClass}">${escapeHTML(msg.name || 'Anónimo')}${badge}</span>
       ${isMine ? avatarHTML : ''}
     </div>
     <div class="chat-msg-bubble">${escapeHTML(filterProfanity(msg.text || ''))}</div>
@@ -5084,14 +5093,27 @@ window.saveMyProfile = async function() {
   }
   if (!valid) return;
 
-  const payload = { desc, ig, tt };
-  // Limpiar campos vacíos para no guardar strings vacíos
-  Object.keys(payload).forEach(k => { if (!payload[k]) delete payload[k]; });
+  const btn = document.querySelector('.myp-save');
+  btn.disabled = true;
+  btn.textContent = 'Guardando…';
 
-  await set(ref(db, 'userSocials/' + encodeURIComponent(S.user)), payload);
-  const saved = document.getElementById('mypSaved');
-  saved.style.display = 'block';
-  setTimeout(() => { saved.style.display = 'none'; }, 2500);
+  try {
+    // Firebase rechaza set() con objeto vacío; siempre guardamos al menos un campo marcador
+    const payload = { _updated: Date.now() };
+    if (desc) payload.desc = desc;
+    if (ig)   payload.ig   = ig;
+    if (tt)   payload.tt   = tt;
+
+    await set(ref(db, 'userSocials/' + encodeURIComponent(S.user)), payload);
+    const saved = document.getElementById('mypSaved');
+    saved.style.display = 'block';
+    setTimeout(() => { saved.style.display = 'none'; }, 2500);
+  } catch(e) {
+    alert('Error al guardar: ' + (e.message || e));
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Guardar';
+  }
 };
 
 window.closeMypOverlay = function(e) {
