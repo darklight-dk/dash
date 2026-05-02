@@ -475,6 +475,10 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
   background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border-radius:50%;
   width:13px;height:13px;font-size:8px;margin-left:3px;vertical-align:middle;flex-shrink:0;
   box-shadow:0 1px 3px rgba(245,158,11,.4);position:relative;top:-0.5px}
+.chat-msg-delete{display:none;background:none;border:none;cursor:pointer;font-size:13px;
+  color:#dc2626;opacity:0.6;padding:0 3px;line-height:1;flex-shrink:0;transition:opacity .15s}
+.chat-msg-delete:hover{opacity:1}
+.is-admin-viewer .chat-msg-delete{display:inline-flex}
 .chat-msg-bubble{padding:8px 12px;border-radius:14px;font-size:13px;line-height:1.4;word-break:break-word}
 .chat-msg.mine .chat-msg-bubble{background:linear-gradient(135deg,var(--teal),#0891b2);color:#fff;
   border-bottom-right-radius:4px}
@@ -2841,12 +2845,15 @@ const RANKING_REF = FB_URL + '/ranking';
 let rankingTab = 'global';
 
 async function saveScoreToRanking(pct, ok, total) {
-  // Solo usuarios logueados con Google
-  if (!S.googleEmail) return;
+  if (!S.user) return;
   const examTitle = S.currentExamMeta?.titulo || 'Examen';
+  // Usar username como clave si no hay email Google
+  const safeKey = S.googleEmail
+    ? S.googleEmail.replace(/[.#$[\]]/g, '_')
+    : 'u_' + S.user.toLowerCase().replace(/[^a-z0-9]/g, '_');
   const entry = {
     user:    S.user,
-    email:   S.googleEmail,
+    email:   S.googleEmail || '',
     picture: S.googlePicture || null,
     pct,
     ok,
@@ -2855,22 +2862,22 @@ async function saveScoreToRanking(pct, ok, total) {
     ts:      Date.now(),
   };
   try {
-    // Guardar por email (clave única por usuario) — solo si supera su récord anterior
-    const safeEmail = S.googleEmail.replace(/[.#$[\]]/g, '_');
-    const existing = await fetch(RANKING_REF + '/' + safeEmail + '.json').then(r => r.json());
-    if (!existing || pct > existing.pct) {
-      await fetch(RANKING_REF + '/' + safeEmail + '.json', {
+    const existing = await fetch(RANKING_REF + '/' + safeKey + '.json').then(r => r.json());
+    if (!existing || pct > (existing.pct || 0)) {
+      await fetch(RANKING_REF + '/' + safeKey + '.json', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(entry),
       });
     }
-    // Guardar en historial personal (siempre)
-    await fetch(FB_URL + '/history/' + safeEmail + '.json', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(entry),
-    });
+    // Historial personal solo si tiene email Google
+    if (S.googleEmail) {
+      await fetch(FB_URL + '/history/' + safeKey + '.json', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(entry),
+      });
+    }
   } catch(e) { console.warn('Ranking save error', e); }
 }
 
@@ -2902,7 +2909,7 @@ async function loadRankingGlobal() {
   try {
     const data = await fetch(RANKING_REF + '.json').then(r => r.json());
     if (!data) { $('rankingBody').innerHTML = '<div class="ranking-empty">😔 Nadie en el ranking todavía.<br>¡Sé el primero en terminar un examen!</div>'; return; }
-    const entries = Object.values(data).sort((a,b) => b.pct - a.pct);
+    const entries = Object.values(data).filter(e => e && e.user && e.pct).sort((a,b) => b.pct - a.pct);
     renderRankingList(entries);
   } catch { $('rankingBody').innerHTML = '<div class="ranking-empty">❌ Error al cargar el ranking</div>'; }
 }
@@ -2976,10 +2983,11 @@ function renderRankingList(entries) {
 }
 
 function rankingRowHTML(e, i, isMe) {
+  if (!e || !e.user || !e.pct) return ''; // skip entradas corruptas
   const medals = ['🥇','🥈','🥉'];
   const posClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
   const pos = i < 3 ? medals[i] : `#${i+1}`;
-  const date = new Date(e.ts).toLocaleDateString('es-MX', {day:'numeric',month:'short'});
+  const date = e.ts ? new Date(e.ts).toLocaleDateString('es-MX', {day:'numeric',month:'short'}) : '—';
   const avatarHTML = e.picture
     ? `<img class="ranking-avatar" src="${e.picture}" onerror="this.style.display='none'">`
     : `<div class="ranking-avatar-initials">${(e.user||'?').slice(0,2).toUpperCase()}</div>`;
@@ -2988,7 +2996,7 @@ function rankingRowHTML(e, i, isMe) {
     ${avatarHTML}
     <div class="ranking-info">
       <div class="ranking-name">${e.user}${isMe ? ' 👈' : ''}</div>
-      <div class="ranking-exam">${e.exam}</div>
+      <div class="ranking-exam">${e.exam || '—'}</div>
     </div>
     <div class="ranking-score">
       <div class="ranking-pct">${e.pct}%</div>
@@ -4793,7 +4801,7 @@ const recentQ = query(msgsRef, limitToLast(80));
 onChildAdded(recentQ, snap => {
   const msg = snap.val();
   if (!msg) return;
-  appendChatMsg(msg);
+  appendChatMsg(msg, snap.key);
   if (!chatOpen && !firstLoad) {
     unreadCount++;
     const badge = document.getElementById('chatBadge');
@@ -4813,7 +4821,7 @@ onChildAdded(recentQ, snap => {
 });
 
 // ── Renderizar mensaje ──
-function appendChatMsg(msg) {
+function appendChatMsg(msg, key) {
   const container = document.getElementById('chatMessages');
   if (!container) return;
 
@@ -4833,6 +4841,7 @@ function appendChatMsg(msg) {
   const isMine = S.user && msg.name === S.user;
   const wrap   = document.createElement('div');
   wrap.className = 'chat-msg ' + (isMine ? 'mine' : 'theirs');
+  if (key) wrap.dataset.msgKey = key;
 
   const initials = (msg.name || '?').slice(0,2).toUpperCase();
   const avatarHTML = msg.picture
@@ -4844,11 +4853,13 @@ function appendChatMsg(msg) {
   const isAdminMsg = msg.role === 'Administrador';
   const nameClass  = isAdminMsg ? 'chat-msg-name admin-name' : 'chat-msg-name';
   const badge      = isAdminMsg ? '<span class="chat-verified-badge" title="Administrador">✓</span>' : '';
+  const deleteBtn  = key ? `<button class="chat-msg-delete" onclick="deleteChatMsg('${key}',this)" title="Eliminar mensaje">✕</button>` : '';
 
   wrap.innerHTML = `
     <div class="chat-msg-header" style="cursor:pointer" onclick="openProfileView('${escapeHTML(msg.name||'')}','${escapeHTML(msg.role||'')}','${escapeHTML(msg.picture||'')}')">
       ${!isMine ? avatarHTML : ''}
       <span class="${nameClass}">${escapeHTML(msg.name || 'Anónimo')}${badge}</span>
+      ${deleteBtn}
       ${isMine ? avatarHTML : ''}
     </div>
     <div class="chat-msg-bubble">${escapeHTML(filterProfanity(msg.text || ''))}</div>
@@ -4857,6 +4868,17 @@ function appendChatMsg(msg) {
   container.appendChild(wrap);
   if (chatOpen) scrollChat();
 }
+
+window.deleteChatMsg = async function(key, btn) {
+  if (S.role !== 'Administrador') return;
+  try {
+    await remove(ref(db, 'chat/messages/' + key));
+    const wrap = btn.closest('.chat-msg');
+    if (wrap) wrap.remove();
+  } catch(e) {
+    alert('Error al eliminar: ' + (e.message || e));
+  }
+};
 
 function scrollChat() {
   const msgs = document.getElementById('chatMessages');
@@ -4963,6 +4985,9 @@ window.updateProfileUI = function() {
   // Mostrar barra admin en chat si es Administrador
   const adminBar = document.getElementById('chatAdminBar');
   if (adminBar) adminBar.classList.toggle('visible', S.role === 'Administrador');
+  // Mostrar botones de eliminar mensaje si es admin
+  const chatMsgs = document.getElementById('chatMessages');
+  if (chatMsgs) chatMsgs.classList.toggle('is-admin-viewer', S.role === 'Administrador');
 };
 
 // ── Perfil: ver usuario del chat ──
