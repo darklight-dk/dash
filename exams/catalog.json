@@ -70,5 +70,23 @@
     "path": "exams/redaccion-indirecta-vol-ii-2026-05-02.zip",
     "nuevo": true,
     "agregado": "2026-05-02"
+  },
+  {
+    "titulo": "Pensamiento Matemático Vol.1",
+    "materia": "(en progreso)",
+    "icono": "📐",
+    "tags": [
+      "Matemáticas",
+      "EXANI-II",
+      "2026"
+    ],
+    "preguntas": 5,
+    "horas": "0:40",
+    "imagenes": 3,
+    "tiempo_minutos": 40,
+    "version": "2026",
+    "path": "exams/pensamiento-matematico-vol-1-2026-05-02.zip",
+    "nuevo": true,
+    "agregado": "2026-05-02"
   }
 ]
