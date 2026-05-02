@@ -638,6 +638,55 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
   border:none;border-radius:14px;padding:17px;font-size:16px;font-weight:800;
   color:#ffffff;letter-spacing:1px}
 
+/* ── RANKING ── */
+.ranking-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;
+  display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);
+  opacity:0;pointer-events:none;transition:opacity .2s}
+.ranking-overlay.show{opacity:1;pointer-events:auto}
+.ranking-modal{background:#fff;border-radius:24px;width:min(520px,96vw);max-height:86vh;
+  display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.18)}
+.ranking-header{background:linear-gradient(135deg,#1e293b,#0f172a);padding:22px 24px;
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.ranking-header-title{color:#fff;font-size:18px;font-weight:800;display:flex;align-items:center;gap:10px}
+.ranking-close{background:none;border:none;color:rgba(255,255,255,.6);font-size:20px;cursor:pointer}
+.ranking-tabs{display:flex;border-bottom:1px solid #f1f5f9;flex-shrink:0;background:#fff}
+.ranking-tab{flex:1;padding:11px;font-size:12px;font-weight:700;color:var(--muted);
+  background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;
+  font-family:'Sora',sans-serif;letter-spacing:.3px;text-transform:uppercase}
+.ranking-tab.active{color:var(--teal);border-bottom-color:var(--teal)}
+.ranking-body{flex:1;overflow-y:auto;padding:16px}
+.ranking-my-pos{background:linear-gradient(135deg,rgba(13,148,136,.08),rgba(13,148,136,.04));
+  border:1.5px solid rgba(13,148,136,.2);border-radius:14px;padding:12px 16px;
+  margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.ranking-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;
+  transition:background .12s;cursor:default}
+.ranking-row:hover{background:#f8fafc}
+.ranking-row.me{background:rgba(13,148,136,.06);border:1px solid rgba(13,148,136,.15)}
+.ranking-pos{font-size:15px;font-weight:900;min-width:28px;text-align:center;font-family:'DM Mono',monospace}
+.ranking-pos.gold{color:#f59e0b}
+.ranking-pos.silver{color:#94a3b8}
+.ranking-pos.bronze{color:#d97706}
+.ranking-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid #e2e8f0}
+.ranking-avatar-initials{width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;
+  font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ranking-info{flex:1;min-width:0}
+.ranking-name{font-size:13px;font-weight:700;color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ranking-exam{font-size:11px;color:var(--muted);margin-top:1px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ranking-score{text-align:right;flex-shrink:0}
+.ranking-pct{font-size:17px;font-weight:900;color:var(--teal);font-family:'DM Mono',monospace}
+.ranking-date{font-size:10px;color:var(--muted);margin-top:2px}
+.ranking-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:14px}
+.ranking-loading{text-align:center;padding:40px;color:var(--muted)}
+.ranking-fab{position:fixed;bottom:90px;right:24px;width:48px;height:48px;
+  background:linear-gradient(135deg,#f59e0b,#d97706);border:none;border-radius:50%;
+  color:#fff;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(245,158,11,.4);
+  z-index:300;transition:all .2s;display:none;align-items:center;justify-content:center}
+.ranking-fab:hover{transform:scale(1.1)}
+@media(max-width:480px){.ranking-fab{bottom:80px;right:16px}}
+
 /* loading */
 #loadOv{position:fixed;inset:0;background:rgba(248,250,252,.94);display:none;
   align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:20px}
@@ -1012,6 +1061,27 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
   💬
   <span class="chat-fab-badge" id="chatBadge"></span>
 </button>
+
+<!-- RANKING FAB -->
+<button class="ranking-fab" id="rankingFab" onclick="openRanking()" title="Ranking global">🏆</button>
+
+<!-- RANKING MODAL -->
+<div class="ranking-overlay" id="rankingOverlay" onclick="closeRankingOnBg(event)">
+  <div class="ranking-modal">
+    <div class="ranking-header">
+      <div class="ranking-header-title">🏆 Ranking Global</div>
+      <button class="ranking-close" onclick="closeRanking()">✕</button>
+    </div>
+    <div class="ranking-tabs">
+      <button class="ranking-tab active" id="rtabGlobal" onclick="switchRankingTab('global')">🌍 Global</button>
+      <button class="ranking-tab" id="rtabExam" onclick="switchRankingTab('exam')">📋 Por examen</button>
+      <button class="ranking-tab" id="rtabMine" onclick="switchRankingTab('mine')">👤 Mi historial</button>
+    </div>
+    <div class="ranking-body" id="rankingBody">
+      <div class="ranking-loading">⏳ Cargando…</div>
+    </div>
+  </div>
+</div>
 <div class="chat-panel" id="chatPanel">
   <div class="chat-header">
     <div>
@@ -1545,6 +1615,7 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
     </div>
     <div class="review-grid" id="reviewGrid"></div>
     <button class="btn-exit" onclick="exitToLogin()">Volver al inicio</button>
+    <button class="btn-exit" style="background:linear-gradient(135deg,#f59e0b,#d97706);margin-top:10px" onclick="openRanking()">🏆 Ver ranking global</button>
     <button class="btn-exit" id="btnResultsAdmin" style="display:none;background:var(--teal);color:#fff;border:none;margin-top:8px" onclick="openAdmin()">⚙️ Editar imágenes del examen</button>
   </div>
 </div>
@@ -1778,6 +1849,9 @@ function doLogin() {
 function doLogout() {
   stopTimer();
   stopChat();
+  const rfab = $('rankingFab');
+  if (rfab) rfab.style.display = 'none';
+  closeRanking();
   localStorage.removeItem('exani_session');
   S = { user:null, role:null, googlePicture:null, googleEmail:'', questions:[], images:{}, answers:{}, current:0, navStart:0,
         timerSecs:TOTAL_SECS, timerInt:null, running:false, paused:false,
@@ -1886,6 +1960,9 @@ function finishGoogleLogin(role) {
   renderExamCards();
   show('dashScreen');
   initChat();
+  // Mostrar ranking FAB solo para Google users
+  const rfab = $('rankingFab');
+  if (rfab) rfab.style.display = S.googleEmail ? 'flex' : 'none';
 }
 
 // ══════════════════════════════════════════
@@ -2294,6 +2371,8 @@ function showResults() {
   $('reviewGrid').innerHTML = html;
 
   show('resultsScreen');
+  // Guardar en ranking (solo Google users)
+  saveScoreToRanking(pct, ok, total);
   // Mostrar botón admin en resultados si corresponde
   const adminResBtn = $('btnResultsAdmin');
   if (adminResBtn) adminResBtn.style.display = S.role === 'Administrador' ? '' : 'none';
@@ -2468,7 +2547,6 @@ async function loadCatalogExam(idx) {
   const ex = CATALOG[idx];
   if (!ex) return;
   const path = ex.path || `exams/${ex.archivo || ex.file}`;
-  // Solo afectar los botones "Iniciar examen", no los de "Editar"
   const btns = [...document.querySelectorAll('.exam-card-btn')].filter(b => b.textContent.includes('Iniciar'));
   btns.forEach(b => { b.textContent = '⏳ Cargando…'; b.style.pointerEvents = 'none'; });
   try {
@@ -2479,8 +2557,9 @@ async function loadCatalogExam(idx) {
     const file = new File([blob], name, { type: 'application/zip' });
     await handleFile(file);
   } catch(e) {
-    btns.forEach(b => { b.textContent = '▶ Iniciar examen'; b.style.pointerEvents = ''; });
     alert('⚠️ Error al cargar el examen.\n\nAsegúrate de abrir el HTML desde un servidor local (Live Server) y que el ZIP esté en la ruta indicada en catalog.json.');
+  } finally {
+    btns.forEach(b => { b.textContent = '▶ Iniciar examen'; b.style.pointerEvents = ''; });
   }
 }
 
@@ -2533,6 +2612,10 @@ async function editCatalogExam(idx) {
       };
     });
 
+    // Abrir panel admin PRIMERO para que los elementos existan en el DOM
+    openAdmin();
+    switchAdminTab('create');
+
     // Rellenar campos de metadata del builder
     var totalMins = meta.tiempo_minutos || 0;
     var bh = Math.floor(totalMins / 60);
@@ -2545,10 +2628,6 @@ async function editCatalogExam(idx) {
     $('bldMins').value    = bm;
     updateTimePreview();
     renderBuilderQList();
-
-    // Abrir panel admin en tab "Crear examen" (que ahora actua como editor completo)
-    openAdmin();
-    switchAdminTab('create');
     showToast('✏️ ' + data.questions.length + ' preguntas cargadas — edita y exporta el ZIP');
 
   } catch(e) {
@@ -2716,21 +2795,17 @@ async function initChat() {
     return;
   }
 
-  // Polling cada 3 segundos para nuevos mensajes (más simple que SSE para GitHub Pages)
+  // Polling cada 3 segundos para nuevos mensajes
+  let lastTs = Date.now();
   if (chatListener) clearInterval(chatListener);
   chatListener = setInterval(async () => {
     try {
-      const url = chatLastKey
-        ? CHAT_REF + '.json?orderBy="$key"&startAfter="' + chatLastKey + '"&limitToLast=20'
-        : CHAT_REF + '.json?orderBy="ts"&limitToLast=5';
-      const res = await fetch(url);
+      const res = await fetch(CHAT_REF + '.json?orderBy="ts"&startAfter=' + lastTs + '&limitToLast=20');
       const data = await res.json();
       if (data && typeof data === 'object') {
         const msgs = Object.entries(data).sort((a,b) => a[1].ts - b[1].ts);
         msgs.forEach(([key, msg]) => {
-          // Actualizar siempre chatLastKey aunque ya exista el mensaje
-          if (key > (chatLastKey || '')) chatLastKey = key;
-          // Solo renderizar si no está ya en el DOM
+          if (msg.ts > lastTs) lastTs = msg.ts;
           if (!document.querySelector('[data-key="' + key + '"]')) {
             renderChatMsg(key, msg, true);
           }
@@ -2746,6 +2821,169 @@ function stopChat() {
   if (fab) fab.style.display = 'none';
   chatOpen = false;
   $('chatPanel')?.classList.remove('show');
+}
+
+// ══════════════════════════════════════════
+//  RANKING GLOBAL — Firebase
+// ══════════════════════════════════════════
+const RANKING_REF = FB_URL + '/ranking';
+let rankingTab = 'global';
+
+async function saveScoreToRanking(pct, ok, total) {
+  // Solo usuarios logueados con Google
+  if (!S.googleEmail) return;
+  const examTitle = S.currentExamMeta?.titulo || 'Examen';
+  const entry = {
+    user:    S.user,
+    email:   S.googleEmail,
+    picture: S.googlePicture || null,
+    pct,
+    ok,
+    total,
+    exam:    examTitle,
+    ts:      Date.now(),
+  };
+  try {
+    // Guardar por email (clave única por usuario) — solo si supera su récord anterior
+    const safeEmail = S.googleEmail.replace(/[.#$[\]]/g, '_');
+    const existing = await fetch(RANKING_REF + '/' + safeEmail + '.json').then(r => r.json());
+    if (!existing || pct > existing.pct) {
+      await fetch(RANKING_REF + '/' + safeEmail + '.json', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(entry),
+      });
+    }
+    // Guardar en historial personal (siempre)
+    await fetch(FB_URL + '/history/' + safeEmail + '.json', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(entry),
+    });
+  } catch(e) { console.warn('Ranking save error', e); }
+}
+
+function openRanking() {
+  $('rankingOverlay').classList.add('show');
+  switchRankingTab(rankingTab);
+}
+
+function closeRanking() {
+  $('rankingOverlay').classList.remove('show');
+}
+
+function closeRankingOnBg(e) {
+  if (e.target === $('rankingOverlay')) closeRanking();
+}
+
+function switchRankingTab(tab) {
+  rankingTab = tab;
+  ['global','exam','mine'].forEach(t => {
+    $('rtab' + t.charAt(0).toUpperCase() + t.slice(1))?.classList.toggle('active', t === tab);
+  });
+  if (tab === 'global') loadRankingGlobal();
+  else if (tab === 'exam') loadRankingByExam();
+  else loadRankingMine();
+}
+
+async function loadRankingGlobal() {
+  $('rankingBody').innerHTML = '<div class="ranking-loading">⏳ Cargando…</div>';
+  try {
+    const data = await fetch(RANKING_REF + '.json').then(r => r.json());
+    if (!data) { $('rankingBody').innerHTML = '<div class="ranking-empty">😔 Nadie en el ranking todavía.<br>¡Sé el primero en terminar un examen!</div>'; return; }
+    const entries = Object.values(data).sort((a,b) => b.pct - a.pct);
+    renderRankingList(entries);
+  } catch { $('rankingBody').innerHTML = '<div class="ranking-empty">❌ Error al cargar el ranking</div>'; }
+}
+
+async function loadRankingByExam() {
+  $('rankingBody').innerHTML = '<div class="ranking-loading">⏳ Cargando…</div>';
+  try {
+    const data = await fetch(RANKING_REF + '.json').then(r => r.json());
+    if (!data) { $('rankingBody').innerHTML = '<div class="ranking-empty">Sin datos aún</div>'; return; }
+    const all = Object.values(data);
+    // Agrupar por examen
+    const byExam = {};
+    all.forEach(e => {
+      if (!byExam[e.exam]) byExam[e.exam] = [];
+      byExam[e.exam].push(e);
+    });
+    let html = '';
+    Object.entries(byExam).forEach(([exam, entries]) => {
+      entries.sort((a,b) => b.pct - a.pct);
+      html += `<div style="font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;
+        letter-spacing:.5px;margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid #f1f5f9">${exam}</div>`;
+      html += entries.slice(0,5).map((e,i) => rankingRowHTML(e, i)).join('');
+    });
+    $('rankingBody').innerHTML = html || '<div class="ranking-empty">Sin datos aún</div>';
+  } catch { $('rankingBody').innerHTML = '<div class="ranking-empty">❌ Error</div>'; }
+}
+
+async function loadRankingMine() {
+  $('rankingBody').innerHTML = '<div class="ranking-loading">⏳ Cargando…</div>';
+  if (!S.googleEmail) {
+    $('rankingBody').innerHTML = '<div class="ranking-empty">🔒 Solo disponible para usuarios con Google</div>';
+    return;
+  }
+  try {
+    const safeEmail = S.googleEmail.replace(/[.#$[\]]/g, '_');
+    const data = await fetch(FB_URL + '/history/' + safeEmail + '.json').then(r => r.json());
+    if (!data) { $('rankingBody').innerHTML = '<div class="ranking-empty">Aún no tenés exámenes completados 📚</div>'; return; }
+    const entries = Object.values(data).sort((a,b) => b.ts - a.ts);
+    let html = `<div style="font-size:12px;font-weight:800;color:var(--muted);margin-bottom:12px">TUS ÚLTIMOS ${Math.min(entries.length,20)} EXÁMENES</div>`;
+    html += entries.slice(0,20).map(e => {
+      const date = new Date(e.ts).toLocaleDateString('es-MX', {day:'numeric',month:'short',year:'numeric'});
+      const col = e.pct >= 60 ? 'var(--teal)' : 'var(--red)';
+      return `<div class="ranking-row">
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700;color:var(--text)">${e.exam}</div>
+          <div style="font-size:11px;color:var(--muted)">${date} · ${e.ok}/${e.total} correctas</div>
+        </div>
+        <div style="font-size:18px;font-weight:900;color:${col};font-family:'DM Mono',monospace">${e.pct}%</div>
+      </div>`;
+    }).join('');
+    $('rankingBody').innerHTML = html;
+  } catch { $('rankingBody').innerHTML = '<div class="ranking-empty">❌ Error</div>'; }
+}
+
+function renderRankingList(entries) {
+  const myEmail = S.googleEmail;
+  const myPos = myEmail ? entries.findIndex(e => e.email === myEmail) : -1;
+  let html = '';
+
+  // Mi posición fija arriba si no está en top 10
+  if (myPos > 9 && myEmail) {
+    const me = entries[myPos];
+    html += `<div class="ranking-my-pos">
+      <div style="font-size:12px;font-weight:700;color:var(--teal)">TU POSICIÓN</div>
+      ${rankingRowHTML(me, myPos)}
+    </div>`;
+  }
+
+  html += entries.slice(0,20).map((e,i) => rankingRowHTML(e, i, e.email === myEmail)).join('');
+  $('rankingBody').innerHTML = html || '<div class="ranking-empty">Sin datos aún</div>';
+}
+
+function rankingRowHTML(e, i, isMe) {
+  const medals = ['🥇','🥈','🥉'];
+  const posClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+  const pos = i < 3 ? medals[i] : `#${i+1}`;
+  const date = new Date(e.ts).toLocaleDateString('es-MX', {day:'numeric',month:'short'});
+  const avatarHTML = e.picture
+    ? `<img class="ranking-avatar" src="${e.picture}" onerror="this.style.display='none'">`
+    : `<div class="ranking-avatar-initials">${(e.user||'?').slice(0,2).toUpperCase()}</div>`;
+  return `<div class="ranking-row ${isMe ? 'me' : ''}">
+    <div class="ranking-pos ${posClass}">${pos}</div>
+    ${avatarHTML}
+    <div class="ranking-info">
+      <div class="ranking-name">${e.user}${isMe ? ' 👈' : ''}</div>
+      <div class="ranking-exam">${e.exam}</div>
+    </div>
+    <div class="ranking-score">
+      <div class="ranking-pct">${e.pct}%</div>
+      <div class="ranking-date">${date}</div>
+    </div>
+  </div>`;
 }
 
 buildCalc();
