@@ -56,6 +56,28 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
   font-family:'Sora',sans-serif;margin-top:10px}
 .btn-google:hover{border-color:#0d9488;box-shadow:0 4px 16px rgba(13,148,136,.15);transform:translateY(-1px)}
 .btn-google svg{width:20px;height:20px;flex-shrink:0}
+.login-toggle{text-align:center;margin-top:16px;font-size:13px;color:var(--muted)}
+.login-toggle a{color:var(--teal);font-weight:700;cursor:pointer;text-decoration:none}
+.login-toggle a:hover{text-decoration:underline}
+.btn-register{width:100%;background:linear-gradient(135deg,#0f766e,#0e7490);border:none;
+  border-radius:14px;color:#fff;font-size:15px;font-weight:700;padding:14px;
+  letter-spacing:.5px;transition:.2s;margin-top:4px}
+.btn-register:hover{transform:translateY(-2px)}
+.auth-loading{display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:12px;color:var(--teal);font-size:14px;font-weight:600}
+.auth-loading::before{content:'';width:18px;height:18px;border:2px solid var(--teal);
+  border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+.inp-label{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.8px;
+  text-transform:uppercase;margin-bottom:-8px}
+.role-select{background:#f8fafc;border:1px solid var(--b2);border-radius:12px;
+  padding:12px 16px;font-size:14px;color:var(--text);font-family:'Sora',sans-serif;
+  width:100%;appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2364748b' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;cursor:pointer}
+.role-select:focus{outline:none;border-color:var(--teal)}
+.success-msg{background:rgba(22,163,74,.08);border:1px solid rgba(22,163,74,.3);
+  border-radius:10px;padding:10px 14px;font-size:13px;color:#15803d;
+  margin-bottom:12px;display:none}
 .google-role-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;
   justify-content:center;z-index:9999;backdrop-filter:blur(4px)}
 .google-role-card{background:#fff;border-radius:20px;padding:32px 28px;width:320px;text-align:center;
@@ -119,7 +141,7 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .btn-secondary:hover{border-color:var(--teal);color:var(--teal)}
 
 /* ── ADMIN PANEL ── */
-#adminScreen{background:var(--bg);display:flex;flex-direction:column;height:100vh;overflow:hidden}
+#adminScreen{background:var(--bg);flex-direction:column;height:100vh;overflow:hidden}
 .admin-badge{background:var(--teal);color:#fff;font-size:9px;letter-spacing:2px;
   padding:2px 8px;border-radius:4px;font-weight:700;text-transform:uppercase;margin-left:8px;vertical-align:middle}
 .admin-body{flex:1;padding:32px 40px;display:flex;flex-direction:column;gap:24px;overflow-y:auto;min-height:0}
@@ -1041,18 +1063,42 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
       <div class="logo-text"><span class="e">EXANI</span><span class="d">-DASH</span></div>
       <div class="logo-sub">Plataforma de Evaluación</div>
     </div>
-    <div class="field-group">
-      <input id="inpUser" class="inp" placeholder="Usuario" autocomplete="off"/>
-      <input id="inpPass" class="inp" type="password" placeholder="Contraseña"/>
+
+    <!-- ── FORM LOGIN ── -->
+    <div id="formLogin">
+      <div class="field-group">
+        <input id="inpUser" class="inp" placeholder="Usuario" autocomplete="off"/>
+        <input id="inpPass" class="inp" type="password" placeholder="Contraseña"/>
+      </div>
+      <div id="loginErr" class="err-msg" style="display:none">Usuario o contraseña incorrectos</div>
+      <div id="loginLoading" class="auth-loading" style="display:none">Iniciando sesión…</div>
+      <button class="btn-login" onclick="doLogin()">INGRESAR</button>
+      <div class="login-toggle">¿No tienes cuenta? <a onclick="switchAuthForm('register')">Crear cuenta</a></div>
+      <div class="login-divider">o</div>
+      <button class="btn-google" onclick="doGoogleLogin()">
+        <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
+        Continuar con Google
+      </button>
+      <div class="login-footer">EXANI-DASH · Sistema de Evaluación</div>
     </div>
-    <div id="loginErr" class="err-msg">Usuario o contraseña incorrectos</div>
-    <button class="btn-login" onclick="doLogin()">INGRESAR</button>
-    <div class="login-divider">o</div>
-    <button class="btn-google" onclick="doGoogleLogin()">
-      <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
-      Continuar con Google
-    </button>
-    <div class="login-footer">Acceso restringido · Sistema local</div>
+
+    <!-- ── FORM REGISTRO ── -->
+    <div id="formRegister" style="display:none">
+      <div class="field-group">
+        <input id="regName" class="inp" placeholder="Nombre de usuario" autocomplete="off"/>
+        <input id="regPass" class="inp" type="password" placeholder="Contraseña (mín. 6 caracteres)"/>
+        <select id="regRole" class="role-select">
+          <option value="Aspirante">📚 Aspirante</option>
+          <option value="Estudiante">🎒 Estudiante</option>
+          <option value="Profesor">👨‍🏫 Profesor</option>
+        </select>
+      </div>
+      <div id="registerErr" class="err-msg" style="display:none">Error al crear la cuenta</div>
+      <div id="registerSuccess" class="success-msg">✅ ¡Cuenta creada! Ya puedes ingresar.</div>
+      <div id="registerLoading" class="auth-loading" style="display:none">Creando cuenta…</div>
+      <button class="btn-register" onclick="doRegister()">CREAR CUENTA</button>
+      <div class="login-toggle">¿Ya tienes cuenta? <a onclick="switchAuthForm('login')">Iniciar sesión</a></div>
+    </div>
   </div>
 </div>
 
@@ -1741,11 +1787,10 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
 //  AUTH
 // ══════════════════════════════════════════
 // Usuarios con contraseña real — solo estos tienen acceso verificado
-const USERS = {
-  Acselito:    { pass: 'donni25',   role: 'Administrador' },
-  Admin456:    { pass: 'Admin456',  role: 'Administrador' },
-  Filtrado777: { pass: 'Filt777',   role: 'Tutor / Revisor' },
-};
+// USERS legacy — mantenido solo para compatibilidad (auth migrado a Firebase Auth)
+const USERS = {};
+// Emails que reciben rol Administrador automáticamente
+const ADMIN_EMAILS_LOCAL = ['acselito@gmail.com', 'donniaxel55@gmail.com'];
 const TOTAL_SECS = 4*3600+30*60;
 const NAV_WIN = 10;
 
@@ -1805,45 +1850,50 @@ const pad = n => String(n).padStart(2,'0');
 // ══════════════════════════════════════════
 //  LOGIN
 // ══════════════════════════════════════════
-$('inpUser').addEventListener('keydown', e => e.key==='Enter' && doLogin());
 $('inpPass').addEventListener('keydown', e => e.key==='Enter' && doLogin());
+// regPass Enter → doRegister
+document.addEventListener('DOMContentLoaded', () => {
+  const rp = $('regPass'); if (rp) rp.addEventListener('keydown', e => e.key==='Enter' && doRegister());
+});
 
+// ── Cambiar entre login / registro ──
+function switchAuthForm(form) {
+  $('formLogin').style.display    = form === 'login'    ? '' : 'none';
+  $('formRegister').style.display = form === 'register' ? '' : 'none';
+  $('loginErr').style.display     = 'none';
+  $('registerErr').style.display  = 'none';
+  $('registerSuccess').style.display = 'none';
+}
+
+// ── Login con Firebase Auth (delegado al módulo) ──
 function doLogin() {
-  const u = $('inpUser').value.trim();
-  const p = $('inpPass').value;
-  const card = document.querySelector('.login-card');
+  if (window._fbDoLogin) { window._fbDoLogin(); return; }
+  // fallback mientras carga el módulo
+  $('loginErr').textContent = 'Cargando autenticación…';
+  $('loginErr').style.display = 'block';
+}
 
-  // ── Verificar credenciales ──
-  let role = null;
-  if (USERS[u]) {
-    // Usuario nombrado: requiere contraseña exacta
-    if (USERS[u].pass === p) {
-      role = USERS[u].role;
-    }
-  } else if (u.length >= 3 && p.length >= 3) {
-    // Usuario genérico (Aspirante)
-    role = 'Aspirante';
-  }
+// ── Registro con Firebase Auth (delegado al módulo) ──
+function doRegister() {
+  if (window._fbDoRegister) { window._fbDoRegister(); return; }
+  $('registerErr').textContent = 'Cargando autenticación…';
+  $('registerErr').style.display = 'block';
+}
 
-  if (role) {
-    S.user = u;
-    S.role = role;
-    S.googlePicture = null;
-    S.googleEmail   = '';
-    localStorage.setItem('exani_session', JSON.stringify({ user: u, role, googlePicture: null, googleEmail: '' }));
-    $('loginErr').style.display = 'none';
-    updateProfileUI();
-    // Mostrar botón admin solo para administradores
-    const adminBtn = $('btnAdminPanel');
-    if (adminBtn) adminBtn.style.display = role === 'Administrador' ? 'flex' : 'none';
-    renderExamCards(); // re-render para mostrar/ocultar botón "Editar examen" según rol
-    show('dashScreen');
-    initChat();
-  } else {
-    $('loginErr').style.display = 'block';
-    card.style.animation = 'none';
-    requestAnimationFrame(() => card.style.animation = 'shake .4s ease');
-  }
+// ── Helper interno: entrar al dashboard tras autenticarse ──
+function _enterDash(user, role, picture, email) {
+  S.user          = user;
+  S.role          = role;
+  S.googlePicture = picture || null;
+  S.googleEmail   = email  || '';
+  localStorage.setItem('exani_session', JSON.stringify({ user, role, googlePicture: S.googlePicture, googleEmail: S.googleEmail }));
+  $('loginErr').style.display = 'none';
+  updateProfileUI();
+  const adminBtn = $('btnAdminPanel');
+  if (adminBtn) adminBtn.style.display = role === 'Administrador' ? 'flex' : 'none';
+  renderExamCards();
+  show('dashScreen');
+  initChat();
 }
 
 function doLogout() {
@@ -1858,10 +1908,13 @@ function doLogout() {
         rawZip:null, currentExamMeta:null, adminEdits:{} };
   $('inpUser').value = ''; $('inpPass').value = '';
   resetZip();
-  // Cerrar sesión de Google también
+  // Cerrar sesión de Google
   if (window.google && google.accounts) {
     google.accounts.id.disableAutoSelect();
   }
+  // Cerrar sesión de Firebase Auth
+  if (window._fbSignOut) window._fbSignOut();
+  switchAuthForm('login');
   show('loginScreen');
 }
 
@@ -2516,7 +2569,7 @@ function renderExamCards() {
       `<span class="exam-tag${i===0?' teal':''}">${t}</span>`).join('');
     const imgCount = ex.imagenes ?? ex.images ?? 0;
     return `
-      <div class="exam-card" onclick="loadCatalogExam(${idx})">
+      <div class="exam-card">
         ${ex.nuevo ? '<span class="exam-card-new">NUEVO</span>' : ''}
         <div class="exam-card-head">
           <div class="exam-card-icon">${ex.icono || '📄'}</div>
@@ -2531,7 +2584,7 @@ function renderExamCards() {
           <div class="ec-stat"><div class="ec-val">${horas}</div><div class="ec-lbl">Horas</div></div>
           <div class="ec-stat"><div class="ec-val">${imgCount}</div><div class="ec-lbl">Imágenes</div></div>
         </div>
-        <button class="exam-card-btn">▶ Iniciar examen</button>
+        <button class="exam-card-btn" onclick="event.stopPropagation();loadCatalogExam(${idx})">▶ Iniciar examen</button>
         ${S.role === 'Administrador' ? `<button class="exam-card-btn" style="background:linear-gradient(135deg,#0f766e,#0e7490);margin-top:6px;font-size:12px;padding:9px" onclick="event.stopPropagation();editCatalogExam(${idx})">✏️ Editar examen</button>` : ''}
       </div>`;
   }).join('');
@@ -2648,181 +2701,39 @@ function loadBuiltinExam(key) {
 
 
 // ══════════════════════════════════════════
-//  CHAT MUNDIAL — Firebase Realtime Database
+//  CHAT MUNDIAL — stubs (implementación en Firebase SDK module)
 // ══════════════════════════════════════════
-const FB_URL = 'https://exani-dash-adeff-default-rtdb.firebaseio.com';
-const CHAT_REF = FB_URL + '/chat/messages';
+const FB_URL  = 'https://exani-dash-adeff-default-rtdb.firebaseio.com';
 const MAX_MSGS = 80;
-let chatOpen = false;
-let chatLastKey = null;
-let chatUnread = 0;
-let chatListener = null;
 
-function toggleChat() {
-  chatOpen = !chatOpen;
+// initChat / stopChat son llamados desde login/logout.
+// La lógica real vive en el <script type="module"> de Firebase SDK.
+function initChat() {
+  const fab = $('chatFab');
+  if (fab) fab.style.display = 'flex';
+  if (window._fbRegisterPresence) window._fbRegisterPresence();
+}
+function stopChat() {
+  const fab = $('chatFab');
+  if (fab) fab.style.display = 'none';
   const panel = $('chatPanel');
-  panel.classList.toggle('show', chatOpen);
-  if (chatOpen) {
-    chatUnread = 0;
-    updateChatBadge();
-    setTimeout(() => scrollChatBottom(), 100);
-    $('chatInput').focus();
-  }
+  if (panel) panel.classList.remove('show');
 }
 
-function updateChatBadge() {
-  const badge = $('chatBadge');
-  if (!badge) return;
-  if (chatUnread > 0 && !chatOpen) {
-    badge.textContent = chatUnread > 9 ? '9+' : chatUnread;
-    badge.style.display = 'flex';
-  } else {
-    badge.style.display = 'none';
-  }
-}
-
+// scrollChatBottom sigue siendo usado por el SDK module via window.*
 function scrollChatBottom() {
   const el = $('chatMessages');
   if (el) el.scrollTop = el.scrollHeight;
 }
-
-function autoResizeChat(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 80) + 'px';
-}
+function updateChatBadge() {}  // manejado por el SDK module
 
 function chatKeydown(e) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendChatMsg();
-  }
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMsg(); }
 }
-
-function renderChatMsg(key, msg, isNew) {
-  const container = $('chatMessages');
-  if (!container) return;
-  // Quitar "Conectando..." si existe
-  const connecting = container.querySelector('.chat-system');
-  if (connecting && connecting.textContent === 'Conectando…') connecting.remove();
-
-  const isMine = S.user && msg.user === S.user;
-  const time = new Date(msg.ts).toLocaleTimeString('es-MX', { hour:'2-digit', minute:'2-digit' });
-  const initials = (msg.user || '?').slice(0,2).toUpperCase();
-
-  // Avatar
-  const avatarHTML = msg.picture
-    ? `<img class="chat-msg-avatar" src="${msg.picture}" onerror="this.style.display='none'">`
-    : `<div class="chat-msg-avatar-initials">${initials}</div>`;
-
-  const div = document.createElement('div');
-  div.className = 'chat-msg ' + (isMine ? 'mine' : 'theirs');
-  div.dataset.key = key;
-  div.innerHTML = `
-    ${!isMine ? `<div class="chat-msg-header">${avatarHTML}<span class="chat-msg-name">${msg.user}</span></div>` : ''}
-    <div class="chat-msg-bubble">${escapeHtml(msg.text)}</div>
-    <div class="chat-msg-time">${isMine ? '✓ ' : ''}${time}</div>
-  `;
-  container.appendChild(div);
-
-  if (isNew) {
-    scrollChatBottom();
-    if (!chatOpen && !isMine) {
-      chatUnread++;
-      updateChatBadge();
-    }
-  }
+function autoResizeChat(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
 }
-
-function escapeHtml(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-async function sendChatMsg() {
-  if (!S.user) { alert('Tenés que estar logueado para chatear.'); return; }
-  const input = $('chatInput');
-  const text = input.value.trim();
-  if (!text) return;
-  input.value = '';
-  input.style.height = 'auto';
-
-  const msg = {
-    user:    S.user,
-    text:    text,
-    ts:      Date.now(),
-    picture: S.googlePicture || null,
-    role:    S.role || 'Aspirante',
-  };
-
-  try {
-    const res = await fetch(CHAT_REF + '.json', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(msg),
-    });
-    const data = await res.json();
-    // Registrar la key devuelta por Firebase para que el polling no lo duplique
-    if (data && data.name) {
-      chatLastKey = data.name;
-      // Renderizar localmente con esa key real
-      renderChatMsg(data.name, msg, true);
-    }
-  } catch(e) {
-    showToast('❌ Error al enviar el mensaje');
-  }
-}
-
-async function initChat() {
-  // Mostrar FAB solo si está logueado
-  const fab = $('chatFab');
-  if (fab) fab.style.display = 'flex';
-
-  // Cargar últimos mensajes via REST
-  try {
-    const res = await fetch(CHAT_REF + '.json?orderBy="ts"&limitToLast=' + MAX_MSGS);
-    const data = await res.json();
-    if (data && typeof data === 'object') {
-      const msgs = Object.entries(data).sort((a,b) => a[1].ts - b[1].ts);
-      msgs.forEach(([key, msg]) => {
-        chatLastKey = key;
-        renderChatMsg(key, msg, false);
-      });
-      scrollChatBottom();
-    } else {
-      $('chatMessages').innerHTML = '<div class="chat-system">¡Sé el primero en escribir! 👋</div>';
-    }
-  } catch(e) {
-    $('chatMessages').innerHTML = '<div class="chat-system">Sin conexión al chat</div>';
-    return;
-  }
-
-  // Polling cada 3 segundos para nuevos mensajes
-  let lastTs = Date.now();
-  if (chatListener) clearInterval(chatListener);
-  chatListener = setInterval(async () => {
-    try {
-      const res = await fetch(CHAT_REF + '.json?orderBy="ts"&startAfter=' + lastTs + '&limitToLast=20');
-      const data = await res.json();
-      if (data && typeof data === 'object') {
-        const msgs = Object.entries(data).sort((a,b) => a[1].ts - b[1].ts);
-        msgs.forEach(([key, msg]) => {
-          if (msg.ts > lastTs) lastTs = msg.ts;
-          if (!document.querySelector('[data-key="' + key + '"]')) {
-            renderChatMsg(key, msg, true);
-          }
-        });
-      }
-    } catch {}
-  }, 3000);
-}
-
-function stopChat() {
-  if (chatListener) { clearInterval(chatListener); chatListener = null; }
-  const fab = $('chatFab');
-  if (fab) fab.style.display = 'none';
-  chatOpen = false;
-  $('chatPanel')?.classList.remove('show');
-}
-
 // ══════════════════════════════════════════
 //  RANKING GLOBAL — Firebase
 // ══════════════════════════════════════════
@@ -3445,7 +3356,7 @@ function saveCanvas() {
 
 function openAdmin() {
   if (S.role !== 'Administrador') return;
-  $('adminUserLabel').textContent = `${S.user} · Administrador`;
+  updateProfileUI();
   renderAdminPanel();
   show('adminScreen');
 }
@@ -4603,6 +4514,10 @@ function buildTags(area, version) {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, push, onChildAdded, onValue, serverTimestamp, query, limitToLast, set, onDisconnect }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import {
+  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  onAuthStateChanged, signOut, updateProfile
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD08Hrh7p2arUArqmN558QCZa-u-D5iUwU",
@@ -4616,8 +4531,127 @@ const firebaseConfig = {
 
 const fbApp  = initializeApp(firebaseConfig);
 const db     = getDatabase(fbApp);
+const auth   = getAuth(fbApp);
 const msgsRef = ref(db, 'chat/messages');
 const presRef = ref(db, 'chat/presence');
+const usersRef = ref(db, 'users');
+
+// ── Convierte username a email ficticio para Firebase Auth ──
+async function loadUserProfile(uid) {
+  return new Promise(resolve => {
+    const uRef = ref(db, 'users/' + uid);
+    onValue(uRef, snap => {
+      resolve(snap.exists() ? snap.val() : null);
+    }, { onlyOnce: true });
+  });
+}
+
+// ── Convierte username a email ficticio para Firebase Auth ──
+function usernameToEmail(username) {
+  return username.toLowerCase().replace(/[^a-z0-9]/g, '_') + '@exanidash.app';
+}
+
+// ── Usernames que reciben rol Administrador automáticamente ──
+const ADMIN_USERNAMES = ['acselito', 'admin456'];
+
+// ── LOGIN: solo usuario + contraseña ──
+window._fbDoLogin = async function() {
+  const username = document.getElementById('inpUser').value.trim();
+  const pass     = document.getElementById('inpPass').value;
+  const errEl    = document.getElementById('loginErr');
+  const loadEl   = document.getElementById('loginLoading');
+
+  if (!username || !pass) {
+    errEl.textContent = 'Ingresa tu usuario y contraseña.';
+    errEl.style.display = 'block'; return;
+  }
+
+  errEl.style.display = 'none';
+  loadEl.style.display = 'flex';
+
+  const fakeEmail = usernameToEmail(username);
+
+  try {
+    const cred = await signInWithEmailAndPassword(auth, fakeEmail, pass);
+    const profile = await loadUserProfile(cred.user.uid);
+    const displayName = profile?.username || username;
+    const isAdmin = ADMIN_USERNAMES.includes(username.toLowerCase());
+    const role = isAdmin ? 'Administrador' : (profile?.role || 'Aspirante');
+    window._enterDash(displayName, role, null, '');
+  } catch(e) {
+    const msgs = {
+      'auth/user-not-found':     'No existe una cuenta con ese usuario.',
+      'auth/wrong-password':     'Contraseña incorrecta.',
+      'auth/too-many-requests':  'Demasiados intentos. Espera un momento.',
+      'auth/invalid-credential': 'Usuario o contraseña incorrectos.',
+    };
+    errEl.textContent = msgs[e.code] || 'Usuario o contraseña incorrectos.';
+    errEl.style.display = 'block';
+  } finally {
+    loadEl.style.display = 'none';
+  }
+};
+
+// ── REGISTRO: usuario + contraseña + rol (sin email visible) ──
+window._fbDoRegister = async function() {
+  const name   = document.getElementById('regName').value.trim();
+  const pass   = document.getElementById('regPass').value;
+  const role   = document.getElementById('regRole').value;
+  const errEl  = document.getElementById('registerErr');
+  const okEl   = document.getElementById('registerSuccess');
+  const loadEl = document.getElementById('registerLoading');
+
+  if (!name || !pass) {
+    errEl.textContent = 'Completa todos los campos.';
+    errEl.style.display = 'block'; return;
+  }
+  if (name.length < 3) {
+    errEl.textContent = 'El usuario debe tener al menos 3 caracteres.';
+    errEl.style.display = 'block'; return;
+  }
+  if (!/^[a-zA-Z0-9_]+$/.test(name)) {
+    errEl.textContent = 'Solo letras, números y guion bajo (_).';
+    errEl.style.display = 'block'; return;
+  }
+  if (pass.length < 6) {
+    errEl.textContent = 'La contraseña debe tener al menos 6 caracteres.';
+    errEl.style.display = 'block'; return;
+  }
+
+  errEl.style.display = 'none';
+  okEl.style.display  = 'none';
+  loadEl.style.display = 'flex';
+
+  const fakeEmail = usernameToEmail(name);
+
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, fakeEmail, pass);
+    await updateProfile(cred.user, { displayName: name });
+    // Guardar perfil en Realtime Database
+    await set(ref(db, 'users/' + cred.user.uid), {
+      username: name,
+      role,
+      createdAt: Date.now(),
+    });
+    okEl.style.display   = 'block';
+    loadEl.style.display = 'none';
+    // Llenar el login con el usuario recién creado y cambiar vista
+    setTimeout(() => {
+      document.getElementById('inpUser').value = name;
+      document.getElementById('inpPass').value = '';
+      window.switchAuthForm('login');
+    }, 1500);
+  } catch(e) {
+    const msgs = {
+      'auth/email-already-in-use': 'Ese nombre de usuario ya está registrado.',
+      'auth/weak-password':        'Contraseña muy débil (mínimo 6 caracteres).',
+    };
+    errEl.textContent = msgs[e.code] || 'Error al crear la cuenta.';
+    errEl.style.display = 'block';
+  } finally {
+    loadEl.style.display = 'none';
+  }
+};
 
 let chatOpen      = false;
 let unreadCount   = 0;
@@ -4631,6 +4665,7 @@ function registerPresence() {
   set(myPresenceRef, { name: S.user, online: true, ts: Date.now() });
   onDisconnect(myPresenceRef).remove();
 }
+window._fbRegisterPresence = registerPresence;
 
 // Contar online
 onValue(presRef, snap => {
@@ -4762,13 +4797,16 @@ window.updateProfileUI = function() {
   if (S.user) setTimeout(registerPresence, 500);
 };
 
-// Limpiar presencia al salir
-const _origDoLogout = window.doLogout;
-window.doLogout = function() {
-  if (myPresenceRef) set(myPresenceRef, null);
-  myPresenceRef = null;
-  _origDoLogout && _origDoLogout();
+// ── Sign out de Firebase Auth ──
+window._fbSignOut = async function() {
+  try { await signOut(auth); } catch(e) {}
+  if (myPresenceRef) { set(myPresenceRef, null); myPresenceRef = null; }
 };
+
+// Limpiar presencia cuando el usuario cierra la pestaña
+window.addEventListener('beforeunload', () => {
+  if (myPresenceRef) set(myPresenceRef, null);
+});
 </script>
 
 </body>
