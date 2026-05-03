@@ -2404,6 +2404,7 @@ function doLogout() {
   switchAuthForm('login');
   show('loginScreen');
 }
+window.doLogout = doLogout;
 
 // ══════════════════════════════════════════
 //  GOOGLE LOGIN
@@ -2428,7 +2429,7 @@ function doGoogleLogin() {
     alert('Google Sign-In no cargó. Verificá tu conexión a internet.');
     return;
   }
-  // Usar tokenClient — más confiable en móvil que One Tap
+  // Usar tokenClient para obtener id_token que luego se usa con Firebase Auth
   const tokenClient = google.accounts.oauth2.initTokenClient({
     client_id: GOOGLE_CLIENT_ID,
     scope: 'openid email profile',
@@ -2446,6 +2447,7 @@ function doGoogleLogin() {
           name:    info.name    || info.email.split('@')[0],
           email:   info.email   || '',
           picture: info.picture || '',
+          accessToken: tokenResponse.access_token,
         };
         showGoogleRoleModal();
       } catch(e) {
@@ -2469,18 +2471,17 @@ function showGoogleFallback() {
 }
 
 function handleGoogleCredential(response) {
-  // Decodificar JWT del token de Google (sin verificar firma — es solo para UI)
+  // Decodificar JWT del token de Google
   try {
     const payload = JSON.parse(atob(response.credential.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
     _googleProfile = {
       name:    payload.name  || payload.email.split('@')[0],
       email:   payload.email || '',
       picture: payload.picture || '',
+      idToken: response.credential, // guardar para Firebase Auth
     };
-    // Limpiar fallback si existe
     const tmp = document.getElementById('gsiTmp');
     if (tmp) tmp.remove();
-    // Mostrar modal de selección de rol
     showGoogleRoleModal();
   } catch(e) {
     alert('Error al procesar el login de Google. Intentá de nuevo.');
@@ -2498,38 +2499,87 @@ function showGoogleRoleModal() {
   $('googleRoleModal').style.display = 'flex';
 }
 
-function finishGoogleLogin(role) {
+async function finishGoogleLogin(roleSelected) {
   if (!_googleProfile) return;
   $('googleRoleModal').style.display = 'none';
-  S.user = _googleProfile.name;
-  S.role = role;
-  S.googlePicture = _googleProfile.picture || null;
-  S.googleEmail   = _googleProfile.email   || '';
-  localStorage.setItem('exani_session', JSON.stringify({
-    user: S.user, role, googlePicture: S.googlePicture, googleEmail: S.googleEmail
-  }));
-  // Guardar/actualizar usuario de Google en Firebase para el Super Panel
-  if (S.googleEmail && window._fbDB) {
-    const gKey = 'g_' + S.googleEmail.toLowerCase().replace(/[^a-z0-9]/g, '_');
-    const { db: _db, ref: _ref, update: _upd } = window._fbDB;
-    _upd(_ref(_db, `googleUsers/${gKey}`), {
-      username: S.user,
-      email: S.googleEmail,
-      picture: S.googlePicture || '',
-      role,
-      lastLogin: Date.now(),
-      isGoogle: true,
-    }).catch(() => {});
+
+  const loadEl = document.getElementById('loginLoading');
+  if (loadEl) loadEl.style.display = 'flex';
+
+  try {
+    // 1. Autenticar con Firebase Auth usando token de Google
+    let fbUser = null;
+    if (window._fbSignInWithCredential && window._fbGoogleProvider) {
+      try {
+        let credential = null;
+        if (_googleProfile.idToken) {
+          credential = window._fbGoogleProvider.credential(_googleProfile.idToken);
+        } else if (_googleProfile.accessToken) {
+          credential = window._fbGoogleProvider.credential(null, _googleProfile.accessToken);
+        }
+        if (credential) {
+          const cred = await window._fbSignInWithCredential(credential);
+          fbUser = cred.user;
+        }
+      } catch(e) { /* Continuar sin Firebase Auth si falla */ }
+    }
+
+    // 2. Verificar si está baneado en Firebase
+    const gKey = 'g_' + _googleProfile.email.toLowerCase().replace(/[^a-z0-9]/g, '_');
+    let existingData = null;
+    try {
+      const r = await fetch(`https://exani-dash-adeff-default-rtdb.firebaseio.com/googleUsers/${gKey}.json`);
+      existingData = await r.json();
+    } catch(e) {}
+
+    if (existingData?.banned) {
+      if (loadEl) loadEl.style.display = 'none';
+      if (window._fbSignOut) window._fbSignOut();
+      alert('\uD83D\uDEAB Tu cuenta ha sido suspendida. Contacta al administrador.');
+      return;
+    }
+
+    // 3. Rol: admin por email hardcoded > existente en Firebase > seleccionado > Aspirante
+    const isAdminEmail = ADMIN_EMAILS.includes(_googleProfile.email.toLowerCase());
+    let role = isAdminEmail ? 'Administrador' : (existingData?.role || roleSelected || 'Aspirante');
+    if (!isAdminEmail && role === 'Administrador') role = 'Aspirante';
+
+    S.user = _googleProfile.name;
+    S.role = role;
+    S.googlePicture = _googleProfile.picture || null;
+    S.googleEmail   = _googleProfile.email   || '';
+    localStorage.setItem('exani_session', JSON.stringify({
+      user: S.user, role, googlePicture: S.googlePicture, googleEmail: S.googleEmail
+    }));
+
+    // 4. Guardar/actualizar en Firebase
+    if (window._fbDB) {
+      const { db: _db, ref: _ref, update: _upd } = window._fbDB;
+      _upd(_ref(_db, `googleUsers/${gKey}`), {
+        username: S.user,
+        email: S.googleEmail,
+        picture: S.googlePicture || '',
+        role,
+        lastLogin: Date.now(),
+        isGoogle: true,
+        firebaseUid: fbUser?.uid || null,
+      }).catch(() => {});
+    }
+
+    if (loadEl) loadEl.style.display = 'none';
+    updateProfileUI();
+    const adminBtn = $('btnAdminPanel');
+    if (adminBtn) adminBtn.style.display = role === 'Administrador' ? 'flex' : 'none';
+    renderExamCards();
+    show('dashScreen');
+    initChat();
+    const rfab = $('rankingFab'); if (rfab) rfab.style.display = 'none';
+    const rtbBtn = $('rankingTopbarBtn'); if (rtbBtn) rtbBtn.style.display = 'flex';
+
+  } catch(e) {
+    if (loadEl) loadEl.style.display = 'none';
+    alert('Error al iniciar sesion. Intenta de nuevo.');
   }
-  updateProfileUI();
-  const adminBtn = $('btnAdminPanel');
-  if (adminBtn) adminBtn.style.display = role === 'Administrador' ? 'flex' : 'none';
-  renderExamCards();
-  show('dashScreen');
-  initChat();
-  // Mostrar ranking FAB solo para Google users
-  const rfab = $('rankingFab'); if (rfab) rfab.style.display = 'none';
-  const rtbBtn = $('rankingTopbarBtn'); if (rtbBtn) rtbBtn.style.display = 'flex';
 }
 
 // ══════════════════════════════════════════
@@ -3397,7 +3447,6 @@ let rankingTab = 'global';
 async function saveScoreToRanking(pct, ok, total) {
   if (!S.user) return;
   const examTitle = (S.currentExamMeta?.titulo || S.meta?.titulo || 'Examen sin nombre').trim();
-  // Usar username como clave si no hay email Google
   const safeKey = S.googleEmail
     ? S.googleEmail.replace(/[.#$[\]]/g, '_')
     : 'u_' + S.user.toLowerCase().replace(/[^a-z0-9]/g, '_');
@@ -3405,27 +3454,36 @@ async function saveScoreToRanking(pct, ok, total) {
     user:    S.user,
     email:   S.googleEmail || '',
     picture: S.googlePicture || null,
-    pct,
-    ok,
-    total,
+    pct, ok, total,
     exam:    examTitle,
     ts:      Date.now(),
   };
   try {
-    const existing = await fetch(RANKING_REF + '/' + safeKey + '.json').then(r => r.json());
-    if (!existing || pct > (existing.pct || 0)) {
-      await fetch(RANKING_REF + '/' + safeKey + '.json', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(entry),
+    // Usar Firebase SDK (con auth) en lugar de REST abierto
+    if (window._fbDB) {
+      const { db: _db, ref: _ref, set: _set, update: _upd } = window._fbDB;
+      const { get } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js');
+      // Solo actualizar ranking si es mejor puntaje
+      const snap = await get(_ref(_db, `ranking/${safeKey}`));
+      const existing = snap.exists() ? snap.val() : null;
+      if (!existing || pct > (existing.pct || 0)) {
+        await _set(_ref(_db, `ranking/${safeKey}`), entry);
+      }
+      // Historial: push para no sobreescribir
+      const { push: _push } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js');
+      await _push(_ref(_db, `history/${safeKey}`), entry);
+    } else {
+      // Fallback REST si SDK no disponible aún
+      const existing = await fetch(RANKING_REF + '/' + safeKey + '.json').then(r => r.json()).catch(() => null);
+      if (!existing || pct > (existing.pct || 0)) {
+        await fetch(RANKING_REF + '/' + safeKey + '.json', {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(entry),
+        });
+      }
+      await fetch(FB_URL + '/history/' + safeKey + '.json', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(entry),
       });
     }
-    // Historial para todos los usuarios (no solo Google)
-    await fetch(FB_URL + '/history/' + safeKey + '.json', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(entry),
-    });
   } catch(e) { console.warn('Ranking save error', e); }
 }
 
@@ -3628,6 +3686,29 @@ loadCatalog();   // carga exams/catalog.json y renderiza las tarjetas
     show('dashScreen');
     initChat();
     setTimeout(() => window._spInitBubble && window._spInitBubble(), 300);
+
+    // Verificar rol y ban en Firebase de forma asíncrona (silenciosa)
+    setTimeout(async () => {
+      try {
+        if (sess.googleEmail) {
+          // Usuario Google: verificar en googleUsers
+          const gKey = 'g_' + sess.googleEmail.toLowerCase().replace(/[^a-z0-9]/g, '_');
+          const r = await fetch(`https://exani-dash-adeff-default-rtdb.firebaseio.com/googleUsers/${gKey}.json`);
+          const data = await r.json();
+          if (data?.banned) { doLogout(); return; }
+          // Actualizar rol si cambió en Firebase
+          if (data?.role && data.role !== S.role) {
+            S.role = data.role;
+            localStorage.setItem('exani_session', JSON.stringify({ ...sess, role: data.role }));
+            updateProfileUI();
+            const ab = document.getElementById('chatAdminBar');
+            if (ab) ab.classList.toggle('visible', data.role === 'Administrador');
+            window._spInitBubble && window._spInitBubble();
+          }
+        }
+      } catch(e) { /* red no disponible, continuar */ }
+    }, 1500);
+
   } catch(e) {
     localStorage.removeItem('exani_session');
   }
@@ -5227,7 +5308,8 @@ import { getDatabase, ref, push, onChildAdded, onChildRemoved, onValue, serverTi
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import {
   getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
-  onAuthStateChanged, signOut, updateProfile
+  onAuthStateChanged, signOut, updateProfile,
+  GoogleAuthProvider, signInWithCredential
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -5250,14 +5332,21 @@ const usersRef = ref(db, 'users');
 // Exponer funciones de Firebase al scope global para funciones fuera del módulo
 import { update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 window._fbDB = { db, ref, set, update };
+window._fbSignOut = () => signOut(auth);
+window._fbSignInWithCredential = (credential) => signInWithCredential(auth, credential);
+window._fbGoogleProvider = GoogleAuthProvider;
 
 // ── Escuchar estado de autenticación Firebase (mantiene auth vivo al refrescar) ──
-onAuthStateChanged(auth, (firebaseUser) => {
-  // Si Firebase Auth tiene sesión pero el app no la tiene cargada aún, no hacemos nada
-  // Solo usamos esto para confirmar que auth está listo cuando se guarda el perfil
+onAuthStateChanged(auth, async (firebaseUser) => {
   if (firebaseUser) {
-    // Sesión Firebase activa — guardar referencia global
     window._fbCurrentUser = firebaseUser;
+    // Verificar ban en tiempo real para usuarios nativos
+    const profile = await loadUserProfile(firebaseUser.uid).catch(() => null);
+    if (profile?.banned && S.user) {
+      // Usuario baneado — forzar logout
+      await signOut(auth);
+      if (window.doLogout) window.doLogout();
+    }
   } else {
     window._fbCurrentUser = null;
   }
@@ -5283,12 +5372,36 @@ function usernameToEmail(username) {
 // ── Usernames que reciben rol Administrador automáticamente ──
 const ADMIN_USERNAMES = ['acselito', 'admin456'];
 
+// ── Rate limiter de login (máx 5 intentos en 5 min) ──
+const _loginAttempts = { count: 0, firstTs: 0 };
+function _checkLoginRateLimit() {
+  const now = Date.now();
+  if (now - _loginAttempts.firstTs > 5 * 60 * 1000) {
+    _loginAttempts.count = 0;
+    _loginAttempts.firstTs = now;
+  }
+  _loginAttempts.count++;
+  if (_loginAttempts.count > 5) {
+    const waitSecs = Math.ceil((5 * 60 * 1000 - (now - _loginAttempts.firstTs)) / 1000);
+    return `Demasiados intentos. Espera ${waitSecs}s antes de reintentar.`;
+  }
+  return null;
+}
+
 // ── LOGIN: solo usuario + contraseña ──
 window._fbDoLogin = async function() {
   const username = document.getElementById('inpUser').value.trim();
   const pass     = document.getElementById('inpPass').value;
   const errEl    = document.getElementById('loginErr');
   const loadEl   = document.getElementById('loginLoading');
+
+  // Rate limit
+  const rateLimitMsg = _checkLoginRateLimit();
+  if (rateLimitMsg) {
+    errEl.textContent = rateLimitMsg;
+    errEl.style.display = 'block';
+    return;
+  }
 
   if (!username || !pass) {
     errEl.textContent = 'Ingresa tu usuario y contraseña.';
@@ -5303,9 +5416,22 @@ window._fbDoLogin = async function() {
   try {
     const cred = await signInWithEmailAndPassword(auth, fakeEmail, pass);
     const profile = await loadUserProfile(cred.user.uid);
+    // Bloquear usuarios baneados
+    if (profile?.banned) {
+      await signOut(auth);
+      errEl.textContent = '🚫 Tu cuenta ha sido suspendida. Contacta al administrador.';
+      errEl.style.display = 'block';
+      loadEl.style.display = 'none';
+      return;
+    }
     const displayName = profile?.username || username;
+    // Rol siempre desde Firebase — NUNCA desde cliente
     const isAdmin = ADMIN_USERNAMES.includes(username.toLowerCase());
     const role = isAdmin ? 'Administrador' : (profile?.role || 'Aspirante');
+    // Actualizar rol en Firebase si es admin hardcoded y no coincide
+    if (isAdmin && profile?.role !== 'Administrador') {
+      await set(ref(db, `users/${cred.user.uid}/role`), 'Administrador');
+    }
     window._enterDash(displayName, role, null, '');
   } catch(e) {
     const msgs = {
@@ -5356,10 +5482,11 @@ window._fbDoRegister = async function() {
   try {
     const cred = await createUserWithEmailAndPassword(auth, fakeEmail, pass);
     await updateProfile(cred.user, { displayName: name });
-    // Guardar perfil en Realtime Database
+    // Rol siempre Aspirante al registrarse — admins asignan roles manualmente
+    const safeRole = 'Aspirante';
     await set(ref(db, 'users/' + cred.user.uid), {
       username: name,
-      role,
+      role: safeRole,
       createdAt: Date.now(),
     });
     okEl.style.display   = 'block';
