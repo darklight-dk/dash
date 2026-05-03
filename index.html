@@ -2385,7 +2385,6 @@ function doGoogleLogin() {
     alert('Google Sign-In no cargó. Verificá tu conexión a internet.');
     return;
   }
-  // Usar token client directo — más confiable en móvil que One Tap
   const tokenClient = google.accounts.oauth2.initTokenClient({
     client_id: GOOGLE_CLIENT_ID,
     scope: 'openid email profile',
@@ -2477,13 +2476,24 @@ async function finishGoogleLogin(role) {
     });
   }
 
-  // _enterDash maneja S, localStorage, UI, dashboard, chat y burbuja SP
-  window._enterDash(_googleProfile.name, role, _googleProfile.picture || null, _googleProfile.email || '');
-
-  // Mostrar ranking FAB respetando siteSettings
-  const _rankOn = _spSettingsSnap.rankingEnabled !== false;
-  const rfab = $('rankingFab'); if (rfab) rfab.style.display = _rankOn ? 'flex' : 'none';
-  const rtbBtn = $('rankingTopbarBtn'); if (rtbBtn) rtbBtn.style.display = _rankOn ? 'flex' : 'none';
+  // _enterDash puede estar siendo parcheado por el módulo ES — esperar a que esté listo
+  function _doEnter() {
+    if (typeof window._enterDash === 'function') {
+      window._enterDash(_googleProfile.name, role, _googleProfile.picture || null, _googleProfile.email || '');
+    }
+  }
+  // Si el módulo ya cargó, ejecutar directo; si no, esperar máximo 3 segundos
+  if (typeof window._fbSaveGoogleUser === 'function') {
+    _doEnter();
+  } else {
+    const t0 = Date.now();
+    const waitEnter = setInterval(() => {
+      if (typeof window._fbSaveGoogleUser === 'function' || Date.now() - t0 > 3000) {
+        clearInterval(waitEnter);
+        _doEnter();
+      }
+    }, 50);
+  }
 }
 
 // ══════════════════════════════════════════
@@ -5321,9 +5331,10 @@ window._fbDoRegister = async function() {
     okEl.style.display   = 'block';
     loadEl.style.display = 'none';
     // Llenar el login con el usuario recién creado y cambiar vista
+    const _regPass = pass; // guardar antes de limpiar
     setTimeout(() => {
       document.getElementById('inpUser').value = name;
-      document.getElementById('inpPass').value = '';
+      document.getElementById('inpPass').value = _regPass;
       window.switchAuthForm('login');
     }, 1500);
   } catch(e) {
@@ -5835,7 +5846,7 @@ onValue(spSettingsRef, snap => {
   if (_spSettingsSnap.maintenance && S.role && S.role !== 'Administrador') {
     const msg = _spSettingsSnap.maintMsg || '🔧 El sitio está en mantenimiento. Volvemos pronto.';
     _spShowMaintOverlay(msg);
-  } else if (!_spSettingsSnap.maintenance) {
+  } else {
     _spHideMaintOverlay();
   }
   // Chat habilitado
@@ -5843,12 +5854,12 @@ onValue(spSettingsRef, snap => {
 
   // ── Ranking: mostrar/ocultar botones según setting (persiste al refrescar) ──
   const rankingOn = _spSettingsSnap.rankingEnabled !== false;
-  // Aplicar siempre — _enterDash ya oculta los botones antes del login
-  // Así al refrescar con sesión activa los botones aparecen correctamente
-  const rfab   = document.getElementById('rankingFab');
-  const rtbBtn = document.getElementById('rankingTopbarBtn');
-  if (rfab)   rfab.style.display   = (S.user && rankingOn) ? 'flex' : 'none';
-  if (rtbBtn) rtbBtn.style.display = (S.user && rankingOn) ? 'flex' : 'none';
+  if (S.user) { // solo si hay sesión activa
+    const rfab   = document.getElementById('rankingFab');
+    const rtbBtn = document.getElementById('rankingTopbarBtn');
+    if (rfab)   rfab.style.display   = rankingOn ? 'flex' : 'none';
+    if (rtbBtn) rtbBtn.style.display = rankingOn ? 'flex' : 'none';
+  }
 
   // ── Bloquear registro: ocultar link "Crear cuenta" si lockRegister está activo ──
   const regLink = document.querySelector('#formLogin .login-toggle');
@@ -5860,11 +5871,11 @@ onValue(spSettingsRef, snap => {
   }
 
   // ── Exámenes habilitados ──
-  if (S.user) {
-    const examsOff = _spSettingsSnap.examsEnabled === false;
+  if (S.user && _spSettingsSnap.examsEnabled === false) {
+    // Deshabilitar botones de examen en el dashboard
     document.querySelectorAll('.exam-card .btn-start, .exam-card button').forEach(btn => {
-      btn.disabled = examsOff;
-      btn.title = examsOff ? 'Exámenes deshabilitados por el administrador' : '';
+      btn.disabled = true;
+      btn.title = 'Exámenes deshabilitados por el administrador';
     });
   }
 
