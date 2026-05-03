@@ -5886,6 +5886,7 @@ function _spInitDrag() {
   bubble._dragInit = true;
   let ox = 0, oy = 0, bx = 0, by = 0, moved = false;
   function pointerDown(e) {
+    if (e.type === 'touchstart') e.preventDefault(); // evita mousedown/mouseup sintéticos en mobile
     moved = false;
     const cl = e.touches ? e.touches[0] : e;
     const r  = bubble.getBoundingClientRect();
