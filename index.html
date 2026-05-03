@@ -2384,6 +2384,12 @@ function doLogout() {
   const rtbLogout = $('rankingTopbarBtn'); if (rtbLogout) rtbLogout.style.display = 'none';
   closeRanking();
   localStorage.removeItem('exani_session');
+  // Ocultar Super Panel y burbuja
+  _spPanelOpen = false;
+  const spPanel = document.getElementById('superPanel');
+  if (spPanel) spPanel.classList.remove('open');
+  const spBubble = document.getElementById('superPanelBubble');
+  if (spBubble) spBubble.classList.remove('visible');
   S = { user:null, role:null, googlePicture:null, googleEmail:'', questions:[], images:{}, answers:{}, current:0, navStart:0,
         timerSecs:TOTAL_SECS, timerInt:null, running:false, paused:false,
         rawZip:null, currentExamMeta:null, adminEdits:{} };
@@ -5913,12 +5919,38 @@ window._spInitBubble = function() {
   if (!bubble) return;
   const show = S.role === 'Administrador' || S.role === 'Moderador';
   bubble.classList.toggle('visible', show);
-  if (show) _spInitDrag();
-  _spLog_push('info', `Sesión iniciada como ${S.role} · ${S.user}`);
+  // Si no es admin/mod, cerrar el panel por si estuviera abierto
+  if (!show) {
+    _spPanelOpen = false;
+    const panel = document.getElementById('superPanel');
+    if (panel) panel.classList.remove('open');
+  }
+  if (show) {
+    _spInitDrag();
+    _spLog_push('info', `Sesión iniciada como ${S.role} · ${S.user}`);
+  }
 };
 
 // ── Toggle panel ──
-window.toggleSuperPanel = function() {
+window.toggleSuperPanel = async function() {
+  // Verificación doble: rol en memoria Y en Firebase
+  if (S.role !== 'Administrador' && S.role !== 'Moderador') return;
+  // Validar contra Firebase si hay uid de Firebase Auth
+  if (window._fbCurrentUser) {
+    try {
+      const { db: _db, ref: _ref } = window._fbDB || {};
+      if (_db && _ref) {
+        const { get } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js');
+        const snap = await get(_ref(_db, `users/${window._fbCurrentUser.uid}/role`));
+        const fbRole = snap.exists() ? snap.val() : null;
+        if (fbRole !== 'Administrador' && fbRole !== 'Moderador') {
+          // Rol manipulado localmente — forzar logout
+          doLogout();
+          return;
+        }
+      }
+    } catch(e) { /* si falla la red, continuar con rol en memoria */ }
+  }
   _spPanelOpen = !_spPanelOpen;
   const panel = document.getElementById('superPanel');
   if (!panel) return;
