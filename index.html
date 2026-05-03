@@ -2276,19 +2276,9 @@ const load = (v, msg='', sub='') => {
 };
 const pad = n => String(n).padStart(2,'0');
 
-// ── Al cargar la página: ir al dashboard si ya había sesión activa ──
-(function() {
-  try {
-    const last = sessionStorage.getItem('fw_screen');
-    // Si tenía sesión y no estaba en medio de un examen, ir al dash
-    if (last === 'dashScreen') {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      $('dashScreen').classList.add('active');
-      $('userLabel').innerHTML = 'Invitado · <span>Aspirante</span>';
-      S.user = 'Invitado';
-    }
-  } catch(e){}
-})();
+// ── Nota: restauración de sesión real manejada por Firebase onAuthStateChanged
+// y por restoreSession() para Google. El sessionStorage se usa solo para
+// detectar si el usuario refrescó durante el examen (ver lógica de examScreen). ──
 
 // ══════════════════════════════════════════
 //  LOGIN
@@ -2329,7 +2319,11 @@ function _enterDash(user, role, picture, email) {
   S.role          = role;
   S.googlePicture = picture || null;
   S.googleEmail   = email  || '';
-  localStorage.setItem('exani_session', JSON.stringify({ user, role, googlePicture: S.googlePicture, googleEmail: S.googleEmail }));
+  // Solo persistir en localStorage si es sesión Google (sin Firebase Auth UID)
+  // Las sesiones Firebase Auth se restauran automáticamente via onAuthStateChanged
+  if (S.googleEmail) {
+    localStorage.setItem('exani_session', JSON.stringify({ user, role, googlePicture: S.googlePicture, googleEmail: S.googleEmail }));
+  }
   $('loginErr').style.display = 'none';
   updateProfileUI();
   const adminBtn = $('btnAdminPanel');
@@ -2443,6 +2437,19 @@ function showGoogleRoleModal() {
 function finishGoogleLogin(role) {
   if (!_googleProfile) return;
   $('googleRoleModal').style.display = 'none';
+
+  // Validación de seguridad en cliente: el rol Administrador solo es válido
+  // si el email está en ADMIN_EMAILS. Esto previene que alguien modifique el
+  // DOM para mostrar el botón de Admin y lo presione.
+  const allowedRoles = ['Aspirante','Estudiante','Profesor','Moderador'];
+  const isAdminEmail = ADMIN_EMAILS.includes((_googleProfile.email || '').toLowerCase());
+  if (role === 'Administrador' && !isAdminEmail) {
+    console.warn('Intento de obtener rol Administrador con email no autorizado:', _googleProfile.email);
+    role = 'Aspirante'; // degradar rol
+  }
+  if (!allowedRoles.includes(role) && !isAdminEmail) {
+    role = 'Aspirante';
+  }
 
   // Guardar/actualizar usuario Google en Firebase para que aparezca en la lista
   // Usamos window._fbSaveGoogleUser porque db/ref/set viven en el módulo ES
@@ -3541,23 +3548,21 @@ function rankingRowHTML(e, i, isMe) {
 buildCalc();
 loadCatalog();   // carga exams/catalog.json y renderiza las tarjetas
 
-// ── Restaurar sesión si existe ──
+// ── Restaurar sesión Google desde localStorage (solo provider=google) ──
+// Los usuarios Firebase Auth son restaurados por onAuthStateChanged automáticamente.
+// Los usuarios Google no tienen Firebase Auth UID, así que se persisten en localStorage
+// pero se validan contra Firebase Realtime DB antes de restaurar.
 (function restoreSession() {
   try {
     const saved = localStorage.getItem('exani_session');
     if (!saved) return;
     const sess = JSON.parse(saved);
-    if (!sess.user || !sess.role) return;
-    S.user          = sess.user;
-    S.role          = sess.role;
-    S.googlePicture = sess.googlePicture || null;
-    S.googleEmail   = sess.googleEmail   || '';
-    updateProfileUI();
-    const adminBtn = $('btnAdminPanel');
-    if (adminBtn) adminBtn.style.display = sess.role === 'Administrador' ? 'flex' : 'none';
-    renderExamCards();
-    show('dashScreen');
-    initChat();
+    // Solo restaurar sesiones Google (las de Firebase Auth las maneja onAuthStateChanged)
+    if (!sess.googleEmail || !sess.user || !sess.role) return;
+    // La validación real ocurre en window._fbValidateGoogleSession (módulo Firebase)
+    // que lee Firebase DB y confirma que el usuario existe con ese rol.
+    // Lo marcamos como pendiente hasta que el módulo valide.
+    window._pendingGoogleSession = sess;
   } catch(e) {
     localStorage.removeItem('exani_session');
   }
@@ -5186,8 +5191,8 @@ onAuthStateChanged(auth, async (firebaseUser) => {
       try {
         const profile = await loadUserProfile(firebaseUser.uid);
         const username = profile?.username || firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Usuario';
-        const isAdmin = ADMIN_USERNAMES.includes(username.toLowerCase());
-        const role = isAdmin ? 'Administrador' : (profile?.role || 'Aspirante');
+        // El rol viene exclusivamente de Firebase DB — no de lista hardcodeada
+        const role = profile?.role || 'Aspirante';
         window._enterDash(username, role, null, '');
       } catch(e) {
         console.warn('Error restaurando sesión:', e);
@@ -5240,8 +5245,8 @@ window._fbDoLogin = async function() {
     const cred = await signInWithEmailAndPassword(auth, fakeEmail, pass);
     const profile = await loadUserProfile(cred.user.uid);
     const displayName = profile?.username || username;
-    const isAdmin = ADMIN_USERNAMES.includes(username.toLowerCase());
-    const role = isAdmin ? 'Administrador' : (profile?.role || 'Aspirante');
+    // El rol viene exclusivamente de Firebase DB — no de lista hardcodeada en cliente
+    const role = profile?.role || 'Aspirante';
     window._sessionRestored = true;
     window._enterDash(displayName, role, null, '');
   } catch(e) {
@@ -5279,8 +5284,8 @@ window._fbDoRegister = async function() {
     errEl.textContent = 'Solo letras, números y guion bajo (_).';
     errEl.style.display = 'block'; return;
   }
-  if (pass.length < 6) {
-    errEl.textContent = 'La contraseña debe tener al menos 6 caracteres.';
+  if (pass.length < 8) {
+    errEl.textContent = 'La contraseña debe tener al menos 8 caracteres.';
     errEl.style.display = 'block'; return;
   }
 
@@ -5394,9 +5399,11 @@ function appendChatMsg(msg, key) {
   if (key) wrap.dataset.msgKey = key;
 
   const initials = (msg.name || '?').slice(0,2).toUpperCase();
-  const avatarHTML = msg.picture
-    ? `<img class="chat-msg-avatar" src="${msg.picture}" alt="" onerror="this.style.display='none'">`
-    : `<div class="chat-msg-avatar-initials">${initials}</div>`;
+  // Sanitizar URL de foto: solo permitir http/https para evitar javascript: XSS
+  const safePic = msg.picture && /^https?:\/\//i.test(msg.picture) ? msg.picture : null;
+  const avatarHTML = safePic
+    ? `<img class="chat-msg-avatar" src="${escapeHTML(safePic)}" alt="" onerror="this.style.display='none'">`
+    : `<div class="chat-msg-avatar-initials">${escapeHTML(initials)}</div>`;
 
   const time = msg.ts ? new Date(msg.ts).toLocaleTimeString('es-MX', {hour:'2-digit',minute:'2-digit'}) : '';
 
@@ -5438,7 +5445,13 @@ function scrollChat() {
 }
 
 function escapeHTML(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
 }
 
 // ── Filtro de groserías ──
@@ -5736,6 +5749,44 @@ window._fbSaveGoogleUser = async function(safeUid, data) {
   }
 };
 
+// ── Validar sesión Google pendiente contra Firebase DB ──
+// Esto reemplaza la restauración ciega desde localStorage.
+// Solo restaura si el usuario existe en Firebase con el mismo email.
+window._fbValidateGoogleSession = async function() {
+  const sess = window._pendingGoogleSession;
+  if (!sess || !sess.googleEmail) return;
+  window._pendingGoogleSession = null; // consumir
+  try {
+    const safeUid = 'google_' + sess.googleEmail.replace(/[.#$[\]]/g, '_');
+    const snap = await new Promise(resolve => {
+      const uRef = ref(db, 'users/' + safeUid);
+      onValue(uRef, resolve, { onlyOnce: true });
+    });
+    if (!snap.exists()) {
+      // Usuario eliminado de Firebase — limpiar sesión local
+      localStorage.removeItem('exani_session');
+      return;
+    }
+    const data = snap.val();
+    // Verificar que el email coincide (no solo el uid sanitizado)
+    if (data.email !== sess.googleEmail) {
+      localStorage.removeItem('exani_session');
+      return;
+    }
+    // OK — restaurar con el rol que está en Firebase (no el del localStorage)
+    window._enterDash(data.username || sess.user, data.role || 'Aspirante',
+      data.picture || sess.googlePicture || null, sess.googleEmail);
+  } catch(e) {
+    console.warn('Error validando sesión Google:', e);
+    localStorage.removeItem('exani_session');
+  }
+};
+
+// Ejecutar validación cuando el módulo carga
+// (onAuthStateChanged ya corre para usuarios Firebase Auth;
+//  para Google corremos la validación manualmente)
+window._fbValidateGoogleSession();
+
 // Limpiar presencia cuando el usuario cierra la pestaña
 window.addEventListener('beforeunload', () => {
   if (myPresenceRef) set(myPresenceRef, null);
@@ -5998,7 +6049,7 @@ function _spRenderUserList(filter) {
     ).map(r => `<option value="${r}" ${r===role?'selected':''}>${r}</option>`).join('');
 
     return `<div class="sp-user-item">
-      <div class="sp-user-avatar">${u.picture ? `<img src="${u.picture}" style="width:100%;height:100%;border-radius:50%;object-fit:cover" onerror="this.parentNode.textContent='${initials}'"/>` : initials}</div>
+      <div class="sp-user-avatar">${(u.picture && /^https?:\/\//i.test(u.picture)) ? `<img src="${_escHTML(u.picture)}" style="width:100%;height:100%;border-radius:50%;object-fit:cover" onerror="this.style.display='none'"/>` : initials}</div>
       <div class="sp-user-info">
         <div class="sp-user-name">${_escHTML(u.username||uid)} ${u.provider==='google' ? '<span style="font-size:9px;background:rgba(66,133,244,.2);color:#6ba3f5;border-radius:4px;padding:1px 5px;font-weight:700">G</span>' : ''}</div>
         <div class="sp-user-meta">${u.role||'Aspirante'} · ${u.email ? _escHTML(u.email) : (u.createdAt ? new Date(u.createdAt).toLocaleDateString('es-MX') : '—')}</div>
