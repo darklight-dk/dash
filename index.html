@@ -431,62 +431,8 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
   .admin-tabs-bar{padding:0 12px}
   .admin-tab{padding:12px 14px;font-size:13px}
 }
-.dash-body{flex:1;display:flex;flex-direction:column;align-items:stretch;
-  padding:40px 0;gap:28px;overflow-y:auto;min-height:0}
-
-/* ── CAROUSEL PER SECTION ── */
-.carousel-section{display:flex;flex-direction:column;gap:0;width:100%}
-.carousel-section-header{
-  display:flex;align-items:center;gap:12px;
-  padding:0 28px;margin-bottom:16px
-}
-.carousel-section-header h2{font-size:16px;font-weight:800;color:var(--text)}
-.carousel-section-header .est-badge{
-  background:linear-gradient(135deg,var(--teal),#0891b2);
-  color:#fff;font-size:10px;font-weight:800;letter-spacing:1.5px;
-  padding:3px 10px;border-radius:20px;text-transform:uppercase
-}
-.carousel-section-header .carousel-count{
-  font-size:11px;color:var(--muted);font-weight:600;
-  background:var(--card);border:1px solid var(--b2);
-  border-radius:20px;padding:2px 9px
-}
-.carousel-section-header .carousel-arrows{
-  margin-left:auto;display:flex;gap:6px
-}
-.carousel-arrow-btn{
-  width:30px;height:30px;border-radius:50%;border:1.5px solid var(--b2);
-  background:#fff;color:var(--muted);font-size:13px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:all .15s;flex-shrink:0
-}
-.carousel-arrow-btn:hover{border-color:var(--teal);color:var(--teal);background:rgba(13,148,136,.06)}
-.carousel-arrow-btn:disabled{opacity:.3;cursor:not-allowed}
-.carousel-track-wrap{
-  overflow:hidden;width:100%;position:relative
-}
-.carousel-track-wrap::before,.carousel-track-wrap::after{
-  content:'';position:absolute;top:0;bottom:0;width:28px;z-index:2;pointer-events:none
-}
-.carousel-track-wrap::before{left:0;background:linear-gradient(90deg,var(--dark),transparent)}
-.carousel-track-wrap::after{right:0;background:linear-gradient(-90deg,var(--dark),transparent)}
-.carousel-track{
-  display:flex;gap:16px;
-  padding:4px 28px 16px;
-  overflow-x:auto;scroll-behavior:smooth;
-  scrollbar-width:none;-ms-overflow-style:none;
-  cursor:grab
-}
-.carousel-track:active{cursor:grabbing}
-.carousel-track::-webkit-scrollbar{display:none}
-.carousel-coming-card{
-  flex:0 0 260px;background:#fffbeb;border:1.5px dashed #fcd34d;
-  border-radius:20px;padding:28px 24px;text-align:center;display:flex;
-  flex-direction:column;align-items:center;justify-content:center;gap:8px
-}
-.carousel-coming-icon{font-size:32px}
-.carousel-coming-title{font-size:14px;font-weight:700;color:#92400e}
-.carousel-coming-sub{font-size:12px;color:#b45309;line-height:1.4}
+.dash-body{flex:1;display:flex;flex-direction:column;align-items:center;
+  padding:48px 24px;gap:28px;overflow-y:auto;min-height:0}
 /* ── CHAT MUNDIAL ── */
 .chat-fab{position:fixed;bottom:24px;right:24px;width:56px;height:56px;
   background:linear-gradient(135deg,var(--teal),#065f46);border:none;border-radius:50%;
@@ -1037,9 +983,9 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
 .fw-action-btn.save:hover{background:rgba(13,148,136,.15)}
 
 /* ── EXÁMENES DISPONIBLES ── */
-.exams-section{width:100%}
+.exams-section{width:100%;max-width:860px}
 .exams-section-title{
-  display:flex;align-items:center;gap:12px;margin-bottom:20px;padding:0 28px
+  display:flex;align-items:center;gap:12px;margin-bottom:20px
 }
 .exams-section-title h2{font-size:17px;font-weight:800;color:var(--text)}
 .exams-section-title .est-badge{
@@ -1048,12 +994,9 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
   padding:3px 10px;border-radius:20px;text-transform:uppercase
 }
 .exams-grid{
-  display:flex;gap:16px;padding:4px 28px 16px;
-  overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px
 }
-.exams-grid::-webkit-scrollbar{display:none}
 .exam-card{
-  flex:0 0 260px;
   background:#ffffff;border:1.5px solid var(--b2);border-radius:20px;
   padding:24px;display:flex;flex-direction:column;gap:14px;
   box-shadow:0 2px 12px rgba(0,0,0,.05);transition:all .22s;
@@ -1119,16 +1062,275 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
   padding:3px 8px;border-radius:20px;text-transform:uppercase
 }
 .dash-divider{
-  width:100%;
+  width:100%;max-width:860px;
   display:flex;align-items:center;gap:12px;
   color:var(--muted);font-size:12px;font-weight:600;letter-spacing:1px;
-  text-transform:uppercase;margin:4px 0;padding:0 28px
+  text-transform:uppercase;margin:4px 0
 }
 .dash-divider::before,.dash-divider::after{
   content:'';flex:1;height:1px;background:var(--b2)
 }
 
 /* ── MOBILE ── */
+/* ══════════════════════════════════════════
+   SUPER PANEL DE ADMINISTRADOR
+══════════════════════════════════════════ */
+#superPanelBubble{
+  position:fixed;z-index:9000;
+  right:16px;bottom:90px;
+  width:52px;height:52px;border-radius:50%;
+  background:linear-gradient(135deg,#1a1a2e,#0d4f6b);
+  border:2.5px solid rgba(58,173,169,.6);
+  box-shadow:0 4px 20px rgba(0,0,0,.4),0 0 0 0 rgba(58,173,169,.4);
+  cursor:grab;display:none;align-items:center;justify-content:center;
+  font-size:22px;transition:box-shadow .3s,border-color .3s,opacity .2s;
+  user-select:none;touch-action:none;
+  animation:spulse 3s ease-in-out infinite
+}
+#superPanelBubble.visible{display:flex}
+#superPanelBubble.sp-hidden{opacity:0;pointer-events:none}
+#superPanelBubble:active{cursor:grabbing}
+#superPanelBubble:hover{
+  box-shadow:0 6px 28px rgba(58,173,169,.5),0 0 0 6px rgba(58,173,169,.15);
+  border-color:#3AADA9
+}
+@keyframes spulse{
+  0%,100%{box-shadow:0 4px 20px rgba(0,0,0,.4),0 0 0 0 rgba(58,173,169,.3)}
+  50%{box-shadow:0 4px 20px rgba(0,0,0,.4),0 0 0 8px rgba(58,173,169,.08)}
+}
+#superPanelBubble .sp-notif{
+  position:absolute;top:-3px;right:-3px;
+  background:#ef4444;color:#fff;border-radius:50%;
+  width:18px;height:18px;font-size:10px;font-weight:800;
+  display:none;align-items:center;justify-content:center;border:2px solid #fff
+}
+
+/* Panel principal */
+#superPanel{
+  position:fixed;z-index:8999;
+  width:min(480px,95vw);max-height:85vh;
+  background:#1a1a2e;border-radius:20px;
+  border:1px solid rgba(58,173,169,.3);
+  box-shadow:0 24px 80px rgba(0,0,0,.6);
+  display:none;flex-direction:column;overflow:hidden;
+  font-family:'Sora',sans-serif;
+  animation:spfadeIn .2s ease both
+}
+#superPanel.open{display:flex}
+@keyframes spfadeIn{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+/* Header */
+.sp-header{
+  background:linear-gradient(135deg,#162040,#1a1a2e);
+  padding:14px 18px;display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid rgba(58,173,169,.15);flex-shrink:0;
+  cursor:move;user-select:none;touch-action:none
+}
+.sp-logo{
+  width:32px;height:32px;border-radius:10px;
+  background:linear-gradient(135deg,#0d9488,#065f46);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0
+}
+.sp-title{flex:1}
+.sp-title-main{font-size:14px;font-weight:800;color:#f8fafc;letter-spacing:.5px}
+.sp-title-sub{font-size:10px;color:rgba(255,255,255,.4);margin-top:1px;letter-spacing:.3px}
+.sp-close{background:none;border:none;color:rgba(255,255,255,.4);font-size:18px;cursor:pointer;
+  padding:4px 8px;border-radius:8px;transition:all .15s;line-height:1}
+.sp-close:hover{background:rgba(255,255,255,.08);color:#fff}
+
+/* Nav tabs */
+.sp-nav{
+  display:flex;background:#0a1020;border-bottom:1px solid rgba(255,255,255,.06);
+  overflow-x:auto;flex-shrink:0;scrollbar-width:none
+}
+.sp-nav::-webkit-scrollbar{display:none}
+.sp-tab{
+  flex:1;min-width:70px;padding:10px 6px;border:none;background:none;
+  color:rgba(255,255,255,.35);font-size:10px;font-weight:700;cursor:pointer;
+  border-bottom:2px solid transparent;transition:all .15s;text-align:center;
+  font-family:'Sora',sans-serif;letter-spacing:.3px;white-space:nowrap;
+  display:flex;flex-direction:column;align-items:center;gap:3px
+}
+.sp-tab .sp-tab-icon{font-size:15px}
+.sp-tab:hover{color:rgba(255,255,255,.65)}
+.sp-tab.active{color:#0d9488;border-bottom-color:#0d9488}
+
+/* Body */
+.sp-body{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent}
+.sp-body::-webkit-scrollbar{width:4px}
+.sp-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px}
+.sp-pane{display:none;flex-direction:column;gap:0;padding:16px}
+.sp-pane.active{display:flex}
+
+/* Section titles */
+.sp-section{margin-bottom:16px}
+.sp-section-title{
+  font-size:9px;font-weight:800;color:rgba(255,255,255,.25);
+  letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;
+  padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.06)
+}
+
+/* Stat cards row */
+.sp-stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px}
+.sp-stat-card{
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;padding:12px 10px;text-align:center
+}
+.sp-stat-num{font-size:22px;font-weight:900;color:#0d9488;font-family:'DM Mono',monospace}
+.sp-stat-lbl{font-size:9px;color:rgba(255,255,255,.3);margin-top:3px;letter-spacing:.5px;text-transform:uppercase}
+
+/* Row toggle */
+.sp-row{
+  display:flex;align-items:center;gap:12px;padding:11px 14px;
+  background:rgba(255,255,255,.03);border-radius:10px;margin-bottom:7px;
+  border:1px solid rgba(255,255,255,.05)
+}
+.sp-row-info{flex:1}
+.sp-row-label{font-size:13px;font-weight:600;color:#e2e8f0}
+.sp-row-sub{font-size:11px;color:rgba(255,255,255,.3);margin-top:2px;line-height:1.4}
+.sp-toggle{position:relative;width:38px;height:21px;flex-shrink:0}
+.sp-toggle input{opacity:0;width:0;height:0}
+.sp-slider{position:absolute;inset:0;background:rgba(255,255,255,.1);border-radius:99px;cursor:pointer;transition:.2s}
+.sp-slider:before{content:'';position:absolute;width:15px;height:15px;left:3px;bottom:3px;background:#64748b;border-radius:50%;transition:.2s}
+.sp-toggle input:checked+.sp-slider{background:rgba(13,148,136,.3)}
+.sp-toggle input:checked+.sp-slider:before{transform:translateX(17px);background:#0d9488}
+
+/* Buttons */
+.sp-btn{
+  width:100%;padding:10px 14px;border:none;border-radius:10px;
+  font-size:13px;font-weight:700;cursor:pointer;
+  font-family:'Sora',sans-serif;transition:all .18s;text-align:left;
+  display:flex;align-items:center;gap:8px;margin-bottom:7px
+}
+.sp-btn-teal{background:rgba(13,148,136,.15);color:#0d9488;border:1px solid rgba(13,148,136,.25)}
+.sp-btn-teal:hover{background:rgba(13,148,136,.28)}
+.sp-btn-red{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.2)}
+.sp-btn-red:hover{background:rgba(239,68,68,.22)}
+.sp-btn-amber{background:rgba(245,158,11,.1);color:#fbbf24;border:1px solid rgba(245,158,11,.2)}
+.sp-btn-amber:hover{background:rgba(245,158,11,.2)}
+.sp-btn-purple{background:rgba(139,92,246,.12);color:#a78bfa;border:1px solid rgba(139,92,246,.2)}
+.sp-btn-purple:hover{background:rgba(139,92,246,.22)}
+.sp-btn-ghost{background:rgba(255,255,255,.04);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.08)}
+.sp-btn-ghost:hover{background:rgba(255,255,255,.09);color:#e2e8f0}
+.sp-btn-icon{font-size:16px;flex-shrink:0}
+.sp-btn-text{flex:1}
+.sp-btn-text small{display:block;font-size:10px;opacity:.6;font-weight:400;margin-top:1px}
+.sp-btn-arrow{font-size:12px;opacity:.4}
+
+/* User list */
+.sp-user-item{
+  display:flex;align-items:center;gap:10px;padding:9px 12px;
+  background:rgba(255,255,255,.03);border-radius:10px;margin-bottom:6px;
+  border:1px solid rgba(255,255,255,.05);transition:border-color .15s
+}
+.sp-user-item:hover{border-color:rgba(13,148,136,.25)}
+.sp-user-avatar{
+  width:34px;height:34px;border-radius:50%;
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  color:#fff;font-size:13px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0
+}
+.sp-user-info{flex:1;min-width:0}
+.sp-user-name{font-size:13px;font-weight:700;color:#e2e8f0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sp-user-meta{font-size:10px;color:rgba(255,255,255,.3);margin-top:2px}
+.sp-role-pill{
+  font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;
+  flex-shrink:0;letter-spacing:.3px
+}
+.sp-role-Administrador{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.25)}
+.sp-role-Moderador{background:rgba(139,92,246,.15);color:#a78bfa;border:1px solid rgba(139,92,246,.25)}
+.sp-role-Profesor{background:rgba(13,148,136,.15);color:#34d399;border:1px solid rgba(13,148,136,.25)}
+.sp-role-Estudiante{background:rgba(59,130,246,.12);color:#60a5fa;border:1px solid rgba(59,130,246,.2)}
+.sp-role-Aspirante{background:rgba(255,255,255,.06);color:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.08)}
+.sp-role-btn{
+  background:none;border:1px solid rgba(255,255,255,.12);border-radius:6px;
+  padding:4px 8px;color:rgba(255,255,255,.4);font-size:10px;cursor:pointer;
+  font-family:'Sora',sans-serif;transition:all .15s;white-space:nowrap
+}
+.sp-role-btn:hover{border-color:#0d9488;color:#0d9488}
+
+/* Search input */
+.sp-search{
+  width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  border-radius:10px;padding:9px 14px;color:#e2e8f0;font-size:13px;
+  font-family:'Sora',sans-serif;outline:none;transition:border .15s;
+  box-sizing:border-box;margin-bottom:12px
+}
+.sp-search::placeholder{color:rgba(255,255,255,.25)}
+.sp-search:focus{border-color:#0d9488}
+
+/* Role perms grid */
+.sp-perm-table{width:100%;border-collapse:collapse}
+.sp-perm-table th{
+  font-size:9px;font-weight:800;color:rgba(255,255,255,.3);
+  letter-spacing:1.5px;text-transform:uppercase;padding:6px 10px;
+  text-align:left;border-bottom:1px solid rgba(255,255,255,.06)
+}
+.sp-perm-table td{
+  padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.04);
+  font-size:12px;color:#e2e8f0;vertical-align:middle
+}
+.sp-perm-table tr:last-child td{border-bottom:none}
+.sp-perm-check{
+  width:20px;height:20px;border-radius:6px;border:1.5px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.04);cursor:pointer;transition:all .15s;
+  display:flex;align-items:center;justify-content:center;font-size:12px;
+  margin:0 auto
+}
+.sp-perm-check.on{background:rgba(13,148,136,.25);border-color:#0d9488;color:#0d9488}
+.sp-perm-check.on::after{content:'✓'}
+.sp-perm-check.locked{opacity:.35;cursor:not-allowed}
+
+/* Log feed */
+.sp-log-item{
+  font-size:11px;padding:7px 10px;border-radius:7px;margin-bottom:5px;
+  background:rgba(255,255,255,.03);border-left:2px solid rgba(255,255,255,.1);
+  color:rgba(255,255,255,.5);font-family:'DM Mono',monospace;line-height:1.4
+}
+.sp-log-item.info{border-left-color:#0d9488;color:#34d399}
+.sp-log-item.warn{border-left-color:#f59e0b;color:#fbbf24}
+.sp-log-item.danger{border-left-color:#ef4444;color:#f87171}
+.sp-log-item.action{border-left-color:#8b5cf6;color:#a78bfa}
+
+/* Badge */
+.sp-online-dot{
+  width:7px;height:7px;border-radius:50%;background:#22c55e;
+  display:inline-block;margin-right:5px;
+  animation:pulse-dot 2s infinite
+}
+
+/* Input small */
+.sp-inp-sm{
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  border-radius:8px;padding:7px 12px;color:#e2e8f0;font-size:12px;
+  font-family:'Sora',sans-serif;outline:none;width:100%;box-sizing:border-box;transition:border .15s
+}
+.sp-inp-sm:focus{border-color:#0d9488}
+.sp-inp-sm::placeholder{color:rgba(255,255,255,.2)}
+.sp-select{
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  border-radius:8px;padding:7px 12px;color:#e2e8f0;font-size:12px;
+  font-family:'Sora',sans-serif;outline:none;width:100%;box-sizing:border-box;
+  appearance:none;cursor:pointer;transition:border .15s
+}
+.sp-select:focus{border-color:#0d9488}
+.sp-select option{background:#1a1a2e;color:#e2e8f0}
+
+.sp-label{font-size:10px;font-weight:700;color:rgba(255,255,255,.3);
+  text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;display:block}
+.sp-feedback{font-size:11px;text-align:center;padding:7px;border-radius:8px;margin-bottom:8px;display:none}
+.sp-feedback.ok{background:rgba(13,148,136,.15);color:#34d399}
+.sp-feedback.err{background:rgba(239,68,68,.12);color:#f87171}
+
+/* Divider */
+.sp-divider{height:1px;background:rgba(255,255,255,.06);margin:10px 0}
+
+@media(max-width:640px){
+  #superPanel{width:calc(100vw - 20px)!important;max-height:80vh}
+}
+
 @media(max-width:640px){
   /* Login */
   .login-card{padding:36px 24px;margin:16px}
@@ -1137,7 +1339,7 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
   /* Dashboard topbar */
   .topbar{padding:10px 14px;flex-wrap:wrap;gap:8px}
   .logo-sm{font-size:18px}
-  .dash-body{padding:20px 0;gap:18px}
+  .dash-body{padding:24px 14px;gap:18px}
   .drop-zone{padding:32px 20px}
   .meta-card{padding:20px 16px}
   .meta-grid{grid-template-columns:1fr 1fr;gap:8px}
@@ -1407,22 +1609,26 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
       <button id="btnAdminPanel" class="btn-sm btn-admin" style="display:none" onclick="openAdmin()">⚙️ Admin</button>
     </div>
   </div>
-  <div class="dash-body" id="dashBody">
+  <div class="dash-body">
 
-    <!-- ── EXÁMENES — renderizados dinámicamente por JS ── -->
-    <div id="examsContainer">
-      <div class="exams-section-title" style="padding:0 28px">
+    <!-- ── EXÁMENES DISPONIBLES ── -->
+    <div class="exams-section">
+      <div class="exams-section-title">
         <h2>📚 Exámenes disponibles</h2>
         <span class="est-badge" id="examsBadge">Cargando…</span>
       </div>
-      <div style="padding:40px 28px;text-align:center;color:var(--muted)">
-        <div style="font-size:32px;margin-bottom:8px">⏳</div>
-        <div style="font-size:14px">Cargando catálogo de exámenes…</div>
+      <div class="exams-grid" id="examsGrid">
+        <!-- Generado dinámicamente desde exams/catalog.json -->
+        <div style="grid-column:1/-1;text-align:center;padding:40px 0;color:var(--muted)">
+          <div style="font-size:32px;margin-bottom:8px">⏳</div>
+          <div style="font-size:14px">Cargando catálogo de exámenes…</div>
+        </div>
       </div>
     </div>
 
-    <!-- Error -->
-    <div id="dashError" class="dash-error" style="margin:0 28px"></div>
+
+        <!-- Error -->
+    <div id="dashError" class="dash-error"></div>
 
   </div>
 </div>
@@ -2808,8 +3014,8 @@ function cEq(){
 let CATALOG = [];   // se llena al cargar
 
 async function loadCatalog() {
-  const container = $('examsContainer');
-  const badge     = $('examsBadge');
+  const grid  = $('examsGrid');
+  const badge = $('examsBadge');
   try {
     const resp = await fetch('exams/catalog.json?_=' + Date.now());
     if (!resp.ok) throw new Error('No se encontró catalog.json');
@@ -2817,8 +3023,9 @@ async function loadCatalog() {
     renderExamCards();
     badge.textContent = `${CATALOG.length} disponible${CATALOG.length !== 1 ? 's' : ''}`;
   } catch(e) {
-    container.innerHTML = `
-      <div style="text-align:center;padding:48px 28px;color:var(--muted)">
+    // Fallback silencioso: muestra mensaje amigable
+    grid.innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:48px 24px;color:var(--muted)">
         <div style="font-size:40px;margin-bottom:12px">📂</div>
         <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px">No se encontró el catálogo</div>
         <div style="font-size:13px;line-height:1.6;max-width:340px;margin:0 auto">
@@ -2898,116 +3105,67 @@ function buildExamCardHTML(ex, idx) {
 }
 
 function renderExamCards() {
-  const container = $('examsContainer');
-  const badge     = $('examsBadge');
+  const grid = $('examsGrid');
   if (!CATALOG.length) {
-    container.innerHTML = `<div style="padding:40px 28px;text-align:center;color:var(--muted);font-size:14px">No hay exámenes en el catálogo todavía.</div>`;
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:14px">No hay exámenes en el catálogo todavía.</div>`;
     return;
   }
 
-  // Classify exams into sections
+  // Clasificar exámenes en secciones
   const used = new Set();
-  let sectionsHTML = '';
+  let html = '';
 
-  EXAM_SECTIONS.forEach((section, sIdx) => {
+  EXAM_SECTIONS.forEach(section => {
     const sectionExams = CATALOG
       .map((ex, idx) => ({ ex, idx }))
       .filter(({ ex, idx }) => !used.has(idx) && section.match(ex));
+
+    // Marcar como usados
     sectionExams.forEach(({ idx }) => used.add(idx));
 
-    // "Próximamente" section with no exams
+    // Si es "próximamente" y no hay exámenes en esa sección
     if (section.coming && sectionExams.length === 0) {
-      sectionsHTML += `
-        <div class="carousel-section">
-          <div class="carousel-section-header">
-            <h2 style="color:${section.color}">${section.label}</h2>
-            <span style="background:rgba(217,119,6,.1);color:#d97706;border:1px solid rgba(217,119,6,.3);border-radius:20px;font-size:10px;font-weight:800;padding:2px 10px;letter-spacing:1px">PRÓXIMAMENTE</span>
-          </div>
-          <div class="carousel-track">
-            <div class="carousel-coming-card">
-              <div class="carousel-coming-icon">📖</div>
-              <div class="carousel-coming-title">Próximamente disponible</div>
-              <div class="carousel-coming-sub">Estamos preparando los exámenes de esta sección</div>
-            </div>
-          </div>
+      html += `
+        <div class="section-header" style="grid-column:1/-1;display:flex;align-items:center;gap:12px;margin:8px 0 4px">
+          <div style="font-size:16px;font-weight:800;color:${section.color};letter-spacing:.3px">${section.label}</div>
+          <span style="background:rgba(217,119,6,.1);color:#d97706;border:1px solid rgba(217,119,6,.3);border-radius:20px;font-size:10px;font-weight:800;padding:2px 10px;letter-spacing:1px">PRÓXIMAMENTE</span>
+          <div style="flex:1;height:1px;background:var(--b2)"></div>
+        </div>
+        <div style="grid-column:1/-1;background:#fffbeb;border:1.5px dashed #fcd34d;border-radius:16px;padding:28px 24px;text-align:center;margin-bottom:8px">
+          <div style="font-size:32px;margin-bottom:8px">📖</div>
+          <div style="font-size:14px;font-weight:700;color:#92400e">Próximamente disponible</div>
+          <div style="font-size:12px;color:#b45309;margin-top:4px">Estamos preparando los exámenes de esta sección</div>
         </div>`;
       return;
     }
+
     if (sectionExams.length === 0) return;
 
-    const trackId = 'carousel-track-' + sIdx;
-    const cardsHTML = sectionExams.map(({ ex, idx }) => buildExamCardHTML(ex, idx)).join('');
-
-    sectionsHTML += `
-      <div class="carousel-section">
-        <div class="carousel-section-header">
-          <h2 style="color:${section.color}">${section.label}</h2>
-          <span class="carousel-count">${sectionExams.length} examen${sectionExams.length !== 1 ? 'es' : ''}</span>
-          <div class="carousel-arrows">
-            <button class="carousel-arrow-btn" onclick="_carouselScroll('${trackId}',-1)">‹</button>
-            <button class="carousel-arrow-btn" onclick="_carouselScroll('${trackId}',1)">›</button>
-          </div>
-        </div>
-        <div class="carousel-track-wrap">
-          <div class="carousel-track" id="${trackId}">${cardsHTML}</div>
-        </div>
+    html += `
+      <div class="section-header" style="grid-column:1/-1;display:flex;align-items:center;gap:12px;margin:8px 0 4px">
+        <div style="font-size:16px;font-weight:800;color:${section.color};letter-spacing:.3px">${section.label}</div>
+        <div style="flex:1;height:1px;background:var(--b2)"></div>
       </div>`;
+    sectionExams.forEach(({ ex, idx }) => {
+      html += buildExamCardHTML(ex, idx);
+    });
   });
 
-  // Leftover exams not in any section
-  const others = CATALOG.map((ex, idx) => ({ ex, idx })).filter(({ idx }) => !used.has(idx));
+  // Exámenes que no cayeron en ninguna sección
+  const others = CATALOG
+    .map((ex, idx) => ({ ex, idx }))
+    .filter(({ idx }) => !used.has(idx));
+
   if (others.length > 0) {
-    const trackId = 'carousel-track-others';
-    const cardsHTML = others.map(({ ex, idx }) => buildExamCardHTML(ex, idx)).join('');
-    sectionsHTML += `
-      <div class="carousel-section">
-        <div class="carousel-section-header">
-          <h2 style="color:var(--muted)">📄 Otros exámenes</h2>
-          <span class="carousel-count">${others.length} examen${others.length !== 1 ? 'es' : ''}</span>
-          <div class="carousel-arrows">
-            <button class="carousel-arrow-btn" onclick="_carouselScroll('${trackId}',-1)">‹</button>
-            <button class="carousel-arrow-btn" onclick="_carouselScroll('${trackId}',1)">›</button>
-          </div>
-        </div>
-        <div class="carousel-track-wrap">
-          <div class="carousel-track" id="${trackId}">${cardsHTML}</div>
-        </div>
+    html += `
+      <div class="section-header" style="grid-column:1/-1;display:flex;align-items:center;gap:12px;margin:8px 0 4px">
+        <div style="font-size:16px;font-weight:800;color:var(--muted);letter-spacing:.3px">📄 Otros exámenes</div>
+        <div style="flex:1;height:1px;background:var(--b2)"></div>
       </div>`;
+    others.forEach(({ ex, idx }) => { html += buildExamCardHTML(ex, idx); });
   }
 
-  // Header row (badge + title)
-  container.innerHTML = `
-    <div class="exams-section-title">
-      <h2>📚 Exámenes disponibles</h2>
-      <span class="est-badge" id="examsBadge">${CATALOG.length} disponible${CATALOG.length !== 1 ? 's' : ''}</span>
-    </div>
-    ${sectionsHTML}`;
-
-  // Enable drag-to-scroll on each track
-  document.querySelectorAll('.carousel-track').forEach(_initCarouselDrag);
-}
-
-function _carouselScroll(trackId, dir) {
-  const track = document.getElementById(trackId);
-  if (!track) return;
-  track.scrollBy({ left: dir * 276, behavior: 'smooth' });
-}
-
-function _initCarouselDrag(track) {
-  let isDown = false, startX, scrollLeft;
-  track.addEventListener('mousedown', e => {
-    isDown = true;
-    track.style.userSelect = 'none';
-    startX = e.pageX - track.offsetLeft;
-    scrollLeft = track.scrollLeft;
-  });
-  document.addEventListener('mouseup', () => { isDown = false; if(track) track.style.userSelect=''; });
-  track.addEventListener('mousemove', e => {
-    if (!isDown) return;
-    e.preventDefault();
-    const x = e.pageX - track.offsetLeft;
-    track.scrollLeft = scrollLeft - (x - startX);
-  });
+  grid.innerHTML = html;
 }
 
 function minutosToHoras(min) {
@@ -4985,7 +5143,7 @@ function buildTags(area, version) {
 <!-- FIREBASE SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, onChildAdded, onChildRemoved, onValue, serverTimestamp, query, limitToLast, set, onDisconnect, remove }
+import { getDatabase, ref, push, onChildAdded, onChildRemoved, onValue, serverTimestamp, query, limitToLast, set, get, onDisconnect, remove }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import {
   getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
@@ -5010,14 +5168,24 @@ const presRef  = ref(db, 'chat/presence');
 const usersRef = ref(db, 'users');
 
 // ── Escuchar estado de autenticación Firebase (mantiene auth vivo al refrescar) ──
-onAuthStateChanged(auth, (firebaseUser) => {
-  // Si Firebase Auth tiene sesión pero el app no la tiene cargada aún, no hacemos nada
-  // Solo usamos esto para confirmar que auth está listo cuando se guarda el perfil
+onAuthStateChanged(auth, async (firebaseUser) => {
   if (firebaseUser) {
-    // Sesión Firebase activa — guardar referencia global
     window._fbCurrentUser = firebaseUser;
+    if (!window._sessionRestored) {
+      window._sessionRestored = true;
+      try {
+        const profile = await loadUserProfile(firebaseUser.uid);
+        const username = profile?.username || firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Usuario';
+        const isAdmin = ADMIN_USERNAMES.includes(username.toLowerCase());
+        const role = isAdmin ? 'Administrador' : (profile?.role || 'Aspirante');
+        window._enterDash(username, role, null, '');
+      } catch(e) {
+        console.warn('Error restaurando sesión:', e);
+      }
+    }
   } else {
     window._fbCurrentUser = null;
+    window._sessionRestored = false;
   }
 });
 
@@ -5064,6 +5232,7 @@ window._fbDoLogin = async function() {
     const displayName = profile?.username || username;
     const isAdmin = ADMIN_USERNAMES.includes(username.toLowerCase());
     const role = isAdmin ? 'Administrador' : (profile?.role || 'Aspirante');
+    window._sessionRestored = true;
     window._enterDash(displayName, role, null, '');
   } catch(e) {
     const msgs = {
@@ -5552,6 +5721,508 @@ window._fbSignOut = async function() {
 window.addEventListener('beforeunload', () => {
   if (myPresenceRef) set(myPresenceRef, null);
 });
+
+// ══════════════════════════════════════════════════════════════
+//  ⚡ SUPER PANEL DE ADMINISTRADOR
+// ══════════════════════════════════════════════════════════════
+
+// ── Permisos por rol (se guardan en Firebase) ──
+const SP_ROLES   = ['Administrador','Moderador','Profesor','Estudiante','Aspirante'];
+const SP_PERMS   = [
+  { key:'exam',       label:'Realizar exámenes' },
+  { key:'chat',       label:'Usar el chat' },
+  { key:'ranking',    label:'Ver ranking' },
+  { key:'results',    label:'Ver resultados propios' },
+  { key:'modChat',    label:'Moderar chat' },
+  { key:'viewUsers',  label:'Ver lista de usuarios' },
+  { key:'viewStats',  label:'Ver estadísticas' },
+  { key:'assignMod',  label:'Asignar rol Moderador' },
+  { key:'editExam',   label:'Editar exámenes (admin)' },
+  { key:'manageAll',  label:'Control total' },
+];
+// Defaults: Administrador tiene todo, los demás permisos base
+const SP_PERM_DEFAULTS = {
+  Administrador: { exam:1,chat:1,ranking:1,results:1,modChat:1,viewUsers:1,viewStats:1,assignMod:1,editExam:1,manageAll:1 },
+  Moderador:     { exam:1,chat:1,ranking:1,results:1,modChat:1,viewUsers:1,viewStats:1,assignMod:0,editExam:0,manageAll:0 },
+  Profesor:      { exam:1,chat:1,ranking:1,results:1,modChat:0,viewUsers:0,viewStats:1,assignMod:0,editExam:0,manageAll:0 },
+  Estudiante:    { exam:1,chat:1,ranking:1,results:1,modChat:0,viewUsers:0,viewStats:0,assignMod:0,editExam:0,manageAll:0 },
+  Aspirante:     { exam:1,chat:1,ranking:0,results:1,modChat:0,viewUsers:0,viewStats:0,assignMod:0,editExam:0,manageAll:0 },
+};
+let _spPerms = JSON.parse(JSON.stringify(SP_PERM_DEFAULTS));
+let _spUsers = {};      // uid → { username, role, createdAt }
+let _spLog   = [];      // activity log entries
+let _spSettingsSnap = {};
+let _spPanelOpen = false;
+
+// ── Ref helpers ──
+const spSettingsRef = ref(db, 'siteSettings');
+const spUsersRef    = ref(db, 'users');
+const spPermsRef    = ref(db, 'rolePermissions');
+
+// ── Cargar settings en tiempo real ──
+onValue(spSettingsRef, snap => {
+  _spSettingsSnap = snap.exists() ? snap.val() : {};
+  if (_spPanelOpen) _spSyncToggles();
+  // Aplicar modo mantenimiento para usuarios normales
+  if (_spSettingsSnap.maintenance && S.role && S.role !== 'Administrador') {
+    const msg = _spSettingsSnap.maintMsg || '🔧 El sitio está en mantenimiento. Volvemos pronto.';
+    _spShowMaintOverlay(msg);
+  } else {
+    _spHideMaintOverlay();
+  }
+  // Chat habilitado
+  window._spChatEnabled = _spSettingsSnap.chatEnabled !== false;
+});
+
+// ── Cargar permisos en tiempo real ──
+onValue(spPermsRef, snap => {
+  if (snap.exists()) {
+    _spPerms = { ...JSON.parse(JSON.stringify(SP_PERM_DEFAULTS)), ...snap.val() };
+  }
+  if (_spPanelOpen) _spRenderPermsTable();
+});
+
+// ── Cargar usuarios en tiempo real ──
+onValue(spUsersRef, snap => {
+  _spUsers = snap.exists() ? snap.val() : {};
+  // stats
+  const total = Object.keys(_spUsers).length;
+  const el = document.getElementById('spStatUsers');
+  if (el) el.textContent = total;
+  if (_spPanelOpen) _spRenderUserList();
+});
+
+// ── Online count desde presencia ──
+onValue(presRef, snap => {
+  const count = snap.exists() ? Object.keys(snap.val()).length : 0;
+  const el = document.getElementById('spStatOnline');
+  if (el) el.textContent = count;
+  const dot = document.getElementById('spNotifDot');
+  if (dot) { dot.textContent = count; dot.style.display = count > 0 ? 'flex' : 'none'; }
+});
+
+// ── Message count ──
+onValue(msgsRef, snap => {
+  const count = snap.exists() ? Object.keys(snap.val()).length : 0;
+  const el = document.getElementById('spStatMsgs');
+  if (el) el.textContent = count;
+});
+
+// ── Mostrar burbuja solo para Administrador/Moderador ──
+window._spInitBubble = function() {
+  const bubble = document.getElementById('superPanelBubble');
+  if (!bubble) return;
+  const show = S.role === 'Administrador' || S.role === 'Moderador';
+  bubble.classList.toggle('visible', show);
+  if (show) _spInitDrag();
+  _spLog_push('info', `Sesión iniciada como ${S.role} · ${S.user}`);
+};
+
+// ── Toggle panel ──
+window.toggleSuperPanel = function() {
+  _spPanelOpen = !_spPanelOpen;
+  const panel  = document.getElementById('superPanel');
+  const bubble = document.getElementById('superPanelBubble');
+  if (!panel) return;
+  panel.classList.toggle('open', _spPanelOpen);
+  if (bubble) bubble.classList.toggle('sp-hidden', _spPanelOpen);
+  if (_spPanelOpen) {
+    _spPositionPanel();
+    _spRefreshUsers();
+    _spRenderPermsTable();
+    _spSyncToggles();
+    _spRenderLog();
+  }
+};
+
+function _spPositionPanel() {
+  const bubble = document.getElementById('superPanelBubble');
+  const panel  = document.getElementById('superPanel');
+  if (!bubble || !panel) return;
+  const br = bubble.getBoundingClientRect();
+  const pw = Math.min(480, window.innerWidth - 20);
+  const ph = 520;
+  let left = br.right + 10;
+  let top  = br.top;
+  if (left + pw > window.innerWidth - 10) left = br.left - pw - 10;
+  if (top + ph > window.innerHeight - 10) top = window.innerHeight - ph - 10;
+  if (left < 10) left = 10;
+  if (top  < 10) top  = 10;
+  panel.style.left   = left + 'px';
+  panel.style.top    = top  + 'px';
+  panel.style.width  = pw   + 'px';
+  panel.style.maxHeight = Math.min(ph, window.innerHeight - 40) + 'px';
+}
+
+// ── Drag burbuja ──
+function _spInitDrag() {
+  const bubble = document.getElementById('superPanelBubble');
+  if (!bubble || bubble._dragInit) return;
+  bubble._dragInit = true;
+  const THRESHOLD = 8;
+  let ox = 0, oy = 0, sx = 0, sy = 0, moved = false;
+  function pointerDown(e) {
+    moved = false;
+    bubble._wasDragged = false;
+    const cl = e.touches ? e.touches[0] : e;
+    const r  = bubble.getBoundingClientRect();
+    ox = cl.clientX - r.left; oy = cl.clientY - r.top;
+    sx = cl.clientX; sy = cl.clientY;
+    document.addEventListener('mousemove', pointerMove);
+    document.addEventListener('mouseup',   pointerUp);
+    document.addEventListener('touchmove', pointerMove, {passive:false});
+    document.addEventListener('touchend',  pointerUp);
+  }
+  function pointerMove(e) {
+    const cl = e.touches ? e.touches[0] : e;
+    const dx = cl.clientX - sx, dy = cl.clientY - sy;
+    if (!moved && Math.sqrt(dx*dx + dy*dy) < THRESHOLD) return;
+    moved = true;
+    bubble._wasDragged = true;
+    const nx = cl.clientX - ox;
+    const ny = cl.clientY - oy;
+    const maxX = window.innerWidth  - bubble.offsetWidth;
+    const maxY = window.innerHeight - bubble.offsetHeight;
+    bubble.style.left = Math.max(0, Math.min(nx, maxX)) + 'px';
+    bubble.style.top  = Math.max(0, Math.min(ny, maxY)) + 'px';
+    bubble.style.right = 'auto'; bubble.style.bottom = 'auto';
+    if (e.cancelable) e.preventDefault();
+  }
+  function pointerUp() {
+    document.removeEventListener('mousemove', pointerMove);
+    document.removeEventListener('mouseup',   pointerUp);
+    document.removeEventListener('touchmove', pointerMove);
+    document.removeEventListener('touchend',  pointerUp);
+    if (!moved) {
+      bubble._wasDragged = false;
+      window.toggleSuperPanel();
+    } else {
+      setTimeout(() => { bubble._wasDragged = false; }, 100);
+    }
+  }
+  bubble.addEventListener('mousedown',  pointerDown);
+  bubble.addEventListener('touchstart', pointerDown, {passive:false});
+}
+
+// ── Tab switching ──
+window.spSwitchTab = function(btn) {
+  document.querySelectorAll('.sp-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.sp-pane').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  const pane = document.getElementById(btn.dataset.pane);
+  if (pane) pane.classList.add('active');
+};
+window.spSwitchTabById = function(id) {
+  const btn = document.querySelector(`.sp-tab[data-pane="${id}"]`);
+  if (btn) spSwitchTab(btn);
+};
+
+// ── Sync toggles from Firebase ──
+function _spSyncToggles() {
+  const s = _spSettingsSnap;
+  _spSetToggle('spToggleMaint',   !!s.maintenance);
+  _spSetToggle('spToggleReg',     !!s.lockRegister);
+  _spSetToggle('spToggleChat',    s.chatEnabled !== false);
+  _spSetToggle('spToggleRanking', s.rankingEnabled !== false);
+  const mt = document.getElementById('spMaintMsg');
+  if (mt && s.maintMsg) mt.value = s.maintMsg;
+}
+function _spSetToggle(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.checked = val;
+}
+
+// ── Toggle a site setting ──
+window.spToggleSetting = function(key, val) {
+  set(ref(db, 'siteSettings/' + key), val);
+  _spLog_push('action', `Setting "${key}" → ${val ? 'ON' : 'OFF'}`);
+};
+
+// ── Render user list ──
+function _spRefreshUsers(filter) {
+  // Si ya tenemos datos en cache, renderizamos inmediatamente
+  if (Object.keys(_spUsers).length > 0) {
+    _spRenderUserList(filter);
+    return;
+  }
+  // Si el cache está vacío (primer open), forzar fetch una sola vez
+  const el = document.getElementById('spUserList');
+  if (el) el.innerHTML = `<div style="text-align:center;padding:28px;color:rgba(255,255,255,.25);font-size:13px">⏳ Cargando usuarios…</div>`;
+  get(spUsersRef).then(snap => {
+    _spUsers = snap.exists() ? snap.val() : {};
+    _spRenderUserList(filter);
+  }).catch(() => {
+    if (el) el.innerHTML = `<div style="text-align:center;padding:28px;color:#f87171;font-size:13px">❌ Error al cargar usuarios</div>`;
+  });
+}
+function _spRenderUserList(filter) {
+  const el = document.getElementById('spUserList');
+  if (!el) return;
+  const entries = Object.entries(_spUsers);
+  const q = (filter || '').toLowerCase();
+  const filtered = q ? entries.filter(([,u]) => (u.username||'').toLowerCase().includes(q)) : entries;
+
+  if (!filtered.length) {
+    el.innerHTML = `<div style="text-align:center;padding:28px;color:rgba(255,255,255,.25);font-size:13px">
+      ${Object.keys(_spUsers).length === 0 ? '⏳ Cargando usuarios…' : '🔍 Sin resultados'}
+    </div>`;
+    return;
+  }
+  el.innerHTML = filtered.map(([uid, u]) => {
+    const initials = (u.username||'?').slice(0,2).toUpperCase();
+    const role = u.role || 'Aspirante';
+    const canChange = S.role === 'Administrador' ||
+      (S.role === 'Moderador' && role !== 'Administrador');
+    const roleOpts = (S.role === 'Administrador'
+      ? SP_ROLES
+      : SP_ROLES.filter(r => r !== 'Administrador')
+    ).map(r => `<option value="${r}" ${r===role?'selected':''}>${r}</option>`).join('');
+
+    return `<div class="sp-user-item">
+      <div class="sp-user-avatar">${initials}</div>
+      <div class="sp-user-info">
+        <div class="sp-user-name">${_escHTML(u.username||uid)}</div>
+        <div class="sp-user-meta">${u.role||'Aspirante'} · ${u.createdAt ? new Date(u.createdAt).toLocaleDateString('es-MX') : '—'}</div>
+      </div>
+      <span class="sp-role-pill sp-role-${role}">${role.slice(0,3).toUpperCase()}</span>
+      ${canChange ? `
+        <select class="sp-role-btn" onchange="spChangeUserRole('${uid}','${_escHTML(u.username||uid)}',this.value)">
+          ${roleOpts}
+        </select>` : ''}
+    </div>`;
+  }).join('');
+}
+
+window.spFilterUsers = function(q) { _spRenderUserList(q); };
+
+window.spChangeUserRole = async function(uid, username, newRole) {
+  if (!uid || !newRole) return;
+  const isAdmin = S.role === 'Administrador';
+  const isMod   = S.role === 'Moderador';
+  if (!isAdmin && (newRole === 'Administrador' || newRole === 'Moderador')) {
+    spShowFeedback('spUserFeedback', 'err', '⛔ Solo el Administrador puede asignar ese rol.');
+    return;
+  }
+  try {
+    await set(ref(db, `users/${uid}/role`), newRole);
+    _spLog_push('action', `Rol de "${username}" → ${newRole} (por ${S.user})`);
+    spShowFeedback('spUserFeedback', 'ok', `✅ Rol de ${username} actualizado a ${newRole}`);
+  } catch(e) {
+    spShowFeedback('spUserFeedback', 'err', '❌ Error: ' + (e.message || e));
+  }
+};
+
+// ── Render perms table ──
+function _spRenderPermsTable() {
+  const tbody = document.getElementById('spPermBody');
+  if (!tbody) return;
+  const isAdmin = S.role === 'Administrador';
+  tbody.innerHTML = SP_PERMS.map(perm => {
+    const cells = SP_ROLES.map((role, ri) => {
+      const on  = !!(_spPerms[role]?.[perm.key]);
+      const locked = role === 'Administrador' || !isAdmin;
+      return `<td style="text-align:center">
+        <div class="sp-perm-check ${on?'on':''} ${locked?'locked':''}"
+          data-role="${role}" data-perm="${perm.key}"
+          onclick="${locked ? '' : `spTogglePerm(this,'${role}','${perm.key}')`}"
+          title="${role}"></div>
+      </td>`;
+    }).join('');
+    return `<tr><td style="color:rgba(255,255,255,.6);font-size:11px">${perm.label}</td>${cells}</tr>`;
+  }).join('');
+}
+
+window.spTogglePerm = function(el, role, permKey) {
+  const on = el.classList.toggle('on');
+  if (!_spPerms[role]) _spPerms[role] = {};
+  _spPerms[role][permKey] = on ? 1 : 0;
+};
+
+window.spSavePerms = async function() {
+  try {
+    await set(spPermsRef, _spPerms);
+    _spLog_push('action', `Permisos actualizados por ${S.user}`);
+    spShowFeedback('spPermFeedback', 'ok', '✅ Permisos guardados en Firebase');
+  } catch(e) {
+    spShowFeedback('spPermFeedback', 'err', '❌ Error al guardar: ' + (e.message||e));
+  }
+};
+
+// ── Quick actions ──
+window.spQuickAction = async function(action) {
+  if (action === 'chat_clear') {
+    if (!confirm('¿Limpiar todo el chat? Esto es irreversible.')) return;
+    await remove(msgsRef);
+    push(msgsRef, { system:true, text:'🧹 Chat limpiado por un administrador.', ts:Date.now() });
+    _spLog_push('danger', `Chat limpiado por ${S.user}`);
+  } else if (action === 'announce') {
+    spSwitchTabById('spSite');
+  }
+};
+
+window.spPublishAnnounce = async function() {
+  const text = document.getElementById('spAnnounceText').value.trim();
+  const type = document.getElementById('spAnnounceType').value;
+  if (!text) { spShowFeedback('spAnnounceFeedback','err','Escribe un mensaje primero.'); return; }
+  try {
+    await set(ref(db, 'siteSettings/announce'), { text, type, ts: Date.now(), by: S.user });
+    _spLog_push('info', `Anuncio publicado: "${text.slice(0,40)}"`);
+    spShowFeedback('spAnnounceFeedback','ok','✅ Anuncio publicado');
+    // Mostrar banner en pantalla
+    _spShowAnnounce({ text, type });
+    // Inyectar como mensaje de sistema en el chat
+    const chatMsgs = document.getElementById('chatMessages');
+    if (chatMsgs) {
+      const div = document.createElement('div');
+      div.style.cssText = 'text-align:center;font-size:11px;color:rgba(58,173,169,.6);padding:4px 0;margin:2px 0;font-style:italic';
+      div.textContent = `🌐 Web: ${text}`;
+      chatMsgs.appendChild(div);
+      chatMsgs.scrollTop = chatMsgs.scrollHeight;
+    }
+  } catch(e) {
+    spShowFeedback('spAnnounceFeedback','err','❌ Error al publicar: ' + (e.message || e));
+  }
+};
+
+window.spClearAnnounce = async function() {
+  await set(ref(db, 'siteSettings/announce'), null);
+  _spHideAnnounce();
+  spShowFeedback('spAnnounceFeedback','ok','✅ Anuncio eliminado');
+};
+
+window.spSaveMaintMsg = async function() {
+  const msg = document.getElementById('spMaintMsg').value.trim();
+  await set(ref(db, 'siteSettings/maintMsg'), msg || '🔧 Sitio en mantenimiento. Volvemos pronto.');
+  _spLog_push('info', `Mensaje de mantenimiento actualizado`);
+};
+
+window.spBanAllGuests = function() {
+  alert('Función de expulsión de invitados: En tu implementación actual el chat requiere login, así que ya solo usuarios autenticados pueden chatear.');
+};
+
+// ── Site announcement banner ──
+function _spShowAnnounce(data) {
+  let banner = document.getElementById('spAnnounceBanner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'spAnnounceBanner';
+    banner.style.cssText = `position:fixed;top:0;left:0;right:0;z-index:7999;padding:10px 20px;
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      font-family:'Sora',sans-serif;font-size:13px;font-weight:600;
+      box-shadow:0 2px 12px rgba(0,0,0,.2)`;
+    document.body.prepend(banner);
+  }
+  const colors = { info:'#0e7490', warn:'#b45309', success:'#15803d', danger:'#b91c1c' };
+  banner.style.background = colors[data.type] || colors.info;
+  banner.style.color = '#fff';
+  banner.innerHTML = `<span>📢 ${_escHTML(data.text)}</span>
+    <button onclick="this.parentNode.remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:6px;
+      padding:3px 8px;color:#fff;cursor:pointer;font-size:12px;font-family:'Sora',sans-serif">✕</button>`;
+}
+function _spHideAnnounce() {
+  const b = document.getElementById('spAnnounceBanner'); if (b) b.remove();
+}
+
+// ── Maintenance overlay ──
+function _spShowMaintOverlay(msg) {
+  let ov = document.getElementById('spMaintOv');
+  if (!ov) {
+    ov = document.createElement('div');
+    ov.id = 'spMaintOv';
+    ov.style.cssText = `position:fixed;inset:0;z-index:8998;background:rgba(10,16,32,.97);
+      display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;flex-direction:column;gap:16px;text-align:center`;
+    ov.innerHTML = `<div style="font-size:52px">🔧</div>
+      <div style="font-size:20px;font-weight:800;color:#f8fafc">Sitio en mantenimiento</div>
+      <div id="spMaintOvMsg" style="font-size:14px;color:#94a3b8;max-width:360px;line-height:1.6">${_escHTML(msg)}</div>`;
+    document.body.appendChild(ov);
+  } else {
+    const el = document.getElementById('spMaintOvMsg'); if (el) el.textContent = msg;
+  }
+}
+function _spHideMaintOverlay() {
+  const ov = document.getElementById('spMaintOv'); if (ov) ov.remove();
+}
+
+// ── Escuchar anuncios en tiempo real ──
+onValue(ref(db, 'siteSettings/announce'), snap => {
+  if (snap.exists() && snap.val()?.text) { _spShowAnnounce(snap.val()); }
+  else { _spHideAnnounce(); }
+});
+
+// ── Activity log ──
+function _spLog_push(type, msg) {
+  const entry = { type, msg, ts: new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',second:'2-digit'}) };
+  _spLog.unshift(entry);
+  if (_spLog.length > 60) _spLog.pop();
+  if (_spPanelOpen) _spRenderLog();
+}
+function _spRenderLog() {
+  const el = document.getElementById('spLogFeed');
+  if (!el) return;
+  if (!_spLog.length) { el.innerHTML = '<div class="sp-log-item">Sin actividad aún.</div>'; return; }
+  el.innerHTML = _spLog.map(e =>
+    `<div class="sp-log-item ${e.type}">[${e.ts}] ${_escHTML(e.msg)}</div>`
+  ).join('');
+}
+window.spClearLog = function() { _spLog = []; _spRenderLog(); };
+
+// ── Feedback helper ──
+window.spShowFeedback = function(id, type, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.className = `sp-feedback ${type}`;
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 3000);
+};
+
+function _escHTML(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ── Drag del panel (mouse + touch) ──
+(function() {
+  const panel = document.getElementById('superPanel');
+  const header = document.getElementById('spHeader');
+  if (!panel || !header) return;
+  let ox = 0, oy = 0;
+
+  function startDrag(clientX, clientY) {
+    const r = panel.getBoundingClientRect();
+    ox = clientX - r.left; oy = clientY - r.top;
+  }
+  function moveDrag(clientX, clientY) {
+    panel.style.left = Math.max(0, Math.min(clientX - ox, window.innerWidth  - panel.offsetWidth))  + 'px';
+    panel.style.top  = Math.max(0, Math.min(clientY - oy, window.innerHeight - panel.offsetHeight)) + 'px';
+    panel.style.right = 'auto'; panel.style.bottom = 'auto';
+  }
+
+  // Mouse
+  header.addEventListener('mousedown', e => {
+    if (e.target.classList.contains('sp-close')) return;
+    startDrag(e.clientX, e.clientY);
+    function move(e) { moveDrag(e.clientX, e.clientY); }
+    function up()   { document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', up); }
+    document.addEventListener('mousemove', move);
+    document.addEventListener('mouseup', up);
+  });
+
+  // Touch
+  header.addEventListener('touchstart', e => {
+    if (e.target.classList.contains('sp-close')) return;
+    const t = e.touches[0];
+    startDrag(t.clientX, t.clientY);
+    function move(e) { if (e.cancelable) e.preventDefault(); const t = e.touches[0]; moveDrag(t.clientX, t.clientY); }
+    function up()   { document.removeEventListener('touchmove', move); document.removeEventListener('touchend', up); }
+    document.addEventListener('touchmove', move, {passive:false});
+    document.addEventListener('touchend', up);
+  }, {passive:true});
+})();
+
+// ── Hook en _enterDash para mostrar burbuja ──
+const _origEnterDash = window._enterDash;
+window._enterDash = function(user, role, picture, email) {
+  _origEnterDash && _origEnterDash(user, role, picture, email);
+  setTimeout(() => window._spInitBubble(), 300);
+};
 </script>
 
 <!-- PROFILE VIEWER MODAL -->
@@ -5602,6 +6273,293 @@ window.addEventListener('beforeunload', () => {
     <div class="myp-saved" id="mypSaved">✓ Guardado correctamente</div>
   </div>
 </div>
+
+<!-- ══════════════════════════════════════════
+     SUPER PANEL DE ADMINISTRADOR
+══════════════════════════════════════════ -->
+
+<!-- Burbuja flotante -->
+<div id="superPanelBubble" title="Super Panel Admin" onclick="if(!this._wasDragged)toggleSuperPanel()">
+  ⚡
+  <div class="sp-notif" id="spNotifDot"></div>
+</div>
+
+<!-- Panel principal -->
+<div id="superPanel">
+  <!-- Header -->
+  <div class="sp-header" id="spHeader">
+    <div class="sp-logo">⚡</div>
+    <div class="sp-title">
+      <div class="sp-title-main">SUPER PANEL</div>
+      <div class="sp-title-sub">Control absoluto · Solo administradores</div>
+    </div>
+    <button class="sp-close" onclick="toggleSuperPanel()" title="Cerrar">✕</button>
+  </div>
+
+  <!-- Nav tabs -->
+  <div class="sp-nav">
+    <button class="sp-tab active" data-pane="spHome" onclick="spSwitchTab(this)">
+      <span class="sp-tab-icon">🏠</span>Vista general
+    </button>
+    <button class="sp-tab" data-pane="spUsers" onclick="spSwitchTab(this)">
+      <span class="sp-tab-icon">👥</span>Usuarios
+    </button>
+    <button class="sp-tab" data-pane="spRoles" onclick="spSwitchTab(this)">
+      <span class="sp-tab-icon">🎭</span>Roles
+    </button>
+    <button class="sp-tab" data-pane="spSite" onclick="spSwitchTab(this)">
+      <span class="sp-tab-icon">🌐</span>Sitio
+    </button>
+    <button class="sp-tab" data-pane="spLog" onclick="spSwitchTab(this)">
+      <span class="sp-tab-icon">📋</span>Registro
+    </button>
+  </div>
+
+  <!-- Body -->
+  <div class="sp-body">
+
+    <!-- ── PANE: HOME ── -->
+    <div class="sp-pane active" id="spHome">
+      <div class="sp-stats-row" id="spStatsRow">
+        <div class="sp-stat-card">
+          <div class="sp-stat-num" id="spStatUsers">—</div>
+          <div class="sp-stat-lbl">Usuarios</div>
+        </div>
+        <div class="sp-stat-card">
+          <div class="sp-stat-num" id="spStatOnline">—</div>
+          <div class="sp-stat-lbl">En línea</div>
+        </div>
+        <div class="sp-stat-card">
+          <div class="sp-stat-num" id="spStatMsgs">—</div>
+          <div class="sp-stat-lbl">Mensajes</div>
+        </div>
+      </div>
+
+      <div class="sp-section">
+        <div class="sp-section-title">Acciones rápidas</div>
+        <button class="sp-btn sp-btn-teal" onclick="spQuickAction('chat_clear')">
+          <span class="sp-btn-icon">🗑️</span>
+          <span class="sp-btn-text">Limpiar chat<small>Borra todos los mensajes actuales</small></span>
+          <span class="sp-btn-arrow">›</span>
+        </button>
+        <button class="sp-btn sp-btn-amber" onclick="spQuickAction('announce')">
+          <span class="sp-btn-icon">📢</span>
+          <span class="sp-btn-text">Anuncio global<small>Mensaje de sistema a todos los usuarios</small></span>
+          <span class="sp-btn-arrow">›</span>
+        </button>
+        <button class="sp-btn sp-btn-purple" onclick="spSwitchTabById('spUsers')">
+          <span class="sp-btn-icon">👥</span>
+          <span class="sp-btn-text">Gestionar usuarios<small>Ver, cambiar roles y banear</small></span>
+          <span class="sp-btn-arrow">›</span>
+        </button>
+        <button class="sp-btn sp-btn-ghost" onclick="openAdmin()">
+          <span class="sp-btn-icon">📋</span>
+          <span class="sp-btn-text">Panel Admin clásico<small>Editor de exámenes, estadísticas</small></span>
+          <span class="sp-btn-arrow">›</span>
+        </button>
+      </div>
+
+      <div class="sp-section">
+        <div class="sp-section-title">Modo del sitio</div>
+        <div class="sp-row">
+          <div class="sp-row-info">
+            <div class="sp-row-label">🔒 Modo mantenimiento</div>
+            <div class="sp-row-sub">Solo admins pueden acceder al dashboard</div>
+          </div>
+          <label class="sp-toggle">
+            <input type="checkbox" id="spToggleMaint" onchange="spToggleSetting('maintenance',this.checked)">
+            <span class="sp-slider"></span>
+          </label>
+        </div>
+        <div class="sp-row">
+          <div class="sp-row-info">
+            <div class="sp-row-label">🚫 Bloquear registro</div>
+            <div class="sp-row-sub">Deshabilita la creación de cuentas nuevas</div>
+          </div>
+          <label class="sp-toggle">
+            <input type="checkbox" id="spToggleReg" onchange="spToggleSetting('lockRegister',this.checked)">
+            <span class="sp-slider"></span>
+          </label>
+        </div>
+        <div class="sp-row">
+          <div class="sp-row-info">
+            <div class="sp-row-label">💬 Chat habilitado</div>
+            <div class="sp-row-sub">Permitir mensajes en el chat global</div>
+          </div>
+          <label class="sp-toggle">
+            <input type="checkbox" id="spToggleChat" checked onchange="spToggleSetting('chatEnabled',this.checked)">
+            <span class="sp-slider"></span>
+          </label>
+        </div>
+        <div class="sp-row">
+          <div class="sp-row-info">
+            <div class="sp-row-label">🏆 Ranking público</div>
+            <div class="sp-row-sub">Mostrar ranking global a todos los usuarios</div>
+          </div>
+          <label class="sp-toggle">
+            <input type="checkbox" id="spToggleRanking" checked onchange="spToggleSetting('rankingEnabled',this.checked)">
+            <span class="sp-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PANE: USUARIOS ── -->
+    <div class="sp-pane" id="spUsers">
+      <input class="sp-search" id="spUserSearch" placeholder="🔍  Buscar usuario…" oninput="spFilterUsers(this.value)"/>
+      <div class="sp-feedback" id="spUserFeedback"></div>
+      <div id="spUserList">
+        <div style="text-align:center;padding:32px;color:rgba(255,255,255,.25);font-size:13px">
+          ⏳ Cargando usuarios…
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PANE: ROLES ── -->
+    <div class="sp-pane" id="spRoles">
+      <div class="sp-section">
+        <div class="sp-section-title">Roles definidos</div>
+
+        <!-- Rol Administrador -->
+        <div class="sp-row" style="margin-bottom:8px">
+          <div class="sp-row-info">
+            <div class="sp-row-label">⚡ Administrador</div>
+            <div class="sp-row-sub">Control total — asignado manualmente en el código</div>
+          </div>
+          <span class="sp-role-pill sp-role-Administrador">ADMIN</span>
+        </div>
+
+        <!-- Rol Moderador -->
+        <div class="sp-row" style="margin-bottom:8px">
+          <div class="sp-row-info">
+            <div class="sp-row-label">🛡️ Moderador</div>
+            <div class="sp-row-sub">Puede moderar chat, ver usuarios y ver estadísticas</div>
+          </div>
+          <span class="sp-role-pill sp-role-Moderador">MOD</span>
+        </div>
+
+        <!-- Rol Profesor -->
+        <div class="sp-row" style="margin-bottom:8px">
+          <div class="sp-row-info">
+            <div class="sp-row-label">👨‍🏫 Profesor</div>
+            <div class="sp-row-sub">Puede ver resultados y estadísticas</div>
+          </div>
+          <span class="sp-role-pill sp-role-Profesor">PROF</span>
+        </div>
+
+        <!-- Rol Estudiante -->
+        <div class="sp-row" style="margin-bottom:8px">
+          <div class="sp-row-info">
+            <div class="sp-row-label">🎒 Estudiante</div>
+            <div class="sp-row-sub">Acceso estándar a exámenes y chat</div>
+          </div>
+          <span class="sp-role-pill sp-role-Estudiante">EST</span>
+        </div>
+
+        <!-- Rol Aspirante -->
+        <div class="sp-row" style="margin-bottom:8px">
+          <div class="sp-row-info">
+            <div class="sp-row-label">📚 Aspirante</div>
+            <div class="sp-row-sub">Rol base al registrarse — acceso limitado</div>
+          </div>
+          <span class="sp-role-pill sp-role-Aspirante">ASP</span>
+        </div>
+      </div>
+
+      <div class="sp-divider"></div>
+
+      <div class="sp-section">
+        <div class="sp-section-title">Permisos por rol</div>
+        <table class="sp-perm-table" id="spPermTable">
+          <thead>
+            <tr>
+              <th style="min-width:130px">Permiso</th>
+              <th style="text-align:center">Admin</th>
+              <th style="text-align:center">Mod</th>
+              <th style="text-align:center">Profe</th>
+              <th style="text-align:center">Estud</th>
+              <th style="text-align:center">Asp</th>
+            </tr>
+          </thead>
+          <tbody id="spPermBody"></tbody>
+        </table>
+        <button class="sp-btn sp-btn-teal" style="margin-top:12px" onclick="spSavePerms()">
+          <span class="sp-btn-icon">💾</span>
+          <span class="sp-btn-text">Guardar permisos</span>
+        </button>
+        <div class="sp-feedback" id="spPermFeedback"></div>
+      </div>
+    </div>
+
+    <!-- ── PANE: SITIO ── -->
+    <div class="sp-pane" id="spSite">
+      <div class="sp-section">
+        <div class="sp-section-title">Anuncio del sistema</div>
+        <label class="sp-label">Mensaje a mostrar en el dashboard</label>
+        <textarea id="spAnnounceText" class="sp-inp-sm" rows="3" placeholder="Escribe aquí el anuncio para todos los usuarios…" style="resize:vertical;margin-bottom:8px"></textarea>
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <select id="spAnnounceType" class="sp-select" style="flex:1">
+            <option value="info">ℹ️ Info</option>
+            <option value="warn">⚠️ Advertencia</option>
+            <option value="success">✅ Éxito</option>
+            <option value="danger">🚨 Urgente</option>
+          </select>
+          <button class="sp-btn sp-btn-teal" style="margin:0;flex:1;justify-content:center" onclick="spPublishAnnounce()">
+            <span class="sp-btn-icon">📢</span> Publicar
+          </button>
+        </div>
+        <button class="sp-btn sp-btn-red" onclick="spClearAnnounce()">
+          <span class="sp-btn-icon">✕</span>
+          <span class="sp-btn-text">Quitar anuncio activo</span>
+        </button>
+        <div class="sp-feedback" id="spAnnounceFeedback"></div>
+      </div>
+
+      <div class="sp-divider"></div>
+
+      <div class="sp-section">
+        <div class="sp-section-title">Mensaje de mantenimiento</div>
+        <label class="sp-label">Texto que ven los usuarios mientras el sitio está en mantenimiento</label>
+        <input id="spMaintMsg" class="sp-inp-sm" placeholder="🔧 Sitio en mantenimiento. Volvemos pronto." style="margin-bottom:8px"/>
+        <button class="sp-btn sp-btn-amber" onclick="spSaveMaintMsg()">
+          <span class="sp-btn-icon">💾</span>
+          <span class="sp-btn-text">Guardar mensaje</span>
+        </button>
+      </div>
+
+      <div class="sp-divider"></div>
+
+      <div class="sp-section">
+        <div class="sp-section-title">Peligro</div>
+        <button class="sp-btn sp-btn-red" onclick="spQuickAction('chat_clear')">
+          <span class="sp-btn-icon">🗑️</span>
+          <span class="sp-btn-text">Limpiar todo el chat<small>Irreversible</small></span>
+        </button>
+        <button class="sp-btn sp-btn-red" onclick="spBanAllGuests()">
+          <span class="sp-btn-icon">🚫</span>
+          <span class="sp-btn-text">Expulsar invitados del chat<small>Solo usuarios autenticados podrán chatear</small></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ── PANE: REGISTRO ── -->
+    <div class="sp-pane" id="spLog">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span style="font-size:11px;color:rgba(255,255,255,.3);letter-spacing:.5px">REGISTRO DE ACTIVIDAD</span>
+        <button onclick="spClearLog()" style="background:none;border:1px solid rgba(255,255,255,.1);border-radius:7px;
+          padding:4px 10px;font-size:10px;color:rgba(255,255,255,.3);cursor:pointer;font-family:'Sora',sans-serif;transition:all .15s"
+          onmouseover="this.style.borderColor='rgba(239,68,68,.4)';this.style.color='#f87171'"
+          onmouseout="this.style.borderColor='rgba(255,255,255,.1)';this.style.color='rgba(255,255,255,.3)'">
+          Limpiar
+        </button>
+      </div>
+      <div id="spLogFeed">
+        <div class="sp-log-item">Iniciando registro…</div>
+      </div>
+    </div>
+
+  </div><!-- /sp-body -->
+</div><!-- /superPanel -->
 
 </body>
 </html>
