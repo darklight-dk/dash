@@ -2502,6 +2502,19 @@ function finishGoogleLogin(role) {
   localStorage.setItem('exani_session', JSON.stringify({
     user: S.user, role, googlePicture: S.googlePicture, googleEmail: S.googleEmail
   }));
+  // Guardar/actualizar usuario de Google en Firebase para el Super Panel
+  if (S.googleEmail && window._fbDB) {
+    const gKey = 'g_' + S.googleEmail.toLowerCase().replace(/[^a-z0-9]/g, '_');
+    const { db: _db, ref: _ref, update: _upd } = window._fbDB;
+    _upd(_ref(_db, `googleUsers/${gKey}`), {
+      username: S.user,
+      email: S.googleEmail,
+      picture: S.googlePicture || '',
+      role,
+      lastLogin: Date.now(),
+      isGoogle: true,
+    }).catch(() => {});
+  }
   updateProfileUI();
   const adminBtn = $('btnAdminPanel');
   if (adminBtn) adminBtn.style.display = role === 'Administrador' ? 'flex' : 'none';
@@ -3599,7 +3612,10 @@ loadCatalog();   // carga exams/catalog.json y renderiza las tarjetas
     S.role          = sess.role;
     S.googlePicture = sess.googlePicture || null;
     S.googleEmail   = sess.googleEmail   || '';
+    localStorage.setItem('exani_loginTs', Date.now());
     updateProfileUI();
+    const adminBar = document.getElementById('chatAdminBar');
+    if (adminBar) adminBar.classList.toggle('visible', sess.role === 'Administrador');
     const adminBtn = $('btnAdminPanel');
     if (adminBtn) adminBtn.style.display = sess.role === 'Administrador' ? 'flex' : 'none';
     renderExamCards();
@@ -5225,6 +5241,10 @@ const msgsRef  = ref(db, 'chat/messages');
 const presRef  = ref(db, 'chat/presence');
 const usersRef = ref(db, 'users');
 
+// Exponer funciones de Firebase al scope global para funciones fuera del módulo
+import { update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+window._fbDB = { db, ref, set, update };
+
 // ── Escuchar estado de autenticación Firebase (mantiene auth vivo al refrescar) ──
 onAuthStateChanged(auth, (firebaseUser) => {
   // Si Firebase Auth tiene sesión pero el app no la tiene cargada aún, no hacemos nada
@@ -5856,12 +5876,18 @@ onValue(spPermsRef, snap => {
 });
 
 // ── Cargar usuarios en tiempo real ──
+let _spGoogleUsers = {};
 onValue(spUsersRef, snap => {
   _spUsers = snap.exists() ? snap.val() : {};
-  // stats
-  const total = Object.keys(_spUsers).length;
+  // Combinar con usuarios de Google
+  const merged = { ..._spGoogleUsers, ..._spUsers };
+  const total = Object.keys(merged).length;
   const el = document.getElementById('spStatUsers');
   if (el) el.textContent = total;
+  if (_spPanelOpen) _spRenderUserList();
+});
+onValue(ref(db, 'googleUsers'), snap => {
+  _spGoogleUsers = snap.exists() ? snap.val() : {};
   if (_spPanelOpen) _spRenderUserList();
 });
 
@@ -6004,13 +6030,14 @@ window.spToggleSetting = function(key, val) {
 function _spRenderUserList(filter) {
   const el = document.getElementById('spUserList');
   if (!el) return;
-  const entries = Object.entries(_spUsers);
+  const merged = { ..._spGoogleUsers, ..._spUsers };
+  const entries = Object.entries(merged);
   const q = (filter || '').toLowerCase();
   const filtered = q ? entries.filter(([,u]) => (u.username||'').toLowerCase().includes(q)) : entries;
 
   if (!filtered.length) {
     el.innerHTML = `<div style="text-align:center;padding:28px;color:rgba(255,255,255,.25);font-size:13px">
-      ${Object.keys(_spUsers).length === 0 ? '⏳ Cargando usuarios…' : '🔍 Sin resultados'}
+      ${Object.keys(merged).length === 0 ? '⏳ Cargando usuarios…' : '🔍 Sin resultados'}
     </div>`;
     return;
   }
@@ -6018,6 +6045,11 @@ function _spRenderUserList(filter) {
     const initials = (u.username||'?').slice(0,2).toUpperCase();
     const role = u.role || 'Aspirante';
     const banned = !!u.banned;
+    const picture = u.picture || '';
+    const avatarHTML = picture
+      ? `<img src="${_escHTML(picture)}" style="width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid rgba(255,255,255,.1)" onerror="this.style.display='none';this.nextSibling.style.display='flex'">`
+        + `<div class="sp-user-avatar" style="display:none;${banned ? 'background:linear-gradient(135deg,#7f1d1d,#991b1b)' : ''}">${initials}</div>`
+      : `<div class="sp-user-avatar" style="${banned ? 'background:linear-gradient(135deg,#7f1d1d,#991b1b)' : ''}">${initials}</div>`;
     const canChange = S.role === 'Administrador' ||
       (S.role === 'Moderador' && role !== 'Administrador');
     const roleOpts = (S.role === 'Administrador'
@@ -6026,10 +6058,10 @@ function _spRenderUserList(filter) {
     ).map(r => `<option value="${r}" ${r===role?'selected':''}>${r}</option>`).join('');
 
     return `<div class="sp-user-item" style="${banned ? 'opacity:.5;border-color:rgba(239,68,68,.3)' : ''}">
-      <div class="sp-user-avatar" style="${banned ? 'background:linear-gradient(135deg,#7f1d1d,#991b1b)' : ''}">${initials}</div>
+      <div style="display:flex;align-items:center;flex-shrink:0">${avatarHTML}</div>
       <div class="sp-user-info">
-        <div class="sp-user-name">${_escHTML(u.username||uid)}${banned ? '<span class="sp-banned-tag">BANEADO</span>' : ''}</div>
-        <div class="sp-user-meta">${u.role||'Aspirante'} · ${u.createdAt ? new Date(u.createdAt).toLocaleDateString('es-MX') : '—'}</div>
+        <div class="sp-user-name">${_escHTML(u.username||uid)}${banned ? '<span class="sp-banned-tag">BANEADO</span>' : ''}${u.isGoogle ? '<span style="font-size:9px;background:rgba(66,133,244,.2);color:#60a5fa;border-radius:4px;padding:1px 5px;margin-left:4px;font-weight:700">G</span>' : ''}</div>
+        <div class="sp-user-meta">${u.role||'Aspirante'} · ${(u.createdAt||u.lastLogin) ? new Date(u.createdAt||u.lastLogin).toLocaleDateString('es-MX') : '—'}</div>
       </div>
       ${canChange ? `
         <select class="sp-role-btn" onchange="spChangeUserRole('${uid}','${_escHTML(u.username||uid)}',this.value)">
@@ -6059,7 +6091,8 @@ window.spChangeUserRole = async function(uid, username, newRole) {
     return;
   }
   try {
-    await set(ref(db, `users/${uid}/role`), newRole);
+    const dbPath = uid.startsWith('g_') ? `googleUsers/${uid}/role` : `users/${uid}/role`;
+    await set(ref(db, dbPath), newRole);
     _spLog_push('action', `Rol de "${username}" → ${newRole} (por ${S.user})`);
     spShowFeedback('spUserFeedback', 'ok', `✅ Rol de ${username} actualizado a ${newRole}`);
   } catch(e) {
@@ -6148,14 +6181,16 @@ window.spBanAllGuests = function() {
 window.spBanUser = async function(uid, username) {
   if (!confirm(`¿Banear a "${username}"? No podrá iniciar sesión.`)) return;
   try {
-    await set(ref(db, `users/${uid}/banned`), true);
+    const dbPath = uid.startsWith('g_') ? `googleUsers/${uid}/banned` : `users/${uid}/banned`;
+    await set(ref(db, dbPath), true);
     _spLog_push('danger', `Usuario "${username}" baneado por ${S.user}`);
     spShowFeedback('spUserFeedback','ok',`🚫 ${username} baneado`);
   } catch(e) { spShowFeedback('spUserFeedback','err','❌ ' + e.message); }
 };
 window.spUnbanUser = async function(uid, username) {
   try {
-    await set(ref(db, `users/${uid}/banned`), false);
+    const dbPath = uid.startsWith('g_') ? `googleUsers/${uid}/banned` : `users/${uid}/banned`;
+    await set(ref(db, dbPath), false);
     _spLog_push('action', `Usuario "${username}" desbaneado por ${S.user}`);
     spShowFeedback('spUserFeedback','ok',`✅ ${username} desbaneado`);
   } catch(e) { spShowFeedback('spUserFeedback','err','❌ ' + e.message); }
@@ -6165,7 +6200,8 @@ window.spUnbanUser = async function(uid, username) {
 window.spDeleteUser = async function(uid, username) {
   if (!confirm(`⚠️ ELIMINAR cuenta de "${username}" de Firebase? Esto es irreversible.`)) return;
   try {
-    await remove(ref(db, `users/${uid}`));
+    const dbPath = uid.startsWith('g_') ? `googleUsers/${uid}` : `users/${uid}`;
+    await remove(ref(db, dbPath));
     _spLog_push('danger', `Cuenta "${username}" eliminada por ${S.user}`);
     spShowFeedback('spUserFeedback','ok',`🗑️ Cuenta ${username} eliminada`);
   } catch(e) { spShowFeedback('spUserFeedback','err','❌ ' + e.message); }
@@ -6325,8 +6361,7 @@ function _spShowAnnounce(data) {
   const colors = { info:'#0e7490', warn:'#b45309', success:'#15803d', danger:'#b91c1c' };
   banner.style.background = colors[data.type] || colors.info;
   banner.style.color = '#fff';
-  const countdown = data.autoDismiss ? ` · ${Math.round(data.autoDismiss/1000)}s` : '';
-  banner.innerHTML = `<span>📢 ${_escHTML(data.text)}${countdown}</span>
+  banner.innerHTML = `<span>📢 ${_escHTML(data.text)}</span>
     <button onclick="this.parentNode.remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:6px;
       padding:3px 8px;color:#fff;cursor:pointer;font-size:12px;font-family:'Sora',sans-serif">✕</button>`;
   if (data.autoDismiss) {
