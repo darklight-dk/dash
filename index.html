@@ -1331,6 +1331,11 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
   #superPanel{width:calc(100vw - 20px)!important;max-height:80vh}
 }
 
+/* Desktop: burbuja alejada del área de contenido */
+@media(min-width:641px){
+  #superPanelBubble{bottom:32px;right:32px}
+}
+
 @media(max-width:640px){
   /* Login */
   .login-card{padding:36px 24px;margin:16px}
@@ -6060,16 +6065,18 @@ window.spQuickAction = async function(action) {
   }
 };
 
-window.spPublishAnnounce = async function() {
-  const text = document.getElementById('spAnnounceText').value.trim();
+window.spPublishAnnounce = async function(temp = false) {
+  const textEl = document.getElementById('spAnnounceText');
+  const text = textEl.value.trim();
   const type = document.getElementById('spAnnounceType').value;
   if (!text) { spShowFeedback('spAnnounceFeedback','err','Escribe un mensaje primero.'); return; }
   try {
     await set(ref(db, 'siteSettings/announce'), { text, type, ts: Date.now(), by: S.user });
     _spLog_push('info', `Anuncio publicado: "${text.slice(0,40)}"`);
-    spShowFeedback('spAnnounceFeedback','ok','✅ Anuncio publicado');
-    // Mostrar banner en pantalla
+    spShowFeedback('spAnnounceFeedback','ok', temp ? '⏱ Anuncio por 5 seg' : '✅ Anuncio publicado');
     _spShowAnnounce({ text, type });
+    // Limpiar textarea
+    textEl.value = '';
     // Inyectar como mensaje de sistema en el chat
     const chatMsgs = document.getElementById('chatMessages');
     if (chatMsgs) {
@@ -6078,6 +6085,13 @@ window.spPublishAnnounce = async function() {
       div.textContent = `🌐 Web: ${text}`;
       chatMsgs.appendChild(div);
       chatMsgs.scrollTop = chatMsgs.scrollHeight;
+    }
+    // Si es temporal, quitar después de 5 segundos
+    if (temp) {
+      setTimeout(async () => {
+        await set(ref(db, 'siteSettings/announce'), null);
+        _spHideAnnounce();
+      }, 5000);
     }
   } catch(e) {
     spShowFeedback('spAnnounceFeedback','err','❌ Error al publicar: ' + (e.message || e));
@@ -6504,8 +6518,13 @@ window._enterDash = function(user, role, picture, email) {
             <option value="success">✅ Éxito</option>
             <option value="danger">🚨 Urgente</option>
           </select>
-          <button class="sp-btn sp-btn-teal" style="margin:0;flex:1;justify-content:center" onclick="spPublishAnnounce()">
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <button class="sp-btn sp-btn-teal" style="margin:0;flex:1;justify-content:center" onclick="spPublishAnnounce(false)">
             <span class="sp-btn-icon">📢</span> Publicar
+          </button>
+          <button class="sp-btn sp-btn-amber" style="margin:0;flex:1;justify-content:center" onclick="spPublishAnnounce(true)">
+            <span class="sp-btn-icon">⏱</span> 5 seg
           </button>
         </div>
         <button class="sp-btn sp-btn-red" onclick="spClearAnnounce()">
