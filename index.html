@@ -475,10 +475,14 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
   background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border-radius:50%;
   width:13px;height:13px;font-size:8px;margin-left:3px;vertical-align:middle;flex-shrink:0;
   box-shadow:0 1px 3px rgba(245,158,11,.4);position:relative;top:-0.5px}
-.chat-msg-delete{display:none;background:none;border:none;cursor:pointer;font-size:13px;
-  color:#dc2626;opacity:0.6;padding:0 3px;line-height:1;flex-shrink:0;transition:opacity .15s}
-.chat-msg-delete:hover{opacity:1}
+.chat-msg-delete{display:none;align-items:center;justify-content:center;background:rgba(220,38,38,.1);
+  border:none;cursor:pointer;font-size:10px;color:#dc2626;opacity:0;padding:0;
+  width:18px;height:18px;border-radius:50%;flex-shrink:0;transition:opacity .2s;
+  margin-top:2px;align-self:center}
+.chat-msg:hover .chat-msg-delete{opacity:0.7}
+.chat-msg-delete:hover{opacity:1!important;background:rgba(220,38,38,.2)}
 .is-admin-viewer .chat-msg-delete{display:inline-flex}
+.can-delete-own .chat-msg-delete{display:inline-flex}
 .chat-msg-bubble{padding:8px 12px;border-radius:14px;font-size:13px;line-height:1.4;word-break:break-word}
 .chat-msg.mine .chat-msg-bubble{background:linear-gradient(135deg,var(--teal),#0891b2);color:#fff;
   border-bottom-right-radius:4px}
@@ -2294,6 +2298,9 @@ let S = {
 // ══════════════════════════════════════════
 //  HELPERS
 // ══════════════════════════════════════════
+// Timestamp de carga de página — usado para ignorar señales de force-refresh/logout anteriores
+localStorage.setItem('exani_pageLoadTs', Date.now());
+
 const $  = id => document.getElementById(id);
 const show = id => {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -5581,6 +5588,7 @@ function appendChatMsg(msg, key) {
   const isMine = S.user && msg.name === S.user;
   const wrap   = document.createElement('div');
   wrap.className = 'chat-msg ' + (isMine ? 'mine' : 'theirs');
+  if (isMine) wrap.classList.add('can-delete-own');
   if (key) wrap.dataset.msgKey = key;
 
   const initials = (msg.name || '?').slice(0,2).toUpperCase();
@@ -5593,15 +5601,20 @@ function appendChatMsg(msg, key) {
   const isAdminMsg = msg.role === 'Administrador';
   const nameClass  = isAdminMsg ? 'chat-msg-name admin-name' : 'chat-msg-name';
   const badge      = isAdminMsg ? '<span class="chat-verified-badge" title="Administrador">✓</span>' : '';
-  const deleteBtn  = key ? `<button class="chat-msg-delete" onclick="deleteChatMsg('${key}',this)" title="Eliminar mensaje">✕</button>` : '';
+  const canDelete  = key && (S.role === 'Administrador' || isMine);
+  const deleteBtn  = canDelete
+    ? `<button class="chat-msg-delete" onclick="deleteChatMsg('${key}',this)" title="Eliminar mensaje">✕</button>`
+    : '';
 
+  // Para mensajes propios: X a la derecha de la burbuja
+  // Para mensajes de otros (solo admin): X a la derecha también
   wrap.innerHTML = `
     <div class="chat-msg-header" style="cursor:pointer" onclick="openProfileView('${escapeHTML(msg.name||'')}','${escapeHTML(msg.role||'')}','${escapeHTML(msg.picture||'')}')">
       ${!isMine ? avatarHTML : ''}
       <span class="${nameClass}">${escapeHTML(msg.name || 'Anónimo')}${badge}</span>
       ${isMine ? avatarHTML : ''}
     </div>
-    <div style="display:flex;align-items:flex-start;gap:4px">
+    <div style="display:flex;align-items:center;gap:4px">
       <div class="chat-msg-bubble">${escapeHTML(filterProfanity(msg.text || ''))}</div>
       ${deleteBtn}
     </div>
@@ -5612,11 +5625,13 @@ function appendChatMsg(msg, key) {
 }
 
 window.deleteChatMsg = async function(key, btn) {
-  if (S.role !== 'Administrador') return;
+  // Admins pueden borrar cualquier mensaje, usuarios solo los suyos
+  const wrap = btn.closest('.chat-msg');
+  const isOwn = wrap && wrap.classList.contains('can-delete-own');
+  if (S.role !== 'Administrador' && !isOwn) return;
   try {
     await remove(ref(db, 'chat/messages/' + key));
-    const wrap = btn.closest('.chat-msg');
-    if (wrap) wrap.remove();
+    // onChildRemoved se encarga de quitarlo del DOM en todos los clientes
   } catch(e) {
     alert('Error al eliminar: ' + (e.message || e));
   }
@@ -6008,21 +6023,45 @@ onValue(spPermsRef, snap => {
   if (_spPanelOpen) _spRenderPermsTable();
 });
 
-// ── Cargar usuarios en tiempo real ──
+// ── Cargar usuarios en tiempo real (esperar a que auth esté listo) ──
 let _spGoogleUsers = {};
-onValue(spUsersRef, snap => {
-  _spUsers = snap.exists() ? snap.val() : {};
-  // Combinar con usuarios de Google
-  const merged = { ..._spGoogleUsers, ..._spUsers };
-  const total = Object.keys(merged).length;
-  const el = document.getElementById('spStatUsers');
-  if (el) el.textContent = total;
-  if (_spPanelOpen) _spRenderUserList();
+let _spUsersUnsubscribe = null;
+let _spGoogleUsersUnsubscribe = null;
+
+function _spSubscribeUsers() {
+  // Solo suscribir si el usuario es admin con auth activo
+  if (_spUsersUnsubscribe) return; // ya suscrito
+  _spUsersUnsubscribe = onValue(spUsersRef, snap => {
+    _spUsers = snap.exists() ? snap.val() : {};
+    const merged = { ..._spGoogleUsers, ..._spUsers };
+    const total = Object.keys(merged).length;
+    const el = document.getElementById('spStatUsers');
+    if (el) el.textContent = total;
+    if (_spPanelOpen) _spRenderUserList();
+  });
+  _spGoogleUsersUnsubscribe = onValue(ref(db, 'googleUsers'), snap => {
+    _spGoogleUsers = snap.exists() ? snap.val() : {};
+    if (_spPanelOpen) _spRenderUserList();
+  });
+}
+
+// Suscribir cuando auth confirme sesión de admin
+onAuthStateChanged(auth, (fbUser) => {
+  if (fbUser) {
+    // Verificar si es admin antes de suscribir
+    loadUserProfile(fbUser.uid).then(profile => {
+      if (profile?.role === 'Administrador' || profile?.role === 'Moderador') {
+        _spSubscribeUsers();
+      }
+    }).catch(() => {});
+  }
 });
-onValue(ref(db, 'googleUsers'), snap => {
-  _spGoogleUsers = snap.exists() ? snap.val() : {};
-  if (_spPanelOpen) _spRenderUserList();
-});
+// También intentar suscribir si ya hay sesión activa (para el admin que ya estaba logueado)
+setTimeout(() => {
+  if (S.role === 'Administrador' || S.role === 'Moderador') {
+    _spSubscribeUsers();
+  }
+}, 2000);
 
 // ── Online count desde presencia ──
 onValue(presRef, snap => {
@@ -6083,6 +6122,7 @@ window.toggleSuperPanel = async function() {
   if (!panel) return;
   panel.classList.toggle('open', _spPanelOpen);
   if (_spPanelOpen) {
+    _spSubscribeUsers(); // asegurar suscripción activa
     _spPositionPanel();
     _spRenderUserList();
     _spRenderPermsTable();
@@ -6461,20 +6501,22 @@ window.spSaveWelcomeMsg = async function() {
 onValue(ref(db, 'siteSettings/forceRefreshTs'), snap => {
   if (!snap.exists()) return;
   const ts = snap.val();
-  const sessionStart = parseInt(localStorage.getItem('exani_loginTs') || '0');
-  if (ts > sessionStart && S.user && S.role !== 'Administrador') {
-    setTimeout(() => location.reload(), 1500);
-  }
+  // Ignorar si no hay usuario activo o si es admin
+  if (!S.user || S.role === 'Administrador') return;
+  // Ignorar señales viejas (más de 30 segundos antes de que cargara la página)
+  const pageLoad = parseInt(localStorage.getItem('exani_pageLoadTs') || '0');
+  if (ts < pageLoad) return;
+  setTimeout(() => location.reload(), 1500);
 });
 
 // ── Listen for force-logout signal ──
 onValue(ref(db, 'siteSettings/forceLogoutTs'), snap => {
   if (!snap.exists()) return;
   const ts = snap.val();
-  const sessionStart = parseInt(localStorage.getItem('exani_loginTs') || '0');
-  if (ts > sessionStart && S.user && S.role !== 'Administrador') {
-    setTimeout(() => doLogout(), 1500);
-  }
+  if (!S.user || S.role === 'Administrador') return;
+  const pageLoad = parseInt(localStorage.getItem('exani_pageLoadTs') || '0');
+  if (ts < pageLoad) return;
+  setTimeout(() => { if (window.doLogout) window.doLogout(); }, 1500);
 });
 
 // ── Sync new settings from Firebase ──
