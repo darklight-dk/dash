@@ -5482,6 +5482,8 @@ window.clearChatMessages = async function() {
 // ── Enviar mensaje ──
 window.sendChatMsg = function() {
   if (!S.user) { alert('Iniciá sesión para chatear.'); return; }
+  if (window._spChatEnabled === false) { alert('El chat está deshabilitado por el administrador.'); return; }
+  if (_spSettingsSnap.chatReadonly && S.role !== 'Administrador') { alert('El chat está en modo solo lectura.'); return; }
   const input = document.getElementById('chatInput');
   const text  = (input.value || '').trim();
   if (!text) return;
@@ -5768,11 +5770,35 @@ onValue(spSettingsRef, snap => {
   if (_spSettingsSnap.maintenance && S.role && S.role !== 'Administrador') {
     const msg = _spSettingsSnap.maintMsg || '🔧 El sitio está en mantenimiento. Volvemos pronto.';
     _spShowMaintOverlay(msg);
-  } else {
+  } else if (!_spSettingsSnap.maintenance) {
     _spHideMaintOverlay();
   }
   // Chat habilitado
   window._spChatEnabled = _spSettingsSnap.chatEnabled !== false;
+
+  // ── Ranking: actualizar botones en tiempo real (persiste al refrescar) ──
+  const rankingOn = _spSettingsSnap.rankingEnabled !== false;
+  const rfab   = document.getElementById('rankingFab');
+  const rtbBtn = document.getElementById('rankingTopbarBtn');
+  if (rfab)   rfab.style.display   = (S.user && rankingOn) ? 'flex' : 'none';
+  if (rtbBtn) rtbBtn.style.display = (S.user && rankingOn) ? 'flex' : 'none';
+
+  // ── Bloquear registro ──
+  const regLink = document.querySelector('#formLogin .login-toggle');
+  if (regLink) regLink.style.display = _spSettingsSnap.lockRegister ? 'none' : '';
+  if (_spSettingsSnap.lockRegister) {
+    const fReg = document.getElementById('formRegister');
+    if (fReg && fReg.style.display !== 'none') switchAuthForm('login');
+  }
+
+  // ── Exámenes: habilitar/deshabilitar en tiempo real ──
+  if (S.user) {
+    const examsOff = _spSettingsSnap.examsEnabled === false;
+    document.querySelectorAll('.exam-card .btn-start, .exam-card button').forEach(btn => {
+      btn.disabled = examsOff;
+      btn.title = examsOff ? 'Exámenes deshabilitados por el administrador' : '';
+    });
+  }
 });
 
 // ── Cargar permisos en tiempo real ──
@@ -6169,11 +6195,12 @@ window.addEventListener('load', () => {
   }
 });
 
-// ── Hook en _enterDash para mostrar burbuja ──
+// ── Hook en _enterDash: timestamp de login + burbuja ──
 const _origEnterDash = window._enterDash;
 window._enterDash = function(user, role, picture, email) {
+  localStorage.setItem('exani_loginTs', Date.now());
   _origEnterDash && _origEnterDash(user, role, picture, email);
-  setTimeout(() => window._spInitBubble(), 300);
+  setTimeout(() => window._spInitBubble && window._spInitBubble(), 300);
 };
 </script>
 
