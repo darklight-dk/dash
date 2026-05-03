@@ -1461,6 +1461,7 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
   .expl-ans-row{flex-direction:column;gap:8px}
 }
 </style>
+<script src="profanity.js"></script>
 </head>
 <body>
 
@@ -5454,28 +5455,9 @@ function escapeHTML(str) {
     .replace(/'/g,'&#39;');
 }
 
-// ── Filtro de groserías ──
+// ── Filtro de groserías — lógica movida a profanity.js ──
 let profanityFilterOn = false;
-const PALABROTAS = [
-  'puto','puta','putos','putas','verga','vergas','vergon','vergona',
-  'chinga','chingada','chingadas','chingado','chingados','chingarse',
-  'pendejo','pendeja','pendejos','pendejas',
-  'cabron','cabrón','cabrona','cabrones','cabronas',
-  'mierda','mierdas','joto','jotos','culero','culera','culeros','culeras',
-  'mamada','mamadas','mamón','mamon','mamonas','pinche','pinches',
-  'pene','culo','culón','culon','culos','wey','güey','guey',
-  'hijo de puta','hija de puta','putazo','putazos','chinguen',
-  'ojete','ojetes','naco','naca','nacos','nacas','putilla','coño',
-];
-function filterProfanity(text) {
-  if (!profanityFilterOn) return text;
-  let r = text;
-  PALABROTAS.forEach(w => {
-    const re = new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'gi');
-    r = r.replace(re, m => m[0] + '*'.repeat(Math.max(m.length - 1, 2)));
-  });
-  return r;
-}
+// filterProfanity() viene de profanity.js (cargado en <head>)
 
 // Escuchar estado del filtro desde Firebase (sync para todos)
 onValue(ref(db, 'chat/settings/profanityFilter'), snap => {
