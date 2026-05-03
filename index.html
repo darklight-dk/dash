@@ -2385,30 +2385,32 @@ function doGoogleLogin() {
     alert('Google Sign-In no cargó. Verificá tu conexión a internet.');
     return;
   }
-  google.accounts.id.prompt((notification) => {
-    if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-      // Si el popup de One Tap no se muestra, abrir el popup clásico
-      google.accounts.oauth2 && google.accounts.oauth2.initTokenClient({
-        client_id: GOOGLE_CLIENT_ID,
-        scope: 'openid email profile',
-        callback: () => {},
-      });
-      // Fallback: mostrar botón renderizado
-      showGoogleFallback();
-    }
+  // Usar token client directo — más confiable en móvil que One Tap
+  const tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: GOOGLE_CLIENT_ID,
+    scope: 'openid email profile',
+    callback: async (tokenResponse) => {
+      if (tokenResponse.error) {
+        alert('Error al iniciar sesión con Google. Intentá de nuevo.');
+        return;
+      }
+      try {
+        const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: 'Bearer ' + tokenResponse.access_token }
+        });
+        const info = await res.json();
+        _googleProfile = {
+          name:    info.name    || info.email.split('@')[0],
+          email:   info.email   || '',
+          picture: info.picture || '',
+        };
+        showGoogleRoleModal();
+      } catch(e) {
+        alert('Error al obtener datos de Google. Intentá de nuevo.');
+      }
+    },
   });
-}
-
-function showGoogleFallback() {
-  // Renderiza el botón oficial de Google en un div temporal
-  const tmp = document.createElement('div');
-  tmp.id = 'gsiTmp';
-  tmp.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;background:#fff;padding:24px;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.3)';
-  tmp.innerHTML = '<div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:12px;text-align:center">Iniciá sesión con Google</div><div id="gsiBtn"></div><button onclick="this.parentNode.remove()" style="margin-top:12px;width:100%;padding:8px;border:1px solid #e2e8f0;border-radius:8px;background:none;cursor:pointer;font-size:12px;color:#94a3b8">Cancelar</button>';
-  document.body.appendChild(tmp);
-  google.accounts.id.renderButton($('gsiBtn'), {
-    theme: 'outline', size: 'large', width: 280, text: 'signin_with',
-  });
+  tokenClient.requestAccessToken({ prompt: 'select_account' });
 }
 
 function handleGoogleCredential(response) {
@@ -6448,7 +6450,7 @@ onValue(ref(db, 'siteSettings/forceLogoutTs'), snap => {
   if (!snap.exists() || !S.user || S.role === 'Administrador') return;
   const ts = snap.val();
   const loginTs = parseInt(localStorage.getItem('exani_loginTs') || '0');
-  // loginTs === 0 significa sesión recién iniciada, no expulsar
+  // loginTs===0 = sesión nueva, no expulsar
   if (loginTs > 0 && ts > loginTs) {
     alert('🔌 Tu sesión fue cerrada por un administrador.');
     doLogout();
@@ -6594,10 +6596,9 @@ function _escHTML(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;
   }, {passive:true});
 })();
 
-// ── Hook en _enterDash para guardar timestamp y mostrar burbuja ──
+// ── Hook en _enterDash: timestamp + burbuja ──
 const _origEnterDash = window._enterDash;
 window._enterDash = function(user, role, picture, email) {
-  // Guardar timestamp ANTES de que el listener de forceLogout lo compare
   localStorage.setItem('exani_loginTs', Date.now());
   _origEnterDash && _origEnterDash(user, role, picture, email);
   setTimeout(() => window._spInitBubble && window._spInitBubble(), 300);
