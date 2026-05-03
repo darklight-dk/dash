@@ -5456,21 +5456,22 @@ function escapeHTML(str) {
 }
 
 // ── Filtro de groserías — lógica movida a profanity.js ──
-let profanityFilterOn = false;
+// IMPORTANTE: usar window.profanityFilterOn para que profanity.js lo lea
+window.profanityFilterOn = false;
 // filterProfanity() viene de profanity.js (cargado en <head>)
 
 // Escuchar estado del filtro desde Firebase (sync para todos)
 onValue(ref(db, 'chat/settings/profanityFilter'), snap => {
-  profanityFilterOn = snap.exists() ? !!snap.val() : false;
+  window.profanityFilterOn = snap.exists() ? !!snap.val() : false;
   const pill  = document.getElementById('filterPill');
   const label = document.getElementById('filterLabel');
-  if (pill)  pill.classList.toggle('on', profanityFilterOn);
-  if (label) label.textContent = profanityFilterOn ? 'Groserías: ON' : 'Groserías: OFF';
+  if (pill)  pill.classList.toggle('on', window.profanityFilterOn);
+  if (label) label.textContent = window.profanityFilterOn ? 'Groserías: ON' : 'Groserías: OFF';
 });
 
 window.toggleProfanityFilter = function() {
   if (S.role !== 'Administrador') return;
-  set(ref(db, 'chat/settings/profanityFilter'), !profanityFilterOn);
+  set(ref(db, 'chat/settings/profanityFilter'), !window.profanityFilterOn);
 };
 
 window.clearChatMessages = async function() {
