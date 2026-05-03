@@ -2227,8 +2227,10 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
 // Usuarios con contraseña real — solo estos tienen acceso verificado
 // USERS legacy — mantenido solo para compatibilidad (auth migrado a Firebase Auth)
 const USERS = {};
-// Emails que reciben rol Administrador automáticamente
-const ADMIN_EMAILS_LOCAL = ['acselito@gmail.com', 'donniaxel55@gmail.com'];
+// Hashes SHA-256 de los emails con acceso Administrador (los emails no se exponen en el cliente)
+const ADMIN_EMAIL_HASHES_LOCAL = ['64fbaf7892e613157a7d0b3ca9fb5a8811bf81c36f6057107a482056db222f52','ec9129a34a6d649e81f59bb1768cd9f8b1944db2ff6b0ab0487d0f8943f3bd2b'];
+async function _hashEmail(email){ const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(email.toLowerCase().trim())); return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join(''); }
+async function _isAdminEmailLocal(email){ return ADMIN_EMAIL_HASHES_LOCAL.includes(await _hashEmail(email)); }
 const TOTAL_SECS = 4*3600+30*60;
 const NAV_WIN = 10;
 
@@ -2329,6 +2331,10 @@ function _enterDash(user, role, picture, email) {
   updateProfileUI();
   const adminBtn = $('btnAdminPanel');
   if (adminBtn) adminBtn.style.display = role === 'Administrador' ? 'flex' : 'none';
+  // Mostrar ranking solo si está habilitado en siteSettings
+  const rankingOn = _spSettingsSnap.rankingEnabled !== false;
+  const rfab2   = $('rankingFab');      if (rfab2)   rfab2.style.display   = rankingOn ? 'flex' : 'none';
+  const rtbBtn2 = $('rankingTopbarBtn'); if (rtbBtn2) rtbBtn2.style.display = rankingOn ? 'flex' : 'none';
   renderExamCards();
   show('dashScreen');
   initChat();
@@ -2360,8 +2366,8 @@ function doLogout() {
 //  GOOGLE LOGIN
 // ══════════════════════════════════════════
 const GOOGLE_CLIENT_ID = '134270865403-ibnn6k5qfu3h9v4sbudc0d566o0okf0v.apps.googleusercontent.com';
-// Emails que tienen acceso de Administrador (agregá los que quieras)
-const ADMIN_EMAILS = ['acselito@gmail.com', 'donniaxel55@gmail.com'];
+// Hashes SHA-256 de los emails admin (no se exponen en texto plano)
+const ADMIN_EMAIL_HASHES = ['64fbaf7892e613157a7d0b3ca9fb5a8811bf81c36f6057107a482056db222f52','ec9129a34a6d649e81f59bb1768cd9f8b1944db2ff6b0ab0487d0f8943f3bd2b'];
 
 let _googleProfile = null;
 
@@ -2429,23 +2435,26 @@ function showGoogleRoleModal() {
   $('grAvatar').src   = _googleProfile.picture || '';
   $('grName').textContent  = _googleProfile.name;
   $('grEmail').textContent = _googleProfile.email;
-  // Mostrar opción Admin solo si el email está en la lista
-  const isAdmin = ADMIN_EMAILS.includes(_googleProfile.email.toLowerCase());
-  $('grAdminBtn').style.display = isAdmin ? 'block' : 'none';
+  // Mostrar opción Admin solo si el email está en la lista (comparación por hash)
+  _hashEmail(_googleProfile.email).then(h => {
+    const isAdmin = ADMIN_EMAIL_HASHES.includes(h);
+    $('grAdminBtn').style.display = isAdmin ? 'block' : 'none';
+  });
   $('googleRoleModal').style.display = 'flex';
 }
 
-function finishGoogleLogin(role) {
+async function finishGoogleLogin(role) {
   if (!_googleProfile) return;
   $('googleRoleModal').style.display = 'none';
 
   // Validación de seguridad en cliente: el rol Administrador solo es válido
-  // si el email está en ADMIN_EMAILS. Esto previene que alguien modifique el
+  // si el hash del email está en ADMIN_EMAIL_HASHES. Esto previene que alguien modifique el
   // DOM para mostrar el botón de Admin y lo presione.
   const allowedRoles = ['Aspirante','Estudiante','Profesor','Moderador'];
-  const isAdminEmail = ADMIN_EMAILS.includes((_googleProfile.email || '').toLowerCase());
+  const emailHash = await _hashEmail((_googleProfile.email || ''));
+  const isAdminEmail = ADMIN_EMAIL_HASHES.includes(emailHash);
   if (role === 'Administrador' && !isAdminEmail) {
-    console.warn('Intento de obtener rol Administrador con email no autorizado:', _googleProfile.email);
+    console.warn('Intento de obtener rol Administrador con email no autorizado.');
     role = 'Aspirante'; // degradar rol
   }
   if (!allowedRoles.includes(role) && !isAdminEmail) {
@@ -2469,9 +2478,10 @@ function finishGoogleLogin(role) {
   // _enterDash maneja S, localStorage, UI, dashboard, chat y burbuja SP
   window._enterDash(_googleProfile.name, role, _googleProfile.picture || null, _googleProfile.email || '');
 
-  // Mostrar ranking FAB solo para Google users
-  const rfab = $('rankingFab'); if (rfab) rfab.style.display = 'none';
-  const rtbBtn = $('rankingTopbarBtn'); if (rtbBtn) rtbBtn.style.display = 'flex';
+  // Mostrar ranking FAB respetando siteSettings
+  const _rankOn = _spSettingsSnap.rankingEnabled !== false;
+  const rfab = $('rankingFab'); if (rfab) rfab.style.display = _rankOn ? 'flex' : 'none';
+  const rtbBtn = $('rankingTopbarBtn'); if (rtbBtn) rtbBtn.style.display = _rankOn ? 'flex' : 'none';
 }
 
 // ══════════════════════════════════════════
@@ -5223,6 +5233,7 @@ function usernameToEmail(username) {
 }
 
 // ── Usernames que reciben rol Administrador automáticamente ──
+// Nota: comparación interna, no se expone información sensible en logs
 const ADMIN_USERNAMES = ['acselito', 'admin456'];
 
 // ── LOGIN: solo usuario + contraseña ──
@@ -5825,6 +5836,24 @@ onValue(spSettingsRef, snap => {
   }
   // Chat habilitado
   window._spChatEnabled = _spSettingsSnap.chatEnabled !== false;
+
+  // ── Ranking: mostrar/ocultar botones según setting (persiste al refrescar) ──
+  const rankingOn = _spSettingsSnap.rankingEnabled !== false;
+  if (S.user) { // solo si hay sesión activa
+    const rfab   = document.getElementById('rankingFab');
+    const rtbBtn = document.getElementById('rankingTopbarBtn');
+    if (rfab)   rfab.style.display   = rankingOn ? 'flex' : 'none';
+    if (rtbBtn) rtbBtn.style.display = rankingOn ? 'flex' : 'none';
+  }
+
+  // ── Bloquear registro: ocultar link "Crear cuenta" si lockRegister está activo ──
+  const regLink = document.querySelector('#formLogin .login-toggle');
+  if (regLink) regLink.style.display = _spSettingsSnap.lockRegister ? 'none' : '';
+  // Si el usuario ya estaba viendo el form de registro, mandarlo al login
+  if (_spSettingsSnap.lockRegister) {
+    const fReg = document.getElementById('formRegister');
+    if (fReg && fReg.style.display !== 'none') switchAuthForm('login');
+  }
 });
 
 // ── Cargar permisos en tiempo real ──
