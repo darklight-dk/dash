@@ -819,12 +819,11 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .ranking-date{font-size:10px;color:var(--muted);margin-top:2px}
 .ranking-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:14px}
 .ranking-loading{text-align:center;padding:40px;color:var(--muted)}
-.ranking-fab{position:fixed;bottom:90px;right:24px;width:48px;height:48px;
+.ranking-fab-REMOVED{position:fixed;bottom:90px;right:24px;width:48px;height:48px;
   background:linear-gradient(135deg,#f59e0b,#d97706);border:none;border-radius:50%;
   color:#fff;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(245,158,11,.4);
   z-index:300;transition:all .2s;display:none;align-items:center;justify-content:center}
-.ranking-fab:hover{transform:scale(1.1)}
-@media(max-width:480px){.ranking-fab{bottom:80px;right:16px}}
+@media(max-width:480px){}
 
 /* loading */
 #loadOv{position:fixed;inset:0;background:rgba(248,250,252,.94);display:none;
@@ -1511,7 +1510,7 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
 </button>
 
 <!-- RANKING FAB -->
-<button class="ranking-fab" id="rankingFab" onclick="openRanking()" title="Ranking global">🏆</button>
+<!-- ranking-fab removed -->
 
 <!-- RANKING MODAL -->
 <div class="ranking-overlay" id="rankingOverlay" onclick="closeRankingOnBg(event)">
@@ -3560,6 +3559,7 @@ loadCatalog();   // carga exams/catalog.json y renderiza las tarjetas
     renderExamCards();
     show('dashScreen');
     initChat();
+    setTimeout(() => window._spInitBubble && window._spInitBubble(), 300);
   } catch(e) {
     localStorage.removeItem('exani_session');
   }
