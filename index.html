@@ -5854,6 +5854,40 @@ onValue(spSettingsRef, snap => {
     const fReg = document.getElementById('formRegister');
     if (fReg && fReg.style.display !== 'none') switchAuthForm('login');
   }
+
+  // ── Exámenes habilitados ──
+  if (S.user && _spSettingsSnap.examsEnabled === false) {
+    // Deshabilitar botones de examen en el dashboard
+    document.querySelectorAll('.exam-card .btn-start, .exam-card button').forEach(btn => {
+      btn.disabled = true;
+      btn.title = 'Exámenes deshabilitados por el administrador';
+    });
+  }
+
+  // ── Modo solo lectura global ──
+  // Solo aplica si hay sesión activa (no bloquear login) y no es admin
+  if (_spSettingsSnap.siteReadonly && S.user && S.role !== 'Administrador') {
+    document.querySelectorAll('#dashScreen button, #examScreen button').forEach(btn => {
+      if (!btn.closest('#superPanel')) btn.disabled = true;
+    });
+  } else if (!_spSettingsSnap.siteReadonly) {
+    // Reactivar botones si se desactiva el modo
+    document.querySelectorAll('#dashScreen button, #examScreen button').forEach(btn => {
+      if (!btn.closest('#superPanel')) btn.disabled = false;
+    });
+  }
+
+  // ── Force dark mode ──
+  document.documentElement.classList.toggle('sp-force-dark', !!_spSettingsSnap.forceDark);
+
+  // ── Force logout check (para Google sessions sin onAuthStateChanged) ──
+  if (_spSettingsSnap.forceLogoutTs && S.user && S.role !== 'Administrador') {
+    const loginTs = parseInt(localStorage.getItem('exani_loginTs') || '0');
+    if (_spSettingsSnap.forceLogoutTs > loginTs) {
+      alert('🔌 Tu sesión fue cerrada por un administrador.');
+      doLogout();
+    }
+  }
 });
 
 // ── Cargar permisos en tiempo real ──
@@ -6006,8 +6040,12 @@ function _spSyncToggles() {
   _spSetToggle('spToggleReg',     !!s.lockRegister);
   _spSetToggle('spToggleChat',    s.chatEnabled !== false);
   _spSetToggle('spToggleRanking', s.rankingEnabled !== false);
+  _spSetToggle('spToggleExams',   s.examsEnabled !== false);
+  _spSetToggle('spToggleReadonly',!!s.siteReadonly);
   const mt = document.getElementById('spMaintMsg');
   if (mt && s.maintMsg) mt.value = s.maintMsg;
+  // llamar versión extendida si ya fue definida
+  if (typeof window._spSyncTogglesExtended === 'function') window._spSyncTogglesExtended();
 }
 function _spSetToggle(id, val) {
   const el = document.getElementById(id);
@@ -6189,6 +6227,259 @@ window.spSaveMaintMsg = async function() {
 
 window.spBanAllGuests = function() {
   alert('Función de expulsión de invitados: En tu implementación actual el chat requiere login, así que ya solo usuarios autenticados pueden chatear.');
+};
+
+// ══════════════════════════════════════════
+//  ⚡ SUPER PANEL — NUEVAS FUNCIONES
+// ══════════════════════════════════════════
+
+// ── Sync nuevos toggles ──
+const _origSyncToggles = typeof _spSyncToggles === 'function' ? _spSyncToggles : null;
+
+// Extender spSyncToggles para los nuevos toggles
+const _origSpSyncTogglesRef = window._spSyncToggles;
+window._spSyncTogglesExtended = function() {
+  const s = _spSettingsSnap;
+  _spSetToggle('spToggleDark',       !!s.forceDark);
+  _spSetToggle('spToggleOnlineCount',s.showOnlineCount !== false);
+  _spSetToggle('spToggleProfanity',  !!window.profanityFilterOn);
+  _spSetToggle('spToggleChatReadonly',!!s.chatReadonly);
+  _spSetToggle('spToggleExams',      s.examsEnabled !== false);
+  _spSetToggle('spToggleReadonly',   !!s.siteReadonly);
+  if (s.siteName) {
+    const el = document.getElementById('spSiteName');
+    if (el) el.value = s.siteName;
+  }
+  if (s.chatRateLimit) {
+    const el = document.getElementById('spChatRateLimit');
+    if (el) el.value = s.chatRateLimit;
+  }
+};
+
+// Parchar _spSyncToggles para incluir los nuevos
+const _origSyncRef = window._spSyncToggles;
+window._spSyncToggles = function() {
+  if (typeof _origSyncRef === 'function') _origSyncRef();
+  window._spSyncTogglesExtended();
+};
+
+// ── Exams pane: cargar catálogo ──
+window.spLoadExamPane = async function() {
+  const el = document.getElementById('spExamList');
+  if (!el) return;
+  try {
+    const snap = await get(ref(db, 'siteSettings/examStats'));
+    // Leer catalog.json del sitio
+    const resp = await fetch('exams/catalog.json?_=' + Date.now()).catch(() => null);
+    if (!resp || !resp.ok) {
+      el.innerHTML = '<div style="color:rgba(255,255,255,.3);font-size:12px;text-align:center;padding:16px">No se encontró catalog.json en el servidor</div>';
+      return;
+    }
+    const catalog = await resp.json();
+    el.innerHTML = catalog.map(exam => `
+      <div style="background:rgba(255,255,255,.05);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px">${exam.icono||'📝'}</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.85);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${_escHTML(exam.titulo)}</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.35)">${exam.preguntas} preguntas · ${exam.horas}h · v${exam.version||'?'}</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          ${exam.nuevo ? '<span style="background:rgba(13,148,136,.3);color:#2dd4bf;border-radius:4px;padding:1px 6px;font-size:9px;font-weight:700">NUEVO</span>' : ''}
+          <label class="sp-toggle" style="transform:scale(.8)" title="Habilitar/deshabilitar este examen">
+            <input type="checkbox" ${(typeof window._spDisabledExams === 'undefined' || !window._spDisabledExams?.[exam.path]) ? 'checked' : ''}
+              onchange="spToggleExam('${_escHTML(exam.path)}', this.checked)">
+            <span class="sp-slider"></span>
+          </label>
+        </div>
+      </div>
+    `).join('');
+  } catch(e) {
+    el.innerHTML = '<div style="color:#f87171;font-size:12px;text-align:center;padding:16px">Error cargando catálogo</div>';
+  }
+};
+
+window.spToggleExam = async function(path, enabled) {
+  const key = 'disabledExams/' + btoa(path).replace(/=/g,'');
+  await set(ref(db, 'siteSettings/' + key), enabled ? null : true);
+  _spLog_push('action', `Examen ${enabled ? 'habilitado' : 'deshabilitado'}: ${path}`);
+  spShowFeedback('spExamFeedback', enabled ? 'ok' : 'warn', enabled ? '✅ Examen habilitado' : '⛔ Examen deshabilitado');
+};
+
+window.spReloadCatalog = function() {
+  if (typeof loadCatalog === 'function') {
+    loadCatalog();
+    spShowFeedback('spExamFeedback','ok','🔄 Catálogo recargado');
+    _spLog_push('info', `Catálogo recargado por ${S.user}`);
+  }
+};
+
+window.spResetAllScores = async function() {
+  if (!confirm('⚠️ ¿Borrar TODOS los resultados de exámenes de todos los usuarios? Esta acción es IRREVERSIBLE.')) return;
+  const second = confirm('¿Estás completamente seguro? No hay vuelta atrás.');
+  if (!second) return;
+  try {
+    await remove(ref(db, 'scores'));
+    await remove(ref(db, 'ranking'));
+    _spLog_push('danger', `TODOS los scores eliminados por ${S.user}`);
+    spShowFeedback('spExamFeedback','ok','✅ Todos los scores eliminados');
+    spShowFeedback('spDangerFeedback','ok','✅ Scores reseteados correctamente');
+  } catch(e) {
+    spShowFeedback('spExamFeedback','err','❌ Error: ' + e.message);
+  }
+};
+
+// ── Apariencia ──
+window.spSaveSiteName = async function() {
+  const val = document.getElementById('spSiteName').value.trim();
+  if (!val) return;
+  await set(ref(db, 'siteSettings/siteName'), val);
+  // Actualizar topbar en tiempo real
+  const logos = document.querySelectorAll('.logo-sm, .logo-text');
+  logos.forEach(el => { if (el.classList.contains('logo-sm')) el.innerHTML = `<span class="e">E</span><span class="d">D</span> <span style="font-size:14px;font-weight:600;color:#64748b">${_escHTML(val)}</span>`; });
+  _spLog_push('action', `Nombre del sitio → "${val}"`);
+  spShowFeedback('spControlUserFeedback','ok','✅ Nombre guardado');
+};
+
+// ── Filtro de chat ──
+window.spToggleProfanityFilter = function(val) {
+  if (typeof toggleProfanityFilter === 'function') toggleProfanityFilter();
+  else set(ref(db, 'chat/settings/profanityFilter'), val);
+  _spLog_push('action', `Filtro de palabras → ${val ? 'ON' : 'OFF'}`);
+};
+
+// ── Rate limit chat ──
+window.spSaveChatRateLimit = async function() {
+  const val = parseInt(document.getElementById('spChatRateLimit').value) || 30;
+  await set(ref(db, 'siteSettings/chatRateLimit'), val);
+  _spLog_push('action', `Rate limit chat → ${val} msgs/hora`);
+  spShowFeedback('spControlUserFeedback','ok',`✅ Límite guardado: ${val} msgs/hora`);
+};
+
+// ── Exportar usuarios ──
+window.spExportUsers = function() {
+  const entries = Object.entries(_spUsers).map(([uid, u]) => ({
+    uid, username: u.username, role: u.role,
+    provider: u.provider, createdAt: u.createdAt ? new Date(u.createdAt).toISOString() : null,
+    lastLogin: u.lastLogin ? new Date(u.lastLogin).toISOString() : null,
+  }));
+  const blob = new Blob([JSON.stringify(entries, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `usuarios_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  _spLog_push('info', `Lista de usuarios exportada (${entries.length} usuarios) por ${S.user}`);
+  spShowFeedback('spControlUserFeedback','ok',`📤 Exportados ${entries.length} usuarios`);
+};
+
+// ── Estadísticas de usuarios ──
+window.spShowUserStats = function() {
+  const box = document.getElementById('spUserStatsBox');
+  if (!box) return;
+  const entries = Object.values(_spUsers);
+  const byRole = {};
+  SP_ROLES.forEach(r => byRole[r] = 0);
+  entries.forEach(u => { const r = u.role || 'Aspirante'; if (byRole[r] !== undefined) byRole[r]++; else byRole[r] = 1; });
+  const google = entries.filter(u => u.provider === 'google').length;
+  const firebase = entries.filter(u => u.provider !== 'google').length;
+  const banned = entries.filter(u => u.banned).length;
+  const now = Date.now();
+  const active30 = entries.filter(u => u.lastLogin && (now - u.lastLogin) < 30*24*3600*1000).length;
+  box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  box.innerHTML = `
+    <b style="color:rgba(255,255,255,.6)">POR ROL:</b><br>
+    ${SP_ROLES.map(r => `  ${r}: <b style="color:#2dd4bf">${byRole[r]||0}</b>`).join('<br>')}<br><br>
+    <b style="color:rgba(255,255,255,.6)">ACCESO:</b><br>
+    Google: <b style="color:#6ba3f5">${google}</b> · Firebase: <b style="color:#a78bfa">${firebase}</b><br><br>
+    <b style="color:rgba(255,255,255,.6)">ACTIVIDAD:</b><br>
+    Activos (30 días): <b style="color:#34d399">${active30}</b><br>
+    Baneados: <b style="color:#f87171">${banned}</b>
+  `;
+  // Actualizar stat cards
+  const elBanned = document.getElementById('spStatBanned');
+  const elAdmins = document.getElementById('spStatAdmins');
+  if (elBanned) elBanned.textContent = banned;
+  if (elAdmins) elAdmins.textContent = byRole['Administrador'] || 0;
+};
+
+// ── Purgar inactivos ──
+window.spPurgeInactiveUsers = async function() {
+  const now = Date.now();
+  const cutoff = 30 * 24 * 3600 * 1000;
+  const toDelete = Object.entries(_spUsers).filter(([uid, u]) =>
+    u.role !== 'Administrador' && u.lastLogin && (now - u.lastLogin) > cutoff
+  );
+  if (!toDelete.length) {
+    spShowFeedback('spControlUserFeedback','ok','✅ No hay usuarios inactivos en los últimos 30 días');
+    return;
+  }
+  if (!confirm(`¿Eliminar ${toDelete.length} usuario(s) inactivos por más de 30 días? Esto es irreversible.`)) return;
+  let deleted = 0;
+  for (const [uid] of toDelete) {
+    try { await remove(ref(db, 'users/' + uid)); deleted++; } catch {}
+  }
+  _spLog_push('danger', `${deleted} usuarios inactivos eliminados por ${S.user}`);
+  spShowFeedback('spControlUserFeedback','ok',`🧹 ${deleted} usuarios eliminados`);
+};
+
+// ── Force logout all (escribe flag en Firebase) ──
+window.spForceLogoutAll = async function() {
+  if (!confirm('¿Cerrar sesión a TODOS los usuarios activos? Se activará un flag en Firebase que forzará el logout en el próximo request.')) return;
+  const ts = Date.now();
+  await set(ref(db, 'siteSettings/forceLogoutTs'), ts);
+  _spLog_push('danger', `Logout forzado global activado por ${S.user} (ts: ${ts})`);
+  spShowFeedback('spDangerFeedback','ok','✅ Flag de logout activado. Los usuarios serán expulsados.');
+};
+
+// ── Nuke chat (eliminar todo incluyendo settings) ──
+window.spNukeChat = async function() {
+  if (!confirm('¿ELIMINAR permanentemente TODO el historial del chat? Incluye mensajes, logs y configuración. Irreversible.')) return;
+  if (!confirm('CONFIRMACIÓN FINAL: ¿seguro?')) return;
+  try {
+    await remove(msgsRef);
+    _spLog_push('danger', `Chat nukeado completamente por ${S.user}`);
+    spShowFeedback('spDangerFeedback','ok','💣 Chat eliminado completamente');
+  } catch(e) {
+    spShowFeedback('spDangerFeedback','err','❌ Error: ' + e.message);
+  }
+};
+
+// ── Listener para force logout ──
+onValue(ref(db, 'siteSettings/forceLogoutTs'), snap => {
+  if (!snap.exists() || !S.user || S.role === 'Administrador') return;
+  const ts = snap.val();
+  // Si el flag es más nuevo que el login actual → forzar logout
+  const loginTs = parseInt(localStorage.getItem('exani_loginTs') || '0');
+  if (ts > loginTs) {
+    alert('🔌 Tu sesión fue cerrada por un administrador.');
+    doLogout();
+  }
+});
+
+// ── Guardar timestamp de login ──
+const _origEnterDash = window._enterDash;
+window._enterDash = function(user, role, picture, email) {
+  localStorage.setItem('exani_loginTs', Date.now());
+  _origEnterDash(user, role, picture, email);
+};
+
+// ── Cargar estadísticas extra en Home ──
+onValue(ref(db, 'users'), snap => {
+  if (!snap.exists()) return;
+  const users = Object.values(snap.val());
+  const banned = users.filter(u => u.banned).length;
+  const admins = users.filter(u => u.role === 'Administrador').length;
+  const elB = document.getElementById('spStatBanned');
+  const elA = document.getElementById('spStatAdmins');
+  if (elB) elB.textContent = banned;
+  if (elA) elA.textContent = admins;
+});
+
+// Abrir el pane de exámenes activa la carga del catálogo
+const _origSpSwitchTab = window.spSwitchTab;
+window.spSwitchTab = function(btn) {
+  _origSpSwitchTab(btn);
+  if (btn && btn.dataset.pane === 'spExams') spLoadExamPane();
+  if (btn && btn.dataset.pane === 'spControl') window._spSyncTogglesExtended();
 };
 
 // ── Site announcement banner ──
@@ -6401,6 +6692,12 @@ window._enterDash = function(user, role, picture, email) {
     <button class="sp-tab" data-pane="spSite" onclick="spSwitchTab(this)">
       <span class="sp-tab-icon">🌐</span>Sitio
     </button>
+    <button class="sp-tab" data-pane="spExams" onclick="spSwitchTab(this)">
+      <span class="sp-tab-icon">📝</span>Exámenes
+    </button>
+    <button class="sp-tab" data-pane="spControl" onclick="spSwitchTab(this)">
+      <span class="sp-tab-icon">⚙️</span>Control
+    </button>
     <button class="sp-tab" data-pane="spLog" onclick="spSwitchTab(this)">
       <span class="sp-tab-icon">📋</span>Registro
     </button>
@@ -6491,6 +6788,44 @@ window._enterDash = function(user, role, picture, email) {
             <input type="checkbox" id="spToggleRanking" checked onchange="spToggleSetting('rankingEnabled',this.checked)">
             <span class="sp-slider"></span>
           </label>
+        </div>
+        <div class="sp-row">
+          <div class="sp-row-info">
+            <div class="sp-row-label">📝 Exámenes habilitados</div>
+            <div class="sp-row-sub">Permite a los usuarios iniciar exámenes</div>
+          </div>
+          <label class="sp-toggle">
+            <input type="checkbox" id="spToggleExams" checked onchange="spToggleSetting('examsEnabled',this.checked)">
+            <span class="sp-slider"></span>
+          </label>
+        </div>
+        <div class="sp-row">
+          <div class="sp-row-info">
+            <div class="sp-row-label">👁️ Modo solo lectura global</div>
+            <div class="sp-row-sub">El sitio es visible pero nadie puede hacer nada</div>
+          </div>
+          <label class="sp-toggle">
+            <input type="checkbox" id="spToggleReadonly" onchange="spToggleSetting('siteReadonly',this.checked)">
+            <span class="sp-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="sp-section">
+        <div class="sp-section-title">📊 Stats en tiempo real</div>
+        <div class="sp-stats-row" style="gap:8px">
+          <div class="sp-stat-card" style="flex:1">
+            <div class="sp-stat-num" id="spStatExams">—</div>
+            <div class="sp-stat-lbl">Exámenes hechos</div>
+          </div>
+          <div class="sp-stat-card" style="flex:1">
+            <div class="sp-stat-num" id="spStatBanned">—</div>
+            <div class="sp-stat-lbl">Baneados</div>
+          </div>
+          <div class="sp-stat-card" style="flex:1">
+            <div class="sp-stat-num" id="spStatAdmins">—</div>
+            <div class="sp-stat-lbl">Admins</div>
+          </div>
         </div>
       </div>
     </div>
@@ -6651,6 +6986,151 @@ window._enterDash = function(user, role, picture, email) {
       </div>
       <div id="spLogFeed">
         <div class="sp-log-item">Iniciando registro…</div>
+      </div>
+    </div>
+
+    <!-- ── PANE: EXÁMENES ── -->
+    <div class="sp-pane" id="spExams">
+      <div class="sp-section">
+        <div class="sp-section-title">Catálogo de exámenes</div>
+        <div class="sp-feedback" id="spExamFeedback"></div>
+        <div id="spExamList" style="display:flex;flex-direction:column;gap:8px">
+          <div style="text-align:center;padding:24px;color:rgba(255,255,255,.25);font-size:13px">⏳ Cargando catálogo…</div>
+        </div>
+      </div>
+      <div class="sp-divider"></div>
+      <div class="sp-section">
+        <div class="sp-section-title">Acciones de exámenes</div>
+        <button class="sp-btn sp-btn-teal" onclick="spReloadCatalog()">
+          <span class="sp-btn-icon">🔄</span>
+          <span class="sp-btn-text">Recargar catálogo<small>Actualiza las tarjetas de exámenes</small></span>
+          <span class="sp-btn-arrow">›</span>
+        </button>
+        <button class="sp-btn sp-btn-amber" onclick="spResetAllScores()">
+          <span class="sp-btn-icon">🗑️</span>
+          <span class="sp-btn-text">Borrar todos los resultados<small>Elimina scores de todos los usuarios</small></span>
+          <span class="sp-btn-arrow">›</span>
+        </button>
+        <button class="sp-btn sp-btn-ghost" onclick="openAdmin()">
+          <span class="sp-btn-icon">✏️</span>
+          <span class="sp-btn-text">Editor de exámenes<small>Panel clásico de edición</small></span>
+          <span class="sp-btn-arrow">›</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ── PANE: CONTROL ── -->
+    <div class="sp-pane" id="spControl">
+
+      <div class="sp-section">
+        <div class="sp-section-title">🎨 Apariencia del sitio</div>
+        <div class="sp-row">
+          <div class="sp-row-info">
+            <div class="sp-row-label">Nombre del sitio</div>
+            <div class="sp-row-sub">Se muestra en el topbar y login</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <input id="spSiteName" class="sp-inp-sm" placeholder="Ej: EXANI Dash" style="flex:1;margin:0"/>
+          <button class="sp-btn sp-btn-teal" style="margin:0;padding:0 14px;border-radius:10px" onclick="spSaveSiteName()">💾</button>
+        </div>
+        <div class="sp-row">
+          <div class="sp-row-info">
+            <div class="sp-row-label">Modo oscuro forzado</div>
+            <div class="sp-row-sub">Todos los usuarios ven el sitio en modo oscuro</div>
+          </div>
+          <label class="sp-toggle">
+            <input type="checkbox" id="spToggleDark" onchange="spToggleSetting('forceDark',this.checked)">
+            <span class="sp-slider"></span>
+          </label>
+        </div>
+        <div class="sp-row">
+          <div class="sp-row-info">
+            <div class="sp-row-label">Mostrar contador online</div>
+            <div class="sp-row-sub">Muestra cuántos usuarios están conectados</div>
+          </div>
+          <label class="sp-toggle">
+            <input type="checkbox" id="spToggleOnlineCount" onchange="spToggleSetting('showOnlineCount',this.checked)">
+            <span class="sp-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="sp-divider"></div>
+
+      <div class="sp-section">
+        <div class="sp-section-title">👥 Gestión de usuarios</div>
+        <button class="sp-btn sp-btn-amber" onclick="spPurgeInactiveUsers()">
+          <span class="sp-btn-icon">🧹</span>
+          <span class="sp-btn-text">Purgar inactivos (30 días)<small>Elimina cuentas sin actividad reciente</small></span>
+          <span class="sp-btn-arrow">›</span>
+        </button>
+        <button class="sp-btn sp-btn-ghost" onclick="spExportUsers()">
+          <span class="sp-btn-icon">📤</span>
+          <span class="sp-btn-text">Exportar lista de usuarios<small>Descarga un JSON con todos los usuarios</small></span>
+          <span class="sp-btn-arrow">›</span>
+        </button>
+        <button class="sp-btn sp-btn-ghost" onclick="spShowUserStats()">
+          <span class="sp-btn-icon">📊</span>
+          <span class="sp-btn-text">Estadísticas de usuarios<small>Distribución por roles y actividad</small></span>
+          <span class="sp-btn-arrow">›</span>
+        </button>
+        <div class="sp-feedback" id="spControlUserFeedback"></div>
+        <div id="spUserStatsBox" style="display:none;background:rgba(255,255,255,.05);border-radius:10px;padding:12px;margin-top:8px;font-size:12px;line-height:1.8;color:rgba(255,255,255,.7)"></div>
+      </div>
+
+      <div class="sp-divider"></div>
+
+      <div class="sp-section">
+        <div class="sp-section-title">💬 Chat avanzado</div>
+        <div class="sp-row">
+          <div class="sp-row-info">
+            <div class="sp-row-label">Filtro de palabras</div>
+            <div class="sp-row-sub">Bloquea lenguaje inapropiado automáticamente</div>
+          </div>
+          <label class="sp-toggle">
+            <input type="checkbox" id="spToggleProfanity" onchange="spToggleProfanityFilter(this.checked)">
+            <span class="sp-slider"></span>
+          </label>
+        </div>
+        <div class="sp-row">
+          <div class="sp-row-info">
+            <div class="sp-row-label">Modo solo lectura</div>
+            <div class="sp-row-sub">Nadie puede escribir (solo admins y mods)</div>
+          </div>
+          <label class="sp-toggle">
+            <input type="checkbox" id="spToggleChatReadonly" onchange="spToggleSetting('chatReadonly',this.checked)">
+            <span class="sp-slider"></span>
+          </label>
+        </div>
+        <div class="sp-row" style="align-items:flex-start;flex-direction:column;gap:8px">
+          <div class="sp-row-label" style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700">LÍMITE DE MENSAJES POR USUARIO</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <input id="spChatRateLimit" type="number" min="1" max="100" value="30"
+              class="sp-inp-sm" style="width:80px;margin:0;text-align:center"/>
+            <span style="font-size:12px;color:rgba(255,255,255,.4)">msgs/hora</span>
+            <button class="sp-btn sp-btn-teal" style="margin:0;padding:6px 12px;border-radius:8px;font-size:11px" onclick="spSaveChatRateLimit()">Guardar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="sp-divider"></div>
+
+      <div class="sp-section">
+        <div class="sp-section-title" style="color:#f87171">⚠️ Zona de peligro</div>
+        <button class="sp-btn sp-btn-red" onclick="spNukeChat()">
+          <span class="sp-btn-icon">💣</span>
+          <span class="sp-btn-text">Eliminar todo el chat<small>Borra mensajes y logs permanentemente</small></span>
+        </button>
+        <button class="sp-btn sp-btn-red" onclick="spResetAllScores()">
+          <span class="sp-btn-icon">🗑️</span>
+          <span class="sp-btn-text">Resetear todos los scores<small>Borra resultados de exámenes de todos</small></span>
+        </button>
+        <button class="sp-btn sp-btn-red" onclick="spForceLogoutAll()">
+          <span class="sp-btn-icon">🔌</span>
+          <span class="sp-btn-text">Cerrar sesión a todos<small>Invalida sesiones activas</small></span>
+        </button>
+        <div class="sp-feedback" id="spDangerFeedback"></div>
       </div>
     </div>
 
