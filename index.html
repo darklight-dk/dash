@@ -1077,26 +1077,24 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
 ══════════════════════════════════════════ */
 #superPanelBubble{
   position:fixed;z-index:9000;
-  right:16px;bottom:90px;
   width:52px;height:52px;border-radius:50%;
-  background:linear-gradient(135deg,#1a1a2e,#0d4f6b);
-  border:2.5px solid rgba(58,173,169,.6);
-  box-shadow:0 4px 20px rgba(0,0,0,.4),0 0 0 0 rgba(58,173,169,.4);
+  background:linear-gradient(135deg,#0f172a,#1e3a5f);
+  border:2.5px solid rgba(13,148,136,.6);
+  box-shadow:0 4px 20px rgba(0,0,0,.4),0 0 0 0 rgba(13,148,136,.4);
   cursor:grab;display:none;align-items:center;justify-content:center;
-  font-size:22px;transition:box-shadow .3s,border-color .3s,opacity .2s;
+  font-size:22px;transition:box-shadow .3s,border-color .3s;
   user-select:none;touch-action:none;
   animation:spulse 3s ease-in-out infinite
 }
 #superPanelBubble.visible{display:flex}
-#superPanelBubble.sp-hidden{opacity:0;pointer-events:none}
 #superPanelBubble:active{cursor:grabbing}
 #superPanelBubble:hover{
-  box-shadow:0 6px 28px rgba(58,173,169,.5),0 0 0 6px rgba(58,173,169,.15);
-  border-color:#3AADA9
+  box-shadow:0 6px 28px rgba(13,148,136,.5),0 0 0 6px rgba(13,148,136,.15);
+  border-color:var(--teal)
 }
 @keyframes spulse{
-  0%,100%{box-shadow:0 4px 20px rgba(0,0,0,.4),0 0 0 0 rgba(58,173,169,.3)}
-  50%{box-shadow:0 4px 20px rgba(0,0,0,.4),0 0 0 8px rgba(58,173,169,.08)}
+  0%,100%{box-shadow:0 4px 20px rgba(0,0,0,.4),0 0 0 0 rgba(13,148,136,.3)}
+  50%{box-shadow:0 4px 20px rgba(0,0,0,.4),0 0 0 8px rgba(13,148,136,.08)}
 }
 #superPanelBubble .sp-notif{
   position:absolute;top:-3px;right:-3px;
@@ -1109,8 +1107,8 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
 #superPanel{
   position:fixed;z-index:8999;
   width:min(480px,95vw);max-height:85vh;
-  background:#1a1a2e;border-radius:20px;
-  border:1px solid rgba(58,173,169,.3);
+  background:#0f172a;border-radius:20px;
+  border:1px solid rgba(13,148,136,.3);
   box-shadow:0 24px 80px rgba(0,0,0,.6);
   display:none;flex-direction:column;overflow:hidden;
   font-family:'Sora',sans-serif;
@@ -1121,10 +1119,10 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
 
 /* Header */
 .sp-header{
-  background:linear-gradient(135deg,#162040,#1a1a2e);
+  background:linear-gradient(135deg,#1e293b,#0f172a);
   padding:14px 18px;display:flex;align-items:center;gap:10px;
-  border-bottom:1px solid rgba(58,173,169,.15);flex-shrink:0;
-  cursor:move;user-select:none;touch-action:none
+  border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0;
+  cursor:move;user-select:none
 }
 .sp-logo{
   width:32px;height:32px;border-radius:10px;
@@ -1316,7 +1314,7 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
   appearance:none;cursor:pointer;transition:border .15s
 }
 .sp-select:focus{border-color:#0d9488}
-.sp-select option{background:#1a1a2e;color:#e2e8f0}
+.sp-select option{background:#1e293b;color:#e2e8f0}
 
 .sp-label{font-size:10px;font-weight:700;color:rgba(255,255,255,.3);
   text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;display:block}
@@ -1329,11 +1327,6 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
 
 @media(max-width:640px){
   #superPanel{width:calc(100vw - 20px)!important;max-height:80vh}
-}
-
-/* Desktop: burbuja alejada del área de contenido */
-@media(min-width:641px){
-  #superPanelBubble{bottom:32px;right:32px}
 }
 
 @media(max-width:640px){
@@ -1461,7 +1454,6 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
   .expl-ans-row{flex-direction:column;gap:8px}
 }
 </style>
-<script src="profanity.js"></script>
 </head>
 <body>
 
@@ -2227,10 +2219,8 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
 // Usuarios con contraseña real — solo estos tienen acceso verificado
 // USERS legacy — mantenido solo para compatibilidad (auth migrado a Firebase Auth)
 const USERS = {};
-// Hashes SHA-256 de los emails con acceso Administrador (los emails no se exponen en el cliente)
-const ADMIN_EMAIL_HASHES_LOCAL = ['64fbaf7892e613157a7d0b3ca9fb5a8811bf81c36f6057107a482056db222f52','ec9129a34a6d649e81f59bb1768cd9f8b1944db2ff6b0ab0487d0f8943f3bd2b'];
-async function _hashEmail(email){ const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(email.toLowerCase().trim())); return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join(''); }
-async function _isAdminEmailLocal(email){ return ADMIN_EMAIL_HASHES_LOCAL.includes(await _hashEmail(email)); }
+// Emails que reciben rol Administrador automáticamente
+const ADMIN_EMAILS_LOCAL = ['acselito@gmail.com', 'donniaxel55@gmail.com'];
 const TOTAL_SECS = 4*3600+30*60;
 const NAV_WIN = 10;
 
@@ -2279,9 +2269,19 @@ const load = (v, msg='', sub='') => {
 };
 const pad = n => String(n).padStart(2,'0');
 
-// ── Nota: restauración de sesión real manejada por Firebase onAuthStateChanged
-// y por restoreSession() para Google. El sessionStorage se usa solo para
-// detectar si el usuario refrescó durante el examen (ver lógica de examScreen). ──
+// ── Al cargar la página: ir al dashboard si ya había sesión activa ──
+(function() {
+  try {
+    const last = sessionStorage.getItem('fw_screen');
+    // Si tenía sesión y no estaba en medio de un examen, ir al dash
+    if (last === 'dashScreen') {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      $('dashScreen').classList.add('active');
+      $('userLabel').innerHTML = 'Invitado · <span>Aspirante</span>';
+      S.user = 'Invitado';
+    }
+  } catch(e){}
+})();
 
 // ══════════════════════════════════════════
 //  LOGIN
@@ -2322,19 +2322,11 @@ function _enterDash(user, role, picture, email) {
   S.role          = role;
   S.googlePicture = picture || null;
   S.googleEmail   = email  || '';
-  // Solo persistir en localStorage si es sesión Google (sin Firebase Auth UID)
-  // Las sesiones Firebase Auth se restauran automáticamente via onAuthStateChanged
-  if (S.googleEmail) {
-    localStorage.setItem('exani_session', JSON.stringify({ user, role, googlePicture: S.googlePicture, googleEmail: S.googleEmail }));
-  }
+  localStorage.setItem('exani_session', JSON.stringify({ user, role, googlePicture: S.googlePicture, googleEmail: S.googleEmail }));
   $('loginErr').style.display = 'none';
   updateProfileUI();
   const adminBtn = $('btnAdminPanel');
   if (adminBtn) adminBtn.style.display = role === 'Administrador' ? 'flex' : 'none';
-  // Mostrar ranking solo si está habilitado en siteSettings
-  const rankingOn = _spSettingsSnap.rankingEnabled !== false;
-  const rfab2   = $('rankingFab');      if (rfab2)   rfab2.style.display   = rankingOn ? 'flex' : 'none';
-  const rtbBtn2 = $('rankingTopbarBtn'); if (rtbBtn2) rtbBtn2.style.display = rankingOn ? 'flex' : 'none';
   renderExamCards();
   show('dashScreen');
   initChat();
@@ -2366,8 +2358,8 @@ function doLogout() {
 //  GOOGLE LOGIN
 // ══════════════════════════════════════════
 const GOOGLE_CLIENT_ID = '134270865403-ibnn6k5qfu3h9v4sbudc0d566o0okf0v.apps.googleusercontent.com';
-// Hashes SHA-256 de los emails admin (no se exponen en texto plano)
-const ADMIN_EMAIL_HASHES = ['64fbaf7892e613157a7d0b3ca9fb5a8811bf81c36f6057107a482056db222f52','ec9129a34a6d649e81f59bb1768cd9f8b1944db2ff6b0ab0487d0f8943f3bd2b'];
+// Emails que tienen acceso de Administrador (agregá los que quieras)
+const ADMIN_EMAILS = ['acselito@gmail.com', 'donniaxel55@gmail.com'];
 
 let _googleProfile = null;
 
@@ -2385,6 +2377,7 @@ function doGoogleLogin() {
     alert('Google Sign-In no cargó. Verificá tu conexión a internet.');
     return;
   }
+  // Usar tokenClient — más confiable en móvil que One Tap
   const tokenClient = google.accounts.oauth2.initTokenClient({
     client_id: GOOGLE_CLIENT_ID,
     scope: 'openid email profile',
@@ -2412,6 +2405,18 @@ function doGoogleLogin() {
   tokenClient.requestAccessToken({ prompt: 'select_account' });
 }
 
+function showGoogleFallback() {
+  // Renderiza el botón oficial de Google en un div temporal
+  const tmp = document.createElement('div');
+  tmp.id = 'gsiTmp';
+  tmp.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;background:#fff;padding:24px;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.3)';
+  tmp.innerHTML = '<div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:12px;text-align:center">Iniciá sesión con Google</div><div id="gsiBtn"></div><button onclick="this.parentNode.remove()" style="margin-top:12px;width:100%;padding:8px;border:1px solid #e2e8f0;border-radius:8px;background:none;cursor:pointer;font-size:12px;color:#94a3b8">Cancelar</button>';
+  document.body.appendChild(tmp);
+  google.accounts.id.renderButton($('gsiBtn'), {
+    theme: 'outline', size: 'large', width: 280, text: 'signin_with',
+  });
+}
+
 function handleGoogleCredential(response) {
   // Decodificar JWT del token de Google (sin verificar firma — es solo para UI)
   try {
@@ -2436,64 +2441,31 @@ function showGoogleRoleModal() {
   $('grAvatar').src   = _googleProfile.picture || '';
   $('grName').textContent  = _googleProfile.name;
   $('grEmail').textContent = _googleProfile.email;
-  // Mostrar opción Admin solo si el email está en la lista (comparación por hash)
-  _hashEmail(_googleProfile.email).then(h => {
-    const isAdmin = ADMIN_EMAIL_HASHES.includes(h);
-    $('grAdminBtn').style.display = isAdmin ? 'block' : 'none';
-  });
+  // Mostrar opción Admin solo si el email está en la lista
+  const isAdmin = ADMIN_EMAILS.includes(_googleProfile.email.toLowerCase());
+  $('grAdminBtn').style.display = isAdmin ? 'block' : 'none';
   $('googleRoleModal').style.display = 'flex';
 }
 
-async function finishGoogleLogin(role) {
+function finishGoogleLogin(role) {
   if (!_googleProfile) return;
   $('googleRoleModal').style.display = 'none';
-
-  // Validación de seguridad en cliente: el rol Administrador solo es válido
-  // si el hash del email está en ADMIN_EMAIL_HASHES. Esto previene que alguien modifique el
-  // DOM para mostrar el botón de Admin y lo presione.
-  const allowedRoles = ['Aspirante','Estudiante','Profesor','Moderador'];
-  const emailHash = await _hashEmail((_googleProfile.email || ''));
-  const isAdminEmail = ADMIN_EMAIL_HASHES.includes(emailHash);
-  if (role === 'Administrador' && !isAdminEmail) {
-    console.warn('Intento de obtener rol Administrador con email no autorizado.');
-    role = 'Aspirante'; // degradar rol
-  }
-  if (!allowedRoles.includes(role) && !isAdminEmail) {
-    role = 'Aspirante';
-  }
-
-  // Guardar/actualizar usuario Google en Firebase para que aparezca en la lista
-  // Usamos window._fbSaveGoogleUser porque db/ref/set viven en el módulo ES
-  const safeUid = 'google_' + _googleProfile.email.replace(/[.#$[\]]/g, '_');
-  if (typeof window._fbSaveGoogleUser === 'function') {
-    window._fbSaveGoogleUser(safeUid, {
-      username: _googleProfile.name,
-      role: role,
-      email: _googleProfile.email,
-      picture: _googleProfile.picture || '',
-      provider: 'google',
-      lastLogin: Date.now(),
-    });
-  }
-
-  // _enterDash puede estar siendo parcheado por el módulo ES — esperar a que esté listo
-  function _doEnter() {
-    if (typeof window._enterDash === 'function') {
-      window._enterDash(_googleProfile.name, role, _googleProfile.picture || null, _googleProfile.email || '');
-    }
-  }
-  // Si el módulo ya cargó, ejecutar directo; si no, esperar máximo 3 segundos
-  if (typeof window._fbSaveGoogleUser === 'function') {
-    _doEnter();
-  } else {
-    const t0 = Date.now();
-    const waitEnter = setInterval(() => {
-      if (typeof window._fbSaveGoogleUser === 'function' || Date.now() - t0 > 3000) {
-        clearInterval(waitEnter);
-        _doEnter();
-      }
-    }, 50);
-  }
+  S.user = _googleProfile.name;
+  S.role = role;
+  S.googlePicture = _googleProfile.picture || null;
+  S.googleEmail   = _googleProfile.email   || '';
+  localStorage.setItem('exani_session', JSON.stringify({
+    user: S.user, role, googlePicture: S.googlePicture, googleEmail: S.googleEmail
+  }));
+  updateProfileUI();
+  const adminBtn = $('btnAdminPanel');
+  if (adminBtn) adminBtn.style.display = role === 'Administrador' ? 'flex' : 'none';
+  renderExamCards();
+  show('dashScreen');
+  initChat();
+  // Mostrar ranking FAB solo para Google users
+  const rfab = $('rankingFab'); if (rfab) rfab.style.display = 'none';
+  const rtbBtn = $('rankingTopbarBtn'); if (rtbBtn) rtbBtn.style.display = 'flex';
 }
 
 // ══════════════════════════════════════════
@@ -3571,21 +3543,23 @@ function rankingRowHTML(e, i, isMe) {
 buildCalc();
 loadCatalog();   // carga exams/catalog.json y renderiza las tarjetas
 
-// ── Restaurar sesión Google desde localStorage (solo provider=google) ──
-// Los usuarios Firebase Auth son restaurados por onAuthStateChanged automáticamente.
-// Los usuarios Google no tienen Firebase Auth UID, así que se persisten en localStorage
-// pero se validan contra Firebase Realtime DB antes de restaurar.
+// ── Restaurar sesión si existe ──
 (function restoreSession() {
   try {
     const saved = localStorage.getItem('exani_session');
     if (!saved) return;
     const sess = JSON.parse(saved);
-    // Solo restaurar sesiones Google (las de Firebase Auth las maneja onAuthStateChanged)
-    if (!sess.googleEmail || !sess.user || !sess.role) return;
-    // La validación real ocurre en window._fbValidateGoogleSession (módulo Firebase)
-    // que lee Firebase DB y confirma que el usuario existe con ese rol.
-    // Lo marcamos como pendiente hasta que el módulo valide.
-    window._pendingGoogleSession = sess;
+    if (!sess.user || !sess.role) return;
+    S.user          = sess.user;
+    S.role          = sess.role;
+    S.googlePicture = sess.googlePicture || null;
+    S.googleEmail   = sess.googleEmail   || '';
+    updateProfileUI();
+    const adminBtn = $('btnAdminPanel');
+    if (adminBtn) adminBtn.style.display = sess.role === 'Administrador' ? 'flex' : 'none';
+    renderExamCards();
+    show('dashScreen');
+    initChat();
   } catch(e) {
     localStorage.removeItem('exani_session');
   }
@@ -5181,7 +5155,7 @@ function buildTags(area, version) {
 <!-- FIREBASE SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, onChildAdded, onChildRemoved, onValue, serverTimestamp, query, limitToLast, set, get, onDisconnect, remove }
+import { getDatabase, ref, push, onChildAdded, onChildRemoved, onValue, serverTimestamp, query, limitToLast, set, onDisconnect, remove }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import {
   getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
@@ -5206,24 +5180,14 @@ const presRef  = ref(db, 'chat/presence');
 const usersRef = ref(db, 'users');
 
 // ── Escuchar estado de autenticación Firebase (mantiene auth vivo al refrescar) ──
-onAuthStateChanged(auth, async (firebaseUser) => {
+onAuthStateChanged(auth, (firebaseUser) => {
+  // Si Firebase Auth tiene sesión pero el app no la tiene cargada aún, no hacemos nada
+  // Solo usamos esto para confirmar que auth está listo cuando se guarda el perfil
   if (firebaseUser) {
+    // Sesión Firebase activa — guardar referencia global
     window._fbCurrentUser = firebaseUser;
-    if (!window._sessionRestored) {
-      window._sessionRestored = true;
-      try {
-        const profile = await loadUserProfile(firebaseUser.uid);
-        const username = profile?.username || firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Usuario';
-        // El rol viene exclusivamente de Firebase DB — no de lista hardcodeada
-        const role = profile?.role || 'Aspirante';
-        window._enterDash(username, role, null, '');
-      } catch(e) {
-        console.warn('Error restaurando sesión:', e);
-      }
-    }
   } else {
     window._fbCurrentUser = null;
-    window._sessionRestored = false;
   }
 });
 
@@ -5245,7 +5209,6 @@ function usernameToEmail(username) {
 }
 
 // ── Usernames que reciben rol Administrador automáticamente ──
-// Nota: comparación interna, no se expone información sensible en logs
 const ADMIN_USERNAMES = ['acselito', 'admin456'];
 
 // ── LOGIN: solo usuario + contraseña ──
@@ -5269,9 +5232,8 @@ window._fbDoLogin = async function() {
     const cred = await signInWithEmailAndPassword(auth, fakeEmail, pass);
     const profile = await loadUserProfile(cred.user.uid);
     const displayName = profile?.username || username;
-    // El rol viene exclusivamente de Firebase DB — no de lista hardcodeada en cliente
-    const role = profile?.role || 'Aspirante';
-    window._sessionRestored = true;
+    const isAdmin = ADMIN_USERNAMES.includes(username.toLowerCase());
+    const role = isAdmin ? 'Administrador' : (profile?.role || 'Aspirante');
     window._enterDash(displayName, role, null, '');
   } catch(e) {
     const msgs = {
@@ -5308,8 +5270,8 @@ window._fbDoRegister = async function() {
     errEl.textContent = 'Solo letras, números y guion bajo (_).';
     errEl.style.display = 'block'; return;
   }
-  if (pass.length < 8) {
-    errEl.textContent = 'La contraseña debe tener al menos 8 caracteres.';
+  if (pass.length < 6) {
+    errEl.textContent = 'La contraseña debe tener al menos 6 caracteres.';
     errEl.style.display = 'block'; return;
   }
 
@@ -5331,10 +5293,9 @@ window._fbDoRegister = async function() {
     okEl.style.display   = 'block';
     loadEl.style.display = 'none';
     // Llenar el login con el usuario recién creado y cambiar vista
-    const _regPass = pass; // guardar antes de limpiar
     setTimeout(() => {
       document.getElementById('inpUser').value = name;
-      document.getElementById('inpPass').value = _regPass;
+      document.getElementById('inpPass').value = '';
       window.switchAuthForm('login');
     }, 1500);
   } catch(e) {
@@ -5424,11 +5385,9 @@ function appendChatMsg(msg, key) {
   if (key) wrap.dataset.msgKey = key;
 
   const initials = (msg.name || '?').slice(0,2).toUpperCase();
-  // Sanitizar URL de foto: solo permitir http/https para evitar javascript: XSS
-  const safePic = msg.picture && /^https?:\/\//i.test(msg.picture) ? msg.picture : null;
-  const avatarHTML = safePic
-    ? `<img class="chat-msg-avatar" src="${escapeHTML(safePic)}" alt="" onerror="this.style.display='none'">`
-    : `<div class="chat-msg-avatar-initials">${escapeHTML(initials)}</div>`;
+  const avatarHTML = msg.picture
+    ? `<img class="chat-msg-avatar" src="${msg.picture}" alt="" onerror="this.style.display='none'">`
+    : `<div class="chat-msg-avatar-initials">${initials}</div>`;
 
   const time = msg.ts ? new Date(msg.ts).toLocaleTimeString('es-MX', {hour:'2-digit',minute:'2-digit'}) : '';
 
@@ -5470,32 +5429,44 @@ function scrollChat() {
 }
 
 function escapeHTML(str) {
-  if (!str) return '';
-  return String(str)
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;')
-    .replace(/'/g,'&#39;');
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ── Filtro de groserías — lógica movida a profanity.js ──
-// IMPORTANTE: usar window.profanityFilterOn para que profanity.js lo lea
-window.profanityFilterOn = false;
-// filterProfanity() viene de profanity.js (cargado en <head>)
+// ── Filtro de groserías ──
+let profanityFilterOn = false;
+const PALABROTAS = [
+  'puto','puta','putos','putas','verga','vergas','vergon','vergona',
+  'chinga','chingada','chingadas','chingado','chingados','chingarse',
+  'pendejo','pendeja','pendejos','pendejas',
+  'cabron','cabrón','cabrona','cabrones','cabronas',
+  'mierda','mierdas','joto','jotos','culero','culera','culeros','culeras',
+  'mamada','mamadas','mamón','mamon','mamonas','pinche','pinches',
+  'pene','culo','culón','culon','culos','wey','güey','guey',
+  'hijo de puta','hija de puta','putazo','putazos','chinguen',
+  'ojete','ojetes','naco','naca','nacos','nacas','putilla','coño',
+];
+function filterProfanity(text) {
+  if (!profanityFilterOn) return text;
+  let r = text;
+  PALABROTAS.forEach(w => {
+    const re = new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'gi');
+    r = r.replace(re, m => m[0] + '*'.repeat(Math.max(m.length - 1, 2)));
+  });
+  return r;
+}
 
 // Escuchar estado del filtro desde Firebase (sync para todos)
 onValue(ref(db, 'chat/settings/profanityFilter'), snap => {
-  window.profanityFilterOn = snap.exists() ? !!snap.val() : false;
+  profanityFilterOn = snap.exists() ? !!snap.val() : false;
   const pill  = document.getElementById('filterPill');
   const label = document.getElementById('filterLabel');
-  if (pill)  pill.classList.toggle('on', window.profanityFilterOn);
-  if (label) label.textContent = window.profanityFilterOn ? 'Groserías: ON' : 'Groserías: OFF';
+  if (pill)  pill.classList.toggle('on', profanityFilterOn);
+  if (label) label.textContent = profanityFilterOn ? 'Groserías: ON' : 'Groserías: OFF';
 });
 
 window.toggleProfanityFilter = function() {
   if (S.role !== 'Administrador') return;
-  set(ref(db, 'chat/settings/profanityFilter'), !window.profanityFilterOn);
+  set(ref(db, 'chat/settings/profanityFilter'), !profanityFilterOn);
 };
 
 window.clearChatMessages = async function() {
@@ -5511,8 +5482,6 @@ window.clearChatMessages = async function() {
 // ── Enviar mensaje ──
 window.sendChatMsg = function() {
   if (!S.user) { alert('Iniciá sesión para chatear.'); return; }
-  if (window._spChatEnabled === false) { alert('El chat está deshabilitado por el administrador.'); return; }
-  if (_spSettingsSnap.chatReadonly && S.role !== 'Administrador') { alert('El chat está en modo solo lectura.'); return; }
   const input = document.getElementById('chatInput');
   const text  = (input.value || '').trim();
   if (!text) return;
@@ -5749,53 +5718,6 @@ window._fbSignOut = async function() {
   if (myPresenceRef) { set(myPresenceRef, null); myPresenceRef = null; }
 };
 
-// ── Guardar usuario Google en Firebase (llamado desde finishGoogleLogin) ──
-window._fbSaveGoogleUser = async function(safeUid, data) {
-  try {
-    await set(ref(db, 'users/' + safeUid), data);
-  } catch(e) {
-    console.warn('Error guardando usuario Google en Firebase:', e);
-  }
-};
-
-// ── Validar sesión Google pendiente contra Firebase DB ──
-// Esto reemplaza la restauración ciega desde localStorage.
-// Solo restaura si el usuario existe en Firebase con el mismo email.
-window._fbValidateGoogleSession = async function() {
-  const sess = window._pendingGoogleSession;
-  if (!sess || !sess.googleEmail) return;
-  window._pendingGoogleSession = null; // consumir
-  try {
-    const safeUid = 'google_' + sess.googleEmail.replace(/[.#$[\]]/g, '_');
-    const snap = await new Promise(resolve => {
-      const uRef = ref(db, 'users/' + safeUid);
-      onValue(uRef, resolve, { onlyOnce: true });
-    });
-    if (!snap.exists()) {
-      // Usuario eliminado de Firebase — limpiar sesión local
-      localStorage.removeItem('exani_session');
-      return;
-    }
-    const data = snap.val();
-    // Verificar que el email coincide (no solo el uid sanitizado)
-    if (data.email !== sess.googleEmail) {
-      localStorage.removeItem('exani_session');
-      return;
-    }
-    // OK — restaurar con el rol que está en Firebase (no el del localStorage)
-    window._enterDash(data.username || sess.user, data.role || 'Aspirante',
-      data.picture || sess.googlePicture || null, sess.googleEmail);
-  } catch(e) {
-    console.warn('Error validando sesión Google:', e);
-    localStorage.removeItem('exani_session');
-  }
-};
-
-// Ejecutar validación cuando el módulo carga
-// (onAuthStateChanged ya corre para usuarios Firebase Auth;
-//  para Google corremos la validación manualmente)
-window._fbValidateGoogleSession();
-
 // Limpiar presencia cuando el usuario cierra la pestaña
 window.addEventListener('beforeunload', () => {
   if (myPresenceRef) set(myPresenceRef, null);
@@ -5851,58 +5773,6 @@ onValue(spSettingsRef, snap => {
   }
   // Chat habilitado
   window._spChatEnabled = _spSettingsSnap.chatEnabled !== false;
-
-  // ── Ranking: mostrar/ocultar botones según setting (persiste al refrescar) ──
-  const rankingOn = _spSettingsSnap.rankingEnabled !== false;
-  if (S.user) { // solo si hay sesión activa
-    const rfab   = document.getElementById('rankingFab');
-    const rtbBtn = document.getElementById('rankingTopbarBtn');
-    if (rfab)   rfab.style.display   = rankingOn ? 'flex' : 'none';
-    if (rtbBtn) rtbBtn.style.display = rankingOn ? 'flex' : 'none';
-  }
-
-  // ── Bloquear registro: ocultar link "Crear cuenta" si lockRegister está activo ──
-  const regLink = document.querySelector('#formLogin .login-toggle');
-  if (regLink) regLink.style.display = _spSettingsSnap.lockRegister ? 'none' : '';
-  // Si el usuario ya estaba viendo el form de registro, mandarlo al login
-  if (_spSettingsSnap.lockRegister) {
-    const fReg = document.getElementById('formRegister');
-    if (fReg && fReg.style.display !== 'none') switchAuthForm('login');
-  }
-
-  // ── Exámenes habilitados ──
-  if (S.user && _spSettingsSnap.examsEnabled === false) {
-    // Deshabilitar botones de examen en el dashboard
-    document.querySelectorAll('.exam-card .btn-start, .exam-card button').forEach(btn => {
-      btn.disabled = true;
-      btn.title = 'Exámenes deshabilitados por el administrador';
-    });
-  }
-
-  // ── Modo solo lectura global ──
-  // Solo aplica si hay sesión activa (no bloquear login) y no es admin
-  if (_spSettingsSnap.siteReadonly && S.user && S.role !== 'Administrador') {
-    document.querySelectorAll('#dashScreen button, #examScreen button').forEach(btn => {
-      if (!btn.closest('#superPanel')) btn.disabled = true;
-    });
-  } else if (!_spSettingsSnap.siteReadonly) {
-    // Reactivar botones si se desactiva el modo
-    document.querySelectorAll('#dashScreen button, #examScreen button').forEach(btn => {
-      if (!btn.closest('#superPanel')) btn.disabled = false;
-    });
-  }
-
-  // ── Force dark mode ──
-  document.documentElement.classList.toggle('sp-force-dark', !!_spSettingsSnap.forceDark);
-
-  // ── Force logout check (para Google sessions sin onAuthStateChanged) ──
-  if (_spSettingsSnap.forceLogoutTs && S.user && S.role !== 'Administrador') {
-    const loginTs = parseInt(localStorage.getItem('exani_loginTs') || '0');
-    if (loginTs > 0 && _spSettingsSnap.forceLogoutTs > loginTs) {
-      alert('🔌 Tu sesión fue cerrada por un administrador.');
-      doLogout();
-    }
-  }
 });
 
 // ── Cargar permisos en tiempo real ──
@@ -5952,14 +5822,12 @@ window._spInitBubble = function() {
 // ── Toggle panel ──
 window.toggleSuperPanel = function() {
   _spPanelOpen = !_spPanelOpen;
-  const panel  = document.getElementById('superPanel');
-  const bubble = document.getElementById('superPanelBubble');
+  const panel = document.getElementById('superPanel');
   if (!panel) return;
   panel.classList.toggle('open', _spPanelOpen);
-  if (bubble) bubble.classList.toggle('sp-hidden', _spPanelOpen);
   if (_spPanelOpen) {
     _spPositionPanel();
-    _spRefreshUsers();
+    _spRenderUserList();
     _spRenderPermsTable();
     _spSyncToggles();
     _spRenderLog();
@@ -5990,15 +5858,13 @@ function _spInitDrag() {
   const bubble = document.getElementById('superPanelBubble');
   if (!bubble || bubble._dragInit) return;
   bubble._dragInit = true;
-  const THRESHOLD = 8;
-  let ox = 0, oy = 0, sx = 0, sy = 0, moved = false;
+  let ox = 0, oy = 0, bx = 0, by = 0, moved = false;
   function pointerDown(e) {
     moved = false;
-    bubble._wasDragged = false;
     const cl = e.touches ? e.touches[0] : e;
     const r  = bubble.getBoundingClientRect();
     ox = cl.clientX - r.left; oy = cl.clientY - r.top;
-    sx = cl.clientX; sy = cl.clientY;
+    bx = r.left; by = r.top;
     document.addEventListener('mousemove', pointerMove);
     document.addEventListener('mouseup',   pointerUp);
     document.addEventListener('touchmove', pointerMove, {passive:false});
@@ -6006,10 +5872,6 @@ function _spInitDrag() {
   }
   function pointerMove(e) {
     const cl = e.touches ? e.touches[0] : e;
-    const dx = cl.clientX - sx, dy = cl.clientY - sy;
-    if (!moved && Math.sqrt(dx*dx + dy*dy) < THRESHOLD) return;
-    moved = true;
-    bubble._wasDragged = true;
     const nx = cl.clientX - ox;
     const ny = cl.clientY - oy;
     const maxX = window.innerWidth  - bubble.offsetWidth;
@@ -6017,6 +5879,7 @@ function _spInitDrag() {
     bubble.style.left = Math.max(0, Math.min(nx, maxX)) + 'px';
     bubble.style.top  = Math.max(0, Math.min(ny, maxY)) + 'px';
     bubble.style.right = 'auto'; bubble.style.bottom = 'auto';
+    moved = true;
     if (e.cancelable) e.preventDefault();
   }
   function pointerUp() {
@@ -6024,12 +5887,7 @@ function _spInitDrag() {
     document.removeEventListener('mouseup',   pointerUp);
     document.removeEventListener('touchmove', pointerMove);
     document.removeEventListener('touchend',  pointerUp);
-    if (!moved) {
-      bubble._wasDragged = false;
-      window.toggleSuperPanel();
-    } else {
-      setTimeout(() => { bubble._wasDragged = false; }, 100);
-    }
+    if (!moved) { window.toggleSuperPanel(); }
   }
   bubble.addEventListener('mousedown',  pointerDown);
   bubble.addEventListener('touchstart', pointerDown, {passive:false});
@@ -6055,12 +5913,8 @@ function _spSyncToggles() {
   _spSetToggle('spToggleReg',     !!s.lockRegister);
   _spSetToggle('spToggleChat',    s.chatEnabled !== false);
   _spSetToggle('spToggleRanking', s.rankingEnabled !== false);
-  _spSetToggle('spToggleExams',   s.examsEnabled !== false);
-  _spSetToggle('spToggleReadonly',!!s.siteReadonly);
   const mt = document.getElementById('spMaintMsg');
   if (mt && s.maintMsg) mt.value = s.maintMsg;
-  // llamar versión extendida si ya fue definida
-  if (typeof window._spSyncTogglesExtended === 'function') window._spSyncTogglesExtended();
 }
 function _spSetToggle(id, val) {
   const el = document.getElementById(id);
@@ -6074,22 +5928,6 @@ window.spToggleSetting = function(key, val) {
 };
 
 // ── Render user list ──
-function _spRefreshUsers(filter) {
-  // Si ya tenemos datos en cache, renderizamos inmediatamente
-  if (Object.keys(_spUsers).length > 0) {
-    _spRenderUserList(filter);
-    return;
-  }
-  // Si el cache está vacío (primer open), forzar fetch una sola vez
-  const el = document.getElementById('spUserList');
-  if (el) el.innerHTML = `<div style="text-align:center;padding:28px;color:rgba(255,255,255,.25);font-size:13px">⏳ Cargando usuarios…</div>`;
-  get(spUsersRef).then(snap => {
-    _spUsers = snap.exists() ? snap.val() : {};
-    _spRenderUserList(filter);
-  }).catch(() => {
-    if (el) el.innerHTML = `<div style="text-align:center;padding:28px;color:#f87171;font-size:13px">❌ Error al cargar usuarios</div>`;
-  });
-}
 function _spRenderUserList(filter) {
   const el = document.getElementById('spUserList');
   if (!el) return;
@@ -6114,10 +5952,10 @@ function _spRenderUserList(filter) {
     ).map(r => `<option value="${r}" ${r===role?'selected':''}>${r}</option>`).join('');
 
     return `<div class="sp-user-item">
-      <div class="sp-user-avatar">${(u.picture && /^https?:\/\//i.test(u.picture)) ? `<img src="${_escHTML(u.picture)}" style="width:100%;height:100%;border-radius:50%;object-fit:cover" onerror="this.style.display='none'"/>` : initials}</div>
+      <div class="sp-user-avatar">${initials}</div>
       <div class="sp-user-info">
-        <div class="sp-user-name">${_escHTML(u.username||uid)} ${u.provider==='google' ? '<span style="font-size:9px;background:rgba(66,133,244,.2);color:#6ba3f5;border-radius:4px;padding:1px 5px;font-weight:700">G</span>' : ''}</div>
-        <div class="sp-user-meta">${u.role||'Aspirante'} · ${u.email ? _escHTML(u.email) : (u.createdAt ? new Date(u.createdAt).toLocaleDateString('es-MX') : '—')}</div>
+        <div class="sp-user-name">${_escHTML(u.username||uid)}</div>
+        <div class="sp-user-meta">${u.role||'Aspirante'} · ${u.createdAt ? new Date(u.createdAt).toLocaleDateString('es-MX') : '—'}</div>
       </div>
       <span class="sp-role-pill sp-role-${role}">${role.slice(0,3).toUpperCase()}</span>
       ${canChange ? `
@@ -6195,37 +6033,15 @@ window.spQuickAction = async function(action) {
   }
 };
 
-window.spPublishAnnounce = async function(temp = false) {
-  const textEl = document.getElementById('spAnnounceText');
-  const text = textEl.value.trim();
+window.spPublishAnnounce = async function() {
+  const text = document.getElementById('spAnnounceText').value.trim();
   const type = document.getElementById('spAnnounceType').value;
   if (!text) { spShowFeedback('spAnnounceFeedback','err','Escribe un mensaje primero.'); return; }
-  try {
-    await set(ref(db, 'siteSettings/announce'), { text, type, ts: Date.now(), by: S.user });
-    _spLog_push('info', `Anuncio publicado: "${text.slice(0,40)}"`);
-    spShowFeedback('spAnnounceFeedback','ok', temp ? '⏱ Anuncio por 5 seg' : '✅ Anuncio publicado');
-    _spShowAnnounce({ text, type });
-    // Limpiar textarea
-    textEl.value = '';
-    // Inyectar como mensaje de sistema en el chat
-    const chatMsgs = document.getElementById('chatMessages');
-    if (chatMsgs) {
-      const div = document.createElement('div');
-      div.style.cssText = 'text-align:center;font-size:11px;color:rgba(58,173,169,.6);padding:4px 0;margin:2px 0;font-style:italic';
-      div.textContent = `🌐 Web: ${text}`;
-      chatMsgs.appendChild(div);
-      chatMsgs.scrollTop = chatMsgs.scrollHeight;
-    }
-    // Si es temporal, quitar después de 5 segundos
-    if (temp) {
-      setTimeout(async () => {
-        await set(ref(db, 'siteSettings/announce'), null);
-        _spHideAnnounce();
-      }, 5000);
-    }
-  } catch(e) {
-    spShowFeedback('spAnnounceFeedback','err','❌ Error al publicar: ' + (e.message || e));
-  }
+  await set(ref(db, 'siteSettings/announce'), { text, type, ts: Date.now(), by: S.user });
+  _spLog_push('info', `Anuncio publicado: "${text.slice(0,40)}…"`);
+  spShowFeedback('spAnnounceFeedback','ok','✅ Anuncio publicado');
+  // Show it locally
+  _spShowAnnounce({ text, type });
 };
 
 window.spClearAnnounce = async function() {
@@ -6242,253 +6058,6 @@ window.spSaveMaintMsg = async function() {
 
 window.spBanAllGuests = function() {
   alert('Función de expulsión de invitados: En tu implementación actual el chat requiere login, así que ya solo usuarios autenticados pueden chatear.');
-};
-
-// ══════════════════════════════════════════
-//  ⚡ SUPER PANEL — NUEVAS FUNCIONES
-// ══════════════════════════════════════════
-
-// ── Sync nuevos toggles ──
-const _origSyncToggles = typeof _spSyncToggles === 'function' ? _spSyncToggles : null;
-
-// Extender spSyncToggles para los nuevos toggles
-const _origSpSyncTogglesRef = window._spSyncToggles;
-window._spSyncTogglesExtended = function() {
-  const s = _spSettingsSnap;
-  _spSetToggle('spToggleDark',       !!s.forceDark);
-  _spSetToggle('spToggleOnlineCount',s.showOnlineCount !== false);
-  _spSetToggle('spToggleProfanity',  !!window.profanityFilterOn);
-  _spSetToggle('spToggleChatReadonly',!!s.chatReadonly);
-  _spSetToggle('spToggleExams',      s.examsEnabled !== false);
-  _spSetToggle('spToggleReadonly',   !!s.siteReadonly);
-  if (s.siteName) {
-    const el = document.getElementById('spSiteName');
-    if (el) el.value = s.siteName;
-  }
-  if (s.chatRateLimit) {
-    const el = document.getElementById('spChatRateLimit');
-    if (el) el.value = s.chatRateLimit;
-  }
-};
-
-// Parchar _spSyncToggles para incluir los nuevos
-const _origSyncRef = window._spSyncToggles;
-window._spSyncToggles = function() {
-  if (typeof _origSyncRef === 'function') _origSyncRef();
-  window._spSyncTogglesExtended();
-};
-
-// ── Exams pane: cargar catálogo ──
-window.spLoadExamPane = async function() {
-  const el = document.getElementById('spExamList');
-  if (!el) return;
-  try {
-    const snap = await get(ref(db, 'siteSettings/examStats'));
-    // Leer catalog.json del sitio
-    const resp = await fetch('exams/catalog.json?_=' + Date.now()).catch(() => null);
-    if (!resp || !resp.ok) {
-      el.innerHTML = '<div style="color:rgba(255,255,255,.3);font-size:12px;text-align:center;padding:16px">No se encontró catalog.json en el servidor</div>';
-      return;
-    }
-    const catalog = await resp.json();
-    el.innerHTML = catalog.map(exam => `
-      <div style="background:rgba(255,255,255,.05);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px">
-        <span style="font-size:20px">${exam.icono||'📝'}</span>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.85);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${_escHTML(exam.titulo)}</div>
-          <div style="font-size:10px;color:rgba(255,255,255,.35)">${exam.preguntas} preguntas · ${exam.horas}h · v${exam.version||'?'}</div>
-        </div>
-        <div style="display:flex;gap:6px;align-items:center">
-          ${exam.nuevo ? '<span style="background:rgba(13,148,136,.3);color:#2dd4bf;border-radius:4px;padding:1px 6px;font-size:9px;font-weight:700">NUEVO</span>' : ''}
-          <label class="sp-toggle" style="transform:scale(.8)" title="Habilitar/deshabilitar este examen">
-            <input type="checkbox" ${(typeof window._spDisabledExams === 'undefined' || !window._spDisabledExams?.[exam.path]) ? 'checked' : ''}
-              onchange="spToggleExam('${_escHTML(exam.path)}', this.checked)">
-            <span class="sp-slider"></span>
-          </label>
-        </div>
-      </div>
-    `).join('');
-  } catch(e) {
-    el.innerHTML = '<div style="color:#f87171;font-size:12px;text-align:center;padding:16px">Error cargando catálogo</div>';
-  }
-};
-
-window.spToggleExam = async function(path, enabled) {
-  const key = 'disabledExams/' + btoa(path).replace(/=/g,'');
-  await set(ref(db, 'siteSettings/' + key), enabled ? null : true);
-  _spLog_push('action', `Examen ${enabled ? 'habilitado' : 'deshabilitado'}: ${path}`);
-  spShowFeedback('spExamFeedback', enabled ? 'ok' : 'warn', enabled ? '✅ Examen habilitado' : '⛔ Examen deshabilitado');
-};
-
-window.spReloadCatalog = function() {
-  if (typeof loadCatalog === 'function') {
-    loadCatalog();
-    spShowFeedback('spExamFeedback','ok','🔄 Catálogo recargado');
-    _spLog_push('info', `Catálogo recargado por ${S.user}`);
-  }
-};
-
-window.spResetAllScores = async function() {
-  if (!confirm('⚠️ ¿Borrar TODOS los resultados de exámenes de todos los usuarios? Esta acción es IRREVERSIBLE.')) return;
-  const second = confirm('¿Estás completamente seguro? No hay vuelta atrás.');
-  if (!second) return;
-  try {
-    await remove(ref(db, 'scores'));
-    await remove(ref(db, 'ranking'));
-    _spLog_push('danger', `TODOS los scores eliminados por ${S.user}`);
-    spShowFeedback('spExamFeedback','ok','✅ Todos los scores eliminados');
-    spShowFeedback('spDangerFeedback','ok','✅ Scores reseteados correctamente');
-  } catch(e) {
-    spShowFeedback('spExamFeedback','err','❌ Error: ' + e.message);
-  }
-};
-
-// ── Apariencia ──
-window.spSaveSiteName = async function() {
-  const val = document.getElementById('spSiteName').value.trim();
-  if (!val) return;
-  await set(ref(db, 'siteSettings/siteName'), val);
-  // Actualizar topbar en tiempo real
-  const logos = document.querySelectorAll('.logo-sm, .logo-text');
-  logos.forEach(el => { if (el.classList.contains('logo-sm')) el.innerHTML = `<span class="e">E</span><span class="d">D</span> <span style="font-size:14px;font-weight:600;color:#64748b">${_escHTML(val)}</span>`; });
-  _spLog_push('action', `Nombre del sitio → "${val}"`);
-  spShowFeedback('spControlUserFeedback','ok','✅ Nombre guardado');
-};
-
-// ── Filtro de chat ──
-window.spToggleProfanityFilter = function(val) {
-  if (typeof toggleProfanityFilter === 'function') toggleProfanityFilter();
-  else set(ref(db, 'chat/settings/profanityFilter'), val);
-  _spLog_push('action', `Filtro de palabras → ${val ? 'ON' : 'OFF'}`);
-};
-
-// ── Rate limit chat ──
-window.spSaveChatRateLimit = async function() {
-  const val = parseInt(document.getElementById('spChatRateLimit').value) || 30;
-  await set(ref(db, 'siteSettings/chatRateLimit'), val);
-  _spLog_push('action', `Rate limit chat → ${val} msgs/hora`);
-  spShowFeedback('spControlUserFeedback','ok',`✅ Límite guardado: ${val} msgs/hora`);
-};
-
-// ── Exportar usuarios ──
-window.spExportUsers = function() {
-  const entries = Object.entries(_spUsers).map(([uid, u]) => ({
-    uid, username: u.username, role: u.role,
-    provider: u.provider, createdAt: u.createdAt ? new Date(u.createdAt).toISOString() : null,
-    lastLogin: u.lastLogin ? new Date(u.lastLogin).toISOString() : null,
-  }));
-  const blob = new Blob([JSON.stringify(entries, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `usuarios_${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
-  _spLog_push('info', `Lista de usuarios exportada (${entries.length} usuarios) por ${S.user}`);
-  spShowFeedback('spControlUserFeedback','ok',`📤 Exportados ${entries.length} usuarios`);
-};
-
-// ── Estadísticas de usuarios ──
-window.spShowUserStats = function() {
-  const box = document.getElementById('spUserStatsBox');
-  if (!box) return;
-  const entries = Object.values(_spUsers);
-  const byRole = {};
-  SP_ROLES.forEach(r => byRole[r] = 0);
-  entries.forEach(u => { const r = u.role || 'Aspirante'; if (byRole[r] !== undefined) byRole[r]++; else byRole[r] = 1; });
-  const google = entries.filter(u => u.provider === 'google').length;
-  const firebase = entries.filter(u => u.provider !== 'google').length;
-  const banned = entries.filter(u => u.banned).length;
-  const now = Date.now();
-  const active30 = entries.filter(u => u.lastLogin && (now - u.lastLogin) < 30*24*3600*1000).length;
-  box.style.display = box.style.display === 'none' ? 'block' : 'none';
-  box.innerHTML = `
-    <b style="color:rgba(255,255,255,.6)">POR ROL:</b><br>
-    ${SP_ROLES.map(r => `  ${r}: <b style="color:#2dd4bf">${byRole[r]||0}</b>`).join('<br>')}<br><br>
-    <b style="color:rgba(255,255,255,.6)">ACCESO:</b><br>
-    Google: <b style="color:#6ba3f5">${google}</b> · Firebase: <b style="color:#a78bfa">${firebase}</b><br><br>
-    <b style="color:rgba(255,255,255,.6)">ACTIVIDAD:</b><br>
-    Activos (30 días): <b style="color:#34d399">${active30}</b><br>
-    Baneados: <b style="color:#f87171">${banned}</b>
-  `;
-  // Actualizar stat cards
-  const elBanned = document.getElementById('spStatBanned');
-  const elAdmins = document.getElementById('spStatAdmins');
-  if (elBanned) elBanned.textContent = banned;
-  if (elAdmins) elAdmins.textContent = byRole['Administrador'] || 0;
-};
-
-// ── Purgar inactivos ──
-window.spPurgeInactiveUsers = async function() {
-  const now = Date.now();
-  const cutoff = 30 * 24 * 3600 * 1000;
-  const toDelete = Object.entries(_spUsers).filter(([uid, u]) =>
-    u.role !== 'Administrador' && u.lastLogin && (now - u.lastLogin) > cutoff
-  );
-  if (!toDelete.length) {
-    spShowFeedback('spControlUserFeedback','ok','✅ No hay usuarios inactivos en los últimos 30 días');
-    return;
-  }
-  if (!confirm(`¿Eliminar ${toDelete.length} usuario(s) inactivos por más de 30 días? Esto es irreversible.`)) return;
-  let deleted = 0;
-  for (const [uid] of toDelete) {
-    try { await remove(ref(db, 'users/' + uid)); deleted++; } catch {}
-  }
-  _spLog_push('danger', `${deleted} usuarios inactivos eliminados por ${S.user}`);
-  spShowFeedback('spControlUserFeedback','ok',`🧹 ${deleted} usuarios eliminados`);
-};
-
-// ── Force logout all (escribe flag en Firebase) ──
-window.spForceLogoutAll = async function() {
-  if (!confirm('¿Cerrar sesión a TODOS los usuarios activos? Se activará un flag en Firebase que forzará el logout en el próximo request.')) return;
-  const ts = Date.now();
-  await set(ref(db, 'siteSettings/forceLogoutTs'), ts);
-  _spLog_push('danger', `Logout forzado global activado por ${S.user} (ts: ${ts})`);
-  spShowFeedback('spDangerFeedback','ok','✅ Flag de logout activado. Los usuarios serán expulsados.');
-};
-
-// ── Nuke chat (eliminar todo incluyendo settings) ──
-window.spNukeChat = async function() {
-  if (!confirm('¿ELIMINAR permanentemente TODO el historial del chat? Incluye mensajes, logs y configuración. Irreversible.')) return;
-  if (!confirm('CONFIRMACIÓN FINAL: ¿seguro?')) return;
-  try {
-    await remove(msgsRef);
-    _spLog_push('danger', `Chat nukeado completamente por ${S.user}`);
-    spShowFeedback('spDangerFeedback','ok','💣 Chat eliminado completamente');
-  } catch(e) {
-    spShowFeedback('spDangerFeedback','err','❌ Error: ' + e.message);
-  }
-};
-
-// ── Listener para force logout ──
-onValue(ref(db, 'siteSettings/forceLogoutTs'), snap => {
-  if (!snap.exists() || !S.user || S.role === 'Administrador') return;
-  const ts = snap.val();
-  const loginTs = parseInt(localStorage.getItem('exani_loginTs') || '0');
-  if (loginTs > 0 && ts > loginTs) {
-    alert('🔌 Tu sesión fue cerrada por un administrador.');
-    doLogout();
-  }
-});
-
-// ── Guardar timestamp de login (fusionado en el hook de abajo) ──
-
-// ── Cargar estadísticas extra en Home ──
-onValue(ref(db, 'users'), snap => {
-  if (!snap.exists()) return;
-  const users = Object.values(snap.val());
-  const banned = users.filter(u => u.banned).length;
-  const admins = users.filter(u => u.role === 'Administrador').length;
-  const elB = document.getElementById('spStatBanned');
-  const elA = document.getElementById('spStatAdmins');
-  if (elB) elB.textContent = banned;
-  if (elA) elA.textContent = admins;
-});
-
-// Abrir el pane de exámenes activa la carga del catálogo
-const _origSpSwitchTab = window.spSwitchTab;
-window.spSwitchTab = function(btn) {
-  _origSpSwitchTab(btn);
-  if (btn && btn.dataset.pane === 'spExams') spLoadExamPane();
-  if (btn && btn.dataset.pane === 'spControl') window._spSyncTogglesExtended();
 };
 
 // ── Site announcement banner ──
@@ -6569,51 +6138,42 @@ window.spShowFeedback = function(id, type, msg) {
 
 function _escHTML(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-// ── Drag del panel (mouse + touch) ──
+// ── Drag del panel ──
 (function() {
   const panel = document.getElementById('superPanel');
   const header = document.getElementById('spHeader');
   if (!panel || !header) return;
   let ox = 0, oy = 0;
-
-  function startDrag(clientX, clientY) {
-    const r = panel.getBoundingClientRect();
-    ox = clientX - r.left; oy = clientY - r.top;
-  }
-  function moveDrag(clientX, clientY) {
-    panel.style.left = Math.max(0, Math.min(clientX - ox, window.innerWidth  - panel.offsetWidth))  + 'px';
-    panel.style.top  = Math.max(0, Math.min(clientY - oy, window.innerHeight - panel.offsetHeight)) + 'px';
-    panel.style.right = 'auto'; panel.style.bottom = 'auto';
-  }
-
-  // Mouse
   header.addEventListener('mousedown', e => {
     if (e.target.classList.contains('sp-close')) return;
-    startDrag(e.clientX, e.clientY);
-    function move(e) { moveDrag(e.clientX, e.clientY); }
-    function up()   { document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', up); }
+    const r = panel.getBoundingClientRect();
+    ox = e.clientX - r.left; oy = e.clientY - r.top;
+    function move(e) {
+      panel.style.left = Math.max(0, Math.min(e.clientX - ox, window.innerWidth  - panel.offsetWidth))  + 'px';
+      panel.style.top  = Math.max(0, Math.min(e.clientY - oy, window.innerHeight - panel.offsetHeight)) + 'px';
+    }
+    function up() { document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', up); }
     document.addEventListener('mousemove', move);
     document.addEventListener('mouseup', up);
   });
-
-  // Touch
-  header.addEventListener('touchstart', e => {
-    if (e.target.classList.contains('sp-close')) return;
-    const t = e.touches[0];
-    startDrag(t.clientX, t.clientY);
-    function move(e) { if (e.cancelable) e.preventDefault(); const t = e.touches[0]; moveDrag(t.clientX, t.clientY); }
-    function up()   { document.removeEventListener('touchmove', move); document.removeEventListener('touchend', up); }
-    document.addEventListener('touchmove', move, {passive:false});
-    document.addEventListener('touchend', up);
-  }, {passive:true});
 })();
 
-// ── Hook en _enterDash: timestamp + burbuja ──
+// ── Posición inicial de la burbuja ──
+window.addEventListener('load', () => {
+  const bubble = document.getElementById('superPanelBubble');
+  if (bubble) {
+    bubble.style.bottom = '90px';
+    bubble.style.right  = '90px';
+    bubble.style.left   = 'auto';
+    bubble.style.top    = 'auto';
+  }
+});
+
+// ── Hook en _enterDash para mostrar burbuja ──
 const _origEnterDash = window._enterDash;
 window._enterDash = function(user, role, picture, email) {
-  localStorage.setItem('exani_loginTs', Date.now());
   _origEnterDash && _origEnterDash(user, role, picture, email);
-  setTimeout(() => window._spInitBubble && window._spInitBubble(), 300);
+  setTimeout(() => window._spInitBubble(), 300);
 };
 </script>
 
@@ -6671,7 +6231,7 @@ window._enterDash = function(user, role, picture, email) {
 ══════════════════════════════════════════ -->
 
 <!-- Burbuja flotante -->
-<div id="superPanelBubble" title="Super Panel Admin" onclick="if(!this._wasDragged)toggleSuperPanel()">
+<div id="superPanelBubble" title="Super Panel Admin">
   ⚡
   <div class="sp-notif" id="spNotifDot"></div>
 </div>
@@ -6701,12 +6261,6 @@ window._enterDash = function(user, role, picture, email) {
     </button>
     <button class="sp-tab" data-pane="spSite" onclick="spSwitchTab(this)">
       <span class="sp-tab-icon">🌐</span>Sitio
-    </button>
-    <button class="sp-tab" data-pane="spExams" onclick="spSwitchTab(this)">
-      <span class="sp-tab-icon">📝</span>Exámenes
-    </button>
-    <button class="sp-tab" data-pane="spControl" onclick="spSwitchTab(this)">
-      <span class="sp-tab-icon">⚙️</span>Control
     </button>
     <button class="sp-tab" data-pane="spLog" onclick="spSwitchTab(this)">
       <span class="sp-tab-icon">📋</span>Registro
@@ -6798,44 +6352,6 @@ window._enterDash = function(user, role, picture, email) {
             <input type="checkbox" id="spToggleRanking" checked onchange="spToggleSetting('rankingEnabled',this.checked)">
             <span class="sp-slider"></span>
           </label>
-        </div>
-        <div class="sp-row">
-          <div class="sp-row-info">
-            <div class="sp-row-label">📝 Exámenes habilitados</div>
-            <div class="sp-row-sub">Permite a los usuarios iniciar exámenes</div>
-          </div>
-          <label class="sp-toggle">
-            <input type="checkbox" id="spToggleExams" checked onchange="spToggleSetting('examsEnabled',this.checked)">
-            <span class="sp-slider"></span>
-          </label>
-        </div>
-        <div class="sp-row">
-          <div class="sp-row-info">
-            <div class="sp-row-label">👁️ Modo solo lectura global</div>
-            <div class="sp-row-sub">El sitio es visible pero nadie puede hacer nada</div>
-          </div>
-          <label class="sp-toggle">
-            <input type="checkbox" id="spToggleReadonly" onchange="spToggleSetting('siteReadonly',this.checked)">
-            <span class="sp-slider"></span>
-          </label>
-        </div>
-      </div>
-
-      <div class="sp-section">
-        <div class="sp-section-title">📊 Stats en tiempo real</div>
-        <div class="sp-stats-row" style="gap:8px">
-          <div class="sp-stat-card" style="flex:1">
-            <div class="sp-stat-num" id="spStatExams">—</div>
-            <div class="sp-stat-lbl">Exámenes hechos</div>
-          </div>
-          <div class="sp-stat-card" style="flex:1">
-            <div class="sp-stat-num" id="spStatBanned">—</div>
-            <div class="sp-stat-lbl">Baneados</div>
-          </div>
-          <div class="sp-stat-card" style="flex:1">
-            <div class="sp-stat-num" id="spStatAdmins">—</div>
-            <div class="sp-stat-lbl">Admins</div>
-          </div>
         </div>
       </div>
     </div>
@@ -6940,13 +6456,8 @@ window._enterDash = function(user, role, picture, email) {
             <option value="success">✅ Éxito</option>
             <option value="danger">🚨 Urgente</option>
           </select>
-        </div>
-        <div style="display:flex;gap:8px;margin-bottom:8px">
-          <button class="sp-btn sp-btn-teal" style="margin:0;flex:1;justify-content:center" onclick="spPublishAnnounce(false)">
+          <button class="sp-btn sp-btn-teal" style="margin:0;flex:1;justify-content:center" onclick="spPublishAnnounce()">
             <span class="sp-btn-icon">📢</span> Publicar
-          </button>
-          <button class="sp-btn sp-btn-amber" style="margin:0;flex:1;justify-content:center" onclick="spPublishAnnounce(true)">
-            <span class="sp-btn-icon">⏱</span> 5 seg
           </button>
         </div>
         <button class="sp-btn sp-btn-red" onclick="spClearAnnounce()">
@@ -6996,151 +6507,6 @@ window._enterDash = function(user, role, picture, email) {
       </div>
       <div id="spLogFeed">
         <div class="sp-log-item">Iniciando registro…</div>
-      </div>
-    </div>
-
-    <!-- ── PANE: EXÁMENES ── -->
-    <div class="sp-pane" id="spExams">
-      <div class="sp-section">
-        <div class="sp-section-title">Catálogo de exámenes</div>
-        <div class="sp-feedback" id="spExamFeedback"></div>
-        <div id="spExamList" style="display:flex;flex-direction:column;gap:8px">
-          <div style="text-align:center;padding:24px;color:rgba(255,255,255,.25);font-size:13px">⏳ Cargando catálogo…</div>
-        </div>
-      </div>
-      <div class="sp-divider"></div>
-      <div class="sp-section">
-        <div class="sp-section-title">Acciones de exámenes</div>
-        <button class="sp-btn sp-btn-teal" onclick="spReloadCatalog()">
-          <span class="sp-btn-icon">🔄</span>
-          <span class="sp-btn-text">Recargar catálogo<small>Actualiza las tarjetas de exámenes</small></span>
-          <span class="sp-btn-arrow">›</span>
-        </button>
-        <button class="sp-btn sp-btn-amber" onclick="spResetAllScores()">
-          <span class="sp-btn-icon">🗑️</span>
-          <span class="sp-btn-text">Borrar todos los resultados<small>Elimina scores de todos los usuarios</small></span>
-          <span class="sp-btn-arrow">›</span>
-        </button>
-        <button class="sp-btn sp-btn-ghost" onclick="openAdmin()">
-          <span class="sp-btn-icon">✏️</span>
-          <span class="sp-btn-text">Editor de exámenes<small>Panel clásico de edición</small></span>
-          <span class="sp-btn-arrow">›</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- ── PANE: CONTROL ── -->
-    <div class="sp-pane" id="spControl">
-
-      <div class="sp-section">
-        <div class="sp-section-title">🎨 Apariencia del sitio</div>
-        <div class="sp-row">
-          <div class="sp-row-info">
-            <div class="sp-row-label">Nombre del sitio</div>
-            <div class="sp-row-sub">Se muestra en el topbar y login</div>
-          </div>
-        </div>
-        <div style="display:flex;gap:8px;margin-bottom:8px">
-          <input id="spSiteName" class="sp-inp-sm" placeholder="Ej: EXANI Dash" style="flex:1;margin:0"/>
-          <button class="sp-btn sp-btn-teal" style="margin:0;padding:0 14px;border-radius:10px" onclick="spSaveSiteName()">💾</button>
-        </div>
-        <div class="sp-row">
-          <div class="sp-row-info">
-            <div class="sp-row-label">Modo oscuro forzado</div>
-            <div class="sp-row-sub">Todos los usuarios ven el sitio en modo oscuro</div>
-          </div>
-          <label class="sp-toggle">
-            <input type="checkbox" id="spToggleDark" onchange="spToggleSetting('forceDark',this.checked)">
-            <span class="sp-slider"></span>
-          </label>
-        </div>
-        <div class="sp-row">
-          <div class="sp-row-info">
-            <div class="sp-row-label">Mostrar contador online</div>
-            <div class="sp-row-sub">Muestra cuántos usuarios están conectados</div>
-          </div>
-          <label class="sp-toggle">
-            <input type="checkbox" id="spToggleOnlineCount" onchange="spToggleSetting('showOnlineCount',this.checked)">
-            <span class="sp-slider"></span>
-          </label>
-        </div>
-      </div>
-
-      <div class="sp-divider"></div>
-
-      <div class="sp-section">
-        <div class="sp-section-title">👥 Gestión de usuarios</div>
-        <button class="sp-btn sp-btn-amber" onclick="spPurgeInactiveUsers()">
-          <span class="sp-btn-icon">🧹</span>
-          <span class="sp-btn-text">Purgar inactivos (30 días)<small>Elimina cuentas sin actividad reciente</small></span>
-          <span class="sp-btn-arrow">›</span>
-        </button>
-        <button class="sp-btn sp-btn-ghost" onclick="spExportUsers()">
-          <span class="sp-btn-icon">📤</span>
-          <span class="sp-btn-text">Exportar lista de usuarios<small>Descarga un JSON con todos los usuarios</small></span>
-          <span class="sp-btn-arrow">›</span>
-        </button>
-        <button class="sp-btn sp-btn-ghost" onclick="spShowUserStats()">
-          <span class="sp-btn-icon">📊</span>
-          <span class="sp-btn-text">Estadísticas de usuarios<small>Distribución por roles y actividad</small></span>
-          <span class="sp-btn-arrow">›</span>
-        </button>
-        <div class="sp-feedback" id="spControlUserFeedback"></div>
-        <div id="spUserStatsBox" style="display:none;background:rgba(255,255,255,.05);border-radius:10px;padding:12px;margin-top:8px;font-size:12px;line-height:1.8;color:rgba(255,255,255,.7)"></div>
-      </div>
-
-      <div class="sp-divider"></div>
-
-      <div class="sp-section">
-        <div class="sp-section-title">💬 Chat avanzado</div>
-        <div class="sp-row">
-          <div class="sp-row-info">
-            <div class="sp-row-label">Filtro de palabras</div>
-            <div class="sp-row-sub">Bloquea lenguaje inapropiado automáticamente</div>
-          </div>
-          <label class="sp-toggle">
-            <input type="checkbox" id="spToggleProfanity" onchange="spToggleProfanityFilter(this.checked)">
-            <span class="sp-slider"></span>
-          </label>
-        </div>
-        <div class="sp-row">
-          <div class="sp-row-info">
-            <div class="sp-row-label">Modo solo lectura</div>
-            <div class="sp-row-sub">Nadie puede escribir (solo admins y mods)</div>
-          </div>
-          <label class="sp-toggle">
-            <input type="checkbox" id="spToggleChatReadonly" onchange="spToggleSetting('chatReadonly',this.checked)">
-            <span class="sp-slider"></span>
-          </label>
-        </div>
-        <div class="sp-row" style="align-items:flex-start;flex-direction:column;gap:8px">
-          <div class="sp-row-label" style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700">LÍMITE DE MENSAJES POR USUARIO</div>
-          <div style="display:flex;align-items:center;gap:10px">
-            <input id="spChatRateLimit" type="number" min="1" max="100" value="30"
-              class="sp-inp-sm" style="width:80px;margin:0;text-align:center"/>
-            <span style="font-size:12px;color:rgba(255,255,255,.4)">msgs/hora</span>
-            <button class="sp-btn sp-btn-teal" style="margin:0;padding:6px 12px;border-radius:8px;font-size:11px" onclick="spSaveChatRateLimit()">Guardar</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="sp-divider"></div>
-
-      <div class="sp-section">
-        <div class="sp-section-title" style="color:#f87171">⚠️ Zona de peligro</div>
-        <button class="sp-btn sp-btn-red" onclick="spNukeChat()">
-          <span class="sp-btn-icon">💣</span>
-          <span class="sp-btn-text">Eliminar todo el chat<small>Borra mensajes y logs permanentemente</small></span>
-        </button>
-        <button class="sp-btn sp-btn-red" onclick="spResetAllScores()">
-          <span class="sp-btn-icon">🗑️</span>
-          <span class="sp-btn-text">Resetear todos los scores<small>Borra resultados de exámenes de todos</small></span>
-        </button>
-        <button class="sp-btn sp-btn-red" onclick="spForceLogoutAll()">
-          <span class="sp-btn-icon">🔌</span>
-          <span class="sp-btn-text">Cerrar sesión a todos<small>Invalida sesiones activas</small></span>
-        </button>
-        <div class="sp-feedback" id="spDangerFeedback"></div>
       </div>
     </div>
 
