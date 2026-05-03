@@ -6455,12 +6455,7 @@ onValue(ref(db, 'siteSettings/forceLogoutTs'), snap => {
   }
 });
 
-// ── Guardar timestamp de login ──
-const _origEnterDash = window._enterDash;
-window._enterDash = function(user, role, picture, email) {
-  localStorage.setItem('exani_loginTs', Date.now());
-  _origEnterDash(user, role, picture, email);
-};
+// ── Guardar timestamp de login (fusionado con hook de burbuja abajo) ──
 
 // ── Cargar estadísticas extra en Home ──
 onValue(ref(db, 'users'), snap => {
@@ -6599,9 +6594,10 @@ function _escHTML(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;
   }, {passive:true});
 })();
 
-// ── Hook en _enterDash para mostrar burbuja ──
+// ── Hook en _enterDash para guardar timestamp y mostrar burbuja ──
 const _origEnterDash = window._enterDash;
 window._enterDash = function(user, role, picture, email) {
+  localStorage.setItem('exani_loginTs', Date.now());
   _origEnterDash && _origEnterDash(user, role, picture, email);
   setTimeout(() => window._spInitBubble(), 300);
 };
