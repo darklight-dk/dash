@@ -2445,15 +2445,18 @@ function finishGoogleLogin(role) {
   $('googleRoleModal').style.display = 'none';
 
   // Guardar/actualizar usuario Google en Firebase para que aparezca en la lista
+  // Usamos window._fbSaveGoogleUser porque db/ref/set viven en el módulo ES
   const safeUid = 'google_' + _googleProfile.email.replace(/[.#$[\]]/g, '_');
-  set(ref(db, 'users/' + safeUid), {
-    username: _googleProfile.name,
-    role: role,
-    email: _googleProfile.email,
-    picture: _googleProfile.picture || '',
-    provider: 'google',
-    lastLogin: Date.now(),
-  }).catch(() => {});
+  if (typeof window._fbSaveGoogleUser === 'function') {
+    window._fbSaveGoogleUser(safeUid, {
+      username: _googleProfile.name,
+      role: role,
+      email: _googleProfile.email,
+      picture: _googleProfile.picture || '',
+      provider: 'google',
+      lastLogin: Date.now(),
+    });
+  }
 
   // _enterDash maneja S, localStorage, UI, dashboard, chat y burbuja SP
   window._enterDash(_googleProfile.name, role, _googleProfile.picture || null, _googleProfile.email || '');
@@ -5722,6 +5725,15 @@ window.closeMypOverlay = function(e) {
 window._fbSignOut = async function() {
   try { await signOut(auth); } catch(e) {}
   if (myPresenceRef) { set(myPresenceRef, null); myPresenceRef = null; }
+};
+
+// ── Guardar usuario Google en Firebase (llamado desde finishGoogleLogin) ──
+window._fbSaveGoogleUser = async function(safeUid, data) {
+  try {
+    await set(ref(db, 'users/' + safeUid), data);
+  } catch(e) {
+    console.warn('Error guardando usuario Google en Firebase:', e);
+  }
 };
 
 // Limpiar presencia cuando el usuario cierra la pestaña
