@@ -1324,6 +1324,52 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
 /* Divider */
 .sp-divider{height:1px;background:rgba(255,255,255,.06);margin:10px 0}
 
+/* New button variants */
+.sp-btn-cyan{background:rgba(6,182,212,.12);color:#22d3ee;border:1px solid rgba(6,182,212,.2)}
+.sp-btn-cyan:hover{background:rgba(6,182,212,.22)}
+.sp-btn-pink{background:rgba(236,72,153,.12);color:#f472b6;border:1px solid rgba(236,72,153,.2)}
+.sp-btn-pink:hover{background:rgba(236,72,153,.22)}
+.sp-btn-green{background:rgba(34,197,94,.12);color:#4ade80;border:1px solid rgba(34,197,94,.2)}
+.sp-btn-green:hover{background:rgba(34,197,94,.22)}
+
+/* Stat card wide */
+.sp-stats-row-2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.sp-stat-card-wide{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px}
+.sp-stat-card-wide .sp-stat-num{font-size:18px;font-weight:900;color:#0d9488;font-family:'DM Mono',monospace;flex-shrink:0}
+.sp-stat-card-wide .sp-stat-lbl{font-size:10px;color:rgba(255,255,255,.3);letter-spacing:.4px;text-transform:uppercase;line-height:1.4}
+
+/* Inline input row */
+.sp-input-row{display:flex;gap:6px;margin-bottom:7px;align-items:center}
+.sp-input-row .sp-inp-sm{flex:1;margin:0}
+.sp-mini-btn{flex-shrink:0;padding:7px 12px;border:none;border-radius:8px;
+  font-size:12px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;transition:all .15s;white-space:nowrap}
+.sp-mini-btn-teal{background:rgba(13,148,136,.2);color:#0d9488}
+.sp-mini-btn-teal:hover{background:rgba(13,148,136,.35)}
+.sp-mini-btn-red{background:rgba(239,68,68,.15);color:#f87171}
+.sp-mini-btn-red:hover{background:rgba(239,68,68,.25)}
+.sp-mini-btn-amber{background:rgba(245,158,11,.15);color:#fbbf24}
+.sp-mini-btn-amber:hover{background:rgba(245,158,11,.25)}
+.sp-mini-btn-purple{background:rgba(139,92,246,.15);color:#a78bfa}
+.sp-mini-btn-purple:hover{background:rgba(139,92,246,.25)}
+.sp-mini-btn-cyan{background:rgba(6,182,212,.15);color:#22d3ee}
+.sp-mini-btn-cyan:hover{background:rgba(6,182,212,.25)}
+
+/* Number input */
+.sp-num-inp{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  border-radius:8px;padding:5px 10px;color:#e2e8f0;font-size:13px;font-family:'DM Mono',monospace;
+  outline:none;width:70px;text-align:center;transition:border .15s}
+.sp-num-inp:focus{border-color:#0d9488}
+
+/* Banned tag */
+.sp-banned-tag{font-size:9px;font-weight:800;background:rgba(239,68,68,.2);
+  color:#f87171;border:1px solid rgba(239,68,68,.3);border-radius:20px;
+  padding:1px 7px;margin-left:4px;letter-spacing:.3px}
+
+/* Announce button pair */
+.sp-announce-btns{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+.sp-announce-btns .sp-btn{margin:0}
+
 @media(max-width:640px){
   #superPanel{width:calc(100vw - 20px)!important;max-height:80vh}
 }
@@ -5855,7 +5901,7 @@ window.toggleSuperPanel = function() {
     _spPositionPanel();
     _spRenderUserList();
     _spRenderPermsTable();
-    _spSyncToggles();
+    _spSyncTogglesAll();
     _spRenderLog();
   }
 };
@@ -5971,6 +6017,7 @@ function _spRenderUserList(filter) {
   el.innerHTML = filtered.map(([uid, u]) => {
     const initials = (u.username||'?').slice(0,2).toUpperCase();
     const role = u.role || 'Aspirante';
+    const banned = !!u.banned;
     const canChange = S.role === 'Administrador' ||
       (S.role === 'Moderador' && role !== 'Administrador');
     const roleOpts = (S.role === 'Administrador'
@@ -5978,17 +6025,25 @@ function _spRenderUserList(filter) {
       : SP_ROLES.filter(r => r !== 'Administrador')
     ).map(r => `<option value="${r}" ${r===role?'selected':''}>${r}</option>`).join('');
 
-    return `<div class="sp-user-item">
-      <div class="sp-user-avatar">${initials}</div>
+    return `<div class="sp-user-item" style="${banned ? 'opacity:.5;border-color:rgba(239,68,68,.3)' : ''}">
+      <div class="sp-user-avatar" style="${banned ? 'background:linear-gradient(135deg,#7f1d1d,#991b1b)' : ''}">${initials}</div>
       <div class="sp-user-info">
-        <div class="sp-user-name">${_escHTML(u.username||uid)}</div>
+        <div class="sp-user-name">${_escHTML(u.username||uid)}${banned ? '<span class="sp-banned-tag">BANEADO</span>' : ''}</div>
         <div class="sp-user-meta">${u.role||'Aspirante'} · ${u.createdAt ? new Date(u.createdAt).toLocaleDateString('es-MX') : '—'}</div>
       </div>
-      <span class="sp-role-pill sp-role-${role}">${role.slice(0,3).toUpperCase()}</span>
       ${canChange ? `
         <select class="sp-role-btn" onchange="spChangeUserRole('${uid}','${_escHTML(u.username||uid)}',this.value)">
           ${roleOpts}
         </select>` : ''}
+      ${S.role === 'Administrador' ? `
+        <div style="display:flex;gap:4px;flex-shrink:0">
+          ${banned
+            ? `<button class="sp-mini-btn sp-mini-btn-teal" onclick="spUnbanUser('${uid}','${_escHTML(u.username||uid)}')" title="Desbanear">✓</button>`
+            : `<button class="sp-mini-btn sp-mini-btn-red" onclick="spBanUser('${uid}','${_escHTML(u.username||uid)}')" title="Banear">🚫</button>`
+          }
+          <button class="sp-mini-btn sp-mini-btn-amber" onclick="spResetUserScores('${uid}','${_escHTML(u.username||uid)}')" title="Reset scores">🔄</button>
+          <button class="sp-mini-btn sp-mini-btn-red" onclick="spDeleteUser('${uid}','${_escHTML(u.username||uid)}')" title="Eliminar cuenta">🗑</button>
+        </div>` : ''}
     </div>`;
   }).join('');
 }
@@ -6060,15 +6115,17 @@ window.spQuickAction = async function(action) {
   }
 };
 
-window.spPublishAnnounce = async function() {
+window.spPublishAnnounce = async function(autoDismissSecs) {
   const text = document.getElementById('spAnnounceText').value.trim();
   const type = document.getElementById('spAnnounceType').value;
   if (!text) { spShowFeedback('spAnnounceFeedback','err','Escribe un mensaje primero.'); return; }
-  await set(ref(db, 'siteSettings/announce'), { text, type, ts: Date.now(), by: S.user });
-  _spLog_push('info', `Anuncio publicado: "${text.slice(0,40)}…"`);
-  spShowFeedback('spAnnounceFeedback','ok','✅ Anuncio publicado');
-  // Show it locally
-  _spShowAnnounce({ text, type });
+  const payload = { text, type, ts: Date.now(), by: S.user };
+  if (autoDismissSecs) payload.autoDismiss = autoDismissSecs * 1000;
+  await set(ref(db, 'siteSettings/announce'), payload);
+  _spLog_push('info', `Anuncio ${autoDismissSecs ? autoDismissSecs+'s' : 'permanente'}: "${text.slice(0,40)}"`);
+  spShowFeedback('spAnnounceFeedback','ok', autoDismissSecs ? `✅ Publicado · se oculta en ${autoDismissSecs}s` : '✅ Anuncio publicado');
+  document.getElementById('spAnnounceText').value = '';
+  _spShowAnnounce({ text, type, autoDismiss: autoDismissSecs ? autoDismissSecs * 1000 : null });
 };
 
 window.spClearAnnounce = async function() {
@@ -6087,6 +6144,171 @@ window.spBanAllGuests = function() {
   alert('Función de expulsión de invitados: En tu implementación actual el chat requiere login, así que ya solo usuarios autenticados pueden chatear.');
 };
 
+// ── Ban / Unban user ──
+window.spBanUser = async function(uid, username) {
+  if (!confirm(`¿Banear a "${username}"? No podrá iniciar sesión.`)) return;
+  try {
+    await set(ref(db, `users/${uid}/banned`), true);
+    _spLog_push('danger', `Usuario "${username}" baneado por ${S.user}`);
+    spShowFeedback('spUserFeedback','ok',`🚫 ${username} baneado`);
+  } catch(e) { spShowFeedback('spUserFeedback','err','❌ ' + e.message); }
+};
+window.spUnbanUser = async function(uid, username) {
+  try {
+    await set(ref(db, `users/${uid}/banned`), false);
+    _spLog_push('action', `Usuario "${username}" desbaneado por ${S.user}`);
+    spShowFeedback('spUserFeedback','ok',`✅ ${username} desbaneado`);
+  } catch(e) { spShowFeedback('spUserFeedback','err','❌ ' + e.message); }
+};
+
+// ── Delete user ──
+window.spDeleteUser = async function(uid, username) {
+  if (!confirm(`⚠️ ELIMINAR cuenta de "${username}" de Firebase? Esto es irreversible.`)) return;
+  try {
+    await remove(ref(db, `users/${uid}`));
+    _spLog_push('danger', `Cuenta "${username}" eliminada por ${S.user}`);
+    spShowFeedback('spUserFeedback','ok',`🗑️ Cuenta ${username} eliminada`);
+  } catch(e) { spShowFeedback('spUserFeedback','err','❌ ' + e.message); }
+};
+
+// ── Reset user scores ──
+window.spResetUserScores = async function(uid, username) {
+  if (!confirm(`¿Resetear todos los resultados de "${username}"?`)) return;
+  try {
+    await remove(ref(db, `scores/${uid}`));
+    _spLog_push('action', `Scores de "${username}" reseteados por ${S.user}`);
+    spShowFeedback('spUserFeedback','ok',`✅ Scores de ${username} reseteados`);
+  } catch(e) { spShowFeedback('spUserFeedback','err','❌ ' + e.message); }
+};
+
+// ── Broadcast message to chat ──
+window.spBroadcast = async function() {
+  const text = document.getElementById('spBroadcastText').value.trim();
+  if (!text) return;
+  await push(msgsRef, { system:true, text:`📣 ${text}`, ts:Date.now(), by: S.user });
+  document.getElementById('spBroadcastText').value = '';
+  _spLog_push('action', `Broadcast: "${text.slice(0,50)}"`);
+  spShowFeedback('spHomeFeedback','ok','✅ Mensaje enviado a todos');
+};
+
+// ── Force refresh all clients ──
+window.spForceRefresh = async function() {
+  if (!confirm('¿Forzar recarga de todos los clientes conectados?')) return;
+  await set(ref(db, 'siteSettings/forceRefreshTs'), Date.now());
+  _spLog_push('action', `Force-refresh enviado por ${S.user}`);
+  spShowFeedback('spHomeFeedback','ok','✅ Señal de recarga enviada');
+};
+
+// ── Force logout all ──
+window.spForceLogoutAll = async function() {
+  if (!confirm('¿Cerrar sesión de TODOS los usuarios? Solo admins podrán reingresar.')) return;
+  await set(ref(db, 'siteSettings/forceLogoutTs'), Date.now());
+  _spLog_push('danger', `Force-logout enviado por ${S.user}`);
+  spShowFeedback('spAccesoFeedback','ok','✅ Cierre de sesión global enviado');
+};
+
+// ── Reset all scores ──
+window.spResetAllScores = async function() {
+  if (!confirm('⛔ ¿Eliminar TODOS los resultados de exámenes? IRREVERSIBLE.')) return;
+  await remove(ref(db, 'scores'));
+  _spLog_push('danger', `Todos los scores eliminados por ${S.user}`);
+  spShowFeedback('spExamFeedback','ok','🗑️ Todos los resultados eliminados');
+};
+
+// ── Save exam settings ──
+window.spSaveExamSettings = async function() {
+  const maxAttempts = parseInt(document.getElementById('spMaxAttempts').value) || 0;
+  await set(ref(db, 'siteSettings/maxAttempts'), maxAttempts);
+  _spLog_push('action', `Max intentos → ${maxAttempts || 'ilimitado'} (por ${S.user})`);
+  spShowFeedback('spExamFeedback','ok','✅ Configuración guardada');
+};
+
+// ── Save chat slowmode ──
+window.spSaveSlowmode = async function() {
+  const secs = parseInt(document.getElementById('spSlowmode').value) || 0;
+  await set(ref(db, 'siteSettings/slowmode'), secs);
+  _spLog_push('action', `Slowmode → ${secs}s`);
+  spShowFeedback('spChatFeedback','ok',`✅ Slowmode: ${secs ? secs+'s' : 'desactivado'}`);
+};
+
+// ── Save word filter ──
+window.spSaveWordFilter = async function() {
+  const raw = document.getElementById('spWordFilter').value;
+  const words = raw.split(',').map(w => w.trim().toLowerCase()).filter(Boolean);
+  await set(ref(db, 'siteSettings/blockedWords'), words);
+  _spLog_push('action', `Filtro de palabras actualizado: ${words.length} palabras`);
+  spShowFeedback('spChatFeedback','ok',`✅ ${words.length} palabras bloqueadas guardadas`);
+};
+
+// ── Pin message ──
+window.spPinMessage = async function() {
+  const text = document.getElementById('spPinText').value.trim();
+  if (!text) { spShowFeedback('spChatFeedback','err','Escribe un mensaje para fijar.'); return; }
+  await set(ref(db, 'siteSettings/pinnedMsg'), { text, by: S.user, ts: Date.now() });
+  document.getElementById('spPinText').value = '';
+  _spLog_push('action', `Mensaje fijado: "${text.slice(0,40)}"`);
+  spShowFeedback('spChatFeedback','ok','📌 Mensaje fijado en el chat');
+};
+window.spUnpinMessage = async function() {
+  await remove(ref(db, 'siteSettings/pinnedMsg'));
+  spShowFeedback('spChatFeedback','ok','✅ Mensaje desfijado');
+};
+
+// ── Save welcome message ──
+window.spSaveWelcomeMsg = async function() {
+  const msg = document.getElementById('spWelcomeMsg').value.trim();
+  await set(ref(db, 'siteSettings/welcomeMsg'), msg);
+  _spLog_push('action', `Mensaje de bienvenida actualizado`);
+  spShowFeedback('spSiteFeedback','ok','✅ Mensaje guardado');
+};
+
+// ── Listen for force-refresh signal ──
+onValue(ref(db, 'siteSettings/forceRefreshTs'), snap => {
+  if (!snap.exists()) return;
+  const ts = snap.val();
+  const sessionStart = parseInt(localStorage.getItem('exani_loginTs') || '0');
+  if (ts > sessionStart && S.user && S.role !== 'Administrador') {
+    setTimeout(() => location.reload(), 1500);
+  }
+});
+
+// ── Listen for force-logout signal ──
+onValue(ref(db, 'siteSettings/forceLogoutTs'), snap => {
+  if (!snap.exists()) return;
+  const ts = snap.val();
+  const sessionStart = parseInt(localStorage.getItem('exani_loginTs') || '0');
+  if (ts > sessionStart && S.user && S.role !== 'Administrador') {
+    setTimeout(() => doLogout(), 1500);
+  }
+});
+
+// ── Sync new settings from Firebase ──
+const _origSpSyncToggles = _spSyncToggles;
+function _spSyncTogglesAll() {
+  _origSpSyncToggles && _origSpSyncToggles();
+  const s = _spSettingsSnap;
+  _spSetToggle('spToggleChatReadonly',  !!s.chatReadonly);
+  _spSetToggle('spToggleShowResults',   s.showResults !== false);
+  _spSetToggle('spToggleModoRepaso',    s.modoRepaso  !== false);
+  _spSetToggle('spToggleWordFilter',    !!s.wordFilterEnabled);
+  _spSetToggle('spToggleExamsEnabled',  s.examsEnabled !== false);
+  _spSetToggle('spToggleExamsEnabled2', s.examsEnabled !== false);
+  _spSetToggle('spToggleRanking2',      s.rankingEnabled !== false);
+  _spSetToggle('spToggleMaint2',        !!s.maintenance);
+  _spSetToggle('spToggleReg2',          !!s.lockRegister);
+  _spSetToggle('spToggleChat2',         s.chatEnabled !== false);
+  const ma = document.getElementById('spMaxAttempts');
+  if (ma) ma.value = s.maxAttempts || 0;
+  const sl = document.getElementById('spSlowmode');
+  if (sl) sl.value = s.slowmode || 0;
+  const wf = document.getElementById('spWordFilter');
+  if (wf && s.blockedWords) wf.value = Array.isArray(s.blockedWords) ? s.blockedWords.join(', ') : '';
+  const wm = document.getElementById('spWelcomeMsg');
+  if (wm && s.welcomeMsg) wm.value = s.welcomeMsg;
+  const mm2 = document.getElementById('spMaintMsg2');
+  if (mm2 && s.maintMsg) mm2.value = s.maintMsg;
+}
+
 // ── Site announcement banner ──
 function _spShowAnnounce(data) {
   let banner = document.getElementById('spAnnounceBanner');
@@ -6099,12 +6321,20 @@ function _spShowAnnounce(data) {
       box-shadow:0 2px 12px rgba(0,0,0,.2)`;
     document.body.prepend(banner);
   }
+  if (banner._dismissTimer) clearTimeout(banner._dismissTimer);
   const colors = { info:'#0e7490', warn:'#b45309', success:'#15803d', danger:'#b91c1c' };
   banner.style.background = colors[data.type] || colors.info;
   banner.style.color = '#fff';
-  banner.innerHTML = `<span>📢 ${_escHTML(data.text)}</span>
+  const countdown = data.autoDismiss ? ` · ${Math.round(data.autoDismiss/1000)}s` : '';
+  banner.innerHTML = `<span>📢 ${_escHTML(data.text)}${countdown}</span>
     <button onclick="this.parentNode.remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:6px;
       padding:3px 8px;color:#fff;cursor:pointer;font-size:12px;font-family:'Sora',sans-serif">✕</button>`;
+  if (data.autoDismiss) {
+    banner._dismissTimer = setTimeout(() => {
+      _spHideAnnounce();
+      set(ref(db, 'siteSettings/announce'), null);
+    }, data.autoDismiss);
+  }
 }
 function _spHideAnnounce() {
   const b = document.getElementById('spAnnounceBanner'); if (b) b.remove();
@@ -6279,19 +6509,28 @@ window._enterDash = function(user, role, picture, email) {
   <!-- Nav tabs -->
   <div class="sp-nav">
     <button class="sp-tab active" data-pane="spHome" onclick="spSwitchTab(this)">
-      <span class="sp-tab-icon">🏠</span>Vista general
+      <span class="sp-tab-icon">🏠</span>Inicio
     </button>
     <button class="sp-tab" data-pane="spUsers" onclick="spSwitchTab(this)">
       <span class="sp-tab-icon">👥</span>Usuarios
     </button>
-    <button class="sp-tab" data-pane="spRoles" onclick="spSwitchTab(this)">
-      <span class="sp-tab-icon">🎭</span>Roles
+    <button class="sp-tab" data-pane="spExams" onclick="spSwitchTab(this)">
+      <span class="sp-tab-icon">🎯</span>Exámenes
+    </button>
+    <button class="sp-tab" data-pane="spChat" onclick="spSwitchTab(this)">
+      <span class="sp-tab-icon">💬</span>Chat
     </button>
     <button class="sp-tab" data-pane="spSite" onclick="spSwitchTab(this)">
       <span class="sp-tab-icon">🌐</span>Sitio
     </button>
+    <button class="sp-tab" data-pane="spAcceso" onclick="spSwitchTab(this)">
+      <span class="sp-tab-icon">🛡️</span>Acceso
+    </button>
+    <button class="sp-tab" data-pane="spRoles" onclick="spSwitchTab(this)">
+      <span class="sp-tab-icon">🎭</span>Roles
+    </button>
     <button class="sp-tab" data-pane="spLog" onclick="spSwitchTab(this)">
-      <span class="sp-tab-icon">📋</span>Registro
+      <span class="sp-tab-icon">📋</span>Log
     </button>
   </div>
 
@@ -6317,24 +6556,34 @@ window._enterDash = function(user, role, picture, email) {
 
       <div class="sp-section">
         <div class="sp-section-title">Acciones rápidas</div>
-        <button class="sp-btn sp-btn-teal" onclick="spQuickAction('chat_clear')">
-          <span class="sp-btn-icon">🗑️</span>
-          <span class="sp-btn-text">Limpiar chat<small>Borra todos los mensajes actuales</small></span>
-          <span class="sp-btn-arrow">›</span>
-        </button>
+        <div class="sp-input-row">
+          <input class="sp-inp-sm" id="spBroadcastText" placeholder="📣 Broadcast al chat global…"/>
+          <button class="sp-mini-btn sp-mini-btn-teal" onclick="spBroadcast()">Enviar</button>
+        </div>
+        <div class="sp-feedback" id="spHomeFeedback"></div>
         <button class="sp-btn sp-btn-amber" onclick="spQuickAction('announce')">
           <span class="sp-btn-icon">📢</span>
-          <span class="sp-btn-text">Anuncio global<small>Mensaje de sistema a todos los usuarios</small></span>
+          <span class="sp-btn-text">Anuncio global<small>Publicar mensaje en banner superior</small></span>
+          <span class="sp-btn-arrow">›</span>
+        </button>
+        <button class="sp-btn sp-btn-cyan" onclick="spForceRefresh()">
+          <span class="sp-btn-icon">🔄</span>
+          <span class="sp-btn-text">Forzar recarga<small>Recarga la app en todos los clientes</small></span>
           <span class="sp-btn-arrow">›</span>
         </button>
         <button class="sp-btn sp-btn-purple" onclick="spSwitchTabById('spUsers')">
           <span class="sp-btn-icon">👥</span>
-          <span class="sp-btn-text">Gestionar usuarios<small>Ver, cambiar roles y banear</small></span>
+          <span class="sp-btn-text">Gestionar usuarios<small>Ver, banear, cambiar roles</small></span>
           <span class="sp-btn-arrow">›</span>
         </button>
-        <button class="sp-btn sp-btn-ghost" onclick="openAdmin()">
+        <button class="sp-btn sp-btn-teal" onclick="spQuickAction('chat_clear')">
+          <span class="sp-btn-icon">🗑️</span>
+          <span class="sp-btn-text">Limpiar chat<small>Borra todos los mensajes</small></span>
+          <span class="sp-btn-arrow">›</span>
+        </button>
+        <button class="sp-btn sp-btn-ghost" onclick="openAdmin();toggleSuperPanel()">
           <span class="sp-btn-icon">📋</span>
-          <span class="sp-btn-text">Panel Admin clásico<small>Editor de exámenes, estadísticas</small></span>
+          <span class="sp-btn-text">Panel Admin clásico<small>Editor de exámenes y estadísticas</small></span>
           <span class="sp-btn-arrow">›</span>
         </button>
       </div>
@@ -6343,8 +6592,8 @@ window._enterDash = function(user, role, picture, email) {
         <div class="sp-section-title">Modo del sitio</div>
         <div class="sp-row">
           <div class="sp-row-info">
-            <div class="sp-row-label">🔒 Modo mantenimiento</div>
-            <div class="sp-row-sub">Solo admins pueden acceder al dashboard</div>
+            <div class="sp-row-label">🔒 Mantenimiento</div>
+            <div class="sp-row-sub">Solo admins pueden acceder</div>
           </div>
           <label class="sp-toggle">
             <input type="checkbox" id="spToggleMaint" onchange="spToggleSetting('maintenance',this.checked)">
@@ -6354,7 +6603,7 @@ window._enterDash = function(user, role, picture, email) {
         <div class="sp-row">
           <div class="sp-row-info">
             <div class="sp-row-label">🚫 Bloquear registro</div>
-            <div class="sp-row-sub">Deshabilita la creación de cuentas nuevas</div>
+            <div class="sp-row-sub">Sin cuentas nuevas</div>
           </div>
           <label class="sp-toggle">
             <input type="checkbox" id="spToggleReg" onchange="spToggleSetting('lockRegister',this.checked)">
@@ -6363,8 +6612,18 @@ window._enterDash = function(user, role, picture, email) {
         </div>
         <div class="sp-row">
           <div class="sp-row-info">
+            <div class="sp-row-label">🎯 Exámenes habilitados</div>
+            <div class="sp-row-sub">Permite iniciar exámenes</div>
+          </div>
+          <label class="sp-toggle">
+            <input type="checkbox" id="spToggleExamsEnabled" checked onchange="spToggleSetting('examsEnabled',this.checked)">
+            <span class="sp-slider"></span>
+          </label>
+        </div>
+        <div class="sp-row">
+          <div class="sp-row-info">
             <div class="sp-row-label">💬 Chat habilitado</div>
-            <div class="sp-row-sub">Permitir mensajes en el chat global</div>
+            <div class="sp-row-sub">Permite mensajes globales</div>
           </div>
           <label class="sp-toggle">
             <input type="checkbox" id="spToggleChat" checked onchange="spToggleSetting('chatEnabled',this.checked)">
@@ -6374,7 +6633,7 @@ window._enterDash = function(user, role, picture, email) {
         <div class="sp-row">
           <div class="sp-row-info">
             <div class="sp-row-label">🏆 Ranking público</div>
-            <div class="sp-row-sub">Mostrar ranking global a todos los usuarios</div>
+            <div class="sp-row-sub">Visible para todos</div>
           </div>
           <label class="sp-toggle">
             <input type="checkbox" id="spToggleRanking" checked onchange="spToggleSetting('rankingEnabled',this.checked)">
@@ -6471,21 +6730,184 @@ window._enterDash = function(user, role, picture, email) {
       </div>
     </div>
 
+    <!-- ── PANE: EXÁMENES ── -->
+    <div class="sp-pane" id="spExams">
+      <div class="sp-section">
+        <div class="sp-section-title">Control de exámenes</div>
+        <div class="sp-row">
+          <div class="sp-row-info">
+            <div class="sp-row-label">🎯 Exámenes habilitados</div>
+            <div class="sp-row-sub">Permite a usuarios iniciar exámenes</div>
+          </div>
+          <label class="sp-toggle">
+            <input type="checkbox" id="spToggleExamsEnabled2" checked onchange="spToggleSetting('examsEnabled',this.checked)">
+            <span class="sp-slider"></span>
+          </label>
+        </div>
+        <div class="sp-row">
+          <div class="sp-row-info">
+            <div class="sp-row-label">📊 Mostrar resultados al terminar</div>
+            <div class="sp-row-sub">El alumno ve su calificación final</div>
+          </div>
+          <label class="sp-toggle">
+            <input type="checkbox" id="spToggleShowResults" checked onchange="spToggleSetting('showResults',this.checked)">
+            <span class="sp-slider"></span>
+          </label>
+        </div>
+        <div class="sp-row">
+          <div class="sp-row-info">
+            <div class="sp-row-label">🔍 Modo Repaso disponible</div>
+            <div class="sp-row-sub">Permite revisar respuestas después</div>
+          </div>
+          <label class="sp-toggle">
+            <input type="checkbox" id="spToggleModoRepaso" checked onchange="spToggleSetting('modoRepaso',this.checked)">
+            <span class="sp-slider"></span>
+          </label>
+        </div>
+        <div class="sp-row">
+          <div class="sp-row-info">
+            <div class="sp-row-label">🏆 Ranking global</div>
+            <div class="sp-row-sub">Mostrar posición de todos los usuarios</div>
+          </div>
+          <label class="sp-toggle">
+            <input type="checkbox" id="spToggleRanking2" checked onchange="spToggleSetting('rankingEnabled',this.checked)">
+            <span class="sp-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="sp-divider"></div>
+
+      <div class="sp-section">
+        <div class="sp-section-title">Límites</div>
+        <div class="sp-row">
+          <div class="sp-row-info">
+            <div class="sp-row-label">🔁 Intentos por usuario</div>
+            <div class="sp-row-sub">0 = sin límite</div>
+          </div>
+          <input class="sp-num-inp" id="spMaxAttempts" type="number" min="0" value="0"/>
+        </div>
+        <button class="sp-btn sp-btn-teal" onclick="spSaveExamSettings()">
+          <span class="sp-btn-icon">💾</span>
+          <span class="sp-btn-text">Guardar límites</span>
+        </button>
+        <div class="sp-feedback" id="spExamFeedback"></div>
+      </div>
+
+      <div class="sp-divider"></div>
+
+      <div class="sp-section">
+        <div class="sp-section-title">Peligro</div>
+        <button class="sp-btn sp-btn-red" onclick="spResetAllScores()">
+          <span class="sp-btn-icon">🗑️</span>
+          <span class="sp-btn-text">Resetear TODOS los scores<small>Borra todos los resultados — irreversible</small></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ── PANE: CHAT ── -->
+    <div class="sp-pane" id="spChat">
+      <div class="sp-section">
+        <div class="sp-section-title">Estado del chat</div>
+        <div class="sp-row">
+          <div class="sp-row-info">
+            <div class="sp-row-label">💬 Chat habilitado</div>
+            <div class="sp-row-sub">Permite enviar mensajes</div>
+          </div>
+          <label class="sp-toggle">
+            <input type="checkbox" id="spToggleChat2" checked onchange="spToggleSetting('chatEnabled',this.checked)">
+            <span class="sp-slider"></span>
+          </label>
+        </div>
+        <div class="sp-row">
+          <div class="sp-row-info">
+            <div class="sp-row-label">👁️ Solo lectura</div>
+            <div class="sp-row-sub">Solo admins pueden escribir</div>
+          </div>
+          <label class="sp-toggle">
+            <input type="checkbox" id="spToggleChatReadonly" onchange="spToggleSetting('chatReadonly',this.checked)">
+            <span class="sp-slider"></span>
+          </label>
+        </div>
+        <div class="sp-row">
+          <div class="sp-row-info">
+            <div class="sp-row-label">🐌 Slowmode</div>
+            <div class="sp-row-sub">Segundos entre mensajes (0 = off)</div>
+          </div>
+          <input class="sp-num-inp" id="spSlowmode" type="number" min="0" value="0"/>
+        </div>
+        <button class="sp-btn sp-btn-teal" onclick="spSaveSlowmode()">
+          <span class="sp-btn-icon">💾</span>
+          <span class="sp-btn-text">Guardar slowmode</span>
+        </button>
+      </div>
+
+      <div class="sp-divider"></div>
+
+      <div class="sp-section">
+        <div class="sp-section-title">Filtro de palabras</div>
+        <div class="sp-row">
+          <div class="sp-row-info">
+            <div class="sp-row-label">🤬 Filtro activo</div>
+            <div class="sp-row-sub">Reemplaza groserías con ***</div>
+          </div>
+          <label class="sp-toggle">
+            <input type="checkbox" id="spToggleWordFilter" onchange="spToggleSetting('wordFilterEnabled',this.checked)">
+            <span class="sp-slider"></span>
+          </label>
+        </div>
+        <label class="sp-label" style="margin-top:8px">Palabras bloqueadas (separadas por coma)</label>
+        <textarea id="spWordFilter" class="sp-inp-sm" rows="3" placeholder="mala1, mala2, mala3…" style="resize:vertical;margin-bottom:8px"></textarea>
+        <button class="sp-btn sp-btn-amber" onclick="spSaveWordFilter()">
+          <span class="sp-btn-icon">💾</span>
+          <span class="sp-btn-text">Guardar lista</span>
+        </button>
+        <div class="sp-feedback" id="spChatFeedback"></div>
+      </div>
+
+      <div class="sp-divider"></div>
+
+      <div class="sp-section">
+        <div class="sp-section-title">Mensaje fijado</div>
+        <div class="sp-input-row">
+          <input class="sp-inp-sm" id="spPinText" placeholder="📌 Mensaje a fijar en el chat…"/>
+          <button class="sp-mini-btn sp-mini-btn-teal" onclick="spPinMessage()">Fijar</button>
+        </div>
+        <button class="sp-btn sp-btn-ghost" onclick="spUnpinMessage()" style="margin-top:4px">
+          <span class="sp-btn-icon">📌</span>
+          <span class="sp-btn-text">Quitar mensaje fijado</span>
+        </button>
+      </div>
+
+      <div class="sp-divider"></div>
+
+      <div class="sp-section">
+        <div class="sp-section-title">Peligro</div>
+        <button class="sp-btn sp-btn-red" onclick="spQuickAction('chat_clear')">
+          <span class="sp-btn-icon">🗑️</span>
+          <span class="sp-btn-text">Limpiar todo el chat<small>Irreversible</small></span>
+        </button>
+      </div>
+    </div>
+
     <!-- ── PANE: SITIO ── -->
     <div class="sp-pane" id="spSite">
       <div class="sp-section">
         <div class="sp-section-title">Anuncio del sistema</div>
         <label class="sp-label">Mensaje a mostrar en el dashboard</label>
         <textarea id="spAnnounceText" class="sp-inp-sm" rows="3" placeholder="Escribe aquí el anuncio para todos los usuarios…" style="resize:vertical;margin-bottom:8px"></textarea>
-        <div style="display:flex;gap:8px;margin-bottom:8px">
-          <select id="spAnnounceType" class="sp-select" style="flex:1">
-            <option value="info">ℹ️ Info</option>
-            <option value="warn">⚠️ Advertencia</option>
-            <option value="success">✅ Éxito</option>
-            <option value="danger">🚨 Urgente</option>
-          </select>
-          <button class="sp-btn sp-btn-teal" style="margin:0;flex:1;justify-content:center" onclick="spPublishAnnounce()">
+        <select id="spAnnounceType" class="sp-select" style="margin-bottom:8px">
+          <option value="info">ℹ️ Info</option>
+          <option value="warn">⚠️ Advertencia</option>
+          <option value="success">✅ Éxito</option>
+          <option value="danger">🚨 Urgente</option>
+        </select>
+        <div class="sp-announce-btns">
+          <button class="sp-btn sp-btn-teal" onclick="spPublishAnnounce()">
             <span class="sp-btn-icon">📢</span> Publicar
+          </button>
+          <button class="sp-btn sp-btn-amber" onclick="spPublishAnnounce(5)">
+            <span class="sp-btn-icon">⏱️</span> Publicar 5s
           </button>
         </div>
         <button class="sp-btn sp-btn-red" onclick="spClearAnnounce()">
@@ -6498,26 +6920,73 @@ window._enterDash = function(user, role, picture, email) {
       <div class="sp-divider"></div>
 
       <div class="sp-section">
-        <div class="sp-section-title">Mensaje de mantenimiento</div>
-        <label class="sp-label">Texto que ven los usuarios mientras el sitio está en mantenimiento</label>
+        <div class="sp-section-title">Mensaje de bienvenida</div>
+        <label class="sp-label">Texto que ven los usuarios al entrar al dashboard</label>
+        <textarea id="spWelcomeMsg" class="sp-inp-sm" rows="2" placeholder="¡Bienvenidos a DASH! 🎯" style="resize:vertical;margin-bottom:8px"></textarea>
+        <button class="sp-btn sp-btn-teal" onclick="spSaveWelcomeMsg()">
+          <span class="sp-btn-icon">💾</span>
+          <span class="sp-btn-text">Guardar bienvenida</span>
+        </button>
+        <div class="sp-feedback" id="spSiteFeedback"></div>
+      </div>
+
+      <div class="sp-divider"></div>
+
+      <div class="sp-section">
+        <div class="sp-section-title">Mantenimiento</div>
+        <label class="sp-label">Texto visible mientras el sitio está en mantenimiento</label>
         <input id="spMaintMsg" class="sp-inp-sm" placeholder="🔧 Sitio en mantenimiento. Volvemos pronto." style="margin-bottom:8px"/>
         <button class="sp-btn sp-btn-amber" onclick="spSaveMaintMsg()">
           <span class="sp-btn-icon">💾</span>
           <span class="sp-btn-text">Guardar mensaje</span>
         </button>
       </div>
+    </div>
+
+    <!-- ── PANE: ACCESO ── -->
+    <div class="sp-pane" id="spAcceso">
+      <div class="sp-section">
+        <div class="sp-section-title">Control de acceso</div>
+        <div class="sp-row">
+          <div class="sp-row-info">
+            <div class="sp-row-label">🔒 Modo mantenimiento</div>
+            <div class="sp-row-sub">Solo admins pueden entrar</div>
+          </div>
+          <label class="sp-toggle">
+            <input type="checkbox" id="spToggleMaint2" onchange="spToggleSetting('maintenance',this.checked)">
+            <span class="sp-slider"></span>
+          </label>
+        </div>
+        <div class="sp-row">
+          <div class="sp-row-info">
+            <div class="sp-row-label">🚫 Bloquear registro</div>
+            <div class="sp-row-sub">Nadie puede crear cuentas</div>
+          </div>
+          <label class="sp-toggle">
+            <input type="checkbox" id="spToggleReg2" onchange="spToggleSetting('lockRegister',this.checked)">
+            <span class="sp-slider"></span>
+          </label>
+        </div>
+        <label class="sp-label" style="margin-top:8px">Mensaje de mantenimiento</label>
+        <input id="spMaintMsg2" class="sp-inp-sm" placeholder="🔧 Sitio en mantenimiento. Volvemos pronto." style="margin-bottom:8px"/>
+        <button class="sp-btn sp-btn-amber" onclick="spSaveMaintMsg()">
+          <span class="sp-btn-icon">💾</span>
+          <span class="sp-btn-text">Guardar mensaje</span>
+        </button>
+        <div class="sp-feedback" id="spAccesoFeedback"></div>
+      </div>
 
       <div class="sp-divider"></div>
 
       <div class="sp-section">
-        <div class="sp-section-title">Peligro</div>
-        <button class="sp-btn sp-btn-red" onclick="spQuickAction('chat_clear')">
-          <span class="sp-btn-icon">🗑️</span>
-          <span class="sp-btn-text">Limpiar todo el chat<small>Irreversible</small></span>
+        <div class="sp-section-title">Acciones globales de sesión</div>
+        <button class="sp-btn sp-btn-pink" onclick="spForceLogoutAll()">
+          <span class="sp-btn-icon">🚪</span>
+          <span class="sp-btn-text">Forzar logout global<small>Cierra sesión de TODOS los usuarios</small></span>
         </button>
-        <button class="sp-btn sp-btn-red" onclick="spBanAllGuests()">
-          <span class="sp-btn-icon">🚫</span>
-          <span class="sp-btn-text">Expulsar invitados del chat<small>Solo usuarios autenticados podrán chatear</small></span>
+        <button class="sp-btn sp-btn-cyan" onclick="spForceRefresh()">
+          <span class="sp-btn-icon">🔄</span>
+          <span class="sp-btn-text">Forzar recarga global<small>Recarga la app en todos los clientes</small></span>
         </button>
       </div>
     </div>
