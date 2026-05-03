@@ -2443,19 +2443,21 @@ function showGoogleRoleModal() {
 function finishGoogleLogin(role) {
   if (!_googleProfile) return;
   $('googleRoleModal').style.display = 'none';
-  S.user = _googleProfile.name;
-  S.role = role;
-  S.googlePicture = _googleProfile.picture || null;
-  S.googleEmail   = _googleProfile.email   || '';
-  localStorage.setItem('exani_session', JSON.stringify({
-    user: S.user, role, googlePicture: S.googlePicture, googleEmail: S.googleEmail
-  }));
-  updateProfileUI();
-  const adminBtn = $('btnAdminPanel');
-  if (adminBtn) adminBtn.style.display = role === 'Administrador' ? 'flex' : 'none';
-  renderExamCards();
-  show('dashScreen');
-  initChat();
+
+  // Guardar/actualizar usuario Google en Firebase para que aparezca en la lista
+  const safeUid = 'google_' + _googleProfile.email.replace(/[.#$[\]]/g, '_');
+  set(ref(db, 'users/' + safeUid), {
+    username: _googleProfile.name,
+    role: role,
+    email: _googleProfile.email,
+    picture: _googleProfile.picture || '',
+    provider: 'google',
+    lastLogin: Date.now(),
+  }).catch(() => {});
+
+  // _enterDash maneja S, localStorage, UI, dashboard, chat y burbuja SP
+  window._enterDash(_googleProfile.name, role, _googleProfile.picture || null, _googleProfile.email || '');
+
   // Mostrar ranking FAB solo para Google users
   const rfab = $('rankingFab'); if (rfab) rfab.style.display = 'none';
   const rtbBtn = $('rankingTopbarBtn'); if (rtbBtn) rtbBtn.style.display = 'flex';
@@ -5984,10 +5986,10 @@ function _spRenderUserList(filter) {
     ).map(r => `<option value="${r}" ${r===role?'selected':''}>${r}</option>`).join('');
 
     return `<div class="sp-user-item">
-      <div class="sp-user-avatar">${initials}</div>
+      <div class="sp-user-avatar">${u.picture ? `<img src="${u.picture}" style="width:100%;height:100%;border-radius:50%;object-fit:cover" onerror="this.parentNode.textContent='${initials}'"/>` : initials}</div>
       <div class="sp-user-info">
-        <div class="sp-user-name">${_escHTML(u.username||uid)}</div>
-        <div class="sp-user-meta">${u.role||'Aspirante'} · ${u.createdAt ? new Date(u.createdAt).toLocaleDateString('es-MX') : '—'}</div>
+        <div class="sp-user-name">${_escHTML(u.username||uid)} ${u.provider==='google' ? '<span style="font-size:9px;background:rgba(66,133,244,.2);color:#6ba3f5;border-radius:4px;padding:1px 5px;font-weight:700">G</span>' : ''}</div>
+        <div class="sp-user-meta">${u.role||'Aspirante'} · ${u.email ? _escHTML(u.email) : (u.createdAt ? new Date(u.createdAt).toLocaleDateString('es-MX') : '—')}</div>
       </div>
       <span class="sp-role-pill sp-role-${role}">${role.slice(0,3).toUpperCase()}</span>
       ${canChange ? `
