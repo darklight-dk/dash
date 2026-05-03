@@ -5500,6 +5500,8 @@ window.clearChatMessages = async function() {
 // ── Enviar mensaje ──
 window.sendChatMsg = function() {
   if (!S.user) { alert('Iniciá sesión para chatear.'); return; }
+  if (window._spChatEnabled === false) { alert('El chat está deshabilitado por el administrador.'); return; }
+  if (_spSettingsSnap.chatReadonly && S.role !== 'Administrador') { alert('El chat está en modo solo lectura.'); return; }
   const input = document.getElementById('chatInput');
   const text  = (input.value || '').trim();
   if (!text) return;
@@ -5833,7 +5835,7 @@ onValue(spSettingsRef, snap => {
   if (_spSettingsSnap.maintenance && S.role && S.role !== 'Administrador') {
     const msg = _spSettingsSnap.maintMsg || '🔧 El sitio está en mantenimiento. Volvemos pronto.';
     _spShowMaintOverlay(msg);
-  } else {
+  } else if (!_spSettingsSnap.maintenance) {
     _spHideMaintOverlay();
   }
   // Chat habilitado
@@ -5841,12 +5843,12 @@ onValue(spSettingsRef, snap => {
 
   // ── Ranking: mostrar/ocultar botones según setting (persiste al refrescar) ──
   const rankingOn = _spSettingsSnap.rankingEnabled !== false;
-  if (S.user) { // solo si hay sesión activa
-    const rfab   = document.getElementById('rankingFab');
-    const rtbBtn = document.getElementById('rankingTopbarBtn');
-    if (rfab)   rfab.style.display   = rankingOn ? 'flex' : 'none';
-    if (rtbBtn) rtbBtn.style.display = rankingOn ? 'flex' : 'none';
-  }
+  // Aplicar siempre — _enterDash ya oculta los botones antes del login
+  // Así al refrescar con sesión activa los botones aparecen correctamente
+  const rfab   = document.getElementById('rankingFab');
+  const rtbBtn = document.getElementById('rankingTopbarBtn');
+  if (rfab)   rfab.style.display   = (S.user && rankingOn) ? 'flex' : 'none';
+  if (rtbBtn) rtbBtn.style.display = (S.user && rankingOn) ? 'flex' : 'none';
 
   // ── Bloquear registro: ocultar link "Crear cuenta" si lockRegister está activo ──
   const regLink = document.querySelector('#formLogin .login-toggle');
@@ -5858,11 +5860,11 @@ onValue(spSettingsRef, snap => {
   }
 
   // ── Exámenes habilitados ──
-  if (S.user && _spSettingsSnap.examsEnabled === false) {
-    // Deshabilitar botones de examen en el dashboard
+  if (S.user) {
+    const examsOff = _spSettingsSnap.examsEnabled === false;
     document.querySelectorAll('.exam-card .btn-start, .exam-card button').forEach(btn => {
-      btn.disabled = true;
-      btn.title = 'Exámenes deshabilitados por el administrador';
+      btn.disabled = examsOff;
+      btn.title = examsOff ? 'Exámenes deshabilitados por el administrador' : '';
     });
   }
 
@@ -6450,7 +6452,6 @@ onValue(ref(db, 'siteSettings/forceLogoutTs'), snap => {
   if (!snap.exists() || !S.user || S.role === 'Administrador') return;
   const ts = snap.val();
   const loginTs = parseInt(localStorage.getItem('exani_loginTs') || '0');
-  // loginTs===0 = sesión nueva, no expulsar
   if (loginTs > 0 && ts > loginTs) {
     alert('🔌 Tu sesión fue cerrada por un administrador.');
     doLogout();
