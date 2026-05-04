@@ -1828,7 +1828,7 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
 <div id="ejerciciosScreen" class="screen">
   <div class="ej-topbar">
     <div style="display:flex;align-items:center;gap:14px">
-      <button onclick="show('modeScreen')" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--muted);padding:0;line-height:1" title="Volver">←</button>
+      <button onclick="show('dashScreen')" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--muted);padding:0;line-height:1" title="Volver">←</button>
       <div class="logo-sm"><span style="color:#7c3aed">DASH</span> <span style="font-size:12px;font-weight:700;color:#7c3aed;letter-spacing:2px;opacity:.7">EJERCICIOS</span></div>
     </div>
     <div style="font-size:13px;color:var(--muted)">Selecciona una materia</div>
@@ -2841,7 +2841,7 @@ window._enterDash = function _enterDash(user, role, picture, email) {
   const mName   = $('modeUserName');
   if (mAvatar) mAvatar.textContent = (user||'?').slice(0,2).toUpperCase();
   if (mName)   mName.textContent   = user || '—';
-  show('modeScreen');
+  enterExams();
   initChat();
 }
 
@@ -3394,7 +3394,7 @@ async function finishGoogleLogin(roleSelected) {
     const mName2   = $('modeUserName');
     if (mAvatar2) mAvatar2.textContent = (S.user||'?').slice(0,2).toUpperCase();
     if (mName2)   mName2.textContent   = S.user || '—';
-    show('modeScreen');
+    enterExams();
     initChat();
 
   } catch(e) {
@@ -4513,7 +4513,7 @@ loadCatalog();   // carga exams/catalog.json y renderiza las tarjetas
     const mName3   = document.getElementById('modeUserName');
     if (mAvatar3) mAvatar3.textContent = (sess.user||'?').slice(0,2).toUpperCase();
     if (mName3)   mName3.textContent   = sess.user || '—';
-    show('modeScreen');
+    enterExams();
     initChat();
     // Intentar init burbuja con polling hasta que módulo esté listo
     let _bubbleAttempts = 0;
