@@ -596,7 +596,9 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .exam-ai-q-preview.show{display:block}
 .exam-ai-body{flex:1;overflow-y:auto;padding:20px;min-height:120px}
 .exam-ai-empty{text-align:center;color:#94a3b8;font-size:14px;padding:28px 12px;line-height:1.6}
-.exam-ai-response{font-size:14px;color:#1e293b;line-height:1.75;white-space:pre-wrap}
+.exam-ai-response{font-size:14px;color:#1e293b;line-height:1.8;white-space:pre-wrap;word-break:break-word}
+.exam-ai-response .ai-section{margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #f1f5f9}
+.exam-ai-response .ai-section:last-child{border-bottom:none;margin-bottom:0}
 .exam-ai-thinking{display:flex;align-items:center;gap:10px;color:#7c3aed;font-size:14px;font-weight:600;padding:8px 0}
 .exam-ai-thinking::before{content:'';width:18px;height:18px;border:2px solid #7c3aed;
   border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
@@ -607,6 +609,11 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .exam-ai-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(124,58,237,.3)}
 .exam-ai-btn:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
 .mob-ctrl-ai{background:rgba(124,58,237,.1)!important;border-color:#7c3aed!important;color:#7c3aed!important}
+.exam-ai-tts-btn{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;
+  font-size:20px;cursor:pointer;padding:0 14px;transition:.15s;flex-shrink:0}
+.exam-ai-tts-btn:hover{background:#f1f5f9;border-color:#7c3aed}
+.exam-ai-tts-btn.speaking{background:rgba(124,58,237,.1);border-color:#7c3aed;animation:pulse .8s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 .btn-nav-arrow{border:1px solid var(--teal);color:var(--teal);background:rgba(13,148,136,.07);min-width:36px;font-size:15px}.btn-nav-arrow:hover{background:rgba(13,148,136,.18)}
 .progress-chip{background:var(--card);border:1px solid var(--b2);border-radius:8px;padding:7px 16px;
   font-family:'DM Mono',monospace;color:var(--muted);font-size:13px}
@@ -2615,9 +2622,14 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
       </div>
     </div>
     <div class="exam-ai-footer">
-      <button class="exam-ai-btn" id="examAIBtn" onclick="askExamAI()">
-        <span id="examAIBtnIcon">⚡</span> Explicar pregunta
-      </button>
+      <div style="display:flex;gap:10px">
+        <button class="exam-ai-tts-btn" id="examAITTSBtn" onclick="toggleExamTTS()" title="Escuchar respuesta" style="display:none">
+          🔊
+        </button>
+        <button class="exam-ai-btn" id="examAIBtn" onclick="askExamAI()" style="flex:1">
+          <span id="examAIBtnIcon">⚡</span> Explicar pregunta
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -3024,14 +3036,38 @@ function openExamAI() {
   const btn = document.getElementById('examAIBtn');
   btn.disabled = false;
   btn.innerHTML = '<span id="examAIBtnIcon">⚡</span> Explicar pregunta';
+  document.getElementById('examAITTSBtn').style.display = 'none';
 }
 
 function closeExamAI() {
   document.getElementById('examAIOv').classList.remove('show');
+  if (speechSynthesis.speaking) speechSynthesis.cancel();
 }
 
 function closeExamAIOnBg(e) {
   if (e.target === document.getElementById('examAIOv')) closeExamAI();
+}
+
+/* ── TTS ── */
+let _ttsUtterance = null;
+function toggleExamTTS() {
+  const btn = document.getElementById('examAITTSBtn');
+  if (speechSynthesis.speaking) {
+    speechSynthesis.cancel();
+    btn.textContent = '🔊';
+    btn.classList.remove('speaking');
+    return;
+  }
+  const text = btn._text;
+  if (!text) return;
+  _ttsUtterance = new SpeechSynthesisUtterance(text);
+  _ttsUtterance.lang = 'es-MX';
+  _ttsUtterance.rate = 0.95;
+  _ttsUtterance.pitch = 1;
+  _ttsUtterance.onstart = () => { btn.textContent = '⏹️'; btn.classList.add('speaking'); };
+  _ttsUtterance.onend = () => { btn.textContent = '🔊'; btn.classList.remove('speaking'); };
+  _ttsUtterance.onerror = () => { btn.textContent = '🔊'; btn.classList.remove('speaking'); };
+  speechSynthesis.speak(_ttsUtterance);
 }
 
 async function askExamAI() {
@@ -3105,8 +3141,20 @@ Sin markdown, sin asteriscos. Español mexicano. Sé directo y conciso.`;
       body.innerHTML = '';
       const el = document.createElement('div');
       el.className = 'exam-ai-response';
-      el.textContent = text;
+      // Split into sections by emoji markers for spacing
+      const sections = text.split(/(?=🎯|💡|✅)/);
+      sections.forEach(s => {
+        if (!s.trim()) return;
+        const sec = document.createElement('div');
+        sec.className = 'ai-section';
+        sec.textContent = s.trim();
+        el.appendChild(sec);
+      });
       body.appendChild(el);
+      // Show TTS button
+      const ttsBtn = document.getElementById('examAITTSBtn');
+      ttsBtn.style.display = '';
+      ttsBtn._text = text;
     } else {
       const err = json?.error?.message || json?.candidates?.[0]?.finishReason || 'Sin respuesta';
       body.innerHTML = `<div class="exam-ai-response" style="color:#dc2626">⚠️ ${err}</div>`;
