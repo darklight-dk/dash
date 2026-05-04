@@ -2954,7 +2954,7 @@ async function solveMath() {
         body: JSON.stringify({
           system_instruction: { parts: [{ text: systemPrompt }] },
           contents: [{ role: 'user', parts: [{ text: `Resuelve y explica paso a paso: ${query}` }] }],
-          generationConfig: { maxOutputTokens: 1024, temperature: 0.4 }
+          generationConfig: { maxOutputTokens: 2048, temperature: 0.4 }
         })
       }
     );
@@ -3079,7 +3079,7 @@ Usa lenguaje claro en español mexicano, sin markdown, sin asteriscos. Sé conci
         body: JSON.stringify({
           system_instruction: { parts: [{ text: systemPrompt }] },
           contents: [{ role: 'user', parts: userContent }],
-          generationConfig: { maxOutputTokens: 1024, temperature: 0.3 }
+          generationConfig: { maxOutputTokens: 2048, temperature: 0.3 }
         })
       }
     );
