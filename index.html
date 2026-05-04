@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8"/>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://accounts.google.com https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://exani-dash-adeff-default-rtdb.firebaseio.com https://www.googleapis.com https://firebaseinstallations.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com wss://s-usc1c-nss-2079.firebaseio.com wss://exani-dash-adeff-default-rtdb.firebaseio.com https://api.anthropic.com https://generativelanguage.googleapis.com https://dash.donniaxel55.workers.dev; frame-ancestors 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://accounts.google.com https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://exani-dash-adeff-default-rtdb.firebaseio.com https://www.googleapis.com https://firebaseinstallations.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com wss://s-usc1c-nss-2079.firebaseio.com wss://exani-dash-adeff-default-rtdb.firebaseio.com https://api.anthropic.com https://generativelanguage.googleapis.com https://gemini-proxy.donniaxel55.workers.dev; frame-ancestors 'none';">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="referrer" content="strict-origin-when-cross-origin"/>
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
@@ -2959,7 +2959,7 @@ async function solveMath() {
 
   try {
     const response = await fetch(
-      `https://dash.donniaxel55.workers.dev`,
+      `https://gemini-proxy.donniaxel55.workers.dev`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -3124,7 +3124,7 @@ Sin markdown, sin asteriscos. Español mexicano. Sé directo y conciso.`;
 
   try {
     const res = await fetch(
-      `https://dash.donniaxel55.workers.dev`,
+      `https://gemini-proxy.donniaxel55.workers.dev`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
