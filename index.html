@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8"/>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://accounts.google.com https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://exani-dash-adeff-default-rtdb.firebaseio.com https://www.googleapis.com https://firebaseinstallations.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com wss://s-usc1c-nss-2079.firebaseio.com wss://exani-dash-adeff-default-rtdb.firebaseio.com https://api.anthropic.com https://generativelanguage.googleapis.com; frame-ancestors 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://accounts.google.com https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://exani-dash-adeff-default-rtdb.firebaseio.com https://www.googleapis.com https://firebaseinstallations.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com wss://s-usc1c-nss-2079.firebaseio.com wss://exani-dash-adeff-default-rtdb.firebaseio.com https://api.anthropic.com https://generativelanguage.googleapis.com https://dash.donniaxel55.workers.dev; frame-ancestors 'none';">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="referrer" content="strict-origin-when-cross-origin"/>
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
@@ -2942,12 +2942,12 @@ async function solveMath() {
 
   const topicLabel = _mtTopicLabels[_mtCurrentTopic] || 'matemáticas';
 
-  const GEMINI_KEY = 'AIzaSyBvRXwpvvkUuiZ62jrLkct2J1BaQEpqgoQ';
+  
   const systemPrompt = `Eres un tutor de matemáticas experto, didáctico y paciente, especializado en ${topicLabel}. Tu misión es explicar paso a paso el procedimiento completo para resolver el problema o ecuación que el estudiante escribe. Usa un tono amigable y motivador, como si estuvieras sentado junto al alumno. REGLAS DE FORMATO: Estructura tu respuesta con pasos numerados claros: "Paso 1:", "Paso 2:", etc. Explica el PORQUÉ de cada paso, no solo el cómo. Usa ➜ para indicar transformaciones o resultados intermedios. Termina siempre con "✅ Resultado:" y la respuesta final en una línea sola. Si hay un error en la ecuación, dilo amablemente y corrige. Usa lenguaje en español mexicano. Sé conciso pero completo — no uses asteriscos ni markdown, solo texto plano y numeración.`;
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`,
+      `https://dash.donniaxel55.workers.dev`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -3049,7 +3049,7 @@ async function askExamAI() {
   const optsText = q.options.map((o,i) => `${letters[i]}) ${o}`).join('\n');
   const areaInfo = q.area ? `Área: ${q.area}\n` : '';
 
-  const GEMINI_KEY = 'AIzaSyBvRXwpvvkUuiZ62jrLkct2J1BaQEpqgoQ';
+  
   const systemPrompt = `Eres un tutor experto en el examen EXANI-II de premedicina de CENEVAL. Tu misión es ayudar al estudiante a entender el reactivo actual sin simplemente darle la respuesta directa al inicio. Estructura tu respuesta así:
 1. 🎯 Concepto clave: Qué tema evalúa la pregunta (1-2 oraciones).
 2. 💡 Análisis: Explica el razonamiento para descartarse o considerarse cada opción de forma educativa.
@@ -3072,7 +3072,7 @@ Usa lenguaje claro en español mexicano, sin markdown, sin asteriscos. Sé conci
 
   try {
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`,
+      `https://dash.donniaxel55.workers.dev`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
