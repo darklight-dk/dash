@@ -2,7 +2,10 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://accounts.google.com https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://exani-dash-adeff-default-rtdb.firebaseio.com https://www.googleapis.com https://firebaseinstallations.googleapis.com https://identitytoolkit.googleapis.com wss://s-usc1c-nss-2079.firebaseio.com wss://exani-dash-adeff-default-rtdb.firebaseio.com; frame-ancestors 'none';">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="referrer" content="strict-origin-when-cross-origin"/>
+<meta http-equiv="X-Content-Type-Options" content="nosniff"/>
 <title>DASH</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -828,6 +831,30 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
   color:#fff;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(245,158,11,.4);
   z-index:300;transition:all .2s;display:none;align-items:center;justify-content:center}
 @media(max-width:480px){}
+
+/* ── MODAL DE CONFIRMACIÓN (reemplaza confirm() nativo) ── */
+.sp-confirm-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:99999;
+  display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)
+}
+.sp-confirm-overlay.show{display:flex}
+.sp-confirm-card{
+  background:#1e293b;border:1px solid rgba(255,255,255,.12);border-radius:18px;
+  padding:28px 28px 22px;width:min(360px,92vw);box-shadow:0 24px 64px rgba(0,0,0,.5)
+}
+.sp-confirm-icon{font-size:32px;margin-bottom:10px;text-align:center}
+.sp-confirm-title{font-size:15px;font-weight:800;color:#f1f5f9;margin-bottom:6px;text-align:center}
+.sp-confirm-msg{font-size:13px;color:rgba(255,255,255,.5);text-align:center;line-height:1.5;margin-bottom:22px}
+.sp-confirm-btns{display:flex;gap:10px}
+.sp-confirm-cancel{flex:1;padding:11px;border-radius:10px;border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);font-size:13px;font-weight:600;
+  cursor:pointer;font-family:'Sora',sans-serif;transition:all .15s}
+.sp-confirm-cancel:hover{background:rgba(255,255,255,.12);color:#fff}
+.sp-confirm-ok{flex:1;padding:11px;border-radius:10px;border:none;
+  background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;font-size:13px;font-weight:700;
+  cursor:pointer;font-family:'Sora',sans-serif;transition:all .15s}
+.sp-confirm-ok.teal{background:linear-gradient(135deg,#0d9488,#065f46)}
+.sp-confirm-ok:hover{opacity:.9;transform:translateY(-1px)}
 
 /* loading */
 #loadOv{position:fixed;inset:0;background:rgba(248,250,252,.94);display:none;
@@ -2266,10 +2293,8 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
 //  AUTH
 // ══════════════════════════════════════════
 // Usuarios con contraseña real — solo estos tienen acceso verificado
-// USERS legacy — mantenido solo para compatibilidad (auth migrado a Firebase Auth)
-const USERS = {};
-// Emails que reciben rol Administrador automáticamente
-const ADMIN_EMAILS_LOCAL = ['acselito@gmail.com', 'donniaxel55@gmail.com'];
+// Auth migrado completamente a Firebase Auth
+// ADMIN_EMAILS se define en la sección Google Login (única fuente de verdad)
 const TOTAL_SECS = 4*3600+30*60;
 const NAV_WIN = 10;
 
@@ -2321,17 +2346,13 @@ const load = (v, msg='', sub='') => {
 };
 const pad = n => String(n).padStart(2,'0');
 
-// ── Al cargar la página: ir al dashboard si ya había sesión activa ──
+// ── Al cargar la página: NO restaurar pantalla desde sessionStorage sin auth real
+// FIX Ghost Session: eliminado acceso al dashboard sin autenticación verificada
+// La sesión se restaura únicamente desde restoreSession() que valida localStorage + Firebase
 (function() {
   try {
-    const last = sessionStorage.getItem('fw_screen');
-    // Si tenía sesión y no estaba en medio de un examen, ir al dash
-    if (last === 'dashScreen') {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      $('dashScreen').classList.add('active');
-      $('userLabel').innerHTML = 'Invitado · <span>Aspirante</span>';
-      S.user = 'Invitado';
-    }
+    // Limpiar fw_screen para evitar que un valor stale muestre pantallas sin auth
+    sessionStorage.removeItem('fw_screen');
   } catch(e){}
 })();
 
@@ -2391,6 +2412,8 @@ function doLogout() {
   const rtbLogout = $('rankingTopbarBtn'); if (rtbLogout) rtbLogout.style.display = 'none';
   closeRanking();
   localStorage.removeItem('exani_session');
+  // Reset anti-spam state
+  window._lastSentMsg = null;
   // Ocultar Super Panel y burbuja
   _spPanelOpen = false;
   const spPanel = document.getElementById('superPanel');
@@ -2412,6 +2435,33 @@ function doLogout() {
   show('loginScreen');
 }
 window.doLogout = doLogout;
+
+// ══════════════════════════════════════════
+//  MODAL DE CONFIRMACIÓN (reemplaza confirm() nativo)
+// ══════════════════════════════════════════
+let _spConfirmResolve = null;
+
+function spConfirm(msg, opts = {}) {
+  const { title = 'Confirmar acción', icon = '⚠️', okLabel = 'Confirmar', danger = true } = opts;
+  return new Promise(resolve => {
+    _spConfirmResolve = resolve;
+    const overlay = document.getElementById('spConfirmOverlay');
+    if (!overlay) { resolve(window.confirm(msg)); return; } // fallback
+    document.getElementById('spConfirmIcon').textContent  = icon;
+    document.getElementById('spConfirmTitle').textContent = title;
+    document.getElementById('spConfirmMsg').textContent   = msg;
+    const okBtn = document.getElementById('spConfirmOkBtn');
+    okBtn.textContent = okLabel;
+    okBtn.className = danger ? 'sp-confirm-ok' : 'sp-confirm-ok teal';
+    overlay.classList.add('show');
+  });
+}
+
+window.spConfirmResolve = function(result) {
+  const overlay = document.getElementById('spConfirmOverlay');
+  if (overlay) overlay.classList.remove('show');
+  if (_spConfirmResolve) { _spConfirmResolve(result); _spConfirmResolve = null; }
+};
 
 // ══════════════════════════════════════════
 //  GOOGLE LOGIN
@@ -2633,9 +2683,11 @@ function updateProfileUI() {
   // Mostrar opción Admin en dropdown solo si es admin
   const ddAdmin = $('ddAdminItem');
   if (ddAdmin) ddAdmin.style.display = role === 'Administrador' ? 'flex' : 'none';
-  // userLabel legacy (puede que algo lo use)
-  if ($('userLabel')) $('userLabel').innerHTML = `${name} · <span>${role}</span>`;
-  if ($('adminUserLabel')) $('adminUserLabel').innerHTML = `${name} · <span>${role}</span>`;
+  // userLabel legacy eliminado (elemento no existe en DOM)
+  // FIX XSS: escapar name y role antes de insertar en innerHTML
+  const _safeN = String(name||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const _safeR = String(role||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  if ($('adminUserLabel')) $('adminUserLabel').innerHTML = `${_safeN} · <span>${_safeR}</span>`;
 }
 
 function toggleProfileMenu(btn) {
@@ -3468,17 +3520,13 @@ async function saveScoreToRanking(pct, ok, total) {
   try {
     // Usar Firebase SDK (con auth) en lugar de REST abierto
     if (window._fbDB) {
-      const { db: _db, ref: _ref, set: _set, update: _upd } = window._fbDB;
-      const { get } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js');
-      // Solo actualizar ranking si es mejor puntaje
+      const { db: _db, ref: _ref, set: _set } = window._fbDB;
       const snap = await get(_ref(_db, `ranking/${safeKey}`));
       const existing = snap.exists() ? snap.val() : null;
       if (!existing || pct > (existing.pct || 0)) {
         await _set(_ref(_db, `ranking/${safeKey}`), entry);
       }
-      // Historial: push para no sobreescribir
-      const { push: _push } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js');
-      await _push(_ref(_db, `history/${safeKey}`), entry);
+      await push(_ref(_db, `history/${safeKey}`), entry);
     } else {
       // Fallback REST si SDK no disponible aún
       const existing = await fetch(RANKING_REF + '/' + safeKey + '.json').then(r => r.json()).catch(() => null);
@@ -3652,28 +3700,37 @@ function rankingRowHTML(e, i, isMe) {
   const pos = i < 3 ? medals[i] : `#${i+1}`;
   const date = e.ts ? new Date(e.ts).toLocaleDateString('es-MX', {day:'numeric',month:'short'}) : '—';
   const examName = (e.exam && e.exam !== 'undefined') ? e.exam : 'Examen';
-  const avatarHTML = e.picture
-    ? `<img class="ranking-avatar" src="${e.picture}" onerror="this.style.display='none'">`
-    : `<div class="ranking-avatar-initials">${(e.user||'?').slice(0,2).toUpperCase()}</div>`;
+  // FIX XSS: escapar todos los datos de Firebase antes de insertar en innerHTML
+  const safeUser = _esc(e.user || '?');
+  const safeExam = _esc(examName);
+  const safeDate = _esc(date);
+  const safePct  = Number(e.pct) || 0; // nunca string, solo número
+  // FIX: validar que picture sea HTTPS antes de usarla como src
+  const safePic = (e.picture && /^https:\/\//.test(e.picture)) ? e.picture : null;
+  const avatarHTML = safePic
+    ? `<img class="ranking-avatar" src="${safePic}" onerror="this.style.display='none'">`
+    : `<div class="ranking-avatar-initials">${_esc((e.user||'?').slice(0,2).toUpperCase())}</div>`;
   return `<div class="ranking-row ${isMe ? 'me' : ''}">
     <div class="ranking-pos ${posClass}">${pos}</div>
     ${avatarHTML}
     <div class="ranking-info">
-      <div class="ranking-name">${e.user}${isMe ? ' 👈' : ''}</div>
-      <div class="ranking-exam">${examName}</div>
+      <div class="ranking-name">${safeUser}${isMe ? ' 👈' : ''}</div>
+      <div class="ranking-exam">${safeExam}</div>
     </div>
     <div class="ranking-score">
-      <div class="ranking-pct">${e.pct}%</div>
-      <div class="ranking-date">${date}</div>
+      <div class="ranking-pct">${safePct}%</div>
+      <div class="ranking-date">${safeDate}</div>
     </div>
   </div>`;
 }
+// Alias corto para escapeHTML (usado en ranking y otros lugares de string templates)
+function _esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
 buildCalc();
 loadCatalog();   // carga exams/catalog.json y renderiza las tarjetas
 
 // ── Restaurar sesión si existe ──
-(function restoreSession() {
+(async function restoreSession() {
   try {
     const saved = localStorage.getItem('exani_session');
     if (!saved) return;
@@ -3704,7 +3761,22 @@ loadCatalog();   // carga exams/catalog.json y renderiza las tarjetas
           const data = await r.json();
           if (data?.banned) { doLogout(); return; }
           // Actualizar rol si cambió en Firebase
-          if (data?.role && data.role !== S.role) {
+          if (data?.role && VALID_ROLES && VALID_ROLES.includes(data.role) && data.role !== S.role) {
+            S.role = data.role;
+            localStorage.setItem('exani_session', JSON.stringify({ ...sess, role: data.role }));
+            updateProfileUI();
+            const ab = document.getElementById('chatAdminBar');
+            if (ab) ab.classList.toggle('visible', data.role === 'Administrador');
+            window._spInitBubble && window._spInitBubble();
+          }
+        } else if (window._fbCurrentUser) {
+          // FIX: Usuario nativo — verificar ban en Firebase también
+          const uid = window._fbCurrentUser.uid;
+          const r = await fetch(`https://exani-dash-adeff-default-rtdb.firebaseio.com/users/${uid}.json`);
+          const data = await r.json();
+          if (data?.banned) { doLogout(); return; }
+          // Sincronizar rol si cambió
+          if (data?.role && VALID_ROLES && VALID_ROLES.includes(data.role) && data.role !== S.role) {
             S.role = data.role;
             localStorage.setItem('exani_session', JSON.stringify({ ...sess, role: data.role }));
             updateProfileUI();
@@ -3713,7 +3785,7 @@ loadCatalog();   // carga exams/catalog.json y renderiza las tarjetas
             window._spInitBubble && window._spInitBubble();
           }
         }
-      } catch(e) { /* red no disponible, continuar */ }
+      } catch(e) { /* red no disponible, continuar con sesión en memoria */ }
     }, 1500);
 
   } catch(e) {
@@ -4154,7 +4226,11 @@ function saveCanvas() {
 // ══════════════════════════════════════════
 
 function openAdmin() {
-  if (S.role !== 'Administrador') return;
+  // FIX: verificación doble - rol en memoria y elemento de UI
+  if (S.role !== 'Administrador') {
+    console.warn('[Security] Intento de acceso a adminScreen sin rol Administrador');
+    return;
+  }
   updateProfileUI();
   renderAdminPanel();
   show('adminScreen');
@@ -4723,13 +4799,13 @@ function toggleUsername(i) {
   span.dataset.hidden = hidden ? 'false' : 'true';
   btn.textContent    = hidden ? '🙈' : '👁';
 }
-function clearLoadedExam() {
-  if (!confirm('¿Eliminar el examen cargado de la memoria? No borra el archivo ZIP.')) return;
+async function clearLoadedExam() {
+  if (!(await spConfirm('Se eliminará el examen de la memoria. El archivo ZIP no se borra.', {title:'¿Eliminar examen cargado?', icon:'📋', okLabel:'Sí, eliminar', danger:false}))) return;
   S.questions = []; S.meta = null; S.rawZip = null; S.fileName = null;
   alert('Examen eliminado de la memoria. Recarga el Dashboard.');
 }
-function resetConfig() {
-  if (!confirm('¿Restaurar toda la configuración a sus valores predeterminados?')) return;
+async function resetConfig() {
+  if (!(await spConfirm('Se restablecerá toda la configuración a sus valores predeterminados.', {title:'¿Restaurar configuración?', icon:'⚙️', okLabel:'Sí, restaurar', danger:false}))) return;
   localStorage.removeItem(CFG_KEY);
   initConfigTab();
 }
@@ -5311,7 +5387,7 @@ function buildTags(area, version) {
 <!-- FIREBASE SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, onChildAdded, onChildRemoved, onValue, serverTimestamp, query, limitToLast, set, onDisconnect, remove }
+import { getDatabase, ref, push, onChildAdded, onChildRemoved, onValue, serverTimestamp, query, limitToLast, set, onDisconnect, remove, get, update }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import {
   getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
@@ -5337,8 +5413,7 @@ const presRef  = ref(db, 'chat/presence');
 const usersRef = ref(db, 'users');
 
 // Exponer funciones de Firebase al scope global para funciones fuera del módulo
-import { update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-window._fbDB = { db, ref, set, update };
+window._fbDB = { db, ref, set, update, get, push };
 window._fbSignOut = () => signOut(auth);
 window._fbSignInWithCredential = (credential) => signInWithCredential(auth, credential);
 window._fbGoogleProvider = GoogleAuthProvider;
@@ -5377,7 +5452,7 @@ function usernameToEmail(username) {
 }
 
 // ── Usernames que reciben rol Administrador automáticamente ──
-const ADMIN_USERNAMES = ['acselito', 'admin456'];
+const ADMIN_USERNAMES = ['acselito', 'dark_light_6']; // FIX: renombrado admin456 (nombre predecible)
 
 // ── Rate limiter de login (máx 5 intentos en 5 min) ──
 const _loginAttempts = { count: 0, firstTs: 0 };
@@ -5524,7 +5599,8 @@ let myPresenceRef = null;
 // ── Presencia ──
 function registerPresence() {
   if (!S.user) return;
-  myPresenceRef = ref(db, 'chat/presence/' + encodeURIComponent(S.user));
+  const _presKey = encodeURIComponent(S.user).replace(/[.#$/\[\]]/g, '_');
+  myPresenceRef = ref(db, 'chat/presence/' + _presKey);
   set(myPresenceRef, { name: S.user, online: true, ts: Date.now() });
   onDisconnect(myPresenceRef).remove();
 }
@@ -5552,7 +5628,6 @@ onChildAdded(recentQ, snap => {
     }
   }
   if (firstLoad) {
-    // Al terminar la carga inicial, scroll al fondo
     setTimeout(() => {
       const msgs = document.getElementById('chatMessages');
       if (msgs) msgs.scrollTop = msgs.scrollHeight;
@@ -5560,6 +5635,18 @@ onChildAdded(recentQ, snap => {
     }, 200);
   }
 });
+
+// FIX: si no hay mensajes, quitar "Conectando..." después de 3 segundos
+setTimeout(() => {
+  firstLoad = false;
+  const container = document.getElementById('chatMessages');
+  if (!container) return;
+  const connecting = container.querySelector('.chat-system');
+  if (connecting && connecting.textContent === 'Conectando…') {
+    connecting.textContent = 'No hay mensajes aún. ¡Sé el primero en escribir!';
+    connecting.style.opacity = '0.4';
+  }
+}, 3000);
 
 // ── Eliminación en tiempo real para todos ──
 onChildRemoved(ref(db, 'chat/messages'), snap => {
@@ -5685,7 +5772,7 @@ window.toggleProfanityFilter = function() {
 
 window.clearChatMessages = async function() {
   if (S.role !== 'Administrador') return;
-  if (!confirm('¿Limpiar todo el chat? No se puede deshacer.')) return;
+  if (!(await spConfirm('Todos los mensajes serán eliminados permanentemente.', {title:'¿Limpiar chat?', icon:'🗑️', okLabel:'Sí, limpiar'}))) return;
   // Limpiar DOM inmediatamente
   const container = document.getElementById('chatMessages');
   if (container) container.innerHTML = '';
@@ -5694,6 +5781,9 @@ window.clearChatMessages = async function() {
 };
 
 // ── Enviar mensaje ──
+// FIX Slowmode client-side - rastrear último mensaje enviado
+let _lastChatMsgTs = 0;
+
 window.sendChatMsg = function() {
   if (!S.user) { alert('Iniciá sesión para chatear.'); return; }
   if (window._spChatEnabled === false) { alert('El chat está deshabilitado por el administrador.'); return; }
@@ -5701,14 +5791,35 @@ window.sendChatMsg = function() {
   const input = document.getElementById('chatInput');
   const text  = (input.value || '').trim();
   if (!text) return;
+  // FIX: bloquear mensajes con solo espacios/chars invisibles o texto repetido masivo
   if (text.length > 300) { alert('Máximo 300 caracteres.'); return; }
+  if (/^[\s​‌‍﻿]+$/.test(text)) return; // solo whitespace invisible
+  // Anti-spam: bloquear si el mensaje es idéntico al anterior enviado
+  if (text === window._lastSentMsg) {
+    alert('No puedes enviar el mismo mensaje dos veces seguidas.');
+    return;
+  }
+  window._lastSentMsg = text;
 
+  // FIX Slowmode: aplicar cooldown client-side para no-admins
+  const slowSecs = (_spSettingsSnap.slowmode || 0);
+  if (slowSecs > 0 && S.role !== 'Administrador') {
+    const elapsed = (Date.now() - _lastChatMsgTs) / 1000;
+    if (elapsed < slowSecs) {
+      const wait = Math.ceil(slowSecs - elapsed);
+      alert(`Slowmode activo. Espera ${wait}s antes de enviar otro mensaje.`);
+      return;
+    }
+  }
+  _lastChatMsgTs = Date.now();
+
+  // FIX: usar serverTimestamp() en vez de Date.now() del cliente (no manipulable)
   push(msgsRef, {
     name:    S.user,
     role:    S.role    || 'Aspirante',
     picture: S.googlePicture || null,
     text,
-    ts: Date.now(),
+    ts: serverTimestamp(),
   });
 
   input.value = '';
@@ -5778,7 +5889,9 @@ window.openProfileView = async function(username, role, picture) {
   avatarEl.innerHTML = '';
   if (picture) {
     const img = document.createElement('img');
-    img.src = picture; img.alt = username;
+    // FIX: solo cargar imágenes con protocolo seguro
+    img.src = (picture && /^https:\/\//.test(picture)) ? picture : '';
+    img.alt = username;
     img.onerror = () => { avatarEl.textContent = (username||'?').slice(0,2).toUpperCase(); };
     avatarEl.appendChild(img);
   } else {
@@ -5793,7 +5906,8 @@ window.openProfileView = async function(username, role, picture) {
   // Fetch socials + description from Firebase
   try {
     const snap = await new Promise(res => {
-      const socialsQuery = ref(db, 'userSocials/' + encodeURIComponent(username));
+      const _profKey = encodeURIComponent(username).replace(/[.#$/\[\]]/g, '_');
+      const socialsQuery = ref(db, 'userSocials/' + _profKey);
       onValue(socialsQuery, res, { onlyOnce: true });
     });
     const socials = snap.exists() ? snap.val() : {};
@@ -5827,7 +5941,10 @@ window.openProfileView = async function(username, role, picture) {
       links.forEach(l => {
         const a = document.createElement('a');
         a.className = 'pview-social-link';
-        a.href = socials[l.key]; a.target = '_blank'; a.rel = 'noopener noreferrer';
+        // FIX Open Redirect: solo permitir URLs https://
+        const rawUrl = socials[l.key] || '';
+        if (!/^https:\/\//.test(rawUrl)) return; // skip URLs no-https
+        a.href = rawUrl; a.target = '_blank'; a.rel = 'noopener noreferrer';
         const imgStyle = l.bg ? `background:${l.bg};border-radius:5px;padding:2px;` : '';
         a.innerHTML = `<img class="myp-social-icon" src="${l.icon}" alt="${l.label}" style="${imgStyle}"/>${escapeHTML(socialDisplay(socials[l.key]))}`;
         socialsEl.appendChild(a);
@@ -5858,7 +5975,8 @@ window.openMyProfile = async function() {
 
   try {
     const snap = await new Promise(res => {
-      onValue(ref(db, 'userSocials/' + encodeURIComponent(S.user)), res, { onlyOnce: true });
+      const _safeKey = encodeURIComponent(S.user).replace(/[.#$/\[\]]/g, '_');
+      onValue(ref(db, 'userSocials/' + _safeKey), res, { onlyOnce: true });
     });
     if (snap.exists()) {
       const d = snap.val();
@@ -5874,6 +5992,8 @@ function _validateSocialURL(url, allowed) {
   if (!url) return true; // vacío = ok, se borra
   try {
     const u = new URL(url);
+    // FIX: forzar solo HTTPS, bloquear javascript:, data:, etc.
+    if (u.protocol !== 'https:') return false;
     return allowed.some(domain => u.hostname === domain || u.hostname.endsWith('.' + domain));
   } catch { return false; }
 }
@@ -5911,7 +6031,8 @@ window.saveMyProfile = async function() {
     if (ig)   payload.ig   = ig;
     if (tt)   payload.tt   = tt;
 
-    await set(ref(db, 'userSocials/' + encodeURIComponent(S.user)), payload);
+    const _savKey = encodeURIComponent(S.user).replace(/[.#$/\[\]]/g, '_');
+    await set(ref(db, 'userSocials/' + _savKey), payload);
     const saved = document.getElementById('mypSaved');
     saved.style.display = 'block';
     setTimeout(() => { saved.style.display = 'none'; }, 2500);
@@ -6098,36 +6219,38 @@ window._spInitBubble = function() {
 };
 
 // ── Toggle panel ──
-window.toggleSuperPanel = async function() {
-  // Verificación doble: rol en memoria Y en Firebase
+window.toggleSuperPanel = function() {
   if (S.role !== 'Administrador' && S.role !== 'Moderador') return;
-  // Validar contra Firebase si hay uid de Firebase Auth
-  if (window._fbCurrentUser) {
-    try {
-      const { db: _db, ref: _ref } = window._fbDB || {};
-      if (_db && _ref) {
-        const { get } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js');
-        const snap = await get(_ref(_db, `users/${window._fbCurrentUser.uid}/role`));
-        const fbRole = snap.exists() ? snap.val() : null;
-        if (fbRole !== 'Administrador' && fbRole !== 'Moderador') {
-          // Rol manipulado localmente — forzar logout
-          doLogout();
-          return;
-        }
-      }
-    } catch(e) { /* si falla la red, continuar con rol en memoria */ }
-  }
+
   _spPanelOpen = !_spPanelOpen;
-  const panel = document.getElementById('superPanel');
+  const panel  = document.getElementById('superPanel');
+  const bubble = document.getElementById('superPanelBubble');
   if (!panel) return;
   panel.classList.toggle('open', _spPanelOpen);
+  // Ocultar burbuja al abrir panel, mostrarla al cerrar
+  if (bubble) bubble.style.opacity = _spPanelOpen ? '0' : '1';
   if (_spPanelOpen) {
-    _spSubscribeUsers(); // asegurar suscripción activa
+    _spSubscribeUsers();
     _spPositionPanel();
     _spRenderUserList();
     _spRenderPermsTable();
     _spSyncTogglesAll();
     _spRenderLog();
+    // Verificar rol en Firebase de forma NO bloqueante (background)
+    if (window._fbCurrentUser && window._fbDB) {
+      const { db: _db, ref: _ref } = window._fbDB;
+      get(_ref(_db, `users/${window._fbCurrentUser.uid}/role`))
+        .then(snap => {
+          const fbRole = snap.exists() ? snap.val() : null;
+          if (fbRole !== null && fbRole !== 'Administrador' && fbRole !== 'Moderador') {
+            _spPanelOpen = false;
+            panel.classList.remove('open');
+            if (bubble) bubble.style.opacity = '1';
+            doLogout();
+          }
+        })
+        .catch(() => {});
+    }
   }
 };
 
@@ -6155,11 +6278,13 @@ function _spInitDrag() {
   const bubble = document.getElementById('superPanelBubble');
   if (!bubble || bubble._dragInit) return;
   bubble._dragInit = true;
-  let ox = 0, oy = 0, bx = 0, by = 0, moved = false;
+  let ox = 0, oy = 0, bx = 0, by = 0, moved = false, startX = 0, startY = 0;
+  const DRAG_THRESHOLD = 8; // px mínimos para considerar que es drag y no tap
   function pointerDown(e) {
-    if (e.type === 'touchstart') e.preventDefault(); // evita mousedown/mouseup sintéticos en mobile
+    if (e.type === 'touchstart') e.preventDefault();
     moved = false;
     const cl = e.touches ? e.touches[0] : e;
+    startX = cl.clientX; startY = cl.clientY;
     const r  = bubble.getBoundingClientRect();
     ox = cl.clientX - r.left; oy = cl.clientY - r.top;
     bx = r.left; by = r.top;
@@ -6170,6 +6295,11 @@ function _spInitDrag() {
   }
   function pointerMove(e) {
     const cl = e.touches ? e.touches[0] : e;
+    const dx = cl.clientX - startX;
+    const dy = cl.clientY - startY;
+    // Solo activar drag si supera el umbral
+    if (!moved && Math.sqrt(dx*dx + dy*dy) < DRAG_THRESHOLD) return;
+    moved = true;
     const nx = cl.clientX - ox;
     const ny = cl.clientY - oy;
     const maxX = window.innerWidth  - bubble.offsetWidth;
@@ -6177,7 +6307,6 @@ function _spInitDrag() {
     bubble.style.left = Math.max(0, Math.min(nx, maxX)) + 'px';
     bubble.style.top  = Math.max(0, Math.min(ny, maxY)) + 'px';
     bubble.style.right = 'auto'; bubble.style.bottom = 'auto';
-    moved = true;
     if (e.cancelable) e.preventDefault();
   }
   function pointerUp() {
@@ -6281,8 +6410,16 @@ function _spRenderUserList(filter) {
 
 window.spFilterUsers = function(q) { _spRenderUserList(q); };
 
+// FIX: whitelist de roles válidos - rechazar cualquier valor fuera de la lista
+const VALID_ROLES = ['Administrador', 'Moderador', 'Profesor', 'Estudiante', 'Aspirante'];
+
 window.spChangeUserRole = async function(uid, username, newRole) {
   if (!uid || !newRole) return;
+  // FIX: validar que newRole sea un valor permitido
+  if (!VALID_ROLES.includes(newRole)) {
+    spShowFeedback('spUserFeedback', 'err', '⛔ Rol no válido.');
+    return;
+  }
   const isAdmin = S.role === 'Administrador';
   const isMod   = S.role === 'Moderador';
   if (!isAdmin && (newRole === 'Administrador' || newRole === 'Moderador')) {
@@ -6338,7 +6475,7 @@ window.spSavePerms = async function() {
 // ── Quick actions ──
 window.spQuickAction = async function(action) {
   if (action === 'chat_clear') {
-    if (!confirm('¿Limpiar todo el chat? Esto es irreversible.')) return;
+    if (!(await spConfirm('Todos los mensajes serán eliminados permanentemente.', {title:'¿Limpiar chat?', icon:'🗑️', okLabel:'Sí, limpiar'}))) return;
     await remove(msgsRef);
     push(msgsRef, { system:true, text:'🧹 Chat limpiado por un administrador.', ts:Date.now() });
     _spLog_push('danger', `Chat limpiado por ${S.user}`);
@@ -6378,7 +6515,12 @@ window.spBanAllGuests = function() {
 
 // ── Ban / Unban user ──
 window.spBanUser = async function(uid, username) {
-  if (!confirm(`¿Banear a "${username}"? No podrá iniciar sesión.`)) return;
+  // FIX: no permitir auto-baneo
+  if (window._fbCurrentUser && window._fbCurrentUser.uid === uid) {
+    spShowFeedback('spUserFeedback', 'err', '⛔ No puedes banearte a ti mismo.');
+    return;
+  }
+  if (!(await spConfirm(`${username} no podrá iniciar sesión hasta que sea desbaneado.`, {title:`¿Banear a "${username}"?`, icon:"🚫", okLabel:"Sí, banear"}))) return;
   try {
     const dbPath = uid.startsWith('g_') ? `googleUsers/${uid}/banned` : `users/${uid}/banned`;
     await set(ref(db, dbPath), true);
@@ -6397,7 +6539,12 @@ window.spUnbanUser = async function(uid, username) {
 
 // ── Delete user ──
 window.spDeleteUser = async function(uid, username) {
-  if (!confirm(`⚠️ ELIMINAR cuenta de "${username}" de Firebase? Esto es irreversible.`)) return;
+  // FIX: no permitir auto-eliminación del admin actual
+  if (window._fbCurrentUser && window._fbCurrentUser.uid === uid) {
+    spShowFeedback('spUserFeedback', 'err', '⛔ No puedes eliminar tu propia cuenta.');
+    return;
+  }
+  if (!(await spConfirm(`Esta acción es irreversible. Se eliminará la cuenta "${username}" de Firebase.`, {title:"¿Eliminar cuenta?", icon:"🗑️", okLabel:"Sí, eliminar"}))) return;
   try {
     const dbPath = uid.startsWith('g_') ? `googleUsers/${uid}` : `users/${uid}`;
     await remove(ref(db, dbPath));
@@ -6408,7 +6555,7 @@ window.spDeleteUser = async function(uid, username) {
 
 // ── Reset user scores ──
 window.spResetUserScores = async function(uid, username) {
-  if (!confirm(`¿Resetear todos los resultados de "${username}"?`)) return;
+  if (!(await spConfirm(`Se eliminarán todos los resultados de exámenes de "${username}".`, {title:"¿Resetear resultados?", icon:"🔄", okLabel:"Sí, resetear", danger:false}))) return;
   try {
     await remove(ref(db, `scores/${uid}`));
     _spLog_push('action', `Scores de "${username}" reseteados por ${S.user}`);
@@ -6428,7 +6575,7 @@ window.spBroadcast = async function() {
 
 // ── Force refresh all clients ──
 window.spForceRefresh = async function() {
-  if (!confirm('¿Forzar recarga de todos los clientes conectados?')) return;
+  if (!(await spConfirm('Se recargará la página a todos los usuarios conectados.', {title:'¿Forzar recarga global?', icon:'🔄', okLabel:'Sí, recargar', danger:false}))) return;
   await set(ref(db, 'siteSettings/forceRefreshTs'), Date.now());
   _spLog_push('action', `Force-refresh enviado por ${S.user}`);
   spShowFeedback('spHomeFeedback','ok','✅ Señal de recarga enviada');
@@ -6436,7 +6583,7 @@ window.spForceRefresh = async function() {
 
 // ── Force logout all ──
 window.spForceLogoutAll = async function() {
-  if (!confirm('¿Cerrar sesión de TODOS los usuarios? Solo admins podrán reingresar.')) return;
+  if (!(await spConfirm('Se cerrará la sesión de todos los usuarios. Solo administradores podrán reingresar.', {title:'¿Forzar logout global?', icon:'🚪', okLabel:'Sí, cerrar sesiones'}))) return;
   await set(ref(db, 'siteSettings/forceLogoutTs'), Date.now());
   _spLog_push('danger', `Force-logout enviado por ${S.user}`);
   spShowFeedback('spAccesoFeedback','ok','✅ Cierre de sesión global enviado');
@@ -6444,7 +6591,7 @@ window.spForceLogoutAll = async function() {
 
 // ── Reset all scores ──
 window.spResetAllScores = async function() {
-  if (!confirm('⛔ ¿Eliminar TODOS los resultados de exámenes? IRREVERSIBLE.')) return;
+  if (!(await spConfirm('Se eliminarán TODOS los resultados de exámenes de TODOS los usuarios. Esta acción es IRREVERSIBLE.', {title:'¿Eliminar todos los resultados?', icon:'⛔', okLabel:'Sí, eliminar TODO'}))) return;
   await remove(ref(db, 'scores'));
   _spLog_push('danger', `Todos los scores eliminados por ${S.user}`);
   spShowFeedback('spExamFeedback','ok','🗑️ Todos los resultados eliminados');
@@ -7245,6 +7392,19 @@ window._enterDash = function(user, role, picture, email) {
 
   </div><!-- /sp-body -->
 </div><!-- /superPanel -->
+
+<!-- MODAL DE CONFIRMACIÓN PROPIO (reemplaza confirm() nativo) -->
+<div class="sp-confirm-overlay" id="spConfirmOverlay">
+  <div class="sp-confirm-card">
+    <div class="sp-confirm-icon" id="spConfirmIcon">⚠️</div>
+    <div class="sp-confirm-title" id="spConfirmTitle">¿Estás seguro?</div>
+    <div class="sp-confirm-msg" id="spConfirmMsg"></div>
+    <div class="sp-confirm-btns">
+      <button class="sp-confirm-cancel" onclick="spConfirmResolve(false)">Cancelar</button>
+      <button class="sp-confirm-ok" id="spConfirmOkBtn" onclick="spConfirmResolve(true)">Confirmar</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
