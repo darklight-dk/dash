@@ -2954,7 +2954,7 @@ async function solveMath() {
         body: JSON.stringify({
           system_instruction: { parts: [{ text: systemPrompt }] },
           contents: [{ role: 'user', parts: [{ text: `Resuelve y explica paso a paso: ${query}` }] }],
-          generationConfig: { maxOutputTokens: 2048, temperature: 0.4 }
+          generationConfig: { maxOutputTokens: 4096, temperature: 0.4 }
         })
       }
     );
@@ -3050,11 +3050,11 @@ async function askExamAI() {
   const areaInfo = q.area ? `Área: ${q.area}\n` : '';
 
   
-  const systemPrompt = `Eres un tutor experto en el examen EXANI-II de premedicina de CENEVAL. Tu misión es ayudar al estudiante a entender el reactivo actual sin simplemente darle la respuesta directa al inicio. Estructura tu respuesta así:
-1. 🎯 Concepto clave: Qué tema evalúa la pregunta (1-2 oraciones).
-2. 💡 Análisis: Explica el razonamiento para descartarse o considerarse cada opción de forma educativa.
-3. ✅ Respuesta correcta: Indica cuál es la opción correcta y por qué es la correcta con una explicación sólida.
-Usa lenguaje claro en español mexicano, sin markdown, sin asteriscos. Sé conciso pero completo.`;
+  const systemPrompt = `Eres un tutor del EXANI-II premedicina. Responde SIEMPRE con esta estructura exacta y SIN extenderte demasiado en cada punto:
+🎯 Concepto: [tema en 1 oración]
+💡 Análisis: [1-2 líneas por opción, solo lo esencial]
+✅ Respuesta correcta: [opción + explicación breve en 2-3 líneas]
+Sin markdown, sin asteriscos. Español mexicano. Sé directo y conciso.`;
 
   const userContent = [];
 
@@ -3095,7 +3095,7 @@ Usa lenguaje claro en español mexicano, sin markdown, sin asteriscos. Sé conci
         body: JSON.stringify({
           system_instruction: { parts: [{ text: systemPrompt }] },
           contents: [{ role: 'user', parts: userContent }],
-          generationConfig: { maxOutputTokens: 2048, temperature: 0.3 }
+          generationConfig: { maxOutputTokens: 4096, temperature: 0.3 }
         })
       }
     );
