@@ -3060,12 +3060,28 @@ Usa lenguaje claro en español mexicano, sin markdown, sin asteriscos. Sé conci
 
   // Add image if present
   if (q.image && S.images[q.image]) {
-    const dataUrl = S.images[q.image];
-    const comma = dataUrl.indexOf(',');
-    const b64 = dataUrl.slice(comma+1);
-    const mimeMatch = dataUrl.match(/data:([^;]+);/);
-    const mime = mimeMatch ? mimeMatch[1] : 'image/png';
-    userContent.push({ inlineData: { mimeType: mime, data: b64 } });
+    try {
+      const dataUrl = S.images[q.image];
+      let b64, mime;
+      if (dataUrl.startsWith('blob:')) {
+        const blobRes = await fetch(dataUrl);
+        const blob = await blobRes.blob();
+        mime = blob.type || 'image/png';
+        b64 = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result.split(',')[1]);
+          reader.readAsDataURL(blob);
+        });
+      } else {
+        const comma = dataUrl.indexOf(',');
+        b64 = dataUrl.slice(comma+1);
+        const mimeMatch = dataUrl.match(/data:([^;]+);/);
+        mime = mimeMatch ? mimeMatch[1] : 'image/png';
+      }
+      userContent.push({ inlineData: { mimeType: mime, data: b64 } });
+    } catch(imgErr) {
+      console.warn('No se pudo cargar la imagen:', imgErr);
+    }
   }
 
   userContent.push({ text: `${areaInfo}Pregunta: ${q.question}\n\nOpciones:\n${optsText}` });
