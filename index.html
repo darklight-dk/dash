@@ -609,6 +609,10 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .exam-ai-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(124,58,237,.3)}
 .exam-ai-btn:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
 .mob-ctrl-ai{background:rgba(124,58,237,.1)!important;border-color:#7c3aed!important;color:#7c3aed!important}
+.exam-ai-error-card{text-align:center;padding:20px 12px}
+.exam-ai-error-icon{font-size:36px;margin-bottom:10px}
+.exam-ai-error-title{font-size:15px;font-weight:700;color:#1e293b;margin-bottom:6px}
+.exam-ai-error-desc{font-size:13px;color:#64748b;line-height:1.6}
 .exam-ai-tts-btn{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;
   font-size:20px;cursor:pointer;padding:0 14px;transition:.15s;flex-shrink:0}
 .exam-ai-tts-btn:hover{background:#f1f5f9;border-color:#7c3aed}
@@ -3156,11 +3160,30 @@ Sin markdown, sin asteriscos. Español mexicano. Sé directo y conciso.`;
       ttsBtn.style.display = '';
       ttsBtn._text = text;
     } else {
-      const err = json?.error?.message || json?.candidates?.[0]?.finishReason || 'Sin respuesta';
-      body.innerHTML = `<div class="exam-ai-response" style="color:#dc2626">⚠️ ${err}</div>`;
+      const rawErr = json?.error?.message || json?.candidates?.[0]?.finishReason || '';
+      const isQuota = rawErr.toLowerCase().includes('quota') || rawErr.toLowerCase().includes('rate');
+      const isRetry = rawErr.match(/retry in ([\d.]+)s/i);
+      const segundos = isRetry ? Math.ceil(parseFloat(isRetry[1])) : 20;
+      const msg = isQuota
+        ? `<div class="exam-ai-error-card">
+            <div class="exam-ai-error-icon">☕</div>
+            <div class="exam-ai-error-title">La IA necesita un respiro</div>
+            <div class="exam-ai-error-desc">Demasiadas preguntas seguidas. Espera unos ${segundos} segundos e intenta de nuevo, ya viene.</div>
+           </div>`
+        : `<div class="exam-ai-error-card">
+            <div class="exam-ai-error-icon">😅</div>
+            <div class="exam-ai-error-title">Algo salió mal</div>
+            <div class="exam-ai-error-desc">No se pudo obtener una respuesta. Intenta de nuevo en un momento.</div>
+           </div>`;
+      body.innerHTML = msg;
     }
   } catch(e) {
-    body.innerHTML = `<div class="exam-ai-response" style="color:#dc2626">⚠️ Error de red: ${e.message}</div>`;
+    const isNet = e.message.includes('fetch');
+    body.innerHTML = `<div class="exam-ai-error-card">
+      <div class="exam-ai-error-icon">${isNet ? '📡' : '😅'}</div>
+      <div class="exam-ai-error-title">${isNet ? 'Sin conexión' : 'Algo salió mal'}</div>
+      <div class="exam-ai-error-desc">${isNet ? 'Revisa tu internet e intenta de nuevo.' : 'Ocurrió un error inesperado. Intenta de nuevo.'}</div>
+    </div>`;
   }
 
   btn.disabled = false;
