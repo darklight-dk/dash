@@ -2942,7 +2942,7 @@ async function solveMath() {
 
   const topicLabel = _mtTopicLabels[_mtCurrentTopic] || 'matemáticas';
 
-  const GEMINI_KEY = 'AIzaSyB48ALRdXvZ05exBvd575lSaaQCt8i4z-c';
+  const GEMINI_KEY = 'AIzaSyBvRXwpvvkUuiZ62jrLkct2J1BaQEpqgoQ';
   const systemPrompt = `Eres un tutor de matemáticas experto, didáctico y paciente, especializado en ${topicLabel}. Tu misión es explicar paso a paso el procedimiento completo para resolver el problema o ecuación que el estudiante escribe. Usa un tono amigable y motivador, como si estuvieras sentado junto al alumno. REGLAS DE FORMATO: Estructura tu respuesta con pasos numerados claros: "Paso 1:", "Paso 2:", etc. Explica el PORQUÉ de cada paso, no solo el cómo. Usa ➜ para indicar transformaciones o resultados intermedios. Termina siempre con "✅ Resultado:" y la respuesta final en una línea sola. Si hay un error en la ecuación, dilo amablemente y corrige. Usa lenguaje en español mexicano. Sé conciso pero completo — no uses asteriscos ni markdown, solo texto plano y numeración.`;
 
   try {
@@ -3049,7 +3049,7 @@ async function askExamAI() {
   const optsText = q.options.map((o,i) => `${letters[i]}) ${o}`).join('\n');
   const areaInfo = q.area ? `Área: ${q.area}\n` : '';
 
-  const GEMINI_KEY = 'AIzaSyB48ALRdXvZ05exBvd575lSaaQCt8i4z-c';
+  const GEMINI_KEY = 'AIzaSyBvRXwpvvkUuiZ62jrLkct2J1BaQEpqgoQ';
   const systemPrompt = `Eres un tutor experto en el examen EXANI-II de premedicina de CENEVAL. Tu misión es ayudar al estudiante a entender el reactivo actual sin simplemente darle la respuesta directa al inicio. Estructura tu respuesta así:
 1. 🎯 Concepto clave: Qué tema evalúa la pregunta (1-2 oraciones).
 2. 💡 Análisis: Explica el razonamiento para descartarse o considerarse cada opción de forma educativa.
