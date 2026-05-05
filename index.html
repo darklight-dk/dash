@@ -598,8 +598,13 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .exam-ai-header{display:flex;align-items:center;justify-content:space-between;
   padding:16px 18px 14px}
 .exam-ai-title{display:flex;align-items:center;gap:10px}
-.exam-ai-icon{width:44px;height:44px;flex-shrink:0;display:flex;align-items:center;justify-content:center;image-rendering:pixelated}
-.exam-ai-icon svg{width:44px;height:44px}
+.exam-ai-icon{width:52px;height:52px;flex-shrink:0;image-rendering:pixelated}
+.bobi-wrap{width:100%;height:100%;image-rendering:pixelated;animation:bobiIdle 1.4s ease-in-out infinite}
+.bobi-wrap.walk{animation:bobiWalk .5s steps(1) infinite}
+.bobi-wrap.sleep{animation:bobiSleep 2s ease-in-out infinite}
+@keyframes bobiIdle{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@keyframes bobiWalk{0%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-3px) rotate(3deg)}}
+@keyframes bobiSleep{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(2px) rotate(2deg)}}
 .exam-ai-label{font-size:14px;font-weight:700;color:#0f172a;letter-spacing:-.1px}
 .exam-ai-sub{font-size:10px;color:#7c3aed;font-weight:700;letter-spacing:.8px;text-transform:uppercase}
 .exam-ai-close{background:#f8fafc;border:1px solid #e2e8f0;color:#94a3b8;cursor:pointer;
@@ -2657,10 +2662,10 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
   <div class="exam-ai-modal" id="examAIModal">
     <div class="exam-ai-header">
       <div class="exam-ai-title">
-        <div class="exam-ai-icon"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated"><rect x="5" y="1" width="6" height="5" fill="#FFCC00"/><rect x="4" y="2" width="8" height="4" fill="#FFCC00"/><rect x="7" y="0" width="2" height="2" fill="#FFAA00"/><rect x="6" y="0" width="1" height="1" fill="#FFAA00"/><rect x="9" y="0" width="1" height="1" fill="#FFAA00"/><rect x="6" y="3" width="1" height="1" fill="#111"/><rect x="9" y="3" width="1" height="1" fill="#111"/><rect x="7" y="5" width="2" height="1" fill="#FF7700"/><rect x="7" y="6" width="2" height="1" fill="#FF5500"/><rect x="4" y="6" width="8" height="7" fill="#FFCC00"/><rect x="3" y="7" width="10" height="5" fill="#FFCC00"/><rect x="6" y="8" width="4" height="3" fill="#FFE066"/><rect x="2" y="7" width="2" height="3" fill="#FFAA00"/><rect x="3" y="6" width="1" height="1" fill="#FFAA00"/><rect x="12" y="7" width="2" height="3" fill="#FFAA00"/><rect x="12" y="6" width="1" height="1" fill="#FFAA00"/><rect x="5" y="13" width="2" height="1" fill="#FF7700"/><rect x="4" y="14" width="3" height="1" fill="#FF7700"/><rect x="9" y="13" width="2" height="1" fill="#FF7700"/><rect x="9" y="14" width="3" height="1" fill="#FF7700"/></svg></div>
+        <div class="exam-ai-icon" id="bobiIcon"><div class="bobi-wrap" id="bobiSprite"><svg viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="9" y="0" width="2" height="1" fill="#F5A800"/><rect x="10" y="1" width="1" height="1" fill="#F5A800"/><rect x="7" y="1" width="6" height="1" fill="#FFCC00"/><rect x="6" y="2" width="8" height="1" fill="#FFCC00"/><rect x="6" y="3" width="8" height="2" fill="#FFCC00"/><rect x="7" y="5" width="6" height="1" fill="#FFCC00"/><rect x="8" y="3" width="1" height="1" fill="#1A1A1A"/><rect x="8" y="2" width="1" height="1" fill="#1A1A1A"/><rect x="9" y="2" width="1" height="1" fill="#FFFFFF"/><rect x="12" y="3" width="1" height="1" fill="#1A1A1A"/><rect x="12" y="2" width="1" height="1" fill="#1A1A1A"/><rect x="13" y="2" width="1" height="1" fill="#FFFFFF"/><rect x="10" y="5" width="2" height="1" fill="#FF7A00"/><rect x="10" y="6" width="2" height="1" fill="#CC5500"/><rect x="6" y="6" width="8" height="1" fill="#FFCC00"/><rect x="5" y="7" width="10" height="1" fill="#FFCC00"/><rect x="5" y="8" width="10" height="1" fill="#FFCC00"/><rect x="5" y="9" width="10" height="1" fill="#FFCC00"/><rect x="5" y="10" width="10" height="1" fill="#FFCC00"/><rect x="6" y="11" width="8" height="1" fill="#FFCC00"/><rect x="7" y="12" width="6" height="1" fill="#FFCC00"/><rect x="8" y="8" width="4" height="3" fill="#FFE566"/><rect x="3" y="7" width="2" height="3" fill="#F5A800"/><rect x="4" y="6" width="1" height="1" fill="#F5A800"/><rect x="3" y="10" width="3" height="1" fill="#F5A800"/><rect x="15" y="7" width="2" height="3" fill="#F5A800"/><rect x="15" y="6" width="1" height="1" fill="#F5A800"/><rect x="14" y="10" width="3" height="1" fill="#F5A800"/><rect x="8" y="13" width="2" height="1" fill="#FF7A00"/><rect x="7" y="14" width="3" height="1" fill="#FF7A00"/><rect x="11" y="13" width="2" height="1" fill="#FF7A00"/><rect x="11" y="14" width="3" height="1" fill="#FF7A00"/></svg></div></div>
         <div>
-          <div class="exam-ai-label">Tutor IA</div>
-          <div class="exam-ai-sub">EXANI-II · Premedicina</div>
+          <div class="exam-ai-label">BOBI</div>
+          <div class="exam-ai-sub">TUTOR AI · EXANI-II</div>
         </div>
       </div>
       <button class="exam-ai-close" onclick="closeExamAI()">✕</button>
@@ -2668,7 +2673,7 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
     <div class="exam-ai-q-preview" id="examAIQPreview"></div>
     <div class="exam-ai-body" id="examAIBody">
       <div class="exam-ai-empty">
-        <div class="exam-ai-empty-icon" style="width:64px;height:64px;margin:0 auto 10px;image-rendering:pixelated"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated"><rect x="5" y="1" width="6" height="5" fill="#FFCC00"/><rect x="4" y="2" width="8" height="4" fill="#FFCC00"/><rect x="7" y="0" width="2" height="2" fill="#FFAA00"/><rect x="6" y="0" width="1" height="1" fill="#FFAA00"/><rect x="9" y="0" width="1" height="1" fill="#FFAA00"/><rect x="6" y="3" width="1" height="1" fill="#111"/><rect x="9" y="3" width="1" height="1" fill="#111"/><rect x="7" y="5" width="2" height="1" fill="#FF7700"/><rect x="7" y="6" width="2" height="1" fill="#FF5500"/><rect x="4" y="6" width="8" height="7" fill="#FFCC00"/><rect x="3" y="7" width="10" height="5" fill="#FFCC00"/><rect x="6" y="8" width="4" height="3" fill="#FFE066"/><rect x="2" y="7" width="2" height="3" fill="#FFAA00"/><rect x="3" y="6" width="1" height="1" fill="#FFAA00"/><rect x="12" y="7" width="2" height="3" fill="#FFAA00"/><rect x="12" y="6" width="1" height="1" fill="#FFAA00"/><rect x="5" y="13" width="2" height="1" fill="#FF7700"/><rect x="4" y="14" width="3" height="1" fill="#FF7700"/><rect x="9" y="13" width="2" height="1" fill="#FF7700"/><rect x="9" y="14" width="3" height="1" fill="#FF7700"/></svg></div>
+        <div class="exam-ai-empty-icon" style="width:80px;height:80px;margin:0 auto 12px;image-rendering:pixelated"><div class="bobi-wrap"><svg viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="9" y="0" width="2" height="1" fill="#F5A800"/><rect x="10" y="1" width="1" height="1" fill="#F5A800"/><rect x="7" y="1" width="6" height="1" fill="#FFCC00"/><rect x="6" y="2" width="8" height="1" fill="#FFCC00"/><rect x="6" y="3" width="8" height="2" fill="#FFCC00"/><rect x="7" y="5" width="6" height="1" fill="#FFCC00"/><rect x="8" y="3" width="1" height="1" fill="#1A1A1A"/><rect x="8" y="2" width="1" height="1" fill="#1A1A1A"/><rect x="9" y="2" width="1" height="1" fill="#FFFFFF"/><rect x="12" y="3" width="1" height="1" fill="#1A1A1A"/><rect x="12" y="2" width="1" height="1" fill="#1A1A1A"/><rect x="13" y="2" width="1" height="1" fill="#FFFFFF"/><rect x="10" y="5" width="2" height="1" fill="#FF7A00"/><rect x="10" y="6" width="2" height="1" fill="#CC5500"/><rect x="6" y="6" width="8" height="1" fill="#FFCC00"/><rect x="5" y="7" width="10" height="1" fill="#FFCC00"/><rect x="5" y="8" width="10" height="1" fill="#FFCC00"/><rect x="5" y="9" width="10" height="1" fill="#FFCC00"/><rect x="5" y="10" width="10" height="1" fill="#FFCC00"/><rect x="6" y="11" width="8" height="1" fill="#FFCC00"/><rect x="7" y="12" width="6" height="1" fill="#FFCC00"/><rect x="8" y="8" width="4" height="3" fill="#FFE566"/><rect x="3" y="7" width="2" height="3" fill="#F5A800"/><rect x="4" y="6" width="1" height="1" fill="#F5A800"/><rect x="3" y="10" width="3" height="1" fill="#F5A800"/><rect x="15" y="7" width="2" height="3" fill="#F5A800"/><rect x="15" y="6" width="1" height="1" fill="#F5A800"/><rect x="14" y="10" width="3" height="1" fill="#F5A800"/><rect x="8" y="13" width="2" height="1" fill="#FF7A00"/><rect x="7" y="14" width="3" height="1" fill="#FF7A00"/><rect x="11" y="13" width="2" height="1" fill="#FF7A00"/><rect x="11" y="14" width="3" height="1" fill="#FF7A00"/></svg></div></div>
         <div class="exam-ai-empty-text">Toca <strong>Explicar pregunta</strong> y la IA analiza el reactivo completo, incluyendo la imagen si hay una.</div>
       </div>
     </div>
@@ -3086,6 +3091,7 @@ function openExamAI() {
   btn.disabled = false;
   btn.innerHTML = '<span id="examAIBtnIcon">⚡</span> Explicar pregunta';
   document.getElementById('examAITTSBtn').style.display = 'none';
+  setBobiState('idle');
 }
 
 function closeExamAI() {
@@ -3095,6 +3101,17 @@ function closeExamAI() {
 
 function closeExamAIOnBg(e) {
   if (e.target === document.getElementById('examAIOv')) closeExamAI();
+}
+
+const _BOBI_IDLE  = '<svg viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="9" y="0" width="2" height="1" fill="#F5A800"/><rect x="10" y="1" width="1" height="1" fill="#F5A800"/><rect x="7" y="1" width="6" height="1" fill="#FFCC00"/><rect x="6" y="2" width="8" height="1" fill="#FFCC00"/><rect x="6" y="3" width="8" height="2" fill="#FFCC00"/><rect x="7" y="5" width="6" height="1" fill="#FFCC00"/><rect x="8" y="3" width="1" height="1" fill="#1A1A1A"/><rect x="8" y="2" width="1" height="1" fill="#1A1A1A"/><rect x="9" y="2" width="1" height="1" fill="#FFFFFF"/><rect x="12" y="3" width="1" height="1" fill="#1A1A1A"/><rect x="12" y="2" width="1" height="1" fill="#1A1A1A"/><rect x="13" y="2" width="1" height="1" fill="#FFFFFF"/><rect x="10" y="5" width="2" height="1" fill="#FF7A00"/><rect x="10" y="6" width="2" height="1" fill="#CC5500"/><rect x="6" y="6" width="8" height="1" fill="#FFCC00"/><rect x="5" y="7" width="10" height="1" fill="#FFCC00"/><rect x="5" y="8" width="10" height="1" fill="#FFCC00"/><rect x="5" y="9" width="10" height="1" fill="#FFCC00"/><rect x="5" y="10" width="10" height="1" fill="#FFCC00"/><rect x="6" y="11" width="8" height="1" fill="#FFCC00"/><rect x="7" y="12" width="6" height="1" fill="#FFCC00"/><rect x="8" y="8" width="4" height="3" fill="#FFE566"/><rect x="3" y="7" width="2" height="3" fill="#F5A800"/><rect x="4" y="6" width="1" height="1" fill="#F5A800"/><rect x="3" y="10" width="3" height="1" fill="#F5A800"/><rect x="15" y="7" width="2" height="3" fill="#F5A800"/><rect x="15" y="6" width="1" height="1" fill="#F5A800"/><rect x="14" y="10" width="3" height="1" fill="#F5A800"/><rect x="8" y="13" width="2" height="1" fill="#FF7A00"/><rect x="7" y="14" width="3" height="1" fill="#FF7A00"/><rect x="11" y="13" width="2" height="1" fill="#FF7A00"/><rect x="11" y="14" width="3" height="1" fill="#FF7A00"/></svg>';
+const _BOBI_WALK  = '<svg viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="9" y="0" width="2" height="1" fill="#F5A800"/><rect x="10" y="1" width="1" height="1" fill="#F5A800"/><rect x="7" y="1" width="6" height="1" fill="#FFCC00"/><rect x="6" y="2" width="8" height="1" fill="#FFCC00"/><rect x="6" y="3" width="8" height="2" fill="#FFCC00"/><rect x="7" y="5" width="6" height="1" fill="#FFCC00"/><rect x="8" y="3" width="1" height="1" fill="#1A1A1A"/><rect x="8" y="2" width="1" height="1" fill="#1A1A1A"/><rect x="9" y="2" width="1" height="1" fill="#FFFFFF"/><rect x="12" y="3" width="1" height="1" fill="#1A1A1A"/><rect x="12" y="2" width="1" height="1" fill="#1A1A1A"/><rect x="13" y="2" width="1" height="1" fill="#FFFFFF"/><rect x="10" y="5" width="2" height="1" fill="#FF7A00"/><rect x="10" y="6" width="2" height="1" fill="#CC5500"/><rect x="6" y="6" width="8" height="1" fill="#FFCC00"/><rect x="5" y="7" width="10" height="1" fill="#FFCC00"/><rect x="5" y="8" width="10" height="1" fill="#FFCC00"/><rect x="5" y="9" width="10" height="1" fill="#FFCC00"/><rect x="5" y="10" width="10" height="1" fill="#FFCC00"/><rect x="6" y="11" width="8" height="1" fill="#FFCC00"/><rect x="7" y="12" width="6" height="1" fill="#FFCC00"/><rect x="8" y="8" width="4" height="3" fill="#FFE566"/><rect x="2" y="5" width="2" height="2" fill="#F5A800"/><rect x="3" y="7" width="2" height="2" fill="#F5A800"/><rect x="2" y="7" width="1" height="1" fill="#F5A800"/><rect x="15" y="7" width="2" height="3" fill="#F5A800"/><rect x="15" y="6" width="1" height="1" fill="#F5A800"/><rect x="14" y="10" width="3" height="1" fill="#F5A800"/><rect x="8" y="11" width="2" height="1" fill="#FF7A00"/><rect x="7" y="10" width="2" height="1" fill="#FF7A00"/><rect x="11" y="13" width="2" height="1" fill="#FF7A00"/><rect x="11" y="14" width="3" height="1" fill="#FF7A00"/></svg>';
+const _BOBI_SLEEP = '<svg viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="9" y="0" width="2" height="1" fill="#F5A800"/><rect x="7" y="1" width="6" height="1" fill="#FFCC00"/><rect x="6" y="2" width="8" height="1" fill="#FFCC00"/><rect x="6" y="3" width="8" height="2" fill="#FFCC00"/><rect x="7" y="5" width="6" height="1" fill="#FFCC00"/><rect x="8" y="3" width="2" height="1" fill="#1A1A1A"/><rect x="12" y="3" width="2" height="1" fill="#1A1A1A"/><rect x="10" y="5" width="2" height="1" fill="#FF7A00"/><rect x="5" y="6" width="10" height="1" fill="#FFCC00"/><rect x="4" y="7" width="12" height="1" fill="#FFCC00"/><rect x="4" y="8" width="12" height="1" fill="#FFCC00"/><rect x="4" y="9" width="12" height="1" fill="#FFCC00"/><rect x="4" y="10" width="12" height="1" fill="#FFCC00"/><rect x="5" y="11" width="10" height="1" fill="#FFCC00"/><rect x="6" y="12" width="8" height="1" fill="#FFCC00"/><rect x="7" y="8" width="6" height="3" fill="#FFE566"/><rect x="2" y="8" width="3" height="3" fill="#F5A800"/><rect x="15" y="8" width="3" height="3" fill="#F5A800"/><rect x="7" y="13" width="3" height="1" fill="#FF7A00"/><rect x="6" y="14" width="4" height="1" fill="#FF7A00"/><rect x="11" y="13" width="3" height="1" fill="#FF7A00"/><rect x="11" y="14" width="4" height="1" fill="#FF7A00"/><rect x="16" y="1" width="3" height="1" fill="#94a3b8"/><rect x="18" y="2" width="1" height="1" fill="#94a3b8"/><rect x="16" y="3" width="3" height="1" fill="#94a3b8"/></svg>';
+
+function setBobiState(state) {
+  const sp = document.getElementById('bobiSprite');
+  if (!sp) return;
+  sp.className = 'bobi-wrap ' + (state === 'walk' ? 'walk' : state === 'sleep' ? 'sleep' : '');
+  sp.innerHTML = state === 'walk' ? _BOBI_WALK : state === 'sleep' ? _BOBI_SLEEP : _BOBI_IDLE;
 }
 
 /* ── TTS ── */
@@ -3128,6 +3145,7 @@ async function askExamAI() {
   btn.disabled = true;
   btn.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.5);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px"></span> Analizando…';
 
+  setBobiState('walk');
   body.innerHTML = '<div class="exam-ai-thinking">Analizando<div class="exam-ai-thinking-dots"><span></span><span></span><span></span></div></div>';
 
   const letters = ['A','B','C','D','E'];
@@ -3211,6 +3229,7 @@ Sin markdown, sin asteriscos. Español mexicano. Sé directo y conciso.`;
     } else {
       const rawErr = json?.error?.message || json?.candidates?.[0]?.finishReason || '';
       const isQuota = rawErr.toLowerCase().includes('quota') || rawErr.toLowerCase().includes('rate');
+      if (isQuota) setBobiState('sleep');
       const isRetry = rawErr.match(/retry in ([\d.]+)s/i);
       const segundos = isRetry ? Math.ceil(parseFloat(isRetry[1])) : 20;
       const msg = isQuota
@@ -3235,6 +3254,7 @@ Sin markdown, sin asteriscos. Español mexicano. Sé directo y conciso.`;
     </div>`;
   }
 
+  setBobiState('idle');
   btn.disabled = false;
   btn.innerHTML = '<span>🔄</span> Volver a preguntar';
 }
