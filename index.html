@@ -751,6 +751,55 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
   border-radius:12px;padding:28px 28px 20px;
   display:flex;flex-direction:column;min-height:480px
 }
+
+/* ── READING MODE (Comprensión Lectora) ── */
+/* Cuando hay pasaje, la col-izq es más ancha y ambas columnas tienen altura fija */
+.q-columns.reading-mode{
+  grid-template-columns:55% 1fr;
+  align-items:stretch
+}
+/* En reading-mode ambas cols tienen altura igual y fija para scroll interno */
+.reading-mode .q-col-left,
+.reading-mode .q-col-right{
+  height:calc(100vh - 200px);
+  min-height:420px;
+  max-height:700px;
+  overflow:hidden;
+  display:flex;flex-direction:column
+}
+/* El pasaje scrollea internamente */
+.passage-body{
+  flex:1;overflow-y:auto;
+  font-size:15px;line-height:1.9;color:#1e293b;
+  padding-right:6px;
+  /* Scrollbar sutil */
+  scrollbar-width:thin;scrollbar-color:var(--teal) #f1f5f9
+}
+.passage-body::-webkit-scrollbar{width:5px}
+.passage-body::-webkit-scrollbar-track{background:#f1f5f9;border-radius:99px}
+.passage-body::-webkit-scrollbar-thumb{background:var(--teal);border-radius:99px}
+/* Badge "Comprensión Lectora" en el header izquierdo */
+.passage-badge{
+  background:linear-gradient(135deg,#e0f2fe,#ccfbf1);
+  color:#0369a1;border-radius:6px;padding:2px 9px;
+  font-size:10px;font-weight:800;letter-spacing:1px;
+  text-transform:uppercase;font-family:'DM Mono',monospace;
+  border:1px solid #bae6fd;flex-shrink:0
+}
+/* La col-derecha en reading-mode también scrollea si las opciones son largas */
+.reading-mode .q-col-right{overflow-y:auto;
+  scrollbar-width:thin;scrollbar-color:#cbd5e1 #f8fafc}
+.reading-mode .q-col-right::-webkit-scrollbar{width:4px}
+.reading-mode .q-col-right::-webkit-scrollbar-track{background:#f8fafc}
+.reading-mode .q-col-right::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:99px}
+/* Indicador de qué pregunta del bloque es esta */
+.reading-q-counter{
+  display:inline-block;background:#f0fdf4;
+  border:1px solid #bbf7d0;border-radius:6px;
+  padding:2px 9px;font-size:11px;font-weight:700;
+  color:#15803d;font-family:'DM Mono',monospace;
+  margin-left:auto;flex-shrink:0
+}
 .q-col-header{
   display:flex;align-items:center;gap:10px;
   padding-bottom:12px;border-bottom:2px solid var(--teal);margin-bottom:16px
@@ -1804,6 +1853,11 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
   .chat-panel{width:calc(100vw - 32px);right:16px;bottom:80px}
   .chat-fab{bottom:16px;right:16px}
   .q-columns{grid-template-columns:1fr;gap:12px}
+  /* Reading mode en móvil: columnas apiladas, sin altura fija */
+  .q-columns.reading-mode{grid-template-columns:1fr}
+  .reading-mode .q-col-left,
+  .reading-mode .q-col-right{height:auto;max-height:none;overflow:visible}
+  .passage-body{max-height:340px}
   .q-col-left,.q-col-right{padding:18px 16px;min-height:unset}
   .q-text{font-size:15px;line-height:1.65}
   .opt-btn{padding:10px 4px;font-size:14px;gap:10px}
@@ -2583,6 +2637,15 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
             <span class="q-col-label" id="qBadge">Pregunta 1:</span>
             <span class="q-area" id="qArea" style="display:none"></span>
           </div>
+          <!-- PASSAGE PANEL (visible solo en comprensión lectora) -->
+          <div id="passagePanel" style="display:none;flex:1;overflow:hidden;flex-direction:column;gap:0">
+            <div class="q-col-header" style="margin-bottom:10px">
+              <span class="q-col-label">Texto:</span>
+              <span class="passage-badge">Comprensión Lectora</span>
+            </div>
+            <div class="passage-body" id="passageBody"></div>
+          </div>
+          <!-- NORMAL QUESTION TEXT (visible cuando NO hay pasaje) -->
           <div class="q-text" id="qText"></div>
           <div id="qImgWrap" class="q-img-wrap" style="display:none">
             <img id="qImg" src="" alt="Imagen de la pregunta"/>
@@ -2598,6 +2661,7 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
         <div class="q-col-right" style="display:flex;flex-direction:column;min-height:220px">
           <div class="q-col-header">
             <span class="q-col-label">Opciones:</span>
+            <span class="reading-q-counter" id="readingQCounter" style="display:none"></span>
           </div>
           <div class="options" id="optsCont"></div>
           <div class="fw-col-footer">
@@ -3749,7 +3813,53 @@ function renderQ() {
   if (q.area) { areaEl.textContent = q.area; areaEl.style.display = 'block'; }
   else areaEl.style.display = 'none';
 
-  $('qText').textContent = q.question;
+  // ── Comprensión Lectora: detectar si hay pasaje ──
+  const colsEl       = document.querySelector('.q-columns');
+  const passagePanel = $('passagePanel');
+  const qTextEl      = $('qText');
+  const counterEl    = $('readingQCounter');
+
+  if (q.passage) {
+    // Activar modo lectura
+    colsEl.classList.add('reading-mode');
+    passagePanel.style.display = 'flex';
+    qTextEl.style.display = 'none';
+    // Mostrar el texto del pasaje (preservar saltos de línea)
+    $('passageBody').innerHTML = q.passage.replace(/\n/g,'<br>');
+    // Ocultar badge de área (lo reemplaza el badge "Comprensión Lectora")
+    areaEl.style.display = 'none';
+    // Mover la pregunta al header del panel derecho
+    $('qBadge').textContent = `Pregunta ${S.current+1}:`;
+    // Mostrar texto de la pregunta encima de las opciones
+    let qInRight = $('qTextInRight');
+    if (!qInRight) {
+      qInRight = document.createElement('div');
+      qInRight.id = 'qTextInRight';
+      qInRight.style.cssText = 'font-size:15px;line-height:1.7;font-weight:500;color:#1e293b;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid #f1f5f9;flex-shrink:0';
+      const optsCont = $('optsCont');
+      optsCont.parentNode.insertBefore(qInRight, optsCont);
+    }
+    qInRight.textContent = q.question;
+    qInRight.style.display = 'block';
+    // Contador de bloque (preguntas del mismo pasaje)
+    if (q.passage_id !== undefined) {
+      const samePassage = S.questions.filter(x => x.passage_id === q.passage_id);
+      const myIdx = samePassage.indexOf(q);
+      if (myIdx >= 0) {
+        counterEl.textContent = `${myIdx+1} / ${samePassage.length} del texto`;
+        counterEl.style.display = 'inline-block';
+      } else counterEl.style.display = 'none';
+    } else counterEl.style.display = 'none';
+  } else {
+    // Modo normal
+    colsEl.classList.remove('reading-mode');
+    passagePanel.style.display = 'none';
+    qTextEl.style.display = 'block';
+    qTextEl.textContent = q.question;
+    counterEl.style.display = 'none';
+    const qInRight = $('qTextInRight');
+    if (qInRight) qInRight.style.display = 'none';
+  }
 
   // ── Image ──
   const wrap = $('qImgWrap');
