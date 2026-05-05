@@ -3738,7 +3738,13 @@ async function handleFile(file) {
 
     load(true, 'Leyendo preguntas…', jsonFile.name);
     const jsonText = await jsonFile.async('string');
-    const data = JSON.parse(jsonText);
+    const parsed = JSON.parse(jsonText);
+
+    // Soportar tanto array directo como { meta, questions }
+    const data = Array.isArray(parsed)
+      ? { meta: {}, questions: parsed }
+      : parsed;
+
     if (!data.questions?.length) throw new Error('El JSON no contiene preguntas.');
 
     S.questions = data.questions;
@@ -4445,7 +4451,10 @@ async function editCatalogExam(idx) {
     const jsonFile = Object.values(zip.files).find(f => !f.dir && f.name.match(/(questions|preguntas)\.json$/i));
     if (!jsonFile) throw new Error('No se encontro questions.json ni preguntas.json en el ZIP.');
 
-    const data = JSON.parse(await jsonFile.async('string'));
+    const parsedAdmin = JSON.parse(await jsonFile.async('string'));
+    const data = Array.isArray(parsedAdmin)
+      ? { meta: {}, questions: parsedAdmin }
+      : parsedAdmin;
     if (!data.questions || !data.questions.length) throw new Error('El JSON no contiene preguntas.');
 
     // Cargar imágenes como dataURLs
