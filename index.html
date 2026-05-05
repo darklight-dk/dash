@@ -598,9 +598,8 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .exam-ai-header{display:flex;align-items:center;justify-content:space-between;
   padding:16px 18px 14px}
 .exam-ai-title{display:flex;align-items:center;gap:10px}
-.exam-ai-icon{width:38px;height:38px;background:#7c3aed;
-  border-radius:12px;display:flex;align-items:center;justify-content:center;
-  font-size:19px;flex-shrink:0;box-shadow:0 4px 12px rgba(124,58,237,.3)}
+.exam-ai-icon{width:44px;height:44px;flex-shrink:0;display:flex;align-items:center;justify-content:center;image-rendering:pixelated}
+.exam-ai-icon svg{width:44px;height:44px}
 .exam-ai-label{font-size:14px;font-weight:700;color:#0f172a;letter-spacing:-.1px}
 .exam-ai-sub{font-size:10px;color:#7c3aed;font-weight:700;letter-spacing:.8px;text-transform:uppercase}
 .exam-ai-close{background:#f8fafc;border:1px solid #e2e8f0;color:#94a3b8;cursor:pointer;
@@ -2658,7 +2657,7 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
   <div class="exam-ai-modal" id="examAIModal">
     <div class="exam-ai-header">
       <div class="exam-ai-title">
-        <div class="exam-ai-icon">🤖</div>
+        <div class="exam-ai-icon"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated"><rect x="5" y="1" width="6" height="5" fill="#FFCC00"/><rect x="4" y="2" width="8" height="4" fill="#FFCC00"/><rect x="7" y="0" width="2" height="2" fill="#FFAA00"/><rect x="6" y="0" width="1" height="1" fill="#FFAA00"/><rect x="9" y="0" width="1" height="1" fill="#FFAA00"/><rect x="6" y="3" width="1" height="1" fill="#111"/><rect x="9" y="3" width="1" height="1" fill="#111"/><rect x="7" y="5" width="2" height="1" fill="#FF7700"/><rect x="7" y="6" width="2" height="1" fill="#FF5500"/><rect x="4" y="6" width="8" height="7" fill="#FFCC00"/><rect x="3" y="7" width="10" height="5" fill="#FFCC00"/><rect x="6" y="8" width="4" height="3" fill="#FFE066"/><rect x="2" y="7" width="2" height="3" fill="#FFAA00"/><rect x="3" y="6" width="1" height="1" fill="#FFAA00"/><rect x="12" y="7" width="2" height="3" fill="#FFAA00"/><rect x="12" y="6" width="1" height="1" fill="#FFAA00"/><rect x="5" y="13" width="2" height="1" fill="#FF7700"/><rect x="4" y="14" width="3" height="1" fill="#FF7700"/><rect x="9" y="13" width="2" height="1" fill="#FF7700"/><rect x="9" y="14" width="3" height="1" fill="#FF7700"/></svg></div>
         <div>
           <div class="exam-ai-label">Tutor IA</div>
           <div class="exam-ai-sub">EXANI-II · Premedicina</div>
@@ -2669,7 +2668,7 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
     <div class="exam-ai-q-preview" id="examAIQPreview"></div>
     <div class="exam-ai-body" id="examAIBody">
       <div class="exam-ai-empty">
-        <div class="exam-ai-empty-icon">🧠</div>
+        <div class="exam-ai-empty-icon" style="width:64px;height:64px;margin:0 auto 10px;image-rendering:pixelated"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated"><rect x="5" y="1" width="6" height="5" fill="#FFCC00"/><rect x="4" y="2" width="8" height="4" fill="#FFCC00"/><rect x="7" y="0" width="2" height="2" fill="#FFAA00"/><rect x="6" y="0" width="1" height="1" fill="#FFAA00"/><rect x="9" y="0" width="1" height="1" fill="#FFAA00"/><rect x="6" y="3" width="1" height="1" fill="#111"/><rect x="9" y="3" width="1" height="1" fill="#111"/><rect x="7" y="5" width="2" height="1" fill="#FF7700"/><rect x="7" y="6" width="2" height="1" fill="#FF5500"/><rect x="4" y="6" width="8" height="7" fill="#FFCC00"/><rect x="3" y="7" width="10" height="5" fill="#FFCC00"/><rect x="6" y="8" width="4" height="3" fill="#FFE066"/><rect x="2" y="7" width="2" height="3" fill="#FFAA00"/><rect x="3" y="6" width="1" height="1" fill="#FFAA00"/><rect x="12" y="7" width="2" height="3" fill="#FFAA00"/><rect x="12" y="6" width="1" height="1" fill="#FFAA00"/><rect x="5" y="13" width="2" height="1" fill="#FF7700"/><rect x="4" y="14" width="3" height="1" fill="#FF7700"/><rect x="9" y="13" width="2" height="1" fill="#FF7700"/><rect x="9" y="14" width="3" height="1" fill="#FF7700"/></svg></div>
         <div class="exam-ai-empty-text">Toca <strong>Explicar pregunta</strong> y la IA analiza el reactivo completo, incluyendo la imagen si hay una.</div>
       </div>
     </div>
@@ -3082,7 +3081,7 @@ function openExamAI() {
   }
   // Reset body and button
   const body = document.getElementById('examAIBody');
-  body.innerHTML = '<div class="exam-ai-empty"><div class="exam-ai-empty-icon">🧠</div><div class="exam-ai-empty-text">Toca <strong>Explicar pregunta</strong> y la IA analiza el reactivo completo.</div></div>';
+  body.innerHTML = '<div class="exam-ai-empty"><div class="exam-ai-empty-icon" style="width:64px;height:64px;margin:0 auto 10px;image-rendering:pixelated"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated"><rect x="5" y="1" width="6" height="5" fill="#FFCC00"/><rect x="4" y="2" width="8" height="4" fill="#FFCC00"/><rect x="7" y="0" width="2" height="2" fill="#FFAA00"/><rect x="6" y="0" width="1" height="1" fill="#FFAA00"/><rect x="9" y="0" width="1" height="1" fill="#FFAA00"/><rect x="6" y="3" width="1" height="1" fill="#111"/><rect x="9" y="3" width="1" height="1" fill="#111"/><rect x="7" y="5" width="2" height="1" fill="#FF7700"/><rect x="7" y="6" width="2" height="1" fill="#FF5500"/><rect x="4" y="6" width="8" height="7" fill="#FFCC00"/><rect x="3" y="7" width="10" height="5" fill="#FFCC00"/><rect x="6" y="8" width="4" height="3" fill="#FFE066"/><rect x="2" y="7" width="2" height="3" fill="#FFAA00"/><rect x="3" y="6" width="1" height="1" fill="#FFAA00"/><rect x="12" y="7" width="2" height="3" fill="#FFAA00"/><rect x="12" y="6" width="1" height="1" fill="#FFAA00"/><rect x="5" y="13" width="2" height="1" fill="#FF7700"/><rect x="4" y="14" width="3" height="1" fill="#FF7700"/><rect x="9" y="13" width="2" height="1" fill="#FF7700"/><rect x="9" y="14" width="3" height="1" fill="#FF7700"/></svg></div><div class="exam-ai-empty-text">Toca <strong>Explicar pregunta</strong> y la IA analiza el reactivo completo.</div></div>';
   const btn = document.getElementById('examAIBtn');
   btn.disabled = false;
   btn.innerHTML = '<span id="examAIBtnIcon">⚡</span> Explicar pregunta';
@@ -6286,7 +6285,7 @@ onAuthStateChanged(auth, async (firebaseUser) => {
 async function loadUserProfile(uid) {
   return new Promise(resolve => {
     const uRef = ref(db, 'users/' + uid);
-    const timer = setTimeout(() => resolve(null), 5000); // timeout 5s
+    const timer = setTimeout(() => resolve(null), 2000); // timeout 5s
     onValue(uRef, snap => {
       clearTimeout(timer);
       resolve(snap.exists() ? snap.val() : null);
