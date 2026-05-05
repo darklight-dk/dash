@@ -576,47 +576,95 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .btn-ai{border:1px solid #7c3aed;color:#7c3aed;background:rgba(124,58,237,.06)}.btn-ai:hover{background:rgba(124,58,237,.14)}
 
 /* ── EXAM AI MODAL ── */
-.exam-ai-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);
-  z-index:600;display:none;align-items:center;justify-content:center;padding:16px}
+/* ── EXAM AI MODAL — LIGHT PREMIUM ── */
+.exam-ai-overlay{position:fixed;inset:0;background:rgba(15,23,42,.35);backdrop-filter:blur(6px);
+  z-index:600;display:none;align-items:flex-end;justify-content:center;padding:0}
+@media(min-width:640px){.exam-ai-overlay{align-items:center;padding:20px}}
 .exam-ai-overlay.show{display:flex}
-.exam-ai-modal{background:#fff;border-radius:20px;width:100%;max-width:560px;max-height:82vh;
-  display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.18);
-  border:1px solid rgba(124,58,237,.2);overflow:hidden;animation:fadeUp .2s ease both}
+.exam-ai-modal{background:#fff;width:100%;max-width:560px;max-height:88vh;
+  display:flex;flex-direction:column;overflow:hidden;
+  border-radius:24px 24px 0 0;
+  box-shadow:0 -4px 40px rgba(0,0,0,.12),0 0 0 1px rgba(0,0,0,.06);
+  animation:slideUpAI .3s cubic-bezier(.34,1.1,.64,1) both}
+@media(min-width:640px){.exam-ai-modal{border-radius:20px;animation:fadeUp .22s ease both}}
+@keyframes slideUpAI{from{transform:translateY(60px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* drag handle mobile */
+.exam-ai-modal::before{content:'';display:block;width:36px;height:4px;
+  background:#e2e8f0;border-radius:2px;margin:10px auto -6px;flex-shrink:0}
+@media(min-width:640px){.exam-ai-modal::before{display:none}}
+
+/* HEADER */
 .exam-ai-header{display:flex;align-items:center;justify-content:space-between;
-  padding:16px 20px;border-bottom:1px solid #f1f5f9;background:linear-gradient(135deg,rgba(124,58,237,.06),rgba(13,148,136,.04))}
-.exam-ai-title{display:flex;align-items:center;gap:12px}
-.exam-ai-icon{font-size:28px;line-height:1}
-.exam-ai-label{font-size:15px;font-weight:800;color:#1e293b}
-.exam-ai-sub{font-size:11px;color:#7c3aed;font-weight:600;letter-spacing:.5px}
-.exam-ai-close{background:none;border:none;font-size:18px;color:#94a3b8;cursor:pointer;
-  width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:.15s}
-.exam-ai-close:hover{background:#f1f5f9;color:#475569}
-.exam-ai-q-preview{padding:12px 20px;background:#f8fafc;border-bottom:1px solid #e2e8f0;
-  font-size:13px;color:#475569;line-height:1.5;font-style:italic;display:none}
+  padding:16px 18px 14px}
+.exam-ai-title{display:flex;align-items:center;gap:10px}
+.exam-ai-icon{width:38px;height:38px;background:#7c3aed;
+  border-radius:12px;display:flex;align-items:center;justify-content:center;
+  font-size:19px;flex-shrink:0;box-shadow:0 4px 12px rgba(124,58,237,.3)}
+.exam-ai-label{font-size:14px;font-weight:700;color:#0f172a;letter-spacing:-.1px}
+.exam-ai-sub{font-size:10px;color:#7c3aed;font-weight:700;letter-spacing:.8px;text-transform:uppercase}
+.exam-ai-close{background:#f8fafc;border:1px solid #e2e8f0;color:#94a3b8;cursor:pointer;
+  width:30px;height:30px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-size:13px;transition:.15s}
+.exam-ai-close:hover{background:#f1f5f9;color:#64748b}
+
+/* QUESTION PREVIEW */
+.exam-ai-q-preview{margin:0 16px 4px;padding:10px 14px;
+  background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;
+  font-size:12px;color:#64748b;line-height:1.5;font-style:italic;display:none}
 .exam-ai-q-preview.show{display:block}
-.exam-ai-body{flex:1;overflow-y:auto;padding:20px;min-height:120px}
-.exam-ai-empty{text-align:center;color:#94a3b8;font-size:14px;padding:28px 12px;line-height:1.6}
-.exam-ai-response{font-size:14px;color:#1e293b;line-height:1.8;white-space:pre-wrap;word-break:break-word}
-.exam-ai-response .ai-section{margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #f1f5f9}
-.exam-ai-response .ai-section:last-child{border-bottom:none;margin-bottom:0}
-.exam-ai-thinking{display:flex;align-items:center;gap:10px;color:#7c3aed;font-size:14px;font-weight:600;padding:8px 0}
-.exam-ai-thinking::before{content:'';width:18px;height:18px;border:2px solid #7c3aed;
-  border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
-.exam-ai-footer{padding:14px 20px;border-top:1px solid #f1f5f9}
-.exam-ai-btn{width:100%;background:linear-gradient(135deg,#7c3aed,#4f46e5);border:none;
-  border-radius:12px;padding:13px;font-size:14px;font-weight:800;color:#fff;letter-spacing:.5px;
-  cursor:pointer;transition:all .18s;font-family:'Sora',sans-serif}
-.exam-ai-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(124,58,237,.3)}
-.exam-ai-btn:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* BODY */
+.exam-ai-body{flex:1;overflow-y:auto;padding:14px 16px 16px;min-height:120px;
+  scrollbar-width:thin;scrollbar-color:#e2e8f0 transparent}
+.exam-ai-body::-webkit-scrollbar{width:3px}
+.exam-ai-body::-webkit-scrollbar-thumb{background:#e2e8f0;border-radius:3px}
+
+/* EMPTY STATE */
+.exam-ai-empty{text-align:center;padding:28px 16px}
+.exam-ai-empty-icon{font-size:38px;margin-bottom:10px}
+.exam-ai-empty-text{font-size:13px;color:#94a3b8;line-height:1.7}
+.exam-ai-empty-text strong{color:#7c3aed;font-weight:700}
+
+/* RESPONSE */
+.exam-ai-response{font-size:13.5px;color:#334155;line-height:1.8;word-break:break-word}
+.ai-section{padding:12px 14px;border-radius:12px;margin-bottom:8px;border-left:3px solid #e2e8f0;background:#f8fafc}
+.ai-section:last-child{margin-bottom:0}
+.ai-section-concept{border-left-color:#0d9488;background:#f0fdfa}
+.ai-section-analysis{border-left-color:#ca8a04;background:#fefce8}
+.ai-section-answer{border-left-color:#16a34a;background:#f0fdf4}
+
+/* THINKING */
+.exam-ai-thinking{display:flex;align-items:center;gap:10px;
+  font-size:13px;font-weight:600;color:#7c3aed;padding:24px 0;justify-content:center}
+.exam-ai-thinking-dots{display:flex;gap:4px}
+.exam-ai-thinking-dots span{width:6px;height:6px;background:#7c3aed;border-radius:50%;
+  animation:dotBounce 1.2s ease infinite;opacity:.3}
+.exam-ai-thinking-dots span:nth-child(2){animation-delay:.2s}
+.exam-ai-thinking-dots span:nth-child(3){animation-delay:.4s}
+@keyframes dotBounce{0%,80%,100%{transform:translateY(0);opacity:.3}40%{transform:translateY(-5px);opacity:1}}
+
+/* FOOTER */
+.exam-ai-footer{padding:10px 16px 16px;border-top:1px solid #f1f5f9}
+.exam-ai-footer-row{display:flex;gap:8px;align-items:center}
+.exam-ai-btn{flex:1;background:#7c3aed;border:none;border-radius:14px;
+  padding:13px 16px;font-size:13px;font-weight:700;color:#fff;
+  cursor:pointer;transition:all .18s;font-family:'Sora',sans-serif;
+  box-shadow:0 4px 14px rgba(124,58,237,.25)}
+.exam-ai-btn:hover:not(:disabled){background:#6d28d9;box-shadow:0 6px 20px rgba(124,58,237,.35);transform:translateY(-1px)}
+.exam-ai-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.exam-ai-tts-btn{background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;
+  font-size:17px;cursor:pointer;padding:0 14px;height:46px;transition:.15s;flex-shrink:0;color:#94a3b8}
+.exam-ai-tts-btn:hover{background:#f3f0ff;border-color:#c4b5fd;color:#7c3aed}
+.exam-ai-tts-btn.speaking{background:#f3f0ff;border-color:#7c3aed;color:#7c3aed;animation:pulse .8s ease infinite}
+
+/* ERROR */
+.exam-ai-error-card{text-align:center;padding:28px 16px}
+.exam-ai-error-icon{font-size:38px;margin-bottom:10px}
+.exam-ai-error-title{font-size:15px;font-weight:700;color:#0f172a;margin-bottom:6px}
+.exam-ai-error-desc{font-size:13px;color:#94a3b8;line-height:1.6}
+
 .mob-ctrl-ai{background:rgba(124,58,237,.1)!important;border-color:#7c3aed!important;color:#7c3aed!important}
-.exam-ai-error-card{text-align:center;padding:20px 12px}
-.exam-ai-error-icon{font-size:36px;margin-bottom:10px}
-.exam-ai-error-title{font-size:15px;font-weight:700;color:#1e293b;margin-bottom:6px}
-.exam-ai-error-desc{font-size:13px;color:#64748b;line-height:1.6}
-.exam-ai-tts-btn{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;
-  font-size:20px;cursor:pointer;padding:0 14px;transition:.15s;flex-shrink:0}
-.exam-ai-tts-btn:hover{background:#f1f5f9;border-color:#7c3aed}
-.exam-ai-tts-btn.speaking{background:rgba(124,58,237,.1);border-color:#7c3aed;animation:pulse .8s ease infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 .btn-nav-arrow{border:1px solid var(--teal);color:var(--teal);background:rgba(13,148,136,.07);min-width:36px;font-size:15px}.btn-nav-arrow:hover{background:rgba(13,148,136,.18)}
 .progress-chip{background:var(--card);border:1px solid var(--b2);border-radius:8px;padding:7px 16px;
@@ -2610,10 +2658,10 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
   <div class="exam-ai-modal" id="examAIModal">
     <div class="exam-ai-header">
       <div class="exam-ai-title">
-        <span class="exam-ai-icon">🤖</span>
+        <div class="exam-ai-icon">🤖</div>
         <div>
           <div class="exam-ai-label">Tutor IA</div>
-          <div class="exam-ai-sub">EXANI-II Premedicina</div>
+          <div class="exam-ai-sub">EXANI-II · Premedicina</div>
         </div>
       </div>
       <button class="exam-ai-close" onclick="closeExamAI()">✕</button>
@@ -2621,16 +2669,14 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
     <div class="exam-ai-q-preview" id="examAIQPreview"></div>
     <div class="exam-ai-body" id="examAIBody">
       <div class="exam-ai-empty">
-        <div style="font-size:32px;margin-bottom:8px">🧠</div>
-        <div>Toca <strong>Explicar pregunta</strong> para que la IA analice el reactivo actual.</div>
+        <div class="exam-ai-empty-icon">🧠</div>
+        <div class="exam-ai-empty-text">Toca <strong>Explicar pregunta</strong> y la IA analiza el reactivo completo, incluyendo la imagen si hay una.</div>
       </div>
     </div>
     <div class="exam-ai-footer">
-      <div style="display:flex;gap:10px">
-        <button class="exam-ai-tts-btn" id="examAITTSBtn" onclick="toggleExamTTS()" title="Escuchar respuesta" style="display:none">
-          🔊
-        </button>
-        <button class="exam-ai-btn" id="examAIBtn" onclick="askExamAI()" style="flex:1">
+      <div class="exam-ai-footer-row">
+        <button class="exam-ai-tts-btn" id="examAITTSBtn" onclick="toggleExamTTS()" title="Escuchar respuesta" style="display:none">🔊</button>
+        <button class="exam-ai-btn" id="examAIBtn" onclick="askExamAI()">
           <span id="examAIBtnIcon">⚡</span> Explicar pregunta
         </button>
       </div>
@@ -3036,7 +3082,7 @@ function openExamAI() {
   }
   // Reset body and button
   const body = document.getElementById('examAIBody');
-  body.innerHTML = '<div class="exam-ai-empty"><div style="font-size:32px;margin-bottom:8px">🧠</div><div>Toca <strong>Explicar pregunta</strong> para que la IA analice el reactivo actual.</div></div>';
+  body.innerHTML = '<div class="exam-ai-empty"><div class="exam-ai-empty-icon">🧠</div><div class="exam-ai-empty-text">Toca <strong>Explicar pregunta</strong> y la IA analiza el reactivo completo.</div></div>';
   const btn = document.getElementById('examAIBtn');
   btn.disabled = false;
   btn.innerHTML = '<span id="examAIBtnIcon">⚡</span> Explicar pregunta';
@@ -3083,7 +3129,7 @@ async function askExamAI() {
   btn.disabled = true;
   btn.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.5);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px"></span> Analizando…';
 
-  body.innerHTML = '<div class="exam-ai-thinking">Analizando el reactivo…</div>';
+  body.innerHTML = '<div class="exam-ai-thinking">Analizando<div class="exam-ai-thinking-dots"><span></span><span></span><span></span></div></div>';
 
   const letters = ['A','B','C','D','E'];
   const optsText = q.options.map((o,i) => `${letters[i]}) ${o}`).join('\n');
@@ -3150,7 +3196,11 @@ Sin markdown, sin asteriscos. Español mexicano. Sé directo y conciso.`;
       sections.forEach(s => {
         if (!s.trim()) return;
         const sec = document.createElement('div');
-        sec.className = 'ai-section';
+        const cls = s.startsWith('🎯') ? 'ai-section ai-section-concept'
+                  : s.startsWith('💡') ? 'ai-section ai-section-analysis'
+                  : s.startsWith('✅') ? 'ai-section ai-section-answer'
+                  : 'ai-section';
+        sec.className = cls;
         sec.textContent = s.trim();
         el.appendChild(sec);
       });
