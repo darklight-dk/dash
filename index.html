@@ -4279,7 +4279,6 @@ const EXAM_SECTIONS = [
     id: 'comprension',
     label: '📖 Comprensión Lectora',
     color: '#d97706',
-    coming: true,
     match: ex => {
       const t = ((ex.titulo||'')+(ex.materia||'')+(ex.tags||[]).join('')).toLowerCase();
       return t.includes('comprens') || t.includes('lectura') || t.includes('lector');
