@@ -4279,11 +4279,22 @@ const EXAM_SECTIONS = [
     }
   },
   {
+    id: 'comprension',
+    label: '📖 Comprensión Lectora',
+    color: '#d97706',
+    match: ex => {
+      const t = ((ex.titulo||'')+(ex.materia||'')+(ex.tags||[]).join('')).toLowerCase();
+      return t.includes('comprens') || t.includes('lectura') || t.includes('lector');
+    }
+  },
+  {
     id: 'redaccion',
     label: '✍️ Redacción Indirecta',
     color: '#7c3aed',
     match: ex => {
       const t = ((ex.titulo||'')+(ex.materia||'')+(ex.tags||[]).join('')).toLowerCase();
+      // excluir lo que ya captura comprensión
+      if (t.includes('comprens') || t.includes('lectura') || t.includes('lector')) return false;
       return t.includes('redac');
     }
   },
@@ -4294,15 +4305,6 @@ const EXAM_SECTIONS = [
     match: ex => {
       const t = ((ex.titulo||'')+(ex.materia||'')+(ex.tags||[]).join('')).toLowerCase();
       return t.includes('matem') || t.includes('pensamiento mat') || t.includes('calc') || t.includes('algebra') || t.includes('aritm');
-    }
-  },
-  {
-    id: 'comprension',
-    label: '📖 Comprensión Lectora',
-    color: '#d97706',
-    match: ex => {
-      const t = ((ex.titulo||'')+(ex.materia||'')+(ex.tags||[]).join('')).toLowerCase();
-      return t.includes('comprens') || t.includes('lectura') || t.includes('lector');
     }
   },
 ];
