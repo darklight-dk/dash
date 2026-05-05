@@ -599,12 +599,48 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
   padding:16px 18px 14px}
 .exam-ai-title{display:flex;align-items:center;gap:10px}
 .exam-ai-icon{width:52px;height:52px;flex-shrink:0;image-rendering:pixelated}
-.bobi-wrap{width:100%;height:100%;image-rendering:pixelated;animation:bobiIdle 1.4s ease-in-out infinite}
-.bobi-wrap.walk{animation:bobiWalk .5s steps(1) infinite}
-.bobi-wrap.sleep{animation:bobiSleep 2s ease-in-out infinite}
-@keyframes bobiIdle{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
-@keyframes bobiWalk{0%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-3px) rotate(3deg)}}
-@keyframes bobiSleep{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(2px) rotate(2deg)}}
+.bobi-wrap{width:100%;height:100%;image-rendering:pixelated;animation:bobiIdle 1.6s ease-in-out infinite}
+.bobi-wrap.walk{animation:bobiWalk .45s ease-in-out infinite}
+.bobi-wrap.sleep{animation:bobiSleep 2.2s ease-in-out infinite}
+
+/* SMALL HEADER BOBI */
+@keyframes bobiIdle{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-3px) rotate(0deg)}}
+@keyframes bobiWalk{0%,100%{transform:translateY(0) rotate(-5deg) scaleX(1)}50%{transform:translateY(-4px) rotate(5deg) scaleX(.95)}}
+@keyframes bobiSleep{0%,100%{transform:rotate(-5deg) translateY(1px)}50%{transform:rotate(5deg) translateY(2px)}}
+
+/* LARGE CENTER BOBI — cycle through 6 expressions */
+.bobi-big{image-rendering:pixelated;animation:bobiShow 8s ease-in-out infinite}
+@keyframes bobiShow{
+  0%,12%    {transform:translateY(0)}
+  6%         {transform:translateY(-10px)}
+  /* tilt left-right */
+  16%,28%   {transform:rotate(0deg)}
+  20%        {transform:rotate(-12deg) translateY(-2px)}
+  24%        {transform:rotate(12deg) translateY(-2px)}
+  /* SPIN */
+  32%,36%   {transform:rotate(0deg) scaleX(1)}
+  33%        {transform:rotate(120deg) scaleX(-1)}
+  34%        {transform:rotate(240deg) scaleX(1)}
+  35%        {transform:rotate(360deg)}
+  /* SQUISH bounce */
+  40%,52%   {transform:scaleY(1) scaleX(1) translateY(0)}
+  44%        {transform:scaleY(.7) scaleX(1.3) translateY(4px)}
+  46%        {transform:scaleY(1.2) scaleX(.85) translateY(-8px)}
+  50%        {transform:scaleY(1) scaleX(1) translateY(0)}
+  /* SHAKE head */
+  56%,68%   {transform:translateX(0)}
+  59%        {transform:translateX(-6px)}
+  62%        {transform:translateX(6px)}
+  65%        {transform:translateX(-4px)}
+  67%        {transform:translateX(0)}
+  /* FLIP */
+  72%,76%   {transform:scaleX(1)}
+  73%        {transform:scaleX(-1)}
+  75%        {transform:scaleX(1)}
+  /* idle rest */
+  80%,100%  {transform:translateY(0)}
+  90%        {transform:translateY(-6px)}
+}
 .exam-ai-label{font-size:14px;font-weight:700;color:#0f172a;letter-spacing:-.1px}
 .exam-ai-sub{font-size:10px;color:#7c3aed;font-weight:700;letter-spacing:.8px;text-transform:uppercase}
 .exam-ai-close{background:#f8fafc;border:1px solid #e2e8f0;color:#94a3b8;cursor:pointer;
@@ -2673,7 +2709,7 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
     <div class="exam-ai-q-preview" id="examAIQPreview"></div>
     <div class="exam-ai-body" id="examAIBody">
       <div class="exam-ai-empty">
-        <div class="exam-ai-empty-icon" style="width:80px;height:80px;margin:0 auto 12px;image-rendering:pixelated"><div class="bobi-wrap"><svg viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="9" y="0" width="2" height="1" fill="#F5A800"/><rect x="10" y="1" width="1" height="1" fill="#F5A800"/><rect x="7" y="1" width="6" height="1" fill="#FFCC00"/><rect x="6" y="2" width="8" height="1" fill="#FFCC00"/><rect x="6" y="3" width="8" height="2" fill="#FFCC00"/><rect x="7" y="5" width="6" height="1" fill="#FFCC00"/><rect x="8" y="3" width="1" height="1" fill="#1A1A1A"/><rect x="8" y="2" width="1" height="1" fill="#1A1A1A"/><rect x="9" y="2" width="1" height="1" fill="#FFFFFF"/><rect x="12" y="3" width="1" height="1" fill="#1A1A1A"/><rect x="12" y="2" width="1" height="1" fill="#1A1A1A"/><rect x="13" y="2" width="1" height="1" fill="#FFFFFF"/><rect x="10" y="5" width="2" height="1" fill="#FF7A00"/><rect x="10" y="6" width="2" height="1" fill="#CC5500"/><rect x="6" y="6" width="8" height="1" fill="#FFCC00"/><rect x="5" y="7" width="10" height="1" fill="#FFCC00"/><rect x="5" y="8" width="10" height="1" fill="#FFCC00"/><rect x="5" y="9" width="10" height="1" fill="#FFCC00"/><rect x="5" y="10" width="10" height="1" fill="#FFCC00"/><rect x="6" y="11" width="8" height="1" fill="#FFCC00"/><rect x="7" y="12" width="6" height="1" fill="#FFCC00"/><rect x="8" y="8" width="4" height="3" fill="#FFE566"/><rect x="3" y="7" width="2" height="3" fill="#F5A800"/><rect x="4" y="6" width="1" height="1" fill="#F5A800"/><rect x="3" y="10" width="3" height="1" fill="#F5A800"/><rect x="15" y="7" width="2" height="3" fill="#F5A800"/><rect x="15" y="6" width="1" height="1" fill="#F5A800"/><rect x="14" y="10" width="3" height="1" fill="#F5A800"/><rect x="8" y="13" width="2" height="1" fill="#FF7A00"/><rect x="7" y="14" width="3" height="1" fill="#FF7A00"/><rect x="11" y="13" width="2" height="1" fill="#FF7A00"/><rect x="11" y="14" width="3" height="1" fill="#FF7A00"/></svg></div></div>
+        <div class="exam-ai-empty-icon" style="width:90px;height:90px;margin:0 auto 14px;image-rendering:pixelated"><div class="bobi-big"><svg viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="9" y="0" width="2" height="1" fill="#F5A800"/><rect x="10" y="1" width="1" height="1" fill="#F5A800"/><rect x="7" y="1" width="6" height="1" fill="#FFCC00"/><rect x="6" y="2" width="8" height="1" fill="#FFCC00"/><rect x="6" y="3" width="8" height="2" fill="#FFCC00"/><rect x="7" y="5" width="6" height="1" fill="#FFCC00"/><rect x="8" y="3" width="1" height="1" fill="#1A1A1A"/><rect x="8" y="2" width="1" height="1" fill="#1A1A1A"/><rect x="9" y="2" width="1" height="1" fill="#FFFFFF"/><rect x="12" y="3" width="1" height="1" fill="#1A1A1A"/><rect x="12" y="2" width="1" height="1" fill="#1A1A1A"/><rect x="13" y="2" width="1" height="1" fill="#FFFFFF"/><rect x="10" y="5" width="2" height="1" fill="#FF7A00"/><rect x="10" y="6" width="2" height="1" fill="#CC5500"/><rect x="6" y="6" width="8" height="1" fill="#FFCC00"/><rect x="5" y="7" width="10" height="1" fill="#FFCC00"/><rect x="5" y="8" width="10" height="1" fill="#FFCC00"/><rect x="5" y="9" width="10" height="1" fill="#FFCC00"/><rect x="5" y="10" width="10" height="1" fill="#FFCC00"/><rect x="6" y="11" width="8" height="1" fill="#FFCC00"/><rect x="7" y="12" width="6" height="1" fill="#FFCC00"/><rect x="8" y="8" width="4" height="3" fill="#FFE566"/><rect x="3" y="7" width="2" height="3" fill="#F5A800"/><rect x="4" y="6" width="1" height="1" fill="#F5A800"/><rect x="3" y="10" width="3" height="1" fill="#F5A800"/><rect x="15" y="7" width="2" height="3" fill="#F5A800"/><rect x="15" y="6" width="1" height="1" fill="#F5A800"/><rect x="14" y="10" width="3" height="1" fill="#F5A800"/><rect x="8" y="13" width="2" height="1" fill="#FF7A00"/><rect x="7" y="14" width="3" height="1" fill="#FF7A00"/><rect x="11" y="13" width="2" height="1" fill="#FF7A00"/><rect x="11" y="14" width="3" height="1" fill="#FF7A00"/></svg></div></div>
         <div class="exam-ai-empty-text">Toca <strong>Explicar pregunta</strong> y la IA analiza el reactivo completo, incluyendo la imagen si hay una.</div>
       </div>
     </div>
