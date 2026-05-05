@@ -3855,6 +3855,14 @@ function renderQ() {
     $('passageBody').innerHTML = q.passage.replace(/\n/g,'<br>');
     // Ocultar badge de área (lo reemplaza el badge "Comprensión Lectora")
     areaEl.style.display = 'none';
+    // Mostrar título del pasaje en el header izquierdo
+    const passageHeader = passagePanel.querySelector('.q-col-header');
+    if (passageHeader) {
+      const labelEl = passageHeader.querySelector('.q-col-label');
+      const badgeEl = passageHeader.querySelector('.passage-badge');
+      if (labelEl) labelEl.textContent = q.passage_title || 'Texto:';
+      if (badgeEl) badgeEl.style.display = q.passage_title ? 'none' : '';
+    }
     // Mover la pregunta al header del panel derecho
     $('qBadge').textContent = `Pregunta ${S.current+1}:`;
     // Mostrar texto de la pregunta encima de las opciones
