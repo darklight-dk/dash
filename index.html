@@ -692,7 +692,7 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
   cursor:pointer;transition:all .18s;font-family:'Sora',sans-serif;
   box-shadow:0 4px 14px rgba(124,58,237,.25)}
 .exam-ai-btn:hover:not(:disabled){background:#6d28d9;box-shadow:0 6px 20px rgba(124,58,237,.35);transform:translateY(-1px)}
-.exam-ai-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.exam-ai-btn:disabled{opacity:1;cursor:not-allowed;transform:none;box-shadow:none;background:#94a3b8}
 .exam-ai-tts-btn{background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;
   font-size:17px;cursor:pointer;padding:0 14px;height:46px;transition:.15s;flex-shrink:0;color:#94a3b8}
 .exam-ai-tts-btn:hover{background:#f3f0ff;border-color:#c4b5fd;color:#7c3aed}
@@ -3284,6 +3284,7 @@ Sin markdown, sin asteriscos. Español mexicano. Sé directo y conciso.`;
         btn.disabled = true;
         btn.innerHTML = '⏳ Espera ' + segundos + 's…';
         let secs = segundos;
+        window._bobiCooldown = true;
         const cdInterval = setInterval(() => {
           secs--;
           const cdEl = document.getElementById('bobiCountdown');
@@ -3291,6 +3292,7 @@ Sin markdown, sin asteriscos. Español mexicano. Sé directo y conciso.`;
           btn.innerHTML = '⏳ Espera ' + secs + 's…';
           if (secs <= 0) {
             clearInterval(cdInterval);
+            window._bobiCooldown = false;
             setBobiState('idle');
             btn.disabled = false;
             btn.innerHTML = '<span>🔄</span> Reintentar';
@@ -3307,9 +3309,11 @@ Sin markdown, sin asteriscos. Español mexicano. Sé directo y conciso.`;
     </div>`;
   }
 
-  setBobiState('idle');
-  btn.disabled = false;
-  btn.innerHTML = '<span>🔄</span> Volver a preguntar';
+  if (!window._bobiCooldown) {
+    setBobiState('idle');
+    btn.disabled = false;
+    btn.innerHTML = '<span>🔄</span> Volver a preguntar';
+  }
 }
 
 function doLogout() {
