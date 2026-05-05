@@ -88,5 +88,23 @@
     "path": "exams/pensamiento-matematico-vol-1-2026-05-02.zip",
     "nuevo": true,
     "agregado": "2026-05-02"
+  },
+  {
+    "titulo": "Comprensión Lectora Vol. I — 2026",
+    "materia": "Redacción e Interpretación de Textos",
+    "icono": "📖",
+    "tags": [
+      "Comprensión Lectora",
+      "EXANI-II",
+      "2026-A"
+    ],
+    "preguntas": 30,
+    "horas": "0:45",
+    "imagenes": 0,
+    "tiempo_minutos": 45,
+    "version": "2026-A",
+    "path": "exams/comprension-lectora-vol1-2026.zip",
+    "nuevo": true,
+    "agregado": "2026-05-05"
   }
 ]
