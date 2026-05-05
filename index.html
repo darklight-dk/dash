@@ -3225,6 +3225,7 @@ Sin markdown, sin asteriscos. Español mexicano. Sé directo y conciso.`;
 
   userContent.push({ text: `${areaInfo}Pregunta: ${q.question}\n\nOpciones:\n${optsText}` });
 
+  localStorage.setItem('bobi_last_req', Date.now());
   try {
     const res = await fetch(
       `https://gemini-proxy.donniaxel55.workers.dev`,
