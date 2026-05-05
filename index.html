@@ -3267,12 +3267,12 @@ Sin markdown, sin asteriscos. Español mexicano. Sé directo y conciso.`;
       const isQuota = rawErr.toLowerCase().includes('quota') || rawErr.toLowerCase().includes('rate');
       if (isQuota) setBobiState('sleep');
       const isRetry = rawErr.match(/retry in ([\d.]+)s/i);
-      const segundos = isRetry ? Math.ceil(parseFloat(isRetry[1])) : 20;
+      const segundos = isRetry ? Math.ceil(parseFloat(isRetry[1])) : 30;
       const msg = isQuota
         ? `<div class="exam-ai-error-card">
             <div class="exam-ai-error-icon">☕</div>
             <div class="exam-ai-error-title">La IA necesita un respiro</div>
-            <div class="exam-ai-error-desc">Demasiadas preguntas seguidas. Espera unos ${segundos} segundos e intenta de nuevo, ya viene.</div>
+            <div class="exam-ai-error-desc">Demasiadas preguntas seguidas. Reintentando en <strong id="bobiCountdown">${segundos}</strong>s…</div>
            </div>`
         : `<div class="exam-ai-error-card">
             <div class="exam-ai-error-icon">😅</div>
@@ -3280,6 +3280,23 @@ Sin markdown, sin asteriscos. Español mexicano. Sé directo y conciso.`;
             <div class="exam-ai-error-desc">No se pudo obtener una respuesta. Intenta de nuevo en un momento.</div>
            </div>`;
       body.innerHTML = msg;
+      if (isQuota) {
+        btn.disabled = true;
+        btn.innerHTML = '⏳ Espera ' + segundos + 's…';
+        let secs = segundos;
+        const cdInterval = setInterval(() => {
+          secs--;
+          const cdEl = document.getElementById('bobiCountdown');
+          if (cdEl) cdEl.textContent = secs;
+          btn.innerHTML = '⏳ Espera ' + secs + 's…';
+          if (secs <= 0) {
+            clearInterval(cdInterval);
+            setBobiState('idle');
+            btn.disabled = false;
+            btn.innerHTML = '<span>🔄</span> Reintentar';
+          }
+        }, 1000);
+      }
     }
   } catch(e) {
     const isNet = e.message.includes('fetch');
