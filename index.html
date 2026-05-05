@@ -6236,8 +6236,14 @@ onAuthStateChanged(auth, async (firebaseUser) => {
 async function loadUserProfile(uid) {
   return new Promise(resolve => {
     const uRef = ref(db, 'users/' + uid);
+    const timer = setTimeout(() => resolve(null), 5000); // timeout 5s
     onValue(uRef, snap => {
+      clearTimeout(timer);
       resolve(snap.exists() ? snap.val() : null);
+    }, (err) => {
+      clearTimeout(timer);
+      console.warn('loadUserProfile error:', err);
+      resolve(null); // continuar aunque falle DB
     }, { onlyOnce: true });
   });
 }
@@ -6293,7 +6299,7 @@ window._fbDoLogin = async function() {
 
   try {
     const cred = await signInWithEmailAndPassword(auth, fakeEmail, pass);
-    const profile = await loadUserProfile(cred.user.uid);
+    const profile = await loadUserProfile(cred.user.uid).catch(() => null);
     // Bloquear usuarios baneados
     if (profile?.banned) {
       await signOut(auth);
