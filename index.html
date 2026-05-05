@@ -2390,6 +2390,27 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
         <label class="qed-label">Área / Tema</label>
         <input id="qedArea" class="qed-input" placeholder="ej. Fisiología, Anatomía…"/>
       </div>
+      <!-- ── COMPRENSIÓN LECTORA ── -->
+      <details id="qedPassageDetails" style="border:1px solid var(--b2);border-radius:10px;padding:0">
+        <summary style="padding:10px 14px;font-size:12px;font-weight:800;color:var(--teal);letter-spacing:.5px;text-transform:uppercase;cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px">
+          <span>📖</span> Comprensión Lectora (opcional)
+          <span style="margin-left:auto;font-size:10px;color:var(--muted);font-weight:400">▼ expandir</span>
+        </summary>
+        <div style="padding:14px;display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--b2)">
+          <div class="qed-field">
+            <label class="qed-label">ID del pasaje <span style="color:var(--muted);font-weight:400;font-size:11px">(igual para todas las preguntas del mismo texto)</span></label>
+            <input id="qedPassageId" class="qed-input" placeholder="ej. pasaje_01, cuento_mono…"/>
+          </div>
+          <div class="qed-field">
+            <label class="qed-label">Título del pasaje</label>
+            <input id="qedPassageTitle" class="qed-input" placeholder="ej. El mono que quiso ser escritor satírico"/>
+          </div>
+          <div class="qed-field">
+            <label class="qed-label">Texto del pasaje</label>
+            <textarea id="qedPassage" class="qed-textarea" placeholder="Pega aquí el texto completo del pasaje…" rows="6"></textarea>
+          </div>
+        </div>
+      </details>
       <div class="qed-field">
         <label class="qed-label">Opciones de respuesta * <span style="color:var(--muted);font-weight:400;font-size:12px">(selecciona la correcta con ✅)</span></label>
         <div id="qedOptions" class="qed-options-list"></div>
@@ -3709,13 +3730,13 @@ async function handleFile(file) {
   try {
     const zip = await JSZip.loadAsync(await file.arrayBuffer());
 
-    // ── 1. Find preguntas.json (anywhere in the ZIP) ──
+    // ── 1. Find questions.json o preguntas.json (anywhere in the ZIP) ──
     const jsonFile = Object.values(zip.files).find(f =>
-      !f.dir && f.name.match(/preguntas\.json$/i)
+      !f.dir && f.name.match(/(questions|preguntas)\.json$/i)
     );
-    if (!jsonFile) throw new Error('No se encontró <code>preguntas.json</code> dentro del ZIP.');
+    if (!jsonFile) throw new Error('No se encontró <code>questions.json</code> dentro del ZIP.');
 
-    load(true, 'Leyendo preguntas…', 'preguntas.json');
+    load(true, 'Leyendo preguntas…', jsonFile.name);
     const jsonText = await jsonFile.async('string');
     const data = JSON.parse(jsonText);
     if (!data.questions?.length) throw new Error('El JSON no contiene preguntas.');
@@ -3756,7 +3777,7 @@ async function handleFile(file) {
       }
     });
     showDashError(`⚠️ Error al leer el ZIP:<br/><br/>${e.message}<br/><br/>
-      Verifica que el ZIP contenga un archivo <code>preguntas.json</code> con el formato correcto.`);
+      Verifica que el ZIP contenga un archivo <code>questions.json</code> con el formato correcto.`);
   } finally {
     load(false);
   }
@@ -4419,8 +4440,8 @@ async function editCatalogExam(idx) {
     if (!resp.ok) throw new Error('No se pudo cargar: ' + examPath);
     const zip = await JSZip.loadAsync(await resp.arrayBuffer());
 
-    const jsonFile = Object.values(zip.files).find(f => !f.dir && f.name.match(/preguntas\.json$/i));
-    if (!jsonFile) throw new Error('No se encontro preguntas.json en el ZIP.');
+    const jsonFile = Object.values(zip.files).find(f => !f.dir && f.name.match(/(questions|preguntas)\.json$/i));
+    if (!jsonFile) throw new Error('No se encontro questions.json ni preguntas.json en el ZIP.');
 
     const data = JSON.parse(await jsonFile.async('string'));
     if (!data.questions || !data.questions.length) throw new Error('El JSON no contiene preguntas.');
@@ -4448,6 +4469,9 @@ async function editCatalogExam(idx) {
         explanation:  q.explanation || '',
         imageName:    imgName,
         imageDataUrl: (imgName && imgMap[imgName]) ? imgMap[imgName] : null,
+        passage:       q.passage || '',
+        passage_id:    q.passage_id || '',
+        passage_title: q.passage_title || '',
       };
     });
 
@@ -5431,21 +5455,21 @@ async function downloadModifiedZip() {
     // Clonar el ZIP
     const newZip = new JSZip();
 
-    // Copiar todos los archivos excepto preguntas.json e imágenes que vamos a reemplazar
+    // Copiar todos los archivos excepto questions/preguntas.json e imágenes que vamos a reemplazar
     const replacedImages = new Set(Object.values(S.adminEdits).map(e => e.imageName));
 
     for (const [path, file] of Object.entries(S.rawZip.files)) {
       if (file.dir) continue;
       const fname = path.split('/').pop();
 
-      if (/preguntas\.json$/i.test(path)) continue; // lo reconstruimos
+      if (/(questions|preguntas)\.json$/i.test(path)) continue; // lo reconstruimos
       if (replacedImages.has(fname)) continue;       // lo reemplazamos
 
       const blob = await file.async('uint8array');
       newZip.file(path, blob);
     }
 
-    // Construir preguntas.json modificado
+    // Construir questions.json modificado
     const updatedQuestions = S.questions.map((q, idx) => {
       if (S.adminEdits[idx]) {
         return { ...q, image: S.adminEdits[idx].imageName };
@@ -5458,8 +5482,8 @@ async function downloadModifiedZip() {
 
     // Detectar ruta original del json para mantener estructura de carpetas
     const origJsonPath = Object.keys(S.rawZip.files).find(p =>
-      !S.rawZip.files[p].dir && /preguntas\.json$/i.test(p)
-    ) || 'preguntas.json';
+      !S.rawZip.files[p].dir && /(questions|preguntas)\.json$/i.test(p)
+    ) || 'questions.json';
     const basePath = origJsonPath.includes('/') ? origJsonPath.split('/').slice(0,-1).join('/') + '/' : '';
 
     newZip.file(origJsonPath, updatedJson);
@@ -6105,6 +6129,9 @@ function openQuestionEditor(idx) {
     $('qedText').value = '';
     $('qedArea').value = '';
     $('qedExpl').value = '';
+    $('qedPassageId').value    = '';
+    $('qedPassageTitle').value = '';
+    $('qedPassage').value      = '';
     buildOptionFields([{text:'',correct:true},{text:'',correct:false},{text:'',correct:false}]);
     clearQEditorImage();
   } else {
@@ -6113,6 +6140,12 @@ function openQuestionEditor(idx) {
     $('qedText').value = q.text || '';
     $('qedArea').value = q.area || '';
     $('qedExpl').value = q.explanation || '';
+    $('qedPassageId').value    = q.passage_id    || '';
+    $('qedPassageTitle').value = q.passage_title || '';
+    $('qedPassage').value      = q.passage       || '';
+    // Abrir el details si hay pasaje
+    if (q.passage) $('qedPassageDetails').setAttribute('open','');
+    else $('qedPassageDetails').removeAttribute('open');
     const opts = q.options.map((o, i) => ({ text: o, correct: i === q.answerIdx }));
     buildOptionFields(opts);
     if (q.imageName && q.imageDataUrl) {
@@ -6273,6 +6306,9 @@ function saveQuestion() {
     explanation: $('qedExpl').value.trim(),
     imageName:   EB.qEditorImg ? EB.qEditorImg.imageName   : null,
     imageDataUrl:EB.qEditorImg ? EB.qEditorImg.dataUrl      : null,
+    passage:       $('qedPassage').value.trim()      || '',
+    passage_id:    $('qedPassageId').value.trim()    || '',
+    passage_title: $('qedPassageTitle').value.trim() || '',
   };
 
   if (EB.editingIdx === -1) {
@@ -6334,6 +6370,9 @@ async function exportNewExamZip() {
       answer: LETTERS[q.answerIdx] || 'A',
       area: q.area || '', explanation: q.explanation || '',
       ...(q.imageName ? { image: q.imageName } : {}),
+      ...(q.passage       ? { passage:       q.passage       } : {}),
+      ...(q.passage_id    ? { passage_id:    q.passage_id    } : {}),
+      ...(q.passage_title ? { passage_title: q.passage_title } : {}),
     }));
 
     const examZip   = new JSZip();
@@ -6343,7 +6382,7 @@ async function exportNewExamZip() {
         imgFolder.file(q.imageName, q.imageDataUrl.split(',')[1], { base64: true });
       }
     }
-    examZip.file('preguntas.json', JSON.stringify({ meta, questions }, null, 2));
+    examZip.file('questions.json', JSON.stringify({ meta, questions }, null, 2));
     const examBlob = await examZip.generateAsync({
       type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 }
     });
