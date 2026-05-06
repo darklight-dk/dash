@@ -3519,7 +3519,7 @@ window.spConfirmResolve = function(result) {
 // ══════════════════════════════════════════
 const GOOGLE_CLIENT_ID = '134270865403-ibnn6k5qfu3h9v4sbudc0d566o0okf0v.apps.googleusercontent.com';
 // Emails que tienen acceso de Administrador (agregá los que quieras)
-const ADMIN_EMAILS = ['acselito@gmail.com', 'donniaxel55@gmail.com'];
+const ADMIN_EMAILS = []; // admin status se lee de Firebase, no hardcodeado aquí
 
 let _googleProfile = null;
 
@@ -6602,7 +6602,7 @@ function usernameToEmail(username) {
 }
 
 // ── Usernames que reciben rol Administrador automáticamente ──
-const ADMIN_USERNAMES = ['acselito', 'dark_light_6']; // FIX: renombrado admin456 (nombre predecible)
+const ADMIN_USERNAMES = []; // admin status se lee de Firebase, no hardcodeado aquí
 
 // ── Rate limiter de login (máx 5 intentos en 5 min) ──
 const _loginAttempts = { count: 0, firstTs: 0 };
