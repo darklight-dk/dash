@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8"/>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://accounts.google.com https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://exani-dash-adeff-default-rtdb.firebaseio.com https://www.googleapis.com https://firebaseinstallations.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com wss://s-usc1c-nss-2079.firebaseio.com wss://exani-dash-adeff-default-rtdb.firebaseio.com https://api.anthropic.com https://generativelanguage.googleapis.com https://gemini-proxy.donniaxel55.workers.dev https://grok-mat.donniaxel55.workers.dev https://grok-red.donniaxel55.workers.dev https://grok-comp.donniaxel55.workers.dev; frame-ancestors 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://accounts.google.com https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' blob: https://exani-dash-adeff-default-rtdb.firebaseio.com https://www.googleapis.com https://firebaseinstallations.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com wss://s-usc1c-nss-2079.firebaseio.com wss://exani-dash-adeff-default-rtdb.firebaseio.com https://api.anthropic.com https://generativelanguage.googleapis.com https://gemini-proxy.donniaxel55.workers.dev https://grok-mat.donniaxel55.workers.dev https://grok-red.donniaxel55.workers.dev https://grok-comp.donniaxel55.workers.dev; frame-ancestors 'none';">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="referrer" content="strict-origin-when-cross-origin"/>
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
@@ -3195,16 +3195,20 @@ function escapeHtml(str) {
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-/* ── AI ROUTING — elige API según área del reactivo ── */
-function getExamAIConfig(q) {
-  const area = ((q.area || '') + (q.materia || '')).toLowerCase();
-  if (area.includes('matem') || area.includes('pensamiento mat') || area.includes('calc') || area.includes('algebra') || area.includes('aritm')) {
+/* ── AI ROUTING — basado en metadatos del EXAMEN, no del reactivo ── */
+function getExamAIConfig() {
+  // Leer metadatos del examen actual (titulo + materia + tags)
+  const meta = S.currentExamMeta || {};
+  const key = ((meta.titulo || '') + ' ' + (meta.materia || '') + ' ' + (meta.tags || []).join(' ')).toLowerCase();
+
+  if (key.includes('matem') || key.includes('pensamiento mat') || key.includes('calc') ||
+      key.includes('algebra') || key.includes('aritm') || key.includes('trigo') || key.includes('geometr')) {
     return { type: 'grok', url: 'https://grok-mat.donniaxel55.workers.dev', label: 'Grok · Matemáticas' };
   }
-  if (area.includes('redac')) {
+  if (key.includes('redac')) {
     return { type: 'grok', url: 'https://grok-red.donniaxel55.workers.dev', label: 'Grok · Redacción' };
   }
-  if (area.includes('comprens') || area.includes('lectura') || area.includes('lector')) {
+  if (key.includes('comprens') || key.includes('lectura') || key.includes('lector')) {
     return { type: 'grok', url: 'https://grok-comp.donniaxel55.workers.dev', label: 'Grok · Comprensión' };
   }
   // default: premedicina → Gemini
@@ -3292,7 +3296,7 @@ async function askExamAI() {
   const areaInfo = q.area ? `Área: ${q.area}\n` : '';
 
   // Determinar qué API usar según el área
-  const aiCfg = getExamAIConfig(q);
+  const aiCfg = getExamAIConfig();
   console.log('ExamAI → usando:', aiCfg.label);
 
   // System prompts diferenciados por módulo
