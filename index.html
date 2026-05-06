@@ -3302,9 +3302,9 @@ async function askExamAI() {
   // System prompts diferenciados por módulo
   const SYSTEM_PROMPTS = {
     gemini: `Eres un tutor del EXANI-II premedicina. Responde SIEMPRE con esta estructura exacta y SIN extenderte demasiado en cada punto:\n🎯 Concepto: [tema en 1 oración]\n💡 Análisis: [1-2 líneas por opción, solo lo esencial]\n✅ Respuesta correcta: [opción + explicación breve en 2-3 líneas]\nSin markdown, sin asteriscos. Español mexicano. Sé directo y conciso.`,
-    grok_mat: `Eres un tutor experto en matemáticas del EXANI-II. Analiza la pregunta de opción múltiple con precisión. Responde con esta estructura:\n🎯 Concepto: [tema matemático en 1 oración]\n💡 Análisis: [evalúa cada opción brevemente, muestra cálculos clave]\n✅ Respuesta correcta: [opción + solución paso a paso en 3-4 líneas]\nSin markdown, sin asteriscos. Español mexicano. Sé preciso y didáctico.`,
-    grok_red: `Eres un tutor experto en Redacción Indirecta del EXANI-II. Analiza el reactivo de opción múltiple. Responde con esta estructura:\n🎯 Concepto: [habilidad de redacción evaluada]\n💡 Análisis: [explica por qué cada opción es correcta o incorrecta]\n✅ Respuesta correcta: [opción + justificación gramatical/estilística en 2-3 líneas]\nSin markdown, sin asteriscos. Español mexicano. Sé claro y preciso.`,
-    grok_comp: `Eres un tutor experto en Comprensión Lectora del EXANI-II. Analiza el reactivo de opción múltiple. Responde con esta estructura:\n🎯 Concepto: [tipo de comprensión evaluada: literal/inferencial/crítica]\n💡 Análisis: [explica cada opción en relación al texto]\n✅ Respuesta correcta: [opción + explicación de por qué el texto la sustenta, 2-3 líneas]\nSin markdown, sin asteriscos. Español mexicano. Sé claro y conciso.`
+    grok_mat: `Eres un tutor de matemáticas del EXANI-II. Responde SIEMPRE con EXACTAMENTE esta estructura, separando cada sección con una línea en blanco:\n\n🎯 Concepto: [tema en 1 oración]\n\n💡 Análisis:\nA) [evaluación con cálculo si aplica]\nB) [evaluación con cálculo si aplica]\nC) [evaluación con cálculo si aplica]\nD) [evaluación con cálculo si aplica]\n\n✅ Respuesta correcta: [opción + procedimiento paso a paso]\n\nSin asteriscos ni markdown. Español mexicano.`,
+    grok_red: `Eres un tutor de Redacción del EXANI-II. Responde SIEMPRE con EXACTAMENTE esta estructura, separando cada sección con una línea en blanco:\n\n🎯 Concepto: [habilidad gramatical evaluada]\n\n💡 Análisis:\nA) [por qué es correcta o incorrecta]\nB) [por qué es correcta o incorrecta]\nC) [por qué es correcta o incorrecta]\nD) [por qué es correcta o incorrecta]\n\n✅ Respuesta correcta: [opción + justificación gramatical]\n\nSin asteriscos ni markdown. Español mexicano.`,
+    grok_comp: `Eres un tutor de Comprensión Lectora del EXANI-II. Responde SIEMPRE con EXACTAMENTE esta estructura, separando cada sección con una línea en blanco:\n\n🎯 Concepto: [tipo de comprensión: literal / inferencial / crítica]\n\n💡 Análisis:\nA) [relación con el texto]\nB) [relación con el texto]\nC) [relación con el texto]\nD) [relación con el texto]\n\n✅ Respuesta correcta: [opción + por qué el texto la sustenta]\n\nSin asteriscos ni markdown. Español mexicano.`
   };
 
   function getSystemPrompt(cfg) {
@@ -3386,7 +3386,7 @@ async function askExamAI() {
       body.innerHTML = '';
       const el = document.createElement('div');
       el.className = 'exam-ai-response';
-      const sections = text.split(/(?=🎯|💡|✅)/);
+      const sections = text.split(/(?=🎯|💡|✅|Concepto:|Análisis:|Análisis:|Respuesta correcta:)/);
       sections.forEach(s => {
         if (!s.trim()) return;
         const sec = document.createElement('div');
