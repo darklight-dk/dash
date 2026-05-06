@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8"/>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://accounts.google.com https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://exani-dash-adeff-default-rtdb.firebaseio.com https://www.googleapis.com https://firebaseinstallations.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com wss://s-usc1c-nss-2079.firebaseio.com wss://exani-dash-adeff-default-rtdb.firebaseio.com https://api.anthropic.com https://generativelanguage.googleapis.com https://gemini-proxy.donniaxel55.workers.dev; frame-ancestors 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://accounts.google.com https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://exani-dash-adeff-default-rtdb.firebaseio.com https://www.googleapis.com https://firebaseinstallations.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com wss://s-usc1c-nss-2079.firebaseio.com wss://exani-dash-adeff-default-rtdb.firebaseio.com https://api.anthropic.com https://generativelanguage.googleapis.com https://gemini-proxy.donniaxel55.workers.dev https://grok-mat.donniaxel55.workers.dev https://grok-red.donniaxel55.workers.dev https://grok-comp.donniaxel55.workers.dev; frame-ancestors 'none';">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="referrer" content="strict-origin-when-cross-origin"/>
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
@@ -3132,20 +3132,24 @@ async function solveMath() {
 
   try {
     const response = await fetch(
-      `https://gemini-proxy.donniaxel55.workers.dev`,
+      `https://grok-mat.donniaxel55.workers.dev`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          system_instruction: { parts: [{ text: systemPrompt }] },
-          contents: [{ role: 'user', parts: [{ text: `Resuelve y explica paso a paso: ${query}` }] }],
-          generationConfig: { maxOutputTokens: 4096, temperature: 0.4 }
+          model: 'grok-3-mini',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: `Resuelve y explica paso a paso: ${query}` }
+          ],
+          max_tokens: 2048,
+          temperature: 0.4
         })
       }
     );
 
     const json = await response.json();
-    console.log('Gemini raw:', JSON.stringify(json).slice(0, 500));
+    console.log('Grok mat raw:', JSON.stringify(json).slice(0, 500));
 
     thinkEl.remove();
     const aiMsg = document.createElement('div');
@@ -3156,17 +3160,17 @@ async function solveMath() {
     aiMsg.appendChild(bubble);
     chatArea.appendChild(aiMsg);
 
-    const fullText = json?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const fullText = json?.choices?.[0]?.message?.content || '';
     if (fullText) {
       bubble.textContent = fullText;
     } else {
-      const reason = json?.error?.message || json?.candidates?.[0]?.finishReason || 'Sin respuesta';
+      const reason = json?.error?.message || 'Sin respuesta';
       bubble.textContent = '⚠️ ' + reason + ' — Revisa consola (F12).';
       bubble.style.cssText += ';border-color:#fca5a5;background:#fef2f2;color:#dc2626';
     }
 
   } catch(err) {
-    console.error('Gemini fetch error:', err);
+    console.error('Grok mat fetch error:', err);
     if (thinkEl.parentNode) thinkEl.remove();
     const errMsg = document.createElement('div');
     errMsg.className = 'mt-msg mt-msg-ai';
@@ -3189,6 +3193,22 @@ async function solveMath() {
 
 function escapeHtml(str) {
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ── AI ROUTING — elige API según área del reactivo ── */
+function getExamAIConfig(q) {
+  const area = ((q.area || '') + (q.materia || '')).toLowerCase();
+  if (area.includes('matem') || area.includes('pensamiento mat') || area.includes('calc') || area.includes('algebra') || area.includes('aritm')) {
+    return { type: 'grok', url: 'https://grok-mat.donniaxel55.workers.dev', label: 'Grok · Matemáticas' };
+  }
+  if (area.includes('redac')) {
+    return { type: 'grok', url: 'https://grok-red.donniaxel55.workers.dev', label: 'Grok · Redacción' };
+  }
+  if (area.includes('comprens') || area.includes('lectura') || area.includes('lector')) {
+    return { type: 'grok', url: 'https://grok-comp.donniaxel55.workers.dev', label: 'Grok · Comprensión' };
+  }
+  // default: premedicina → Gemini
+  return { type: 'gemini', url: 'https://gemini-proxy.donniaxel55.workers.dev', label: 'Gemini · Premedicina' };
 }
 
 /* ── EXAM AI ── */
@@ -3271,86 +3291,116 @@ async function askExamAI() {
   const optsText = q.options.map((o,i) => `${letters[i]}) ${o}`).join('\n');
   const areaInfo = q.area ? `Área: ${q.area}\n` : '';
 
-  
-  const systemPrompt = `Eres un tutor del EXANI-II premedicina. Responde SIEMPRE con esta estructura exacta y SIN extenderte demasiado en cada punto:
-🎯 Concepto: [tema en 1 oración]
-💡 Análisis: [1-2 líneas por opción, solo lo esencial]
-✅ Respuesta correcta: [opción + explicación breve en 2-3 líneas]
-Sin markdown, sin asteriscos. Español mexicano. Sé directo y conciso.`;
+  // Determinar qué API usar según el área
+  const aiCfg = getExamAIConfig(q);
+  console.log('ExamAI → usando:', aiCfg.label);
 
-  const userContent = [];
+  // System prompts diferenciados por módulo
+  const SYSTEM_PROMPTS = {
+    gemini: `Eres un tutor del EXANI-II premedicina. Responde SIEMPRE con esta estructura exacta y SIN extenderte demasiado en cada punto:\n🎯 Concepto: [tema en 1 oración]\n💡 Análisis: [1-2 líneas por opción, solo lo esencial]\n✅ Respuesta correcta: [opción + explicación breve en 2-3 líneas]\nSin markdown, sin asteriscos. Español mexicano. Sé directo y conciso.`,
+    grok_mat: `Eres un tutor experto en matemáticas del EXANI-II. Analiza la pregunta de opción múltiple con precisión. Responde con esta estructura:\n🎯 Concepto: [tema matemático en 1 oración]\n💡 Análisis: [evalúa cada opción brevemente, muestra cálculos clave]\n✅ Respuesta correcta: [opción + solución paso a paso en 3-4 líneas]\nSin markdown, sin asteriscos. Español mexicano. Sé preciso y didáctico.`,
+    grok_red: `Eres un tutor experto en Redacción Indirecta del EXANI-II. Analiza el reactivo de opción múltiple. Responde con esta estructura:\n🎯 Concepto: [habilidad de redacción evaluada]\n💡 Análisis: [explica por qué cada opción es correcta o incorrecta]\n✅ Respuesta correcta: [opción + justificación gramatical/estilística en 2-3 líneas]\nSin markdown, sin asteriscos. Español mexicano. Sé claro y preciso.`,
+    grok_comp: `Eres un tutor experto en Comprensión Lectora del EXANI-II. Analiza el reactivo de opción múltiple. Responde con esta estructura:\n🎯 Concepto: [tipo de comprensión evaluada: literal/inferencial/crítica]\n💡 Análisis: [explica cada opción en relación al texto]\n✅ Respuesta correcta: [opción + explicación de por qué el texto la sustenta, 2-3 líneas]\nSin markdown, sin asteriscos. Español mexicano. Sé claro y conciso.`
+  };
 
-  // Add image if present
-  if (q.image && S.images[q.image]) {
-    try {
-      const dataUrl = S.images[q.image];
-      let b64, mime;
-      if (dataUrl.startsWith('blob:')) {
-        const blobRes = await fetch(dataUrl);
-        const blob = await blobRes.blob();
-        mime = blob.type || 'image/png';
-        b64 = await new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result.split(',')[1]);
-          reader.readAsDataURL(blob);
-        });
-      } else {
-        const comma = dataUrl.indexOf(',');
-        b64 = dataUrl.slice(comma+1);
-        const mimeMatch = dataUrl.match(/data:([^;]+);/);
-        mime = mimeMatch ? mimeMatch[1] : 'image/png';
-      }
-      userContent.push({ inlineData: { mimeType: mime, data: b64 } });
-    } catch(imgErr) {
-      console.warn('No se pudo cargar la imagen:', imgErr);
-    }
+  function getSystemPrompt(cfg) {
+    if (cfg.type === 'gemini') return SYSTEM_PROMPTS.gemini;
+    if (cfg.url.includes('grok-mat')) return SYSTEM_PROMPTS.grok_mat;
+    if (cfg.url.includes('grok-red')) return SYSTEM_PROMPTS.grok_red;
+    return SYSTEM_PROMPTS.grok_comp;
   }
 
-  userContent.push({ text: `${areaInfo}Pregunta: ${q.question}\n\nOpciones:\n${optsText}` });
+  const systemPrompt = getSystemPrompt(aiCfg);
+  const userText = `${areaInfo}Pregunta: ${q.question}\n\nOpciones:\n${optsText}`;
 
   localStorage.setItem('bobi_last_req', Date.now());
   try {
-    const res = await fetch(
-      `https://gemini-proxy.donniaxel55.workers.dev`,
-      {
+    let text = '';
+    let rawErr = '';
+
+    if (aiCfg.type === 'gemini') {
+      // ── Gemini (premedicina) — soporta imágenes ──
+      const userContent = [];
+      if (q.image && S.images[q.image]) {
+        try {
+          const dataUrl = S.images[q.image];
+          let b64, mime;
+          if (dataUrl.startsWith('blob:')) {
+            const blobRes = await fetch(dataUrl);
+            const blob = await blobRes.blob();
+            mime = blob.type || 'image/png';
+            b64 = await new Promise((resolve) => {
+              const reader = new FileReader();
+              reader.onloadend = () => resolve(reader.result.split(',')[1]);
+              reader.readAsDataURL(blob);
+            });
+          } else {
+            const comma = dataUrl.indexOf(',');
+            b64 = dataUrl.slice(comma+1);
+            const mimeMatch = dataUrl.match(/data:([^;]+);/);
+            mime = mimeMatch ? mimeMatch[1] : 'image/png';
+          }
+          userContent.push({ inlineData: { mimeType: mime, data: b64 } });
+        } catch(imgErr) { console.warn('No se pudo cargar la imagen:', imgErr); }
+      }
+      userContent.push({ text: userText });
+
+      const res = await fetch(aiCfg.url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           system_instruction: { parts: [{ text: systemPrompt }] },
           contents: [{ role: 'user', parts: userContent }],
-          generationConfig: { maxOutputTokens: 4096, temperature: 0.3 }
+          generationConfig: { maxOutputTokens: 2048, temperature: 0.3 }
         })
-      }
-    );
-    const json = await res.json();
-    const text = json?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      });
+      const json = await res.json();
+      text = json?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      rawErr = json?.error?.message || json?.candidates?.[0]?.finishReason || '';
+
+    } else {
+      // ── Grok (matemáticas / redacción / comprensión) ──
+      const res = await fetch(aiCfg.url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'grok-3-mini',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userText }
+          ],
+          max_tokens: 2048,
+          temperature: 0.3
+        })
+      });
+      const json = await res.json();
+      text = json?.choices?.[0]?.message?.content || '';
+      rawErr = json?.error?.message || '';
+    }
+
     if (text) {
       body.innerHTML = '';
       const el = document.createElement('div');
       el.className = 'exam-ai-response';
-      // Split into sections by emoji markers for spacing
       const sections = text.split(/(?=🎯|💡|✅)/);
       sections.forEach(s => {
         if (!s.trim()) return;
         const sec = document.createElement('div');
         sec.className = 'ai-section';
-        // For analysis section: split A) B) C) D) onto separate lines
         let txt = s.trim();
         if (s.startsWith('💡')) {
-          txt = txt.replace(/([A-D]\))/g, '\n$1');
+          txt = txt.replace(/([A-E]\))/g, '\n$1');
         }
         sec.style.whiteSpace = 'pre-wrap';
         sec.textContent = txt;
         el.appendChild(sec);
       });
       body.appendChild(el);
-      // Show TTS button
       const ttsBtn = document.getElementById('examAITTSBtn');
       ttsBtn.style.display = '';
       ttsBtn._text = text;
     } else {
-      const rawErr = json?.error?.message || json?.candidates?.[0]?.finishReason || '';
-      const isQuota = rawErr.toLowerCase().includes('quota') || rawErr.toLowerCase().includes('rate');
+      const isQuota = rawErr.toLowerCase().includes('quota') || rawErr.toLowerCase().includes('rate') || rawErr.toLowerCase().includes('limit');
       if (isQuota) setBobiState('sleep');
       const isRetry = rawErr.match(/retry in ([\d.]+)s/i);
       const segundos = isRetry ? Math.ceil(parseFloat(isRetry[1])) : 30;
