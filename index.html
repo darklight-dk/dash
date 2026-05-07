@@ -522,6 +522,94 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
   .chat-panel{width:calc(100vw - 32px);right:16px;bottom:80px}
   .chat-fab{bottom:16px;right:16px}}
 .dash-title{text-align:center}
+
+/* ── CHAT FEATURES: reactions, reply, gif, image, mentions ── */
+.chat-input-bar{position:relative}
+.chat-toolbar{display:flex;align-items:center;gap:4px;padding:4px 12px 0;flex-shrink:0;background:#fff}
+.chat-tool-btn{background:none;border:none;cursor:pointer;font-size:18px;padding:4px 6px;
+  border-radius:8px;transition:background .15s;line-height:1;color:var(--muted)}
+.chat-tool-btn:hover{background:#f1f5f9;color:var(--text)}
+.chat-tool-btn.admin-only{display:none}
+.is-admin-viewer .chat-tool-btn.admin-only,
+.is-mod-viewer .chat-tool-btn.admin-only{display:inline-flex}
+
+/* Reply bar */
+.chat-reply-bar{display:none;align-items:center;gap:8px;padding:6px 12px;
+  background:#f0fdf8;border-top:2px solid var(--teal);font-size:12px;flex-shrink:0}
+.chat-reply-bar.show{display:flex}
+.chat-reply-preview{flex:1;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-reply-preview strong{color:var(--teal)}
+.chat-reply-cancel{background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);padding:0 2px}
+
+/* Reply quote inside bubble */
+.chat-reply-quote{background:rgba(13,148,136,.1);border-left:3px solid var(--teal);
+  border-radius:6px;padding:4px 8px;margin-bottom:6px;font-size:11px;
+  color:var(--text);max-width:100%;overflow:hidden}
+.chat-reply-quote strong{color:var(--teal);display:block;margin-bottom:2px}
+.chat-reply-quote span{opacity:.8;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;display:block}
+.chat-msg.mine .chat-reply-quote{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.6)}
+.chat-msg.mine .chat-reply-quote strong{color:#fff}
+.chat-msg.mine .chat-reply-quote span{color:rgba(255,255,255,.85)}
+
+/* Reactions */
+.chat-reactions{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px}
+.chat-reaction{background:#f1f5f9;border:1.5px solid #e2e8f0;border-radius:12px;
+  padding:2px 7px;font-size:12px;cursor:pointer;transition:all .15s;
+  display:flex;align-items:center;gap:3px;user-select:none}
+.chat-reaction:hover{background:#e2e8f0;border-color:#cbd5e1}
+.chat-reaction.mine{background:#ecfdf5;border-color:var(--teal);color:var(--teal)}
+.chat-reaction-count{font-size:11px;font-weight:700}
+.chat-reaction-picker{position:absolute;background:#fff;border:1.5px solid #e2e8f0;
+  border-radius:14px;padding:8px 10px;box-shadow:0 8px 24px rgba(0,0,0,.12);
+  display:flex;gap:6px;z-index:400;bottom:100%;left:0;flex-wrap:wrap;max-width:200px;
+  animation:pop-in .15s ease}
+@keyframes pop-in{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+.reaction-emoji-btn{background:none;border:none;cursor:pointer;font-size:20px;
+  padding:4px;border-radius:8px;transition:background .12s;line-height:1}
+.reaction-emoji-btn:hover{background:#f1f5f9;transform:scale(1.2)}
+
+/* Chat image */
+.chat-msg-image{max-width:200px;max-height:160px;border-radius:10px;
+  object-fit:cover;cursor:pointer;display:block;margin-top:4px}
+.chat-img-preview{display:none;align-items:center;gap:8px;padding:6px 12px;
+  background:#fafafa;border-top:1px solid #f1f5f9;flex-shrink:0;font-size:12px}
+.chat-img-preview.show{display:flex}
+.chat-img-preview img{width:48px;height:48px;object-fit:cover;border-radius:8px;
+  border:1.5px solid #e2e8f0}
+.chat-img-preview span{flex:1;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-img-cancel{background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted)}
+
+/* GIF picker */
+.chat-gif-picker{display:none;position:absolute;bottom:calc(100% + 8px);left:0;right:0;
+  background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;
+  box-shadow:0 8px 32px rgba(0,0,0,.15);z-index:400;overflow:hidden;
+  flex-direction:column;max-height:280px}
+.chat-gif-picker.show{display:flex}
+.chat-gif-search{padding:10px 12px;border-bottom:1px solid #f1f5f9;display:flex;gap:6px}
+.chat-gif-search input{flex:1;border:1.5px solid #e2e8f0;border-radius:10px;padding:6px 10px;
+  font-size:12px;outline:none;font-family:'Sora',sans-serif}
+.chat-gif-search input:focus{border-color:var(--teal)}
+.chat-gif-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;
+  padding:8px;overflow-y:auto;flex:1}
+.chat-gif-grid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;
+  cursor:pointer;transition:opacity .15s}
+.chat-gif-grid img:hover{opacity:.85}
+.chat-gif-empty{text-align:center;color:var(--muted);font-size:12px;padding:20px;grid-column:1/-1}
+
+/* Mentions autocomplete */
+.chat-mentions{display:none;position:absolute;bottom:100%;left:12px;right:12px;
+  background:#fff;border:1.5px solid #e2e8f0;border-radius:12px;
+  box-shadow:0 4px 16px rgba(0,0,0,.1);z-index:401;overflow:hidden;max-height:140px;overflow-y:auto}
+.chat-mentions.show{display:block}
+.chat-mention-item{padding:7px 12px;cursor:pointer;font-size:13px;font-weight:600;
+  transition:background .12s;display:flex;align-items:center;gap:8px}
+.chat-mention-item:hover{background:#f0fdf8;color:var(--teal)}
+.chat-mention-role{font-size:10px;font-weight:500;color:var(--muted)}
+
+/* Mention highlight in messages */
+.chat-mention-tag{color:var(--teal);font-weight:700}
+.chat-msg.mine .chat-mention-tag{color:#a7f3d0}
 .dash-title h1{font-size:28px;font-weight:800}
 .dash-title p{color:var(--muted);margin-top:8px;font-size:15px}
 
@@ -2162,9 +2250,37 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
   <div class="chat-messages" id="chatMessages">
     <div class="chat-system">Conectando…</div>
   </div>
-  <div class="chat-input-bar">
+  <!-- Reply bar -->
+  <div class="chat-reply-bar" id="chatReplyBar">
+    <span class="chat-reply-preview" id="chatReplyPreview"></span>
+    <button class="chat-reply-cancel" onclick="cancelReply()" title="Cancelar respuesta">✕</button>
+  </div>
+  <!-- Image preview bar -->
+  <div class="chat-img-preview" id="chatImgPreview">
+    <img id="chatImgThumb" src="" alt=""/>
+    <span id="chatImgName">imagen.jpg</span>
+    <button class="chat-img-cancel" onclick="cancelImg()" title="Quitar imagen">✕</button>
+  </div>
+  <!-- Toolbar -->
+  <div class="chat-toolbar">
+    <button class="chat-tool-btn" onclick="toggleGifPicker()" title="GIF">GIF</button>
+    <button class="chat-tool-btn admin-only" onclick="triggerImgUpload()" title="Foto">📷</button>
+    <input type="file" id="chatImgInput" accept="image/*" style="display:none" onchange="handleImgSelect(this)"/>
+  </div>
+  <!-- GIF picker -->
+  <div class="chat-gif-picker" id="chatGifPicker">
+    <div class="chat-gif-search">
+      <input type="text" id="chatGifSearch" placeholder="Buscar GIF…" oninput="searchGifs(this.value)"/>
+    </div>
+    <div class="chat-gif-grid" id="chatGifGrid">
+      <div class="chat-gif-empty">Escribe algo para buscar 🔍</div>
+    </div>
+  </div>
+  <!-- Mentions autocomplete -->
+  <div class="chat-mentions" id="chatMentions"></div>
+  <div class="chat-input-bar" style="position:relative">
     <textarea class="chat-input" id="chatInput" placeholder="Escribe un mensaje…" rows="1"
-      onkeydown="chatKeydown(event)" oninput="autoResizeChat(this)"></textarea>
+      onkeydown="chatKeydown(event)" oninput="autoResizeChat(this);handleMentionInput(this)"></textarea>
     <button class="chat-send" onclick="sendChatMsg()">➤</button>
   </div>
 </div>
@@ -4595,6 +4711,12 @@ function initChat() {
   const fab = $('chatFab');
   if (fab) fab.style.display = 'flex';
   if (window._fbRegisterPresence) window._fbRegisterPresence();
+  // Set admin/mod class for conditional UI
+  const panel = $('chatPanel');
+  if (panel) {
+    panel.classList.toggle('is-admin-viewer', S.role === 'Administrador');
+    panel.classList.toggle('is-mod-viewer',   S.role === 'Moderador');
+  }
 }
 function stopChat() {
   const fab = $('chatFab');
@@ -6809,7 +6931,6 @@ function appendChatMsg(msg, key) {
   const container = document.getElementById('chatMessages');
   if (!container) return;
 
-  // Quitar "Conectando..."
   const connecting = container.querySelector('.chat-system');
   if (connecting && connecting.textContent === 'Conectando…') connecting.remove();
 
@@ -6834,38 +6955,106 @@ function appendChatMsg(msg, key) {
     : `<div class="chat-msg-avatar-initials">${initials}</div>`;
 
   const time = msg.ts ? new Date(msg.ts).toLocaleTimeString('es-MX', {hour:'2-digit',minute:'2-digit'}) : '';
-
-  const isAdminMsg = msg.role === 'Administrador';
-  const nameClass  = isAdminMsg ? 'chat-msg-name admin-name' : 'chat-msg-name';
-  const badge      = isAdminMsg ? '<span class="chat-verified-badge" title="Administrador">✓</span>' : '';
-  const canDelete  = key && (S.role === 'Administrador' || isMine);
+  const isAdminMsg = msg.role === 'Administrador' || msg.role === 'Moderador';
+  const isAdmin    = msg.role === 'Administrador';
+  const isMod      = msg.role === 'Moderador';
+  const nameClass  = isAdmin ? 'chat-msg-name admin-name' : (isMod ? 'chat-msg-name' : 'chat-msg-name');
+  const nameStyle  = isMod ? 'style="color:#7c3aed"' : '';
+  const badge      = isAdmin ? '<span class="chat-verified-badge" title="Administrador">✓</span>' : '';
+  const canDelete  = key && (S.role === 'Administrador' || S.role === 'Moderador' || isMine);
   const deleteBtn  = canDelete
-    ? `<button class="chat-msg-delete" onclick="deleteChatMsg('${key}',this)" title="Eliminar mensaje">✕</button>`
+    ? `<button class="chat-msg-delete" onclick="deleteChatMsg('${key}',this)" title="Eliminar">✕</button>`
     : '';
 
-  // Para mensajes propios: X a la derecha de la burbuja
-  // Para mensajes de otros (solo admin): X a la derecha también
+  // Reply quote
+  const replyHTML = msg.replyTo
+    ? `<div class="chat-reply-quote" onclick="scrollToMsg('${escapeHTML(msg.replyTo.key||'')}')">
+        <strong>${escapeHTML(msg.replyTo.name||'')}</strong>
+        <span>${escapeHTML((msg.replyTo.text||'').slice(0,80))}</span>
+       </div>`
+    : '';
+
+  // Body: text or image or gif
+  let bodyHTML = '';
+  if (msg.imageData) {
+    bodyHTML = `<img class="chat-msg-image" src="${msg.imageData}" alt="foto" onclick="viewFullImg(this.src)"/>`;
+  } else if (msg.gifUrl) {
+    bodyHTML = `<img class="chat-msg-image" src="${msg.gifUrl}" alt="GIF" style="max-width:180px"/>`;
+  } else {
+    bodyHTML = highlightMentions(escapeHTML(filterProfanity(msg.text || '')));
+  }
+
+  // Reply button (on hover)
+  const replyBtn = `<button class="chat-msg-delete" style="font-size:12px" onclick="setReply('${key}','${escapeHTML(msg.name||'')}','${escapeHTML((msg.text||msg.gifUrl?'GIF':'📷').slice(0,60))}')" title="Responder">↩</button>`;
+
   wrap.innerHTML = `
     <div class="chat-msg-header" style="cursor:pointer" onclick="openProfileView('${escapeHTML(msg.name||'')}','${escapeHTML(msg.role||'')}','${escapeHTML(msg.picture||'')}')">
       ${!isMine ? avatarHTML : ''}
-      <span class="${nameClass}">${escapeHTML(msg.name || 'Anónimo')}${badge}</span>
+      <span class="${nameClass}" ${nameStyle}>${escapeHTML(msg.name || 'Anónimo')}${badge}</span>
       ${isMine ? avatarHTML : ''}
     </div>
-    <div style="display:flex;align-items:center;gap:4px">
-      <div class="chat-msg-bubble">${escapeHTML(filterProfanity(msg.text || ''))}</div>
-      ${deleteBtn}
+    <div style="display:flex;align-items:flex-end;gap:4px">
+      <div class="chat-msg-bubble">
+        ${replyHTML}
+        ${bodyHTML}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:2px">
+        ${replyBtn}
+        ${deleteBtn}
+      </div>
     </div>
-    <div class="chat-msg-time">${time}</div>`;
+    <div class="chat-reactions" id="reactions-${key}"></div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <div class="chat-msg-time">${time}</div>
+      ${key ? `<button class="chat-msg-delete" style="font-size:14px;width:20px;height:20px;display:none;opacity:0" onclick="toggleReactionPicker('${key}',this)" title="Reaccionar">😊</button>` : ''}
+    </div>`;
+
+  // Show emoji btn on hover
+  if (key) {
+    wrap.addEventListener('mouseenter', () => {
+      const btn = wrap.querySelector('[title="Reaccionar"]');
+      if (btn) { btn.style.display='inline-flex'; btn.style.opacity='0.6'; }
+    });
+    wrap.addEventListener('mouseleave', () => {
+      const btn = wrap.querySelector('[title="Reaccionar"]');
+      if (btn) { btn.style.display='none'; btn.style.opacity='0'; }
+    });
+  }
 
   container.appendChild(wrap);
+
+  // Listen reactions
+  if (key) listenReactions(key);
+
   if (chatOpen) scrollChat();
 }
 
+// ── Highlight @mentions ──
+function highlightMentions(text) {
+  return text.replace(/@(\S+)/g, '<span class="chat-mention-tag">@$1</span>');
+}
+
+// ── Scroll to quoted message ──
+function scrollToMsg(key) {
+  if (!key) return;
+  const el = document.querySelector(`[data-msg-key="${key}"]`);
+  if (el) { el.scrollIntoView({behavior:'smooth',block:'center'}); el.style.background='#ecfdf5'; setTimeout(()=>el.style.background='',1200); }
+}
+
+// ── View full image ──
+window.viewFullImg = function(src) {
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:pointer';
+  ov.innerHTML = `<img src="${src}" style="max-width:90vw;max-height:90vh;border-radius:12px;object-fit:contain"/>`;
+  ov.onclick = () => ov.remove();
+  document.body.appendChild(ov);
+};
+
 window.deleteChatMsg = async function(key, btn) {
-  // Admins pueden borrar cualquier mensaje, usuarios solo los suyos
   const wrap = btn.closest('.chat-msg');
   const isOwn = wrap && wrap.classList.contains('can-delete-own');
-  if (S.role !== 'Administrador' && !isOwn) return;
+  const canMod = S.role === 'Administrador' || S.role === 'Moderador';
+  if (!canMod && !isOwn) return;
   try {
     await remove(ref(db, 'chat/messages/' + key));
     // onChildRemoved se encarga de quitarlo del DOM en todos los clientes
@@ -6916,7 +7105,7 @@ onValue(ref(db, 'chat/settings/profanityFilter'), snap => {
 });
 
 window.toggleProfanityFilter = function() {
-  if (S.role !== 'Administrador') return;
+  if (S.role !== 'Administrador' && S.role !== 'Moderador') return;
   set(ref(db, 'chat/settings/profanityFilter'), !profanityFilterOn);
 };
 
@@ -6930,7 +7119,241 @@ window.clearChatMessages = async function() {
   push(msgsRef, { system: true, text: 'Chat limpiado por un administrador.', ts: Date.now() });
 };
 
-// ── Enviar mensaje ──
+// ══════════════════════════════════════════
+//  CHAT FEATURES: reactions, reply, gif, image, mentions
+// ══════════════════════════════════════════
+
+// ── REACTIONS ──
+const REACTION_EMOJIS = ['👍','❤️','😂','😮','😢','🔥','🎉','👏'];
+const _reactionListeners = {};
+
+function listenReactions(msgKey) {
+  if (_reactionListeners[msgKey]) return;
+  const rRef = ref(db, 'chat/reactions/' + msgKey);
+  _reactionListeners[msgKey] = onValue(rRef, snap => {
+    const data = snap.exists() ? snap.val() : {};
+    renderReactions(msgKey, data);
+  });
+}
+
+function renderReactions(msgKey, data) {
+  const el = document.getElementById('reactions-' + msgKey);
+  if (!el) return;
+  el.innerHTML = '';
+  Object.entries(data).forEach(([emoji, info]) => {
+    const count = Object.keys(info.users || {}).length;
+    if (!count) return;
+    const iMine = info.users && info.users[S.user?.replace(/[^a-zA-Z0-9]/g,'_')];
+    const btn = document.createElement('button');
+    btn.className = 'chat-reaction' + (iMine ? ' mine' : '');
+    btn.innerHTML = `${emoji} <span class="chat-reaction-count">${count}</span>`;
+    btn.onclick = () => toggleReaction(msgKey, emoji);
+    el.appendChild(btn);
+  });
+}
+
+window.toggleReactionPicker = function(msgKey, triggerBtn) {
+  // Close any open picker
+  document.querySelectorAll('.chat-reaction-picker').forEach(p => p.remove());
+  const picker = document.createElement('div');
+  picker.className = 'chat-reaction-picker';
+  REACTION_EMOJIS.forEach(emoji => {
+    const btn = document.createElement('button');
+    btn.className = 'reaction-emoji-btn';
+    btn.textContent = emoji;
+    btn.onclick = () => { toggleReaction(msgKey, emoji); picker.remove(); };
+    picker.appendChild(btn);
+  });
+  const bar = triggerBtn.closest('.chat-msg');
+  if (bar) bar.style.position = 'relative';
+  triggerBtn.parentElement.style.position = 'relative';
+  triggerBtn.parentElement.appendChild(picker);
+  setTimeout(() => document.addEventListener('click', () => picker.remove(), {once:true}), 100);
+};
+
+async function toggleReaction(msgKey, emoji) {
+  if (!S.user) return;
+  const userKey = S.user.replace(/[^a-zA-Z0-9]/g,'_');
+  const rRef = ref(db, `chat/reactions/${msgKey}/${emoji}/users/${userKey}`);
+  const snap = await get(rRef);
+  if (snap.exists()) {
+    await remove(rRef);
+  } else {
+    await set(rRef, true);
+  }
+}
+
+// ── REPLY ──
+let _replyTo = null;
+
+window.setReply = function(key, name, text) {
+  _replyTo = { key, name, text };
+  const bar = document.getElementById('chatReplyBar');
+  const prev = document.getElementById('chatReplyPreview');
+  if (bar && prev) {
+    prev.innerHTML = `Respondiendo a <strong>${escapeHTML(name)}</strong>: ${escapeHTML(text.slice(0,60))}`;
+    bar.classList.add('show');
+  }
+  document.getElementById('chatInput')?.focus();
+};
+
+window.cancelReply = function() {
+  _replyTo = null;
+  document.getElementById('chatReplyBar')?.classList.remove('show');
+};
+
+// ── GIF PICKER ──
+let _gifTimeout = null;
+
+window.toggleGifPicker = function() {
+  const picker = document.getElementById('chatGifPicker');
+  if (!picker) return;
+  const showing = picker.classList.toggle('show');
+  if (showing) {
+    document.getElementById('chatGifSearch')?.focus();
+    loadTrendingGifs();
+  }
+};
+
+async function loadTrendingGifs() {
+  const grid = document.getElementById('chatGifGrid');
+  if (!grid) return;
+  grid.innerHTML = '<div class="chat-gif-empty">⏳ Cargando…</div>';
+  try {
+    const res = await fetch(`https://api.giphy.com/v1/gifs/trending?api_key=dc6zaTOxFJmzC&limit=12&rating=g`);
+    const json = await res.json();
+    renderGifs(json.data || []);
+  } catch(e) {
+    grid.innerHTML = '<div class="chat-gif-empty">Error al cargar GIFs</div>';
+  }
+}
+
+window.searchGifs = function(q) {
+  clearTimeout(_gifTimeout);
+  if (!q.trim()) { loadTrendingGifs(); return; }
+  _gifTimeout = setTimeout(async () => {
+    const grid = document.getElementById('chatGifGrid');
+    if (!grid) return;
+    grid.innerHTML = '<div class="chat-gif-empty">⏳ Buscando…</div>';
+    try {
+      const res = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=dc6zaTOxFJmzC&q=${encodeURIComponent(q)}&limit=12&rating=g`);
+      const json = await res.json();
+      renderGifs(json.data || []);
+    } catch(e) {
+      grid.innerHTML = '<div class="chat-gif-empty">Error al buscar</div>';
+    }
+  }, 400);
+};
+
+function renderGifs(gifs) {
+  const grid = document.getElementById('chatGifGrid');
+  if (!grid) return;
+  if (!gifs.length) { grid.innerHTML = '<div class="chat-gif-empty">Sin resultados</div>'; return; }
+  grid.innerHTML = '';
+  gifs.forEach(gif => {
+    const img = document.createElement('img');
+    img.src = gif.images?.fixed_height_small?.url || gif.images?.downsized?.url || '';
+    img.alt = gif.title || 'GIF';
+    img.loading = 'lazy';
+    img.onclick = () => sendGif(gif.images?.downsized?.url || img.src);
+    grid.appendChild(img);
+  });
+}
+
+function sendGif(url) {
+  document.getElementById('chatGifPicker')?.classList.remove('show');
+  if (!S.user) return;
+  push(msgsRef, {
+    name: S.user, role: S.role || 'Aspirante',
+    picture: S.googlePicture || null,
+    gifUrl: url, ts: serverTimestamp(),
+    ..._replyTo ? {replyTo:_replyTo} : {}
+  });
+  cancelReply();
+  _lastChatMsgTs = Date.now();
+}
+
+// ── IMAGE UPLOAD (admin/mod only) ──
+let _pendingImg = null;
+
+window.triggerImgUpload = function() {
+  if (S.role !== 'Administrador' && S.role !== 'Moderador') return;
+  document.getElementById('chatImgInput')?.click();
+};
+
+window.handleImgSelect = function(input) {
+  const file = input.files?.[0];
+  if (!file) return;
+  if (file.size > 500 * 1024) { alert('Máximo 500KB por imagen.'); return; }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    _pendingImg = e.target.result;
+    const preview = document.getElementById('chatImgPreview');
+    const thumb   = document.getElementById('chatImgThumb');
+    const name    = document.getElementById('chatImgName');
+    if (preview && thumb) {
+      thumb.src = _pendingImg;
+      if (name) name.textContent = file.name;
+      preview.classList.add('show');
+    }
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+};
+
+window.cancelImg = function() {
+  _pendingImg = null;
+  document.getElementById('chatImgPreview')?.classList.remove('show');
+};
+
+// ── MENTIONS AUTOCOMPLETE ──
+let _onlineUsers = [];
+
+onValue(presRef, snap => {
+  _onlineUsers = snap.exists() ? Object.values(snap.val()).map(u => u.name).filter(Boolean) : [];
+});
+
+window.handleMentionInput = function(textarea) {
+  const val = textarea.value;
+  const cursor = textarea.selectionStart;
+  const before = val.slice(0, cursor);
+  const match = before.match(/@(\w*)$/);
+  const mentionsEl = document.getElementById('chatMentions');
+  if (!mentionsEl) return;
+  if (!match) { mentionsEl.classList.remove('show'); return; }
+  const query = match[1].toLowerCase();
+  const matches = _onlineUsers.filter(u => u.toLowerCase().startsWith(query) && u !== S.user);
+  if (!matches.length) { mentionsEl.classList.remove('show'); return; }
+  mentionsEl.innerHTML = matches.slice(0,5).map(u =>
+    `<div class="chat-mention-item" onclick="insertMention('${escapeHTML(u)}')">
+      <span>@${escapeHTML(u)}</span>
+     </div>`
+  ).join('');
+  mentionsEl.classList.add('show');
+};
+
+window.insertMention = function(name) {
+  const inp = document.getElementById('chatInput');
+  if (!inp) return;
+  const val = inp.value;
+  const cursor = inp.selectionStart;
+  const before = val.slice(0, cursor).replace(/@\w*$/, '@' + name + ' ');
+  inp.value = before + val.slice(cursor);
+  inp.focus();
+  document.getElementById('chatMentions')?.classList.remove('show');
+};
+
+// Close pickers on outside click
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#chatGifPicker') && !e.target.closest('.chat-tool-btn')) {
+    document.getElementById('chatGifPicker')?.classList.remove('show');
+  }
+  if (!e.target.closest('#chatMentions') && !e.target.closest('#chatInput')) {
+    document.getElementById('chatMentions')?.classList.remove('show');
+  }
+});
+
+// ── ENVIAR MENSAJE ──
 // FIX Slowmode client-side - rastrear último mensaje enviado
 let _lastChatMsgTs = 0;
 
@@ -6964,16 +7387,32 @@ window.sendChatMsg = function() {
   _lastChatMsgTs = Date.now();
 
   // FIX: usar serverTimestamp() en vez de Date.now() del cliente (no manipulable)
-  push(msgsRef, {
+  // Build message object
+  const msgObj = {
     name:    S.user,
     role:    S.role    || 'Aspirante',
     picture: S.googlePicture || null,
-    text,
-    ts: serverTimestamp(),
-  });
+    ts:      serverTimestamp(),
+  };
+
+  if (_pendingImg) {
+    msgObj.imageData = _pendingImg;
+    if (text) msgObj.text = text;
+    cancelImg();
+  } else {
+    msgObj.text = text;
+  }
+
+  if (_replyTo) {
+    msgObj.replyTo = _replyTo;
+    cancelReply();
+  }
+
+  push(msgsRef, msgObj);
 
   input.value = '';
   input.style.height = 'auto';
+  document.getElementById('chatMentions')?.classList.remove('show');
 };
 
 // ── Toggle chat ──
