@@ -7085,8 +7085,8 @@ function appendChatMsg(msg, key) {
 
   container.appendChild(wrap);
 
-  // Listen reactions
-  if (key) listenReactions(key);
+  // Listen reactions — defer para asegurar que el DOM esté listo
+  if (key) setTimeout(() => listenReactions(key), 0);
 
   if (chatOpen) scrollChat();
 }
@@ -7195,7 +7195,13 @@ function emojiToKey(emoji) {
   return [...emoji].map(c => c.codePointAt(0).toString(16)).join('_');
 }
 function keyToEmoji(key) {
-  return key.split('_').map(h => String.fromCodePoint(parseInt(h,16))).join('');
+  try {
+    return key.split('_').map(h => {
+      const cp = parseInt(h, 16);
+      if (isNaN(cp) || cp < 0 || cp > 0x10FFFF) return '';
+      return String.fromCodePoint(cp);
+    }).join('');
+  } catch(e) { return ''; }
 }
 
 function listenReactions(msgKey) {
