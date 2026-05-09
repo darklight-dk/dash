@@ -486,6 +486,15 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .chat-msg-delete:hover{opacity:1!important;background:rgba(220,38,38,.2)}
 .is-admin-viewer .chat-msg-delete{display:inline-flex}
 .can-delete-own .chat-msg-delete{display:inline-flex}
+/* Reply btn — siempre visible */
+.chat-reply-btn{display:inline-flex;align-items:center;justify-content:center;
+  background:none;border:none;cursor:pointer;color:#94a3b8;padding:0;
+  width:22px;height:22px;border-radius:50%;flex-shrink:0;transition:all .2s;
+  margin-top:2px;align-self:center;opacity:.5}
+.chat-reply-btn:hover{opacity:1;background:#f1f5f9;color:var(--teal)}
+/* Swipe-to-reply animation */
+.chat-msg.swipe-hint .chat-bubble-wrap{transform:translateX(8px);transition:transform .2s}
+.chat-msg.mine.swipe-hint .chat-bubble-wrap{transform:translateX(-8px)}
 .chat-msg-bubble{padding:8px 12px;border-radius:14px;font-size:13px;line-height:1.4;word-break:break-word}
 .chat-msg.mine .chat-msg-bubble{background:linear-gradient(135deg,var(--teal),#0891b2);color:#fff;
   border-bottom-right-radius:4px}
@@ -552,28 +561,46 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .chat-msg.mine .chat-reply-quote strong{color:#fff}
 .chat-msg.mine .chat-reply-quote span{color:rgba(255,255,255,.85)}
 
-/* Reactions */
-.chat-reactions{display:flex;flex-wrap:wrap;gap:3px;margin-top:-6px;margin-bottom:4px;padding:0 2px}
-.chat-msg.mine .chat-reactions{justify-content:flex-end}
-.chat-reaction{background:#fff;border:1.5px solid #e8e8e8;border-radius:100px;
-  padding:2px 7px 2px 4px;font-size:14px;cursor:pointer;transition:all .15s;
+/* Reactions — estilo WhatsApp/Instagram pegadas a la burbuja */
+.chat-bubble-wrap{position:relative;display:inline-block;padding-bottom:14px;max-width:100%}
+.chat-reactions{display:flex;flex-wrap:wrap;gap:2px;
+  position:absolute;bottom:0;left:4px;z-index:10}
+.chat-msg.mine .chat-reactions{left:auto;right:4px}
+.chat-reactions:empty{display:none}
+.chat-reaction{background:#fff;border:1.5px solid #e2e8f0;border-radius:99px;
+  padding:1px 6px;font-size:12px;cursor:pointer;transition:all .15s;
   display:flex;align-items:center;gap:2px;user-select:none;
-  box-shadow:0 1px 6px rgba(0,0,0,.15)}
-.chat-reaction:hover{transform:scale(1.1)}
+  box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.chat-reaction:hover{background:#f1f5f9;border-color:#cbd5e1}
 .chat-reaction.mine{background:#ecfdf5;border-color:var(--teal)}
-.chat-reaction-count{font-size:11px;font-weight:700;color:#555}
-.chat-react-btn{background:none;border:none;cursor:pointer;color:var(--muted);
-  display:inline-flex;align-items:center;justify-content:center;
-  width:20px;height:20px;border-radius:50%;padding:0;opacity:0.45;
-  transition:opacity .15s,background .15s}
-.chat-react-btn:hover{opacity:1;background:#f1f5f9}
-.chat-reaction-picker{position:fixed;background:#fff;border:1.5px solid #e2e8f0;
-  border-radius:100px;padding:6px 10px;box-shadow:0 8px 32px rgba(0,0,0,.18);
-  display:flex;gap:4px;z-index:9999;animation:pop-in .15s ease}
+.chat-reaction-count{font-size:10px;font-weight:700;color:#374151}
+.chat-reaction-picker{position:absolute;background:#fff;border:1.5px solid #e2e8f0;
+  border-radius:16px;padding:8px 10px;box-shadow:0 8px 28px rgba(0,0,0,.15);
+  display:flex;gap:4px;z-index:500;bottom:calc(100% + 6px);left:0;
+  animation:pop-in .15s ease}
+.chat-msg.mine .chat-reaction-picker{left:auto;right:0}
 @keyframes pop-in{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
 .reaction-emoji-btn{background:none;border:none;cursor:pointer;font-size:22px;
-  padding:4px 2px;border-radius:8px;transition:transform .12s;line-height:1}
-.reaction-emoji-btn:hover{transform:scale(1.35)}
+  padding:4px 5px;border-radius:8px;transition:all .12s;line-height:1}
+.reaction-emoji-btn:hover{background:#f1f5f9;transform:scale(1.25)}
+/* Modal quiénes reaccionaron */
+.reaction-detail-modal{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9000;
+  display:flex;align-items:flex-end;justify-content:center;animation:fade-in .15s ease}
+@keyframes fade-in{from{opacity:0}to{opacity:1}}
+.reaction-detail-card{background:#fff;border-radius:20px 20px 0 0;padding:18px 16px 32px;
+  width:100%;max-width:420px;max-height:60vh;display:flex;flex-direction:column;
+  animation:slide-up .2s ease}
+@keyframes slide-up{from{transform:translateY(40px)}to{transform:translateY(0)}}
+.reaction-detail-header{display:flex;align-items:center;gap:6px;margin-bottom:14px;
+  padding-bottom:12px;border-bottom:1px solid #f1f5f9}
+.reaction-detail-close{margin-left:auto;background:none;border:none;cursor:pointer;
+  font-size:16px;color:var(--muted);padding:4px 8px;border-radius:50%}
+.reaction-detail-close:hover{background:#f1f5f9}
+.reaction-detail-list{list-style:none;padding:0;margin:0;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+.reaction-detail-user{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:500;color:var(--text)}
+.reaction-detail-avatar{width:34px;height:34px;border-radius:50%;background:var(--teal);
+  color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;
+  font-weight:700;flex-shrink:0}
 
 /* Chat image */
 .chat-msg-image{max-width:200px;max-height:160px;border-radius:10px;
@@ -586,22 +613,6 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .chat-img-preview span{flex:1;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .chat-img-cancel{background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted)}
 
-/* GIF picker */
-.chat-gif-picker{display:none;position:fixed;left:8px;right:8px;
-  background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;
-  box-shadow:0 8px 32px rgba(0,0,0,.2);z-index:9999;overflow:hidden;
-  flex-direction:column;max-height:260px}
-.chat-gif-picker.show{display:flex}
-.chat-gif-search{padding:10px 12px;border-bottom:1px solid #f1f5f9;display:flex;gap:6px}
-.chat-gif-search input{flex:1;border:1.5px solid #e2e8f0;border-radius:10px;padding:6px 10px;
-  font-size:12px;outline:none;font-family:'Sora',sans-serif}
-.chat-gif-search input:focus{border-color:var(--teal)}
-.chat-gif-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;
-  padding:8px;overflow-y:auto;flex:1}
-.chat-gif-grid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;
-  cursor:pointer;transition:opacity .15s}
-.chat-gif-grid img:hover{opacity:.85}
-.chat-gif-empty{text-align:center;color:var(--muted);font-size:12px;padding:20px;grid-column:1/-1}
 
 /* Mentions autocomplete */
 .chat-mentions{display:none;position:absolute;bottom:100%;left:12px;right:12px;
@@ -2268,8 +2279,8 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
     <button class="chat-img-cancel" onclick="cancelImg()" title="Quitar imagen">✕</button>
   </div>
   <!-- Toolbar -->
-  <div class="chat-toolbar" id="chatToolbar">
-    <button class="chat-tool-btn admin-only" onclick="triggerImgUpload()" title="Foto">📷</button>
+  <div class="chat-toolbar">
+    <button class="chat-tool-btn admin-only" onclick="triggerImgUpload()" title="Foto"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></button>
     <input type="file" id="chatImgInput" accept="image/*" style="display:none" onchange="handleImgSelect(this)"/>
   </div>
   <!-- Mentions autocomplete -->
@@ -6973,16 +6984,15 @@ function appendChatMsg(msg, key) {
   // Body: text or image or gif
   let bodyHTML = '';
   if (msg.imageData) {
-    const caption = msg.text ? `<div style="margin-top:6px;font-size:13px">${escapeHTML(filterProfanity(msg.text))}</div>` : '';
-    bodyHTML = `<img class="chat-msg-image" src="${msg.imageData}" alt="foto" onclick="viewFullImg(this.src)"/>${caption}`;
+    bodyHTML = `<img class="chat-msg-image" src="${msg.imageData}" alt="foto" onclick="viewFullImg(this.src)"/>`;
   } else if (msg.gifUrl) {
     bodyHTML = `<img class="chat-msg-image" src="${msg.gifUrl}" alt="GIF" style="max-width:180px"/>`;
   } else {
     bodyHTML = highlightMentions(escapeHTML(filterProfanity(msg.text || '')));
   }
 
-  // Reply button (on hover)
-  const replyBtn = `<button class="chat-msg-delete" style="font-size:12px" onclick="setReply('${key}','${escapeHTML(msg.name||'')}','${escapeHTML((msg.text||msg.gifUrl?'GIF':'📷').slice(0,60))}')" title="Responder">↩</button>`;
+  // Reply button — siempre visible
+  const replyBtn = key ? `<button class="chat-reply-btn" onclick="setReply('${key}','${escapeHTML(msg.name||'')}','${escapeHTML((msg.text||'foto').slice(0,60))}')" title="Responder"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/></svg></button>` : '';
 
   wrap.innerHTML = `
     <div class="chat-msg-header" style="cursor:pointer" onclick="openProfileView('${escapeHTML(msg.name||'')}','${escapeHTML(msg.role||'')}','${escapeHTML(msg.picture||'')}')">
@@ -6991,20 +7001,81 @@ function appendChatMsg(msg, key) {
       ${isMine ? avatarHTML : ''}
     </div>
     <div style="display:flex;align-items:flex-end;gap:4px">
-      <div class="chat-msg-bubble">
-        ${replyHTML}
-        ${bodyHTML}
+      <div class="chat-bubble-wrap">
+        <div class="chat-msg-bubble">
+          ${replyHTML}
+          ${bodyHTML}
+        </div>
+        <div class="chat-reactions" id="reactions-${key}"></div>
       </div>
       <div style="display:flex;flex-direction:column;gap:2px">
         ${replyBtn}
         ${deleteBtn}
       </div>
     </div>
-    <div class="chat-reactions" id="reactions-${key}"></div>
-    <div style="display:flex;align-items:center;gap:4px">
+    <div style="display:flex;align-items:center;gap:6px">
       <div class="chat-msg-time">${time}</div>
-      ${key ? `<button class="chat-react-btn" onclick="toggleReactionPicker('${key}',this)" title="Reaccionar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></button>` : ''}
+
     </div>`;
+
+
+
+  // Long-press para reaccionar + swipe para responder
+  if (key) {
+    let _tx = 0, _startX = 0, _startY = 0, _swiping = false;
+    let _lpTimer = null, _lpFired = false;
+    const bubbleWrap = wrap.querySelector('.chat-bubble-wrap');
+    const bubble = wrap.querySelector('.chat-msg-bubble');
+
+    // ── Long press ──
+    function startLongPress(e) {
+      _lpFired = false;
+      _lpTimer = setTimeout(() => {
+        _lpFired = true;
+        showReactionPicker(key, bubbleWrap);
+      }, 520);
+    }
+    function cancelLongPress() { clearTimeout(_lpTimer); }
+
+    bubble.addEventListener('mousedown', startLongPress);
+    bubble.addEventListener('mouseup', cancelLongPress);
+    bubble.addEventListener('mouseleave', cancelLongPress);
+    bubble.addEventListener('touchstart', startLongPress, {passive:true});
+    bubble.addEventListener('touchend', cancelLongPress, {passive:true});
+    bubble.addEventListener('touchmove', cancelLongPress, {passive:true});
+
+    // ── Swipe-to-reply ──
+    wrap.addEventListener('touchstart', e => {
+      _startX = e.touches[0].clientX;
+      _startY = e.touches[0].clientY;
+      _swiping = false;
+    }, {passive:true});
+    wrap.addEventListener('touchmove', e => {
+      if (_lpFired) return; // si abrió picker, no swipe
+      const dx = e.touches[0].clientX - _startX;
+      const dy = e.touches[0].clientY - _startY;
+      if (!_swiping && Math.abs(dy) > Math.abs(dx)) return;
+      _swiping = true;
+      const isMineMsg = wrap.classList.contains('mine');
+      if ((!isMineMsg && dx > 0) || (isMineMsg && dx < 0)) {
+        _tx = Math.min(Math.abs(dx), 60) * (dx > 0 ? 1 : -1);
+        bubbleWrap.style.transition = 'none';
+        bubbleWrap.style.transform = `translateX(${_tx}px)`;
+      }
+    }, {passive:true});
+    wrap.addEventListener('touchend', () => {
+      if (Math.abs(_tx) > 35 && !_lpFired) {
+        const snippet = (msg.text||'foto').slice(0,60);
+        setReply(key, msg.name||'', snippet);
+        if (navigator.vibrate) navigator.vibrate(40);
+        wrap.classList.add('swipe-hint');
+        setTimeout(() => wrap.classList.remove('swipe-hint'), 300);
+      }
+      bubbleWrap.style.transition = 'transform .25s ease';
+      bubbleWrap.style.transform = 'translateX(0)';
+      _tx = 0;
+    }, {passive:true});
+  }
 
   container.appendChild(wrap);
 
@@ -7020,7 +7091,7 @@ function highlightMentions(text) {
 }
 
 // ── Scroll to quoted message ──
-function scrollToMsg(key) {
+window.scrollToMsg = function(key) {
   if (!key) return;
   const el = document.querySelector(`[data-msg-key="${key}"]`);
   if (el) { el.scrollIntoView({behavior:'smooth',block:'center'}); el.style.background='#ecfdf5'; setTimeout(()=>el.style.background='',1200); }
@@ -7111,12 +7182,14 @@ window.clearChatMessages = async function() {
 // ── REACTIONS ──
 const REACTION_EMOJIS = ['👍','❤️','😂','😮','😢','🔥','🎉','👏'];
 const _reactionListeners = {};
+let _reactionData = {}; // cache local de reacciones por msgKey
 
 function listenReactions(msgKey) {
   if (_reactionListeners[msgKey]) return;
   const rRef = ref(db, 'chat/reactions/' + msgKey);
   _reactionListeners[msgKey] = onValue(rRef, snap => {
     const data = snap.exists() ? snap.val() : {};
+    _reactionData[msgKey] = data;
     renderReactions(msgKey, data);
   });
 }
@@ -7125,24 +7198,25 @@ function renderReactions(msgKey, data) {
   const el = document.getElementById('reactions-' + msgKey);
   if (!el) return;
   el.innerHTML = '';
-  const entries = Object.entries(data).filter(([,info]) => Object.keys(info.users||{}).length > 0);
-  if (!entries.length) return;
-  entries.forEach(([eKey, info]) => {
+  Object.entries(data).forEach(([emoji, info]) => {
     const users = info.users || {};
     const count = Object.keys(users).length;
-    const emoji = info.emoji || '?';
+    if (!count) return;
     const userKey = S.user?.replace(/[^a-zA-Z0-9]/g,'_');
-    const iMine = userKey && !!users[userKey];
+    const iMine = userKey && users[userKey];
     const btn = document.createElement('button');
     btn.className = 'chat-reaction' + (iMine ? ' mine' : '');
-    btn.title = Object.keys(users).join(', ');
-    btn.innerHTML = `<span style="font-size:15px">${emoji}</span>${count > 1 ? `<span class="chat-reaction-count">${count}</span>` : ''}`;
-    btn.onclick = (e) => { e.stopPropagation(); toggleReaction(msgKey, emoji); };
+    btn.innerHTML = `${emoji} <span class="chat-reaction-count">${count}</span>`;
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      showReactionDetails(msgKey, emoji, data);
+    };
     el.appendChild(btn);
   });
 }
 
-window.toggleReactionPicker = function(msgKey, triggerBtn) {
+// Mostrar picker al mantener presionado
+function showReactionPicker(msgKey, bubbleWrap) {
   document.querySelectorAll('.chat-reaction-picker').forEach(p => p.remove());
   const picker = document.createElement('div');
   picker.className = 'chat-reaction-picker';
@@ -7150,41 +7224,52 @@ window.toggleReactionPicker = function(msgKey, triggerBtn) {
     const btn = document.createElement('button');
     btn.className = 'reaction-emoji-btn';
     btn.textContent = emoji;
-    btn.onclick = (e) => { e.stopPropagation(); toggleReaction(msgKey, emoji); picker.remove(); };
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      toggleReaction(msgKey, emoji);
+      picker.remove();
+    };
     picker.appendChild(btn);
   });
-  document.body.appendChild(picker);
-  // Position above the button, within viewport
-  const rect = triggerBtn.getBoundingClientRect();
-  const pw = 280; // approx picker width
-  let left = rect.left - pw/2 + rect.width/2;
-  left = Math.max(8, Math.min(left, window.innerWidth - pw - 8));
-  let top = rect.top - 56;
-  if (top < 8) top = rect.bottom + 8;
-  picker.style.left = left + 'px';
-  picker.style.top  = top  + 'px';
-  setTimeout(() => document.addEventListener('click', () => picker.remove(), {once:true}), 100);
-};
+  bubbleWrap.appendChild(picker);
+  if (navigator.vibrate) navigator.vibrate(30);
+  setTimeout(() => {
+    document.addEventListener('click', () => picker.remove(), {once:true});
+    document.addEventListener('touchstart', () => picker.remove(), {once:true});
+  }, 100);
+}
 
-function emojiKey(e) {
-  // Safe Firebase key from emoji - use codepoint
-  return [...e].map(c => c.codePointAt(0).toString(16)).join('_');
+// Modal: quiénes reaccionaron con ese emoji
+function showReactionDetails(msgKey, emoji, data) {
+  document.querySelectorAll('.reaction-detail-modal').forEach(m => m.remove());
+  const info = data[emoji] || (_reactionData[msgKey]?.[emoji]) || {};
+  const users = info.users || {};
+  const names = Object.keys(users).map(k => k.replace(/_/g, ' '));
+  if (!names.length) return;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'reaction-detail-modal';
+  overlay.innerHTML = `
+    <div class="reaction-detail-card">
+      <div class="reaction-detail-header">
+        <span style="font-size:28px;line-height:1">${emoji}</span>
+        <span style="font-size:13px;color:var(--muted);margin-left:6px">${names.length} reacción${names.length>1?'es':''}</span>
+        <button class="reaction-detail-close" onclick="this.closest('.reaction-detail-modal').remove()">✕</button>
+      </div>
+      <ul class="reaction-detail-list">
+        ${names.map(n=>`<li class="reaction-detail-user"><div class="reaction-detail-avatar">${n.charAt(0).toUpperCase()}</div><span>${escapeHTML(n)}</span></li>`).join('')}
+      </ul>
+    </div>`;
+  overlay.onclick = (e) => { if(e.target===overlay) overlay.remove(); };
+  document.body.appendChild(overlay);
 }
 
 async function toggleReaction(msgKey, emoji) {
   if (!S.user) return;
   const userKey = S.user.replace(/[^a-zA-Z0-9]/g,'_');
-  const eKey = emojiKey(emoji);
-  const rRef = ref(db, `chat/reactions/${msgKey}/${eKey}/users/${userKey}`);
-  // Store emoji text alongside
-  const parentRef = ref(db, `chat/reactions/${msgKey}/${eKey}`);
+  const rRef = ref(db, `chat/reactions/${msgKey}/${emoji}/users/${userKey}`);
   const snap = await get(rRef);
-  if (snap.exists()) {
-    await remove(rRef);
-  } else {
-    await set(ref(db, `chat/reactions/${msgKey}/${eKey}/emoji`), emoji);
-    await set(rRef, true);
-  }
+  if (snap.exists()) { await remove(rRef); } else { await set(rRef, true); }
 }
 
 // ── REPLY ──
@@ -7205,94 +7290,6 @@ window.cancelReply = function() {
   _replyTo = null;
   document.getElementById('chatReplyBar')?.classList.remove('show');
 };
-
-// ── GIF PICKER ──
-let _gifTimeout = null;
-
-window.toggleGifPicker = function() {
-  const picker = document.getElementById('chatGifPicker');
-  if (!picker) return;
-  const toolbar = document.getElementById('chatToolbar');
-  const showing = picker.classList.toggle('show');
-  if (showing) {
-    if (toolbar) {
-      const rect = toolbar.getBoundingClientRect();
-      picker.style.top  = 'auto';
-      picker.style.bottom = (window.innerHeight - rect.top + 4) + 'px';
-      picker.style.left = '8px';
-      picker.style.right = '8px';
-    }
-    // prevent keyboard from opening
-    document.activeElement?.blur();
-    setTimeout(() => document.getElementById('chatGifSearch')?.focus(), 150);
-    setTimeout(() => {
-      document.addEventListener('click', function closePicker(e) {
-        if (!e.target.closest('#chatGifPicker') && !e.target.closest('#chatToolbar')) {
-          picker.classList.remove('show');
-          document.removeEventListener('click', closePicker);
-        }
-      });
-    }, 200);
-  }
-};
-
-async function loadTrendingGifs() {
-  const grid = document.getElementById('chatGifGrid');
-  if (!grid) return;
-  grid.innerHTML = '<div class="chat-gif-empty">🔍 Escribe algo para buscar GIFs</div>';
-}
-
-window.searchGifs = function(q) {
-  clearTimeout(_gifTimeout);
-  const grid = document.getElementById('chatGifGrid');
-  if (!q.trim()) { 
-    if (grid) grid.innerHTML = '<div class="chat-gif-empty">🔍 Escribe algo para buscar GIFs</div>'; 
-    return; 
-  }
-  _gifTimeout = setTimeout(async () => {
-    if (!grid) return;
-    grid.innerHTML = '<div class="chat-gif-empty">⏳ Buscando…</div>';
-    try {
-      const key = 'AIzaSyD8Y8jUmUCf8tPqEJbetxO7QUNnVVFoNTI';
-      const res = await fetch(`https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(q)}&key=${key}&limit=12&contentfilter=medium&media_filter=gif,tinygif`);
-      const json = await res.json();
-      renderGifs(json.results || []);
-    } catch(e) {
-      grid.innerHTML = '<div class="chat-gif-empty">Error al buscar GIFs</div>';
-    }
-  }, 400);
-};
-
-function renderGifs(gifs) {
-  const grid = document.getElementById('chatGifGrid');
-  if (!grid) return;
-  if (!gifs.length) { grid.innerHTML = '<div class="chat-gif-empty">Sin resultados 😅</div>'; return; }
-  grid.innerHTML = '';
-  gifs.forEach(gif => {
-    const preview = gif.media_formats?.tinygif?.url || gif.media_formats?.gif?.url || '';
-    const full    = gif.media_formats?.gif?.url || preview;
-    if (!preview) return;
-    const img = document.createElement('img');
-    img.src = preview;
-    img.alt = gif.content_description || 'GIF';
-    img.loading = 'lazy';
-    img.onclick = () => sendGif(full);
-    grid.appendChild(img);
-  });
-}
-
-function sendGif(url) {
-  document.getElementById('chatGifPicker')?.classList.remove('show');
-  if (!S.user) return;
-  push(msgsRef, {
-    name: S.user, role: S.role || 'Aspirante',
-    picture: S.googlePicture || null,
-    gifUrl: url, ts: serverTimestamp(),
-    ..._replyTo ? {replyTo:_replyTo} : {}
-  });
-  cancelReply();
-  _lastChatMsgTs = Date.now();
-}
 
 // ── IMAGE UPLOAD (admin/mod only) ──
 let _pendingImg = null;
@@ -7366,9 +7363,6 @@ window.insertMention = function(name) {
 
 // Close pickers on outside click
 document.addEventListener('click', (e) => {
-  if (!e.target.closest('#chatGifPicker') && !e.target.closest('.chat-tool-btn')) {
-    document.getElementById('chatGifPicker')?.classList.remove('show');
-  }
   if (!e.target.closest('#chatMentions') && !e.target.closest('#chatInput')) {
     document.getElementById('chatMentions')?.classList.remove('show');
   }
@@ -7384,17 +7378,16 @@ window.sendChatMsg = function() {
   if (_spSettingsSnap.chatReadonly && S.role !== 'Administrador') { alert('El chat está en modo solo lectura.'); return; }
   const input = document.getElementById('chatInput');
   const text  = (input.value || '').trim();
-  // Allow sending if there's an image or gif pending, even without text
-  if (!text && !_pendingImg) return;
+  if (!text) return;
   // FIX: bloquear mensajes con solo espacios/chars invisibles o texto repetido masivo
   if (text.length > 300) { alert('Máximo 300 caracteres.'); return; }
-  if (text && /^[\s​‌‍﻿]+$/.test(text)) return;
-  // Anti-spam: solo si hay texto
-  if (text && text === window._lastSentMsg) {
+  if (/^[\s​‌‍﻿]+$/.test(text)) return; // solo whitespace invisible
+  // Anti-spam: bloquear si el mensaje es idéntico al anterior enviado
+  if (text === window._lastSentMsg) {
     alert('No puedes enviar el mismo mensaje dos veces seguidas.');
     return;
   }
-  if (text) window._lastSentMsg = text;
+  window._lastSentMsg = text;
 
   // FIX Slowmode: aplicar cooldown client-side para no-admins
   const slowSecs = (_spSettingsSnap.slowmode || 0);
