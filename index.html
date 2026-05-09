@@ -574,6 +574,7 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .chat-reaction:hover{background:#f1f5f9;border-color:#cbd5e1}
 .chat-reaction.mine{background:#ecfdf5;border-color:var(--teal)}
 .chat-reaction-count{font-size:10px;font-weight:700;color:#374151}
+.chat-reaction-compact{font-size:13px;padding:2px 8px;gap:1px;letter-spacing:-.5px}
 .chat-reaction-picker{position:absolute;background:#fff;border:1.5px solid #e2e8f0;
   border-radius:16px;padding:8px 10px;box-shadow:0 8px 28px rgba(0,0,0,.15);
   display:flex;gap:4px;z-index:500;bottom:calc(100% + 6px);left:0;
@@ -7218,27 +7219,49 @@ function renderReactions(msgKey, data) {
   const el = document.getElementById('reactions-' + msgKey);
   if (!el) return;
   el.innerHTML = '';
-  Object.entries(data).forEach(([emojiKey, info]) => {
-    const users = info.users || {};
-    const count = Object.keys(users).length;
-    if (!count) return;
-    const userKey = S.user?.replace(/[^a-zA-Z0-9]/g,'_');
-    const iMine = userKey && users[userKey];
-    const emoji = keyToEmoji(emojiKey);
+
+  const entries = Object.entries(data)
+    .map(([emojiKey, info]) => {
+      const users = info.users || {};
+      const count = Object.keys(users).length;
+      const emoji = keyToEmoji(emojiKey);
+      const userKey = S.user?.replace(/[^a-zA-Z0-9]/g,'_');
+      const iMine = userKey && !!users[userKey];
+      return { emojiKey, emoji, count, iMine, users };
+    })
+    .filter(e => e.count > 0 && e.emoji);
+
+  if (!entries.length) return;
+
+  const totalCount = entries.reduce((s, e) => s + e.count, 0);
+  const iAnyMine = entries.some(e => e.iMine);
+
+  if (entries.length >= 2) {
+    // Pill compacta: (😂❤️ 3)
+    const pill = document.createElement('button');
+    pill.className = 'chat-reaction chat-reaction-compact' + (iAnyMine ? ' mine' : '');
+    const emojisStr = entries.slice(0, 3).map(e => e.emoji).join('');
+    pill.innerHTML = `${emojisStr} <span class="chat-reaction-count">${totalCount}</span>`;
+    pill.title = 'Ver reacciones';
+    pill.onclick = (e) => {
+      e.stopPropagation();
+      showAllReactionDetails(msgKey, data);
+    };
+    el.appendChild(pill);
+  } else {
+    // Solo 1 tipo — pill normal
+    const { emojiKey, emoji, count, iMine } = entries[0];
     const btn = document.createElement('button');
     btn.className = 'chat-reaction' + (iMine ? ' mine' : '');
     btn.innerHTML = `${emoji} <span class="chat-reaction-count">${count}</span>`;
     btn.title = iMine ? 'Quitar reacción' : 'Ver quién reaccionó';
     btn.onclick = (e) => {
       e.stopPropagation();
-      if (iMine) {
-        toggleReaction(msgKey, emoji); // quitar si es mía
-      } else {
-        showReactionDetails(msgKey, emoji, data);
-      }
+      if (iMine) toggleReaction(msgKey, emoji);
+      else showReactionDetails(msgKey, emoji, data);
     };
     el.appendChild(btn);
-  });
+  }
 }
 
 // Picker al long-press (mobile) y click-derecho (PC)
@@ -7265,8 +7288,39 @@ function showReactionPicker(msgKey, bubbleWrap) {
   }, 100);
 }
 
-// Modal: quiénes reaccionaron
-function showReactionDetails(msgKey, emoji, data) {
+// Modal: todos los emojis de un mensaje
+function showAllReactionDetails(msgKey, data) {
+  document.querySelectorAll('.reaction-detail-modal').forEach(m => m.remove());
+  const entries = Object.entries(data)
+    .map(([emojiKey, info]) => {
+      const users = info.users || {};
+      const count = Object.keys(users).length;
+      const emoji = keyToEmoji(emojiKey);
+      const names = Object.keys(users).map(k => k.replace(/_/g,' '));
+      return { emoji, count, names };
+    })
+    .filter(e => e.count > 0 && e.emoji);
+
+  const overlay = document.createElement('div');
+  overlay.className = 'reaction-detail-modal';
+  overlay.innerHTML = `
+    <div class="reaction-detail-card">
+      <div class="reaction-detail-header">
+        <span style="font-size:15px;font-weight:600;color:var(--text)">Reacciones</span>
+        <button class="reaction-detail-close" onclick="this.closest('.reaction-detail-modal').remove()">✕</button>
+      </div>
+      ${entries.map(({emoji, count, names}) => `
+        <div style="margin-bottom:12px">
+          <div style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:6px">${emoji} ${count}</div>
+          <ul class="reaction-detail-list" style="padding-left:4px">
+            ${names.map(n=>`<li class="reaction-detail-user"><div class="reaction-detail-avatar">${n.charAt(0).toUpperCase()}</div><span>${escapeHTML(n)}</span></li>`).join('')}
+          </ul>
+        </div>
+      `).join('')}
+    </div>`;
+  overlay.onclick = (e) => { if(e.target===overlay) overlay.remove(); };
+  document.body.appendChild(overlay);
+}
   document.querySelectorAll('.reaction-detail-modal').forEach(m => m.remove());
   const emojiKey = emojiToKey(emoji);
   const info = data[emojiKey] || (_reactionData[msgKey]?.[emojiKey]) || {};
