@@ -7027,7 +7027,7 @@ function appendChatMsg(msg, key) {
     const bubbleWrap = wrap.querySelector('.chat-bubble-wrap');
     const bubble = wrap.querySelector('.chat-msg-bubble');
 
-    // ── Long press ──
+    // ── Long press (mobile) + click derecho (PC) para reaccionar ──
     function startLongPress(e) {
       _lpFired = false;
       _lpTimer = setTimeout(() => {
@@ -7043,6 +7043,12 @@ function appendChatMsg(msg, key) {
     bubble.addEventListener('touchstart', startLongPress, {passive:true});
     bubble.addEventListener('touchend', cancelLongPress, {passive:true});
     bubble.addEventListener('touchmove', cancelLongPress, {passive:true});
+    // Click derecho en PC
+    bubble.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      showReactionPicker(key, bubbleWrap);
+    });
 
     // ── Swipe-to-reply ──
     wrap.addEventListener('touchstart', e => {
@@ -7182,7 +7188,15 @@ window.clearChatMessages = async function() {
 // ── REACTIONS ──
 const REACTION_EMOJIS = ['👍','❤️','😂','😮','😢','🔥','🎉','👏'];
 const _reactionListeners = {};
-let _reactionData = {}; // cache local de reacciones por msgKey
+let _reactionData = {};
+
+// Convertir emoji → key segura para Firebase (sin chars especiales)
+function emojiToKey(emoji) {
+  return [...emoji].map(c => c.codePointAt(0).toString(16)).join('_');
+}
+function keyToEmoji(key) {
+  return key.split('_').map(h => String.fromCodePoint(parseInt(h,16))).join('');
+}
 
 function listenReactions(msgKey) {
   if (_reactionListeners[msgKey]) return;
@@ -7198,24 +7212,30 @@ function renderReactions(msgKey, data) {
   const el = document.getElementById('reactions-' + msgKey);
   if (!el) return;
   el.innerHTML = '';
-  Object.entries(data).forEach(([emoji, info]) => {
+  Object.entries(data).forEach(([emojiKey, info]) => {
     const users = info.users || {};
     const count = Object.keys(users).length;
     if (!count) return;
     const userKey = S.user?.replace(/[^a-zA-Z0-9]/g,'_');
     const iMine = userKey && users[userKey];
+    const emoji = keyToEmoji(emojiKey);
     const btn = document.createElement('button');
     btn.className = 'chat-reaction' + (iMine ? ' mine' : '');
     btn.innerHTML = `${emoji} <span class="chat-reaction-count">${count}</span>`;
+    btn.title = iMine ? 'Quitar reacción' : 'Ver quién reaccionó';
     btn.onclick = (e) => {
       e.stopPropagation();
-      showReactionDetails(msgKey, emoji, data);
+      if (iMine) {
+        toggleReaction(msgKey, emoji); // quitar si es mía
+      } else {
+        showReactionDetails(msgKey, emoji, data);
+      }
     };
     el.appendChild(btn);
   });
 }
 
-// Mostrar picker al mantener presionado
+// Picker al long-press (mobile) y click-derecho (PC)
 function showReactionPicker(msgKey, bubbleWrap) {
   document.querySelectorAll('.chat-reaction-picker').forEach(p => p.remove());
   const picker = document.createElement('div');
@@ -7239,14 +7259,14 @@ function showReactionPicker(msgKey, bubbleWrap) {
   }, 100);
 }
 
-// Modal: quiénes reaccionaron con ese emoji
+// Modal: quiénes reaccionaron
 function showReactionDetails(msgKey, emoji, data) {
   document.querySelectorAll('.reaction-detail-modal').forEach(m => m.remove());
-  const info = data[emoji] || (_reactionData[msgKey]?.[emoji]) || {};
+  const emojiKey = emojiToKey(emoji);
+  const info = data[emojiKey] || (_reactionData[msgKey]?.[emojiKey]) || {};
   const users = info.users || {};
-  const names = Object.keys(users).map(k => k.replace(/_/g, ' '));
+  const names = Object.keys(users).map(k => k.replace(/_/g,' '));
   if (!names.length) return;
-
   const overlay = document.createElement('div');
   overlay.className = 'reaction-detail-modal';
   overlay.innerHTML = `
@@ -7267,7 +7287,8 @@ function showReactionDetails(msgKey, emoji, data) {
 async function toggleReaction(msgKey, emoji) {
   if (!S.user) return;
   const userKey = S.user.replace(/[^a-zA-Z0-9]/g,'_');
-  const rRef = ref(db, `chat/reactions/${msgKey}/${emoji}/users/${userKey}`);
+  const emojiKey = emojiToKey(emoji);
+  const rRef = ref(db, `chat/reactions/${msgKey}/${emojiKey}/users/${userKey}`);
   const snap = await get(rRef);
   if (snap.exists()) { await remove(rRef); } else { await set(rRef, true); }
 }
