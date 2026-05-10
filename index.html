@@ -561,12 +561,13 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .chat-msg.mine .chat-reply-quote strong{color:#fff}
 .chat-msg.mine .chat-reply-quote span{color:rgba(255,255,255,.85)}
 
-/* Reactions — estilo WhatsApp/Instagram pegadas a la burbuja */
-.chat-bubble-wrap{position:relative;display:inline-block;padding-bottom:14px;max-width:100%}
-.chat-reactions{display:flex;flex-wrap:wrap;gap:2px;
-  position:absolute;bottom:0;left:4px;z-index:10}
-.chat-msg.mine .chat-reactions{left:auto;right:4px}
-.chat-reactions:empty{display:none}
+/* Reactions — debajo de la burbuja, superpuestas */
+.chat-bubble-wrap{position:relative;display:inline-block;max-width:100%}
+.chat-reactions{display:flex;flex-direction:row;flex-wrap:nowrap;gap:3px;
+  margin-top:-10px;padding-bottom:4px;align-items:center;min-height:0;position:relative;z-index:5}
+.chat-reactions:empty{margin-top:0;padding-bottom:0}
+.chat-msg.mine .chat-reactions{justify-content:flex-end;padding-right:8px}
+.chat-msg:not(.mine) .chat-reactions{justify-content:flex-start;padding-left:8px}
 .chat-reaction{background:#fff;border:1.5px solid #e2e8f0;border-radius:99px;
   padding:1px 6px;font-size:12px;cursor:pointer;transition:all .15s;
   display:flex;align-items:center;gap:2px;user-select:none;
@@ -7002,10 +7003,12 @@ function appendChatMsg(msg, key) {
       ${isMine ? avatarHTML : ''}
     </div>
     <div style="display:flex;align-items:flex-end;gap:4px">
-      <div class="chat-bubble-wrap">
-        <div class="chat-msg-bubble">
-          ${replyHTML}
-          ${bodyHTML}
+      <div style="display:flex;flex-direction:column;align-items:${isMine?'flex-end':'flex-start'}">
+        <div class="chat-bubble-wrap">
+          <div class="chat-msg-bubble">
+            ${replyHTML}
+            ${bodyHTML}
+          </div>
         </div>
         <div class="chat-reactions" id="reactions-${key}"></div>
       </div>
@@ -7321,6 +7324,9 @@ function showAllReactionDetails(msgKey, data) {
   overlay.onclick = (e) => { if(e.target===overlay) overlay.remove(); };
   document.body.appendChild(overlay);
 }
+
+// Modal: un solo emoji — quiénes reaccionaron
+function showReactionDetails(msgKey, emoji, data) {
   document.querySelectorAll('.reaction-detail-modal').forEach(m => m.remove());
   const emojiKey = emojiToKey(emoji);
   const info = data[emojiKey] || (_reactionData[msgKey]?.[emojiKey]) || {};
@@ -7348,9 +7354,31 @@ async function toggleReaction(msgKey, emoji) {
   if (!S.user) return;
   const userKey = S.user.replace(/[^a-zA-Z0-9]/g,'_');
   const emojiKey = emojiToKey(emoji);
-  const rRef = ref(db, `chat/reactions/${msgKey}/${emojiKey}/users/${userKey}`);
-  const snap = await get(rRef);
-  if (snap.exists()) { await remove(rRef); } else { await set(rRef, true); }
+  const targetRef = ref(db, `chat/reactions/${msgKey}/${emojiKey}/users/${userKey}`);
+  const snap = await get(targetRef);
+
+  if (snap.exists()) {
+    // Ya reaccionó con este emoji — quitarlo
+    await remove(targetRef);
+  } else {
+    // Quitar cualquier reacción anterior del usuario en este mensaje
+    const msgReactRef = ref(db, `chat/reactions/${msgKey}`);
+    const allSnap = await get(msgReactRef);
+    if (allSnap.exists()) {
+      const updates = {};
+      allSnap.forEach(emojiSnap => {
+        const users = emojiSnap.val()?.users || {};
+        if (users[userKey]) {
+          updates[`${emojiSnap.key}/users/${userKey}`] = null;
+        }
+      });
+      if (Object.keys(updates).length) {
+        await update(msgReactRef, updates);
+      }
+    }
+    // Poner la nueva reacción
+    await set(targetRef, true);
+  }
 }
 
 // ── REPLY ──
