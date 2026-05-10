@@ -165,7 +165,7 @@ a{text-decoration:none;color:inherit}
       <span class="p-ttl" id="pTtl">—</span>
       <button class="p-x" onclick="closePlayer()">✕</button>
     </div>
-    <div class="p-frame"><iframe id="pFr" allowfullscreen allow="autoplay; encrypted-media"></iframe></div>
+    <div class="p-frame" id="pFrameWrap"><iframe id="pFr" allowfullscreen allow="autoplay; encrypted-media"></iframe></div>
     <div class="p-foot" id="pMeta"></div>
   </div>
 </div>
@@ -320,7 +320,12 @@ window.play=id=>{
   const em=embed(v.url||'');
   if(!em){toast('URL no compatible para embed');return;}
   document.getElementById('pTtl').textContent=v.title||'Video';
-  document.getElementById('pFr').src=em;
+  document.getElementById('pFr').src=em.src;
+  // Ajustar aspect ratio según orientación
+  const frame=document.getElementById('pFrameWrap');
+  frame.style.paddingTop = em.vertical ? 'min(85vh, 177.78%)' : '56.25%';
+  frame.style.maxWidth   = em.vertical ? '360px' : '';
+  frame.style.margin     = em.vertical ? '0 auto' : '';
   document.getElementById('pMeta').innerHTML=`<span>${e(v.tema||'')} › ${e(v.subtema||'')}</span>${v.desc?`<span>${e(v.desc)}</span>`:''}`;
   document.getElementById('playerModal').classList.add('show');
   document.body.style.overflow='hidden';
@@ -330,7 +335,7 @@ window.closePlayer=()=>{document.getElementById('playerModal').classList.remove(
 window.openAdd=()=>{editId=null;document.getElementById('eH').textContent='Agregar video';['eUrl','eTtl','eTema','eSub','eDesc'].forEach(i=>document.getElementById(i).value='');document.getElementById('uPrev').classList.remove('show');document.getElementById('editModal').classList.add('show');};
 window.openEdit=id=>{const v=all.find(a=>a.id===id);if(!v)return;editId=id;document.getElementById('eH').textContent='Editar video';document.getElementById('eUrl').value=v.url||'';document.getElementById('eTtl').value=v.title||'';document.getElementById('eTema').value=v.tema||'';document.getElementById('eSub').value=v.subtema||'';document.getElementById('eDesc').value=v.desc||'';prevUrl();document.getElementById('editModal').classList.add('show');};
 window.closeEdit=()=>{document.getElementById('editModal').classList.remove('show');document.getElementById('pIfr').src='';};
-window.prevUrl=()=>{const em=embed(document.getElementById('eUrl').value.trim());const p=document.getElementById('uPrev');if(em){document.getElementById('pIfr').src=em;p.classList.add('show');}else{p.classList.remove('show');document.getElementById('pIfr').src='';}};
+window.prevUrl=()=>{const em=embed(document.getElementById('eUrl').value.trim());const p=document.getElementById('uPrev');if(em){document.getElementById('pIfr').src=em.src;p.style.aspectRatio=em.vertical?'9/16':'16/9';p.classList.add('show');}else{p.classList.remove('show');document.getElementById('pIfr').src='';}};
 window.saveVideo=async()=>{
   const url=document.getElementById('eUrl').value.trim();
   const title=document.getElementById('eTtl').value.trim();
@@ -347,7 +352,7 @@ window.delVideo=async(id,title)=>{
 };
 
 function source(url){if(/youtube\.com|youtu\.be/.test(url))return'youtube';if(/tiktok\.com/.test(url))return'tiktok';if(/drive\.google\.com/.test(url))return'drive';if(/vimeo\.com/.test(url))return'vimeo';return'otro';}
-function embed(url){let m;m=url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);if(m)return`https://www.youtube.com/embed/${m[1]}?rel=0&modestbranding=1`;m=url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/);if(m)return`https://www.youtube.com/embed/${m[1]}?rel=0`;m=url.match(/vimeo\.com\/(\d+)/);if(m)return`https://player.vimeo.com/video/${m[1]}`;m=url.match(/drive\.google\.com\/file\/d\/([^/]+)/);if(m)return`https://drive.google.com/file/d/${m[1]}/preview`;return null;}
+function embed(url){let m;m=url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);if(m)return{src:`https://www.youtube.com/embed/${m[1]}?rel=0&modestbranding=1`,vertical:false};m=url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/);if(m)return{src:`https://www.youtube.com/embed/${m[1]}?rel=0`,vertical:true};m=url.match(/vimeo\.com\/(\d+)/);if(m)return{src:`https://player.vimeo.com/video/${m[1]}`,vertical:false};m=url.match(/drive\.google\.com\/file\/d\/([^/]+)/);if(m)return{src:`https://drive.google.com/file/d/${m[1]}/preview`,vertical:false};return null;}
 function ytThumb(url,src){if(src!=='youtube')return null;const m=url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|shorts\/)([a-zA-Z0-9_-]{11})/);return m?`https://img.youtube.com/vi/${m[1]}/mqdefault.jpg`:null;}
 function e(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
