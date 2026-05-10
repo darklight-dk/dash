@@ -3047,6 +3047,11 @@ let S = {
 localStorage.setItem('exani_pageLoadTs', Date.now());
 
 const $  = id => document.getElementById(id);
+
+// Pantallas que NO se deben pushear al historial (login, loading, etc.)
+const _noHistoryScreens = new Set(['loginScreen', 'loadOv']);
+let _navIgnoreNext = false; // flag para evitar push al hacer popstate
+
 const show = id => {
   try {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -3058,14 +3063,36 @@ const show = id => {
     const chatFabEl = document.getElementById('chatFab');
     if (id !== 'examScreen') {
       if (mobileBar) mobileBar.style.display = 'none';
-      // Solo mostrar chatFab en dashScreen o examScreen, no en modeScreen/ejercicios
       if (chatFabEl) {
         chatFabEl.style.display = (id === 'dashScreen') ? '' : 'none';
       }
     }
     try { sessionStorage.setItem('fw_screen', id); } catch(e){}
+    // ── History API ──
+    if (!_noHistoryScreens.has(id) && !_navIgnoreNext) {
+      const current = history.state?.screen;
+      if (current !== id) {
+        history.pushState({ screen: id }, '', '#' + id.replace('Screen','').toLowerCase());
+      }
+    }
+    _navIgnoreNext = false;
   } catch(err) { console.error('show() error:', err); }
 };
+
+// Botones ← → del navegador
+window.addEventListener('popstate', (e) => {
+  const screenId = e.state?.screen;
+  if (!screenId) return;
+  // No pushear de nuevo al historial cuando navegamos por popstate
+  _navIgnoreNext = true;
+  // Si intenta volver al examen en curso, ir al dash mejor
+  const examActive = document.getElementById('examScreen')?.classList.contains('active');
+  if (screenId === 'examScreen' && !examActive) {
+    show('dashScreen');
+    return;
+  }
+  show(screenId);
+});
 const load = (v, msg='', sub='') => {
   $('loadOv').className = v ? 'show' : '';
   if (msg) $('loadMsg').textContent = msg;
