@@ -329,18 +329,10 @@ const auth = getAuth(app);
 let S = {user:null,role:null,picture:null};
 try { const s=JSON.parse(localStorage.getItem('exani_session')||'null'); if(s){S.user=s.user;S.role=s.role;S.picture=s.googlePicture;} } catch(e){}
 
-if (!S.user) {
-  const na=document.getElementById('noAuth'); na.style.display='flex';
-} else {
-  document.getElementById('mainPage').style.display='';
-  init();
-}
-
 // ── Estado ──
 let all=[], editId=null, currentVideoId=null;
 let viewMode = localStorage.getItem('dash_video_view')||'grid';
 let favFilter = false;
-// Favoritos y vistos: guardados en localStorage por usuario
 const LS_FAV   = ()=> 'dash_fav_'  +(S.user||'x');
 const LS_WATCH = ()=> 'dash_watch_'+(S.user||'x');
 let favs   = new Set(JSON.parse(localStorage.getItem(LS_FAV())  ||'[]'));
@@ -348,6 +340,13 @@ let watched = new Set(JSON.parse(localStorage.getItem(LS_WATCH())||'[]'));
 
 function saveFavs()    { localStorage.setItem(LS_FAV(),   JSON.stringify([...favs])); }
 function saveWatched() { localStorage.setItem(LS_WATCH(), JSON.stringify([...watched])); }
+
+if (!S.user) {
+  const na=document.getElementById('noAuth'); na.style.display='flex';
+} else {
+  document.getElementById('mainPage').style.display='';
+  init();
+}
 
 // ── Init ──
 function init() {
@@ -399,14 +398,13 @@ function buildHelpers(){
 }
 
 // ── Vista grid/lista ──
-function setView(mode, skipSave){
+window.setView=function(mode, skipSave){
   viewMode=mode;
   if(!skipSave) localStorage.setItem('dash_video_view', mode);
   document.getElementById('vtGrid').classList.toggle('active', mode==='grid');
   document.getElementById('vtList').classList.toggle('active', mode==='list');
   filter();
-}
-window.setView=setView;
+};
 
 // ── Filtro favoritos ──
 window.toggleFavFilter=function(){
