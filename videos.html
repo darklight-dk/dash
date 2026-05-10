@@ -198,8 +198,11 @@ a{text-decoration:none;color:inherit}
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getDatabase, ref, onValue, push, update, remove } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
-const app = initializeApp({
+import { getApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+
+const _cfg = {
   apiKey:"AIzaSyD08Hrh7p2arUArqmN558QCZa-u-D5iUwU",
   authDomain:"exani-dash-adeff.firebaseapp.com",
   projectId:"exani-dash-adeff",
@@ -207,8 +210,11 @@ const app = initializeApp({
   messagingSenderId:"378624076231",
   appId:"1:378624076231:web:bcd916d9aded67ff80d1e2",
   databaseURL:"https://exani-dash-adeff-default-rtdb.firebaseio.com"
-}, 'videos-page');
-const db = getDatabase(app);
+};
+let app;
+try { app = getApp(); } catch(e) { app = initializeApp(_cfg); }
+const db   = getDatabase(app);
+const auth = getAuth(app);
 
 let S = {user:null,role:null,picture:null};
 try { const s=JSON.parse(localStorage.getItem('exani_session')||'null'); if(s){S.user=s.user;S.role=s.role;S.picture=s.googlePicture;} } catch(e){}
@@ -217,6 +223,9 @@ if (!S.user) {
   document.getElementById('noAuth').classList.add('show');
 } else {
   document.getElementById('mainPage').style.display='';
+  // Firebase Auth persiste el token en IndexedDB automáticamente.
+  // Al usar getApp() (misma instancia default que index.html), el usuario
+  // ya está autenticado sin necesidad de re-login.
   init();
 }
 
