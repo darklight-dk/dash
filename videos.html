@@ -331,6 +331,7 @@ try { const s=JSON.parse(localStorage.getItem('exani_session')||'null'); if(s){S
 
 // ── Estado ──
 let all=[], editId=null, currentVideoId=null;
+let loaded = false;
 let viewMode = localStorage.getItem('dash_video_view')||'grid';
 let favFilter = false;
 const LS_FAV   = ()=> 'dash_fav_'  +(S.user||'x');
@@ -364,6 +365,7 @@ function init() {
   setView(viewMode, true);
 
   onValue(ref(db,'videos'), snap => {
+    loaded = true;
     all = snap.exists() ? Object.entries(snap.val()).map(([id,v])=>({id,...v})) : [];
     buildHelpers(); updateStats(); filter();
   });
@@ -433,6 +435,7 @@ const WEEK = 7*24*60*60*1000;
 // ── Render ──
 function render(videos){
   const area=document.getElementById('content');
+  if(!loaded){area.innerHTML='<div class="spinner"></div>';return;}
   if(!videos.length){area.innerHTML=`<div class="empty"><div class="empty-ico">${favFilter?'💔':'📭'}</div><p>${favFilter?'No tienes favoritos aún.':'No hay videos aquí aún.'}</p></div>`;return;}
   const map={};
   videos.forEach(v=>{const t=v.tema||'Sin tema',s=v.subtema||'General';if(!map[t])map[t]={};if(!map[t][s])map[t][s]=[];map[t][s].push(v);});
