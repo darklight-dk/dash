@@ -398,13 +398,14 @@ function buildHelpers(){
 }
 
 // ── Vista grid/lista ──
-window.setView=function(mode, skipSave){
+function setView(mode, skipSave){
   viewMode=mode;
   if(!skipSave) localStorage.setItem('dash_video_view', mode);
   document.getElementById('vtGrid').classList.toggle('active', mode==='grid');
   document.getElementById('vtList').classList.toggle('active', mode==='list');
   filter();
-};
+}
+window.setView=setView;
 
 // ── Filtro favoritos ──
 window.toggleFavFilter=function(){
