@@ -2319,7 +2319,10 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
 <!-- DASHBOARD -->
 <div id="dashScreen" class="screen">
   <div class="topbar">
-    <div class="logo-sm"><span style="color:var(--teal)">DASH</span></div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="logo-sm"><span style="color:var(--teal)">DASH</span></div>
+      <a href="videos.html" style="background:var(--card);border:1.5px solid var(--b2);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:5px;transition:all .15s" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--b2)';this.style.color='var(--muted)'">📹 Videos</a>
+    </div>
     <div style="display:flex;gap:10px;align-items:center">
       <button class="ranking-topbar-btn" id="rankingTopbarBtn" onclick="openRanking()">🏆 Ranking</button>
       <div class="profile-btn" id="profileBtn" onclick="toggleProfileMenu(this)">
