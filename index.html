@@ -7037,16 +7037,20 @@ function appendChatMsg(msg, key) {
       _lpTimer = setTimeout(() => {
         _lpFired = true;
         showReactionPicker(key, bubbleWrap);
-      }, 520);
+      }, 500);
     }
-    function cancelLongPress() { clearTimeout(_lpTimer); }
+    function cancelLongPress(e) {
+      // En touch: solo cancelar si NO hay picker abierto y el movimiento fue mínimo
+      if (e && e.type === 'touchend' && _lpFired) return; // ya disparó, no cancelar
+      clearTimeout(_lpTimer);
+    }
 
     bubble.addEventListener('mousedown', startLongPress);
     bubble.addEventListener('mouseup', cancelLongPress);
     bubble.addEventListener('mouseleave', cancelLongPress);
     bubble.addEventListener('touchstart', startLongPress, {passive:true});
-    bubble.addEventListener('touchend', cancelLongPress, {passive:true});
     bubble.addEventListener('touchmove', cancelLongPress, {passive:true});
+    // NO cancelar en touchend — dejar que el timer dispare si llegó a 500ms
     // Click derecho en PC
     bubble.addEventListener('contextmenu', (e) => {
       e.preventDefault();
@@ -7285,10 +7289,18 @@ function showReactionPicker(msgKey, bubbleWrap) {
   });
   bubbleWrap.appendChild(picker);
   if (navigator.vibrate) navigator.vibrate(30);
+  // Delay para que el touchend actual no cierre el picker inmediatamente
   setTimeout(() => {
-    document.addEventListener('click', () => picker.remove(), {once:true});
-    document.addEventListener('touchstart', () => picker.remove(), {once:true});
-  }, 100);
+    function closePicker(e) {
+      if (!picker.contains(e.target)) {
+        picker.remove();
+        document.removeEventListener('click', closePicker);
+        document.removeEventListener('touchend', closePicker);
+      }
+    }
+    document.addEventListener('click', closePicker);
+    document.addEventListener('touchend', closePicker);
+  }, 300);
 }
 
 // Modal: todos los emojis de un mensaje
