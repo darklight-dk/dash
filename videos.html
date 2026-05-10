@@ -147,26 +147,28 @@ a{text-decoration:none;color:inherit}
 .spinner{width:32px;height:32px;border:2px solid var(--b2);border-top-color:var(--teal);border-radius:50%;animation:spin .7s linear infinite;margin:48px auto}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* PLAYER */
-#playerModal{display:none;position:fixed;inset:0;z-index:500;background:rgba(15,23,42,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px}
+/* PLAYER — YouTube vibes */
+#playerModal{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.92);align-items:center;justify-content:center;padding:20px}
 #playerModal.show{display:flex}
-@keyframes pop{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
-.p-wrap{background:#fff;border-radius:16px;width:100%;max-width:800px;overflow:hidden;box-shadow:0 24px 64px rgba(15,23,42,.18);animation:pop .2s ease;border:1px solid var(--b2)}
-.p-head{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--b2)}
-.p-ttl{font-size:13px;font-weight:700;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.p-head-btns{display:flex;gap:6px;align-items:center}
-.p-fav-btn{background:none;border:1px solid var(--b2);color:var(--muted);border-radius:8px;width:32px;height:32px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.p-fav-btn:hover{border-color:#fecdd3;color:#e11d48;background:#fff0f3}
-.p-fav-btn.active{background:#e11d48;color:#fff;border-color:#e11d48}
-.p-watch-btn{background:none;border:1px solid var(--b2);color:var(--muted);border-radius:8px;padding:0 12px;height:32px;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s;white-space:nowrap}
-.p-watch-btn:hover{border-color:#bbf7d0;color:var(--green);background:#f0fdf4}
-.p-watch-btn.active{background:var(--green);color:#fff;border-color:var(--green)}
-.p-x{background:none;border:1px solid var(--b2);color:var(--muted);border-radius:8px;width:32px;height:32px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
-.p-x:hover{background:var(--card);color:var(--text)}
-.p-frame{position:relative;padding-top:56.25%;background:#0f172a}
+@keyframes pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+.p-wrap{background:#0f0f0f;border-radius:12px;width:100%;max-width:860px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.8);animation:pop .2s ease}
+.p-head{display:flex;align-items:center;gap:10px;padding:12px 16px;background:#212121}
+.p-ttl{font-size:13px;font-weight:600;color:#f1f1f1;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:.1px}
+.p-head-btns{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.p-fav-btn{background:rgba(255,255,255,.08);border:none;color:#aaa;border-radius:20px;width:34px;height:34px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.p-fav-btn:hover{background:rgba(255,255,255,.15);color:#f1f1f1}
+.p-fav-btn.active{background:#e11d48;color:#fff}
+.p-watch-btn{background:rgba(255,255,255,.08);border:none;color:#f1f1f1;border-radius:20px;padding:0 14px;height:34px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap}
+.p-watch-btn:hover{background:rgba(255,255,255,.18)}
+.p-watch-btn.active{background:#fff;color:#0f0f0f}
+.p-x{background:rgba(255,255,255,.08);border:none;color:#aaa;border-radius:50%;width:34px;height:34px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.p-x:hover{background:rgba(255,255,255,.18);color:#f1f1f1}
+.p-frame{position:relative;padding-top:56.25%;background:#000}
 .p-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:none}
-.p-foot{padding:9px 16px;font-size:11px;color:var(--muted);display:flex;gap:12px;align-items:center;border-top:1px solid var(--b2)}
-.p-views-badge{margin-left:auto;font-size:10px;color:var(--muted);font-weight:600}
+.p-foot{padding:10px 16px;background:#212121;border-top:1px solid rgba(255,255,255,.06);font-size:11px;color:#717171;display:flex;gap:12px;align-items:center}
+.p-meta-text{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.p-views-badge{font-size:11px;color:#717171;font-weight:500;flex-shrink:0;display:flex;align-items:center;gap:4px}
+.p-views-badge::before{content:'';display:inline-block;width:3px;height:3px;border-radius:50%;background:#717171}
 
 /* EDIT MODAL */
 #editModal{display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.55);align-items:center;justify-content:center;padding:16px}
@@ -268,14 +270,14 @@ a{text-decoration:none;color:inherit}
       <span class="p-ttl" id="pTtl">—</span>
       <div class="p-head-btns">
         <button class="p-fav-btn" id="pFavBtn" onclick="toggleFavFromPlayer()" title="Favorito">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         </button>
         <button class="p-watch-btn" id="pWatchBtn" onclick="toggleWatchFromPlayer()">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           Marcar visto
         </button>
         <button class="p-x" onclick="closePlayer()" title="Cerrar">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
     </div>
@@ -283,7 +285,7 @@ a{text-decoration:none;color:inherit}
       <iframe id="pFr" allowfullscreen allow="autoplay; encrypted-media"></iframe>
     </div>
     <div class="p-foot">
-      <span id="pMeta"></span>
+      <span class="p-meta-text" id="pMeta"></span>
       <span class="p-views-badge" id="pViews"></span>
     </div>
   </div>
@@ -343,7 +345,6 @@ let all=[], editId=null, currentVideoId=null;
 let loaded = false;
 let viewMode = localStorage.getItem('dash_video_view')||'grid';
 let favFilter = false;
-// Favoritos y vistos: guardados en localStorage por usuario
 const LS_FAV   = ()=> 'dash_fav_'  +(S.user||'x');
 const LS_WATCH = ()=> 'dash_watch_'+(S.user||'x');
 let favs   = new Set(JSON.parse(localStorage.getItem(LS_FAV())  ||'[]'));
