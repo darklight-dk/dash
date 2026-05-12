@@ -347,7 +347,7 @@ a{text-decoration:none;color:inherit}
         <span class="s-ico">🏠</span>
         <span class="s-label">Principal</span>
       </div>
-      <div class="sidebar-item" onclick="toggleFavFilter()">
+      <div class="sidebar-item" data-fav="1" onclick="toggleFavFilter()">
         <span class="s-ico">❤️</span>
         <span class="s-label">Favoritos</span>
       </div>
@@ -417,14 +417,8 @@ a{text-decoration:none;color:inherit}
     <div class="p-head">
       <span class="p-ttl" id="pTtl">—</span>
       <div class="p-head-btns">
-        <button class="p-fav-btn" id="pFavBtn" onclick="toggleFavFromPlayer()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-          Guardar
-        </button>
-        <button class="p-watch-btn" id="pWatchBtn" onclick="toggleWatchFromPlayer()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-          Marcar visto
-        </button>
+        <button class="p-fav-btn" id="pFavBtn" onclick="toggleFavFromPlayer()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span> Guardar</span></button>
+        <button class="p-watch-btn" id="pWatchBtn" onclick="toggleWatchFromPlayer()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span> Marcar visto</span></button>
         <button class="p-x" onclick="closePlayer()">✕</button>
       </div>
     </div>
@@ -655,8 +649,8 @@ function ytcard(v,isA){
       </button>
     </div>
     <div class="yt-actions">
-      <button class="yt-act-btn${isFav?' fav-active':''}" onclick="event.stopPropagation();toggleFav('${v.id}',this)">${favSVG} ${isFav?'Guardado':'Guardar'}</button>
-      <button class="yt-act-btn${isWatched?' watch-active':''}" onclick="event.stopPropagation();toggleWatch('${v.id}',this)">${watchSVG} ${isWatched?'Visto':'Ver después'}</button>
+      <button class="yt-act-btn${isFav?' fav-active':''}" onclick="event.stopPropagation();toggleFav('${v.id}',this)">${favSVG}<span> ${isFav?'Guardado':'Guardar'}</span></button>
+      <button class="yt-act-btn${isWatched?' watch-active':''}" onclick="event.stopPropagation();toggleWatch('${v.id}',this)">${watchSVG}<span> ${isWatched?'Visto':'Ver después'}</span></button>
       ${adminBtns}
     </div>
   </div>`;
@@ -688,68 +682,93 @@ window.setChip=btn=>{
 // ── Sidebar toggle ──
 window.toggleSidebar=()=>document.getElementById('sidebar').classList.toggle('collapsed');
 
-// ── Fav filter ──
-function toggleFavFilter(){
-  favFilter=!favFilter;
-  document.getElementById('favFilterBtn').classList.toggle('active',favFilter);
-  filter();
-}
-
-// ── toggleFav / toggleWatch ──
-function toggleFav(id,btn){
-  if(favs.has(id)){
-    favs.delete(id);
-    if(btn){btn.classList.remove('fav-active');btn.innerHTML=btn.innerHTML.replace('Guardado','Guardar').replace('fill="currentColor"','fill="none"');}
-  } else {
-    favs.add(id);
-    if(btn){btn.classList.add('fav-active');btn.innerHTML=btn.innerHTML.replace('Guardar','Guardado').replace('fill="none"','fill="currentColor"');}
-  }
+// ── toggleFav ──
+function toggleFav(id, btn){
+  const nowFav = favs.has(id);
+  if(nowFav){ favs.delete(id); } else { favs.add(id); }
   saveFavs();
+  // Update the clicked card button without re-render
+  if(btn){
+    const active = !nowFav;
+    btn.classList.toggle('fav-active', active);
+    btn.dataset.active = active ? '1' : '';
+    const svg = btn.querySelector('svg');
+    if(svg) svg.setAttribute('fill', active ? 'currentColor' : 'none');
+    const txt = btn.childNodes[btn.childNodes.length-1];
+    if(txt && txt.nodeType===3) txt.textContent = ' ' + (active ? 'Guardado' : 'Guardar');
+  }
   if(currentVideoId===id) updatePlayerBtns();
   if(favFilter) filter();
 }
-function toggleWatch(id,btn){
-  if(watched.has(id)){
-    watched.delete(id);
-    if(btn){btn.classList.remove('watch-active');btn.innerHTML=btn.innerHTML.replace('Visto','Ver después');}
-  } else {
-    watched.add(id);
-    if(btn){btn.classList.add('watch-active');btn.innerHTML=btn.innerHTML.replace('Ver después','Visto');}
+
+// ── toggleWatch ──
+function toggleWatch(id, btn){
+  const nowWatched = watched.has(id);
+  if(nowWatched){ watched.delete(id); } else { watched.add(id); }
+  saveWatched();
+  // Update card button without full re-render
+  if(btn){
+    const active = !nowWatched;
+    btn.classList.toggle('watch-active', active);
+    const txt = btn.childNodes[btn.childNodes.length-1];
+    if(txt && txt.nodeType===3) txt.textContent = ' ' + (active ? 'Visto' : 'Ver después');
   }
-  saveWatched(); updateStats(); filter();
+  // Update watched bar and label on the card
+  const card = btn ? btn.closest('.yt-card') : null;
+  if(card){
+    const bar = card.querySelector('.yt-watched-bar');
+    const nowActive = !nowWatched;
+    if(bar){ bar.className = 'yt-watched-bar' + (nowActive ? ' full' : ''); bar.style.width = nowActive ? '100%' : '0'; }
+    const lbl = card.querySelector('.yt-watched-label');
+    if(lbl) lbl.textContent = nowActive ? ' · ✓ Visto' : '';
+  }
+  updateStats();
   if(currentVideoId===id) updatePlayerBtns();
+  if(favFilter) filter();
 }
-window.toggleFavFromPlayer=()=>toggleFav(currentVideoId,null);
-window.toggleWatchFromPlayer=()=>toggleWatch(currentVideoId,null);
+
+window.toggleFavFromPlayer=()=>{
+  if(!currentVideoId) return;
+  toggleFav(currentVideoId, null);
+  updatePlayerBtns();
+};
+window.toggleWatchFromPlayer=()=>{
+  if(!currentVideoId) return;
+  toggleWatch(currentVideoId, null);
+  updatePlayerBtns();
+};
 
 function updatePlayerBtns(){
-  const fb=document.getElementById('pFavBtn');
-  const wb=document.getElementById('pWatchBtn');
-  const isFav=favs.has(currentVideoId);
-  const isWatched=watched.has(currentVideoId);
-  fb.classList.toggle('active',isFav);
-  wb.classList.toggle('active',isWatched);
-  wb.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> ${isWatched?'✓ Visto':'Marcar visto'}`;
+  if(!currentVideoId) return;
+  const fb = document.getElementById('pFavBtn');
+  const wb = document.getElementById('pWatchBtn');
+  const isFav = favs.has(currentVideoId);
+  const isWatched = watched.has(currentVideoId);
+  // Fav button
+  fb.classList.toggle('active', isFav);
+  const fbSvg = fb.querySelector('svg');
+  if(fbSvg) fbSvg.setAttribute('fill', isFav ? 'currentColor' : 'none');
+  const fbSpan = fb.querySelector('span');
+  if(fbSpan) fbSpan.textContent = isFav ? ' Guardado' : ' Guardar';
+  // Watch button
+  wb.classList.toggle('active', isWatched);
+  const wbSpan = wb.querySelector('span');
+  if(wbSpan) wbSpan.textContent = isWatched ? ' ✓ Visto' : ' Marcar visto';
 }
 
-// ── Player ──
+// ── Fav filter (sidebar ❤️ item) ──
+function toggleFavFilter(){
+  favFilter = !favFilter;
+  document.getElementById('favFilterBtn').classList.toggle('active', favFilter);
+  // Sync sidebar fav item highlight
+  document.querySelectorAll('.sidebar-item[data-fav]').forEach(el => el.classList.toggle('active', favFilter));
+  filter();
+}
+
+// ── Player — navigate to watch page ──
 async function play(id){
   const v=all.find(x=>x.id===id);if(!v)return;
-  const em=embed(v.url||'');
-  if(!em){toast('URL no compatible para embed');return;}
-  currentVideoId=id;
-  document.getElementById('pTtl').textContent=v.title||'Video';
-  document.getElementById('pFr').src=em.src;
-  const frame=document.getElementById('pFrameWrap');
-  frame.style.paddingTop=em.vertical?'min(85vh, 177.78%)':'56.25%';
-  frame.style.maxWidth=em.vertical?'360px':'';
-  frame.style.margin=em.vertical?'0 auto':'';
-  document.getElementById('pMeta').textContent=`${v.tema||''} › ${v.subtema||''}${v.desc?' — '+v.desc:''}`;
-  updatePlayerBtns();
-  try { await update(ref(db,`videos/${id}`), {views:(v.views||0)+1}); } catch(err){}
-  document.getElementById('pViews').textContent=`👁 ${(v.views||0)+1} visitas`;
-  document.getElementById('playerModal').classList.add('show');
-  document.body.style.overflow='hidden';
+  location.href=`watch.html?v=${id}`;
 }
 function closePlayer(){
   document.getElementById('playerModal').classList.remove('show');
