@@ -798,6 +798,101 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
   box-shadow:0 4px 14px rgba(124,58,237,.25)}
 .exam-ai-btn:hover:not(:disabled){background:#6d28d9;box-shadow:0 6px 20px rgba(124,58,237,.35);transform:translateY(-1px)}
 .exam-ai-btn:disabled{opacity:1;cursor:not-allowed;transform:none;box-shadow:none;background:#94a3b8}
+
+/* ── MODO SELECTOR (ELI5 / NORMAL / TÉCNICO) ── */
+.ai-mode-row{display:flex;gap:6px;padding:8px 16px 0;flex-shrink:0}
+.ai-mode-btn{flex:1;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;
+  padding:6px 4px;font-size:11px;font-weight:700;color:#64748b;
+  cursor:pointer;transition:all .15s;font-family:'Sora',sans-serif;text-align:center}
+.ai-mode-btn.active{background:rgba(124,58,237,.1);border-color:#7c3aed;color:#7c3aed}
+.ai-mode-btn:hover:not(.active){border-color:#7c3aed;color:#7c3aed}
+
+/* ── CHAT CONVERSACIONAL BOBI ── */
+.ai-chat-thread{display:flex;flex-direction:column;gap:10px;padding:4px 0}
+.ai-chat-bubble{max-width:92%;padding:10px 13px;border-radius:14px;font-size:13px;line-height:1.7;word-break:break-word}
+.ai-chat-bubble.user{align-self:flex-end;background:#7c3aed;color:#fff;border-radius:14px 14px 4px 14px}
+.ai-chat-bubble.bobi{align-self:flex-start;background:#f1f5f9;color:#334155;border-radius:14px 14px 14px 4px;white-space:pre-wrap}
+.ai-chat-input-row{display:flex;gap:8px;padding:8px 16px 14px;border-top:1px solid #f1f5f9;flex-shrink:0;align-items:flex-end}
+.ai-chat-inp{flex:1;border:1.5px solid #e2e8f0;border-radius:12px;padding:9px 12px;
+  font-size:13px;font-family:'Sora',sans-serif;resize:none;outline:none;
+  transition:border .15s;max-height:80px;overflow-y:auto;color:#0f172a;background:#f8fafc}
+.ai-chat-inp:focus{border-color:#7c3aed;background:#fff}
+.ai-chat-inp::placeholder{color:#94a3b8}
+.ai-chat-send{background:#7c3aed;border:none;border-radius:10px;width:36px;height:36px;
+  color:#fff;font-size:16px;cursor:pointer;transition:all .15s;display:flex;
+  align-items:center;justify-content:center;flex-shrink:0}
+.ai-chat-send:hover:not(:disabled){background:#6d28d9;transform:scale(1.05)}
+.ai-chat-send:disabled{background:#e2e8f0;cursor:not-allowed}
+
+/* ── PISTAS PROGRESIVAS ── */
+.ai-hint-row{display:flex;gap:6px;padding:0 16px 8px;flex-shrink:0;flex-wrap:wrap}
+.ai-hint-btn{background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;
+  padding:6px 10px;font-size:11px;font-weight:700;color:#64748b;
+  cursor:pointer;transition:all .15s;font-family:'Sora',sans-serif}
+.ai-hint-btn:hover:not(:disabled){border-color:#7c3aed;color:#7c3aed}
+.ai-hint-btn:disabled{opacity:.4;cursor:not-allowed}
+.ai-hint-bubble{background:linear-gradient(135deg,rgba(124,58,237,.07),rgba(124,58,237,.03));
+  border:1px solid rgba(124,58,237,.2);border-radius:12px;padding:10px 13px;
+  font-size:13px;color:#4c1d95;line-height:1.6;margin-bottom:6px}
+
+/* ── DIAGNÓSTICO POST-EXAMEN ── */
+.ai-diag-btn{width:100%;background:linear-gradient(135deg,#7c3aed,#5b21b6);border:none;
+  border-radius:14px;padding:13px 16px;font-size:13px;font-weight:700;color:#fff;
+  cursor:pointer;transition:all .18s;font-family:'Sora',sans-serif;margin-top:12px;
+  box-shadow:0 4px 14px rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;gap:8px}
+.ai-diag-btn:hover:not(:disabled){background:linear-gradient(135deg,#6d28d9,#4c1d95);transform:translateY(-1px)}
+.ai-diag-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.ai-diag-overlay{position:fixed;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(6px);
+  z-index:700;display:none;align-items:flex-end;justify-content:center}
+@media(min-width:640px){.ai-diag-overlay{align-items:center;padding:20px}}
+.ai-diag-overlay.show{display:flex}
+.ai-diag-modal{background:#fff;width:100%;max-width:540px;max-height:88vh;
+  display:flex;flex-direction:column;overflow:hidden;border-radius:24px 24px 0 0;
+  box-shadow:0 -4px 40px rgba(0,0,0,.15);animation:slideUpAI .3s cubic-bezier(.34,1.1,.64,1) both}
+@media(min-width:640px){.ai-diag-modal{border-radius:20px}}
+.ai-diag-header{padding:20px 20px 14px;border-bottom:1px solid #f1f5f9;flex-shrink:0}
+.ai-diag-title{font-size:17px;font-weight:800;color:#0f172a;display:flex;align-items:center;gap:8px}
+.ai-diag-body{flex:1;overflow-y:auto;padding:16px 20px;font-size:13.5px;color:#334155;line-height:1.8;white-space:pre-wrap}
+.ai-diag-footer{padding:12px 20px 20px;border-top:1px solid #f1f5f9;flex-shrink:0}
+.ai-diag-close-btn{width:100%;background:#f1f5f9;border:none;border-radius:12px;
+  padding:12px;font-size:13px;font-weight:700;color:#64748b;cursor:pointer;
+  font-family:'Sora',sans-serif;transition:background .15s}
+.ai-diag-close-btn:hover{background:#e2e8f0}
+.ai-diag-thinking{display:flex;align-items:center;gap:10px;justify-content:center;
+  font-size:13px;font-weight:600;color:#7c3aed;padding:32px 0}
+
+/* ── PRÁCTICA SIMILAR (genera preguntas) ── */
+.ai-practice-btn{width:100%;background:linear-gradient(135deg,#0d9488,#065f46);border:none;
+  border-radius:14px;padding:13px 16px;font-size:13px;font-weight:700;color:#fff;
+  cursor:pointer;transition:all .18s;font-family:'Sora',sans-serif;margin-top:8px;
+  box-shadow:0 4px 14px rgba(13,148,136,.3);display:flex;align-items:center;justify-content:center;gap:8px}
+.ai-practice-btn:hover:not(:disabled){opacity:.9;transform:translateY(-1px)}
+.ai-practice-overlay{position:fixed;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(6px);
+  z-index:700;display:none;align-items:flex-end;justify-content:center}
+@media(min-width:640px){.ai-practice-overlay{align-items:center;padding:20px}}
+.ai-practice-overlay.show{display:flex}
+.ai-practice-modal{background:#fff;width:100%;max-width:560px;max-height:92vh;
+  display:flex;flex-direction:column;overflow:hidden;border-radius:24px 24px 0 0;
+  box-shadow:0 -4px 40px rgba(0,0,0,.15);animation:slideUpAI .3s cubic-bezier(.34,1.1,.64,1) both}
+@media(min-width:640px){.ai-practice-modal{border-radius:20px}}
+.ai-practice-header{padding:18px 18px 12px;border-bottom:1px solid #f1f5f9;flex-shrink:0;
+  display:flex;align-items:center;justify-content:space-between}
+.ai-practice-title{font-size:15px;font-weight:800;color:#0f172a}
+.ai-practice-body{flex:1;overflow-y:auto;padding:14px 16px}
+.ai-pq-card{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:14px;
+  padding:14px 16px;margin-bottom:12px}
+.ai-pq-num{font-size:10px;font-weight:700;color:#7c3aed;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px}
+.ai-pq-text{font-size:13.5px;color:#0f172a;font-weight:600;line-height:1.5;margin-bottom:10px}
+.ai-pq-opts{display:flex;flex-direction:column;gap:6px}
+.ai-pq-opt{background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;
+  padding:8px 12px;font-size:13px;color:#374151;cursor:pointer;
+  transition:all .15s;font-family:'Sora',sans-serif;text-align:left;font-weight:600}
+.ai-pq-opt:hover{border-color:#0d9488;color:#0d9488}
+.ai-pq-opt.correct{border-color:#16a34a;background:rgba(22,163,74,.08);color:#15803d}
+.ai-pq-opt.wrong{border-color:#dc2626;background:rgba(220,38,38,.08);color:#dc2626}
+.ai-practice-footer{padding:10px 16px 18px;border-top:1px solid #f1f5f9;flex-shrink:0;display:flex;gap:8px}
+.ai-practice-close{flex:1;background:#f1f5f9;border:none;border-radius:12px;padding:12px;
+  font-size:13px;font-weight:700;color:#64748b;cursor:pointer;font-family:'Sora',sans-serif}
 .exam-ai-tts-btn{background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;
   font-size:17px;cursor:pointer;padding:0 14px;height:46px;transition:.15s;flex-shrink:0;color:#94a3b8}
 .exam-ai-tts-btn:hover{background:#f3f0ff;border-color:#c4b5fd;color:#7c3aed}
@@ -2887,6 +2982,8 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
     <div class="review-grid" id="reviewGrid"></div>
     <button class="btn-exit" onclick="exitToLogin()">Volver al inicio</button>
     <button class="btn-exit" style="background:linear-gradient(135deg,#f59e0b,#d97706);margin-top:10px" onclick="openRanking()">🏆 Ver ranking global</button>
+    <button class="ai-diag-btn" id="btnAIDiagnosis" onclick="openDiagModal()">🤖 Diagnóstico de BOBI</button>
+    <button class="ai-practice-btn" id="btnAIPractice" onclick="openPracticeFromResults()">🧩 Practicar mis temas débiles</button>
     <button class="btn-exit" id="btnResultsAdmin" style="display:none;background:var(--teal);color:#fff;border:none;margin-top:8px" onclick="openAdmin()">⚙️ Editar imágenes del examen</button>
   </div>
 </div>
@@ -2932,6 +3029,18 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
         <div class="exam-ai-empty-text">Toca <strong>Explicar pregunta</strong> y la IA analiza el reactivo completo, incluyendo la imagen si hay una.</div>
       </div>
     </div>
+    <!-- MODO SELECTOR -->
+    <div class="ai-mode-row" id="aiModeRow">
+      <button class="ai-mode-btn active" id="modeBtnSimple" onclick="setAIMode('simple')" title="Explicación muy sencilla">🧒 Simple</button>
+      <button class="ai-mode-btn" id="modeBtnNormal" onclick="setAIMode('normal')" title="Explicación estándar">📖 Normal</button>
+      <button class="ai-mode-btn" id="modeBtnTech" onclick="setAIMode('tecnico')" title="Explicación técnica y detallada">🔬 Técnico</button>
+    </div>
+    <!-- PISTAS PROGRESIVAS -->
+    <div class="ai-hint-row" id="aiHintRow" style="display:none">
+      <button class="ai-hint-btn" id="hintBtn1" onclick="askHint(1)">💡 Pista 1</button>
+      <button class="ai-hint-btn" id="hintBtn2" onclick="askHint(2)" disabled>💡 Pista 2</button>
+      <button class="ai-hint-btn" id="hintBtn3" onclick="askHint(3)" disabled>✅ Revelar</button>
+    </div>
     <div class="exam-ai-footer">
       <div class="exam-ai-footer-row">
         <button class="exam-ai-tts-btn" id="examAITTSBtn" onclick="toggleExamTTS()" title="Escuchar respuesta" style="display:none">🔊</button>
@@ -2939,6 +3048,46 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
           <span id="examAIBtnIcon">⚡</span> Explicar pregunta
         </button>
       </div>
+    </div>
+    <!-- CHAT CONVERSACIONAL (aparece tras primera respuesta) -->
+    <div id="aiChatSection" style="display:none">
+      <div class="ai-chat-input-row">
+        <textarea class="ai-chat-inp" id="aiChatInp" placeholder="Pregunta algo de seguimiento…" rows="1"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAIChat()}"
+          oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,80)+'px'"></textarea>
+        <button class="ai-chat-send" id="aiChatSend" onclick="sendAIChat()" title="Enviar">➤</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DIAGNÓSTICO POST-EXAMEN MODAL -->
+<div class="ai-diag-overlay" id="aiDiagOverlay" onclick="if(event.target===this)closeDiagModal()">
+  <div class="ai-diag-modal">
+    <div class="ai-diag-header">
+      <div class="ai-diag-title">🤖 Diagnóstico personalizado de BOBI</div>
+    </div>
+    <div class="ai-diag-body" id="aiDiagBody">
+      <div class="ai-diag-thinking">Analizando tu examen<div class="exam-ai-thinking-dots"><span></span><span></span><span></span></div></div>
+    </div>
+    <div class="ai-diag-footer">
+      <button class="ai-diag-close-btn" onclick="closeDiagModal()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRÁCTICA SIMILAR MODAL -->
+<div class="ai-practice-overlay" id="aiPracticeOverlay" onclick="if(event.target===this)closePracticeModal()">
+  <div class="ai-practice-modal">
+    <div class="ai-practice-header">
+      <div class="ai-practice-title">🧩 Práctica similar — generada por BOBI</div>
+      <button class="exam-ai-close" onclick="closePracticeModal()">✕</button>
+    </div>
+    <div class="ai-practice-body" id="aiPracticeBody">
+      <div class="ai-diag-thinking">Generando preguntas…<div class="exam-ai-thinking-dots"><span></span><span></span><span></span></div></div>
+    </div>
+    <div class="ai-practice-footer">
+      <button class="ai-practice-close" onclick="closePracticeModal()">Cerrar</button>
     </div>
   </div>
 </div>
@@ -3358,6 +3507,25 @@ function escapeHtml(str) {
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+// ══════════════════════════════════════════
+//  AI — ESTADO GLOBAL
+// ══════════════════════════════════════════
+let _aiMode = 'simple';          // 'simple' | 'normal' | 'tecnico'
+let _aiConvHistory = [];          // historial conversacional
+let _aiHintLevel = 0;             // cuántas pistas se han dado (0-3)
+let _aiLastFullText = '';         // último texto completo de BOBI
+
+function setAIMode(mode) {
+  _aiMode = mode;
+  ['Simple','Normal','Tech'].forEach(m => {
+    const btn = document.getElementById('modeBtn' + m);
+    if (btn) btn.classList.remove('active');
+  });
+  const active = {simple:'Simple', normal:'Normal', tecnico:'Tech'}[mode];
+  const activeBtn = document.getElementById('modeBtn' + active);
+  if (activeBtn) activeBtn.classList.add('active');
+}
+
 /* ── AI ROUTING — basado en metadatos del EXAMEN, no del reactivo ── */
 function getExamAIConfig() {
   // Leer metadatos del examen actual (titulo + materia + tags)
@@ -3382,6 +3550,21 @@ function getExamAIConfig() {
 function openExamAI() {
   const ov = document.getElementById('examAIOv');
   ov.classList.add('show');
+  // Reset estado conversacional
+  _aiConvHistory = [];
+  _aiHintLevel = 0;
+  _aiLastFullText = '';
+  // Ocultar sección de chat
+  const chatSec = document.getElementById('aiChatSection');
+  if (chatSec) chatSec.style.display = 'none';
+  // Ocultar pistas hasta la primera respuesta
+  const hintRow = document.getElementById('aiHintRow');
+  if (hintRow) hintRow.style.display = 'none';
+  // Resetear pistas
+  ['hintBtn1','hintBtn2','hintBtn3'].forEach((id,i) => {
+    const b = document.getElementById(id);
+    if (b) { b.disabled = (i > 0); b.style.opacity = ''; }
+  });
   // Show question preview
   const q = S.questions && S.questions[S.current];
   const preview = document.getElementById('examAIQPreview');
@@ -3442,6 +3625,125 @@ function toggleExamTTS() {
   speechSynthesis.speak(_ttsUtterance);
 }
 
+// ── Helper: llama al API según config ──
+async function _callBobiAPI(aiCfg, systemPrompt, userText, imageDataUrl) {
+  let text = '', rawErr = '';
+  if (aiCfg.type === 'gemini') {
+    const userContent = [];
+    if (imageDataUrl) {
+      try {
+        let b64, mime;
+        if (imageDataUrl.startsWith('blob:')) {
+          const blobRes = await fetch(imageDataUrl);
+          const blob = await blobRes.blob();
+          mime = blob.type || 'image/png';
+          b64 = await new Promise(resolve => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result.split(',')[1]);
+            reader.readAsDataURL(blob);
+          });
+        } else {
+          const comma = imageDataUrl.indexOf(',');
+          b64 = imageDataUrl.slice(comma+1);
+          const mimeMatch = imageDataUrl.match(/data:([^;]+);/);
+          mime = mimeMatch ? mimeMatch[1] : 'image/png';
+        }
+        userContent.push({ inlineData: { mimeType: mime, data: b64 } });
+      } catch(imgErr) { console.warn('No se pudo cargar la imagen:', imgErr); }
+    }
+    userContent.push({ text: userText });
+    const res = await fetch(aiCfg.url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ role: 'user', parts: userContent }],
+        generationConfig: { maxOutputTokens: 2048, temperature: 0.3 }
+      })
+    });
+    const json = await res.json();
+    text = json?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    rawErr = json?.error?.message || json?.candidates?.[0]?.finishReason || '';
+  } else {
+    // Construir mensajes para Grok — soporta historial
+    const messages = [{ role: 'system', content: systemPrompt }];
+    // Si hay historial previo, incluirlo (sin imagen en turns anteriores)
+    _aiConvHistory.forEach(turn => messages.push(turn));
+    messages.push({ role: 'user', content: userText });
+    const res = await fetch(aiCfg.url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages,
+        max_tokens: 2048,
+        temperature: 0.3
+      })
+    });
+    const json = await res.json();
+    text = json?.choices?.[0]?.message?.content || '';
+    rawErr = json?.error?.message || '';
+  }
+  return { text, rawErr };
+}
+
+// ── Helper: renderiza respuesta de BOBI en el body ──
+function _renderBobiResponse(body, text) {
+  const el = document.createElement('div');
+  el.className = 'exam-ai-response';
+  const sections = text.split(/(?=🎯|💡|✅|Concepto:|Análisis:|Respuesta correcta:)/);
+  sections.forEach(s => {
+    if (!s.trim()) return;
+    const sec = document.createElement('div');
+    sec.className = 'ai-section';
+    let txt = s.trim();
+    if (s.startsWith('💡')) txt = txt.replace(/([A-E]\))/g, '\n$1');
+    sec.style.whiteSpace = 'pre-wrap';
+    sec.textContent = txt;
+    el.appendChild(sec);
+  });
+  body.appendChild(el);
+}
+
+// ── Helper: muestra error de cooldown ──
+function _showBobiCooldown(body, btn, rawErr) {
+  const isQuota = rawErr.toLowerCase().includes('quota') || rawErr.toLowerCase().includes('rate') || rawErr.toLowerCase().includes('limit');
+  if (isQuota) setBobiState('sleep');
+  const isRetry = rawErr.match(/retry in ([\d.]+)s/i);
+  const segundos = isRetry ? Math.ceil(parseFloat(isRetry[1])) : 30;
+  const msg = isQuota
+    ? `<div class="exam-ai-error-card"><div class="exam-ai-error-icon">☕</div><div class="exam-ai-error-title">La IA necesita un respiro</div><div class="exam-ai-error-desc">Demasiadas preguntas seguidas. Reintentando en <strong id="bobiCountdown">${segundos}</strong>s…</div></div>`
+    : `<div class="exam-ai-error-card"><div class="exam-ai-error-icon">😅</div><div class="exam-ai-error-title">Algo salió mal</div><div class="exam-ai-error-desc">No se pudo obtener una respuesta. Intenta de nuevo en un momento.</div></div>`;
+  body.innerHTML = msg;
+  if (isQuota) {
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Espera ' + segundos + 's…';
+    let secs = segundos;
+    window._bobiCooldown = true;
+    const cdInterval = setInterval(() => {
+      secs--;
+      const cdEl = document.getElementById('bobiCountdown');
+      if (cdEl) cdEl.textContent = secs;
+      btn.innerHTML = '⏳ Espera ' + secs + 's…';
+      if (secs <= 0) {
+        clearInterval(cdInterval);
+        window._bobiCooldown = false;
+        setBobiState('idle');
+        btn.disabled = false;
+        btn.innerHTML = '<span>🔄</span> Reintentar';
+      }
+    }, 1000);
+  }
+  return isQuota;
+}
+
+// ── Sufijo de modo para el system prompt ──
+function _getModeInstruction() {
+  if (_aiMode === 'simple') return '\n\nMUY IMPORTANTE: Explica como si el alumno tuviera 12 años. Usa analogías cotidianas, ejemplos simples y lenguaje coloquial. Evita tecnicismos. Sé cálido y motivador.';
+  if (_aiMode === 'tecnico') return '\n\nMUY IMPORTANTE: Da una explicación técnica y profunda. Incluye fundamentos teóricos, fórmulas si aplica, y contexto académico completo.';
+  return ''; // normal — sin modificación
+}
+
 async function askExamAI() {
   const q = S.questions && S.questions[S.current];
   if (!q) return;
@@ -3458,11 +3760,9 @@ async function askExamAI() {
   const optsText = q.options.map((o,i) => `${letters[i]}) ${o}`).join('\n');
   const areaInfo = q.area ? `Área: ${q.area}\n` : '';
 
-  // Determinar qué API usar según el área
   const aiCfg = getExamAIConfig();
-  console.log('ExamAI → usando:', aiCfg.label);
+  console.log('ExamAI → usando:', aiCfg.label, '| modo:', _aiMode);
 
-  // System prompts diferenciados por módulo
   const SYSTEM_PROMPTS = {
     gemini: `Eres un tutor del EXANI-II premedicina. Responde SIEMPRE con esta estructura exacta y SIN extenderte demasiado en cada punto:\n🎯 Concepto: [tema en 1 oración]\n💡 Análisis: [1-2 líneas por opción, solo lo esencial]\n✅ Respuesta correcta: [opción + explicación breve en 2-3 líneas]\nSin markdown, sin asteriscos. Español mexicano. Sé directo y conciso.`,
     grok_mat: `Eres un tutor de matemáticas del EXANI-II. Responde SIEMPRE con EXACTAMENTE esta estructura, separando cada sección con una línea en blanco:\n\n🎯 Concepto: [tema en 1 oración]\n\n💡 Análisis:\nA) [evaluación con cálculo si aplica]\nB) [evaluación con cálculo si aplica]\nC) [evaluación con cálculo si aplica]\nD) [evaluación con cálculo si aplica]\n\n✅ Respuesta correcta: [opción + procedimiento paso a paso]\n\nSin asteriscos ni markdown. Español mexicano.`,
@@ -3471,140 +3771,49 @@ async function askExamAI() {
   };
 
   function getSystemPrompt(cfg) {
-    if (cfg.type === 'gemini') return SYSTEM_PROMPTS.gemini;
-    if (cfg.url.includes('grok-mat')) return SYSTEM_PROMPTS.grok_mat;
-    if (cfg.url.includes('grok-red')) return SYSTEM_PROMPTS.grok_red;
-    return SYSTEM_PROMPTS.grok_comp;
+    let base = '';
+    if (cfg.type === 'gemini') base = SYSTEM_PROMPTS.gemini;
+    else if (cfg.url.includes('grok-mat')) base = SYSTEM_PROMPTS.grok_mat;
+    else if (cfg.url.includes('grok-red')) base = SYSTEM_PROMPTS.grok_red;
+    else base = SYSTEM_PROMPTS.grok_comp;
+    return base + _getModeInstruction();
   }
 
   const systemPrompt = getSystemPrompt(aiCfg);
   const userText = `${areaInfo}Pregunta: ${q.question}\n\nOpciones:\n${optsText}`;
+  const imageDataUrl = (q.image && S.images[q.image]) ? S.images[q.image] : null;
 
+  // Reset historial para nueva pregunta
+  _aiConvHistory = [];
   localStorage.setItem('bobi_last_req', Date.now());
+
   try {
-    let text = '';
-    let rawErr = '';
-
-    if (aiCfg.type === 'gemini') {
-      // ── Gemini (premedicina) — soporta imágenes ──
-      const userContent = [];
-      if (q.image && S.images[q.image]) {
-        try {
-          const dataUrl = S.images[q.image];
-          let b64, mime;
-          if (dataUrl.startsWith('blob:')) {
-            const blobRes = await fetch(dataUrl);
-            const blob = await blobRes.blob();
-            mime = blob.type || 'image/png';
-            b64 = await new Promise((resolve) => {
-              const reader = new FileReader();
-              reader.onloadend = () => resolve(reader.result.split(',')[1]);
-              reader.readAsDataURL(blob);
-            });
-          } else {
-            const comma = dataUrl.indexOf(',');
-            b64 = dataUrl.slice(comma+1);
-            const mimeMatch = dataUrl.match(/data:([^;]+);/);
-            mime = mimeMatch ? mimeMatch[1] : 'image/png';
-          }
-          userContent.push({ inlineData: { mimeType: mime, data: b64 } });
-        } catch(imgErr) { console.warn('No se pudo cargar la imagen:', imgErr); }
-      }
-      userContent.push({ text: userText });
-
-      const res = await fetch(aiCfg.url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system_instruction: { parts: [{ text: systemPrompt }] },
-          contents: [{ role: 'user', parts: userContent }],
-          generationConfig: { maxOutputTokens: 2048, temperature: 0.3 }
-        })
-      });
-      const json = await res.json();
-      text = json?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      rawErr = json?.error?.message || json?.candidates?.[0]?.finishReason || '';
-
-    } else {
-      // ── Grok (matemáticas / redacción / comprensión) ──
-      const res = await fetch(aiCfg.url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userText }
-          ],
-          max_tokens: 2048,
-          temperature: 0.3
-        })
-      });
-      const json = await res.json();
-      text = json?.choices?.[0]?.message?.content || '';
-      rawErr = json?.error?.message || '';
-    }
+    const { text, rawErr } = await _callBobiAPI(aiCfg, systemPrompt, userText, imageDataUrl);
 
     if (text) {
       body.innerHTML = '';
-      const el = document.createElement('div');
-      el.className = 'exam-ai-response';
-      const sections = text.split(/(?=🎯|💡|✅|Concepto:|Análisis:|Análisis:|Respuesta correcta:)/);
-      sections.forEach(s => {
-        if (!s.trim()) return;
-        const sec = document.createElement('div');
-        sec.className = 'ai-section';
-        let txt = s.trim();
-        if (s.startsWith('💡')) {
-          txt = txt.replace(/([A-E]\))/g, '\n$1');
-        }
-        sec.style.whiteSpace = 'pre-wrap';
-        sec.textContent = txt;
-        el.appendChild(sec);
-      });
-      body.appendChild(el);
+      _renderBobiResponse(body, text);
+      _aiLastFullText = text;
+      // Guardar en historial
+      _aiConvHistory.push({ role: 'user', content: userText });
+      _aiConvHistory.push({ role: 'assistant', content: text });
+      // TTS
       const ttsBtn = document.getElementById('examAITTSBtn');
       ttsBtn.style.display = '';
       ttsBtn._text = text;
+      // Activar sección de chat conversacional
+      const chatSec = document.getElementById('aiChatSection');
+      if (chatSec) chatSec.style.display = '';
+      // Mostrar pistas
+      const hintRow = document.getElementById('aiHintRow');
+      if (hintRow) hintRow.style.display = '';
+      _aiHintLevel = 0;
     } else {
-      const isQuota = rawErr.toLowerCase().includes('quota') || rawErr.toLowerCase().includes('rate') || rawErr.toLowerCase().includes('limit');
-      if (isQuota) setBobiState('sleep');
-      const isRetry = rawErr.match(/retry in ([\d.]+)s/i);
-      const segundos = isRetry ? Math.ceil(parseFloat(isRetry[1])) : 30;
-      const msg = isQuota
-        ? `<div class="exam-ai-error-card">
-            <div class="exam-ai-error-icon">☕</div>
-            <div class="exam-ai-error-title">La IA necesita un respiro</div>
-            <div class="exam-ai-error-desc">Demasiadas preguntas seguidas. Reintentando en <strong id="bobiCountdown">${segundos}</strong>s…</div>
-           </div>`
-        : `<div class="exam-ai-error-card">
-            <div class="exam-ai-error-icon">😅</div>
-            <div class="exam-ai-error-title">Algo salió mal</div>
-            <div class="exam-ai-error-desc">No se pudo obtener una respuesta. Intenta de nuevo en un momento.</div>
-           </div>`;
-      body.innerHTML = msg;
-      if (isQuota) {
-        btn.disabled = true;
-        btn.innerHTML = '⏳ Espera ' + segundos + 's…';
-        let secs = segundos;
-        window._bobiCooldown = true;
-        const cdInterval = setInterval(() => {
-          secs--;
-          const cdEl = document.getElementById('bobiCountdown');
-          if (cdEl) cdEl.textContent = secs;
-          btn.innerHTML = '⏳ Espera ' + secs + 's…';
-          if (secs <= 0) {
-            clearInterval(cdInterval);
-            window._bobiCooldown = false;
-            setBobiState('idle');
-            btn.disabled = false;
-            btn.innerHTML = '<span>🔄</span> Reintentar';
-          }
-        }, 1000);
-      }
+      const isQuota = _showBobiCooldown(body, btn, rawErr);
+      if (isQuota) return;
     }
   } catch(e) {
-    const isNet = e.message.includes('fetch');
+    const isNet = e.message && e.message.includes('fetch');
     body.innerHTML = `<div class="exam-ai-error-card">
       <div class="exam-ai-error-icon">${isNet ? '📡' : '😅'}</div>
       <div class="exam-ai-error-title">${isNet ? 'Sin conexión' : 'Algo salió mal'}</div>
@@ -3617,6 +3826,313 @@ async function askExamAI() {
     btn.disabled = false;
     btn.innerHTML = '<span>🔄</span> Volver a preguntar';
   }
+}
+
+// ══════════════════════════════════════════
+//  CHAT CONVERSACIONAL CON BOBI
+// ══════════════════════════════════════════
+async function sendAIChat() {
+  const inp = document.getElementById('aiChatInp');
+  const sendBtn = document.getElementById('aiChatSend');
+  const body = document.getElementById('examAIBody');
+  const text = inp.value.trim();
+  if (!text || sendBtn.disabled) return;
+
+  // Agregar burbuja del usuario
+  const thread = body.querySelector('.ai-chat-thread') || (() => {
+    const t = document.createElement('div');
+    t.className = 'ai-chat-thread';
+    // Mover contenido actual al thread como burbuja de bobi
+    const currentContent = body.innerHTML;
+    body.innerHTML = '';
+    const bobiBubble = document.createElement('div');
+    bobiBubble.className = 'ai-chat-bubble bobi';
+    bobiBubble.textContent = _aiLastFullText;
+    t.appendChild(bobiBubble);
+    body.appendChild(t);
+    return t;
+  })();
+
+  const userBubble = document.createElement('div');
+  userBubble.className = 'ai-chat-bubble user';
+  userBubble.textContent = text;
+  thread.appendChild(userBubble);
+  inp.value = '';
+  inp.style.height = 'auto';
+  body.scrollTop = body.scrollHeight;
+
+  sendBtn.disabled = true;
+  setBobiState('walk');
+
+  // Burbuja de "pensando"
+  const thinkBubble = document.createElement('div');
+  thinkBubble.className = 'ai-chat-bubble bobi';
+  thinkBubble.innerHTML = '<div class="exam-ai-thinking-dots"><span></span><span></span><span></span></div>';
+  thread.appendChild(thinkBubble);
+  body.scrollTop = body.scrollHeight;
+
+  const aiCfg = getExamAIConfig();
+  const q = S.questions && S.questions[S.current];
+  const areaInfo = q && q.area ? `(Área: ${q.area}) ` : '';
+  const systemFollowUp = `Eres BOBI, tutor del EXANI-II. Ya explicaste una pregunta al alumno. El alumno hace una pregunta de seguimiento. Responde de forma concisa y clara en español mexicano. Sin markdown, sin asteriscos.${_getModeInstruction()}`;
+
+  // Añadir turno del usuario al historial
+  _aiConvHistory.push({ role: 'user', content: areaInfo + text });
+
+  try {
+    const { text: reply, rawErr } = await _callBobiAPI(aiCfg, systemFollowUp, areaInfo + text, null);
+    thinkBubble.remove();
+    if (reply) {
+      const replyBubble = document.createElement('div');
+      replyBubble.className = 'ai-chat-bubble bobi';
+      replyBubble.textContent = reply;
+      thread.appendChild(replyBubble);
+      _aiConvHistory.push({ role: 'assistant', content: reply });
+      _aiLastFullText = reply;
+    } else {
+      const errBubble = document.createElement('div');
+      errBubble.className = 'ai-chat-bubble bobi';
+      errBubble.textContent = '😅 No pude responder eso. Intenta de nuevo.';
+      thread.appendChild(errBubble);
+      _aiConvHistory.pop(); // remueve el user turn fallido
+    }
+  } catch(e) {
+    thinkBubble.remove();
+    const errBubble = document.createElement('div');
+    errBubble.className = 'ai-chat-bubble bobi';
+    errBubble.textContent = '📡 Sin conexión. Revisa tu internet.';
+    thread.appendChild(errBubble);
+    _aiConvHistory.pop();
+  }
+
+  setBobiState('idle');
+  sendBtn.disabled = false;
+  body.scrollTop = body.scrollHeight;
+}
+
+// ══════════════════════════════════════════
+//  PISTAS PROGRESIVAS
+// ══════════════════════════════════════════
+async function askHint(level) {
+  if (level <= _aiHintLevel) return; // ya se dio esta pista
+  const q = S.questions && S.questions[S.current];
+  if (!q) return;
+
+  const btn = document.getElementById('hintBtn' + level);
+  if (btn) { btn.disabled = true; btn.style.opacity = '.5'; }
+
+  const aiCfg = getExamAIConfig();
+  const letters = ['A','B','C','D','E'];
+  const optsText = q.options.map((o,i) => `${letters[i]}) ${o}`).join('\n');
+
+  const hintPrompts = {
+    1: `Eres BOBI, tutor del EXANI-II. Para esta pregunta, da SOLO el concepto o tema central en 1-2 oraciones. NO menciones qué opción es correcta. Solo orienta al alumno sobre el tema.`,
+    2: `Eres BOBI, tutor del EXANI-II. Para esta pregunta, di SOLO cuáles opciones son claramente incorrectas y por qué en pocas palabras, SIN revelar la respuesta correcta.`,
+    3: `Eres BOBI, tutor del EXANI-II. Revela la respuesta correcta con una explicación completa y concisa.`
+  };
+
+  const userText = `Pregunta: ${q.question}\n\nOpciones:\n${optsText}`;
+  const body = document.getElementById('examAIBody');
+
+  setBobiState('walk');
+  try {
+    const { text } = await _callBobiAPI(aiCfg, hintPrompts[level] + _getModeInstruction(), userText, null);
+    if (text) {
+      const hintEl = document.createElement('div');
+      hintEl.className = 'ai-hint-bubble';
+      hintEl.textContent = (level === 1 ? '💡 Pista 1: ' : level === 2 ? '🔎 Pista 2: ' : '✅ Respuesta: ') + text;
+      body.appendChild(hintEl);
+      body.scrollTop = body.scrollHeight;
+      _aiHintLevel = level;
+      // Activar siguiente pista
+      if (level < 3) {
+        const nextBtn = document.getElementById('hintBtn' + (level + 1));
+        if (nextBtn) nextBtn.disabled = false;
+      }
+      // Desactivar la pista actual permanentemente
+      if (btn) btn.style.opacity = '.4';
+    }
+  } catch(e) {
+    if (btn) { btn.disabled = false; btn.style.opacity = ''; }
+  }
+  setBobiState('idle');
+}
+
+// ══════════════════════════════════════════
+//  DIAGNÓSTICO POST-EXAMEN
+// ══════════════════════════════════════════
+async function openDiagModal() {
+  const overlay = document.getElementById('aiDiagOverlay');
+  const diagBody = document.getElementById('aiDiagBody');
+  if (!overlay || !diagBody) return;
+  overlay.classList.add('show');
+  diagBody.innerHTML = '<div class="ai-diag-thinking">Analizando tu examen<div class="exam-ai-thinking-dots"><span></span><span></span><span></span></div></div>';
+
+  const qs = S.questions;
+  const ans = S.answers;
+  const total = qs.length;
+  const ok = qs.filter((q,i) => ans[i] === q.answer).length;
+  const fail = Object.keys(ans).length - ok;
+  const blank = total - Object.keys(ans).length;
+  const pct = Math.round((ok / total) * 100);
+
+  // Calcular áreas con más errores
+  const areaErrors = {};
+  qs.forEach((q, i) => {
+    if (ans[i] !== q.answer) {
+      const area = q.area || 'General';
+      areaErrors[area] = (areaErrors[area] || 0) + 1;
+    }
+  });
+  const weakAreas = Object.entries(areaErrors).sort((a,b) => b[1]-a[1]).slice(0,5).map(([a,c]) => `${a} (${c} errores)`).join(', ');
+  const examTitle = (S.currentExamMeta && S.currentExamMeta.titulo) || 'EXANI-II';
+
+  const prompt = `Eres BOBI, tutor experto del EXANI-II. Un alumno acaba de terminar un simulacro llamado "${examTitle}".
+Resultados:
+- Puntaje: ${pct}% (${ok} de ${total} correctas)
+- Incorrectas: ${fail}
+- Sin responder: ${blank}
+- Áreas con más errores: ${weakAreas || 'No determinado'}
+
+Genera un diagnóstico personalizado CON EXACTAMENTE esta estructura:
+
+📊 DIAGNÓSTICO GENERAL
+[2-3 oraciones evaluando el desempeño global honestamente pero con empatía]
+
+🔴 ÁREAS A REFORZAR
+[Lista las 3 áreas más débiles con una recomendación específica de estudio para cada una]
+
+✅ FORTALEZAS
+[Menciona qué hizo bien el alumno o qué áreas domina mejor]
+
+📅 PLAN DE ESTUDIO
+[3 pasos concretos y accionables para mejorar antes del próximo simulacro]
+
+💪 MOTIVACIÓN
+[1-2 oraciones motivadoras y personalizadas]
+
+Sin markdown ni asteriscos. Español mexicano. Sé directo, honesto y motivador.`;
+
+  const aiCfg = getExamAIConfig();
+  try {
+    const { text } = await _callBobiAPI(aiCfg, prompt, 'Genera el diagnóstico del alumno.', null);
+    diagBody.textContent = text || 'No se pudo generar el diagnóstico. Intenta de nuevo.';
+  } catch(e) {
+    diagBody.textContent = '📡 Sin conexión. Verifica tu internet e intenta de nuevo.';
+  }
+}
+
+function closeDiagModal() {
+  const overlay = document.getElementById('aiDiagOverlay');
+  if (overlay) overlay.classList.remove('show');
+}
+
+// ══════════════════════════════════════════
+//  PRÁCTICA SIMILAR (preguntas generadas)
+// ══════════════════════════════════════════
+let _practiceQuestions = [];
+
+async function openPracticeFromResults() {
+  const qs = S.questions;
+  const ans = S.answers;
+  // Tomar hasta 3 preguntas fallidas para contexto
+  const failedQs = qs.filter((q,i) => ans[i] !== q.answer && ans[i] !== undefined).slice(0,3);
+  const context = failedQs.length > 0
+    ? failedQs.map(q => `Tema: ${q.area || 'General'} — Pregunta: ${q.question.slice(0,100)}`).join('\n')
+    : `Examen: ${(S.currentExamMeta && S.currentExamMeta.titulo) || 'EXANI-II'}`;
+  await _openPracticeModal(context, (S.currentExamMeta && S.currentExamMeta.materia) || 'general');
+}
+
+async function openPracticeFromQuestion() {
+  const q = S.questions && S.questions[S.current];
+  if (!q) return;
+  const context = `Área: ${q.area || 'General'}\nPregunta similar a: ${q.question.slice(0,120)}`;
+  await _openPracticeModal(context, q.area || 'general');
+}
+
+async function _openPracticeModal(context, area) {
+  const overlay = document.getElementById('aiPracticeOverlay');
+  const practiceBody = document.getElementById('aiPracticeBody');
+  if (!overlay || !practiceBody) return;
+  overlay.classList.add('show');
+  practiceBody.innerHTML = '<div class="ai-diag-thinking">Generando preguntas…<div class="exam-ai-thinking-dots"><span></span><span></span><span></span></div></div>';
+  _practiceQuestions = [];
+
+  const prompt = `Eres BOBI, generador de reactivos del estilo EXANI-II. Genera exactamente 4 preguntas de opción múltiple sobre estos temas:
+${context}
+
+Responde ÚNICAMENTE con JSON válido, sin texto extra, sin markdown, sin explicaciones fuera del JSON:
+[
+  {
+    "q": "texto de la pregunta",
+    "opts": ["opción A", "opción B", "opción C", "opción D"],
+    "ans": 0,
+    "exp": "explicación breve de por qué esa es la correcta"
+  }
+]
+
+El campo "ans" es el índice (0-3) de la opción correcta. 4 preguntas. Solo el JSON.`;
+
+  const aiCfg = getExamAIConfig();
+  try {
+    const { text } = await _callBobiAPI(aiCfg, prompt, 'Genera las preguntas.', null);
+    let jsonStr = text.replace(/```json|```/g, '').trim();
+    const startIdx = jsonStr.indexOf('[');
+    const endIdx = jsonStr.lastIndexOf(']');
+    if (startIdx !== -1 && endIdx !== -1) jsonStr = jsonStr.slice(startIdx, endIdx + 1);
+    _practiceQuestions = JSON.parse(jsonStr);
+    _renderPracticeQuestions(practiceBody);
+  } catch(e) {
+    practiceBody.innerHTML = '<div style="text-align:center;padding:24px;color:#64748b;font-size:13px">😅 No se pudieron generar las preguntas. Intenta de nuevo.</div>';
+  }
+}
+
+function _renderPracticeQuestions(container) {
+  if (!_practiceQuestions.length) return;
+  container.innerHTML = '';
+  const letters = ['A','B','C','D'];
+  _practiceQuestions.forEach((pq, qi) => {
+    const card = document.createElement('div');
+    card.className = 'ai-pq-card';
+    const numEl = document.createElement('div');
+    numEl.className = 'ai-pq-num';
+    numEl.textContent = `Pregunta ${qi + 1}`;
+    const textEl = document.createElement('div');
+    textEl.className = 'ai-pq-text';
+    textEl.textContent = pq.q;
+    const optsEl = document.createElement('div');
+    optsEl.className = 'ai-pq-opts';
+    pq.opts.forEach((opt, oi) => {
+      const btn = document.createElement('button');
+      btn.className = 'ai-pq-opt';
+      btn.textContent = `${letters[oi]}) ${opt}`;
+      btn.onclick = function() {
+        // Desactivar todos los botones de esta pregunta
+        optsEl.querySelectorAll('.ai-pq-opt').forEach(b => b.onclick = null);
+        if (oi === pq.ans) {
+          btn.classList.add('correct');
+        } else {
+          btn.classList.add('wrong');
+          optsEl.querySelectorAll('.ai-pq-opt')[pq.ans].classList.add('correct');
+        }
+        // Mostrar explicación
+        const expEl = document.createElement('div');
+        expEl.style.cssText = 'font-size:12px;color:#475569;margin-top:8px;padding:8px 10px;background:#f0fdf4;border-radius:8px;line-height:1.5';
+        expEl.textContent = '💡 ' + (pq.exp || '');
+        card.appendChild(expEl);
+      };
+      optsEl.appendChild(btn);
+    });
+    card.appendChild(numEl);
+    card.appendChild(textEl);
+    card.appendChild(optsEl);
+    container.appendChild(card);
+  });
+}
+
+function closePracticeModal() {
+  const overlay = document.getElementById('aiPracticeOverlay');
+  if (overlay) overlay.classList.remove('show');
 }
 
 function doLogout() {
