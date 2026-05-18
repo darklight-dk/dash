@@ -691,10 +691,13 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .exam-ai-overlay{
   position:fixed;inset:0;
   background:rgba(4,4,15,.72);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  z-index:600;display:none;align-items:flex-end;justify-content:center;padding:0}
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  z-index:600;display:flex;align-items:flex-end;justify-content:center;padding:0;
+  opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity .22s ease,visibility .22s ease;
+  will-change:opacity}
 @media(min-width:640px){.exam-ai-overlay{align-items:center;padding:20px}}
-.exam-ai-overlay.show{display:flex}
+.exam-ai-overlay.show{opacity:1;visibility:visible;pointer-events:auto}
 
 /* ── Modal shell ── */
 .exam-ai-modal{
@@ -705,8 +708,13 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
   border:1px solid rgba(124,58,237,.2);
   border-bottom:none;
   box-shadow:0 -4px 80px rgba(88,28,235,.25),0 0 0 1px rgba(139,92,246,.08);
-  animation:slideUpAI .32s cubic-bezier(.34,1.1,.64,1) both}
-@media(min-width:640px){.exam-ai-modal{border-radius:20px;border-bottom:1px solid rgba(124,58,237,.2);animation:fadeUp .22s ease both}}
+  will-change:transform,opacity;
+  transform:translateY(72px);opacity:0;
+  transition:transform .3s cubic-bezier(.34,1.1,.64,1),opacity .22s ease}
+.exam-ai-overlay.show .exam-ai-modal{transform:translateY(0);opacity:1}
+@media(min-width:640px){
+  .exam-ai-modal{border-radius:20px;border-bottom:1px solid rgba(124,58,237,.2);transform:translateY(16px)}
+  .exam-ai-overlay.show .exam-ai-modal{transform:translateY(0);opacity:1}}
 @keyframes slideUpAI{from{transform:translateY(72px);opacity:0}to{transform:translateY(0);opacity:1}}
 @keyframes fadeUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
 
@@ -741,8 +749,8 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
   display:flex;align-items:center;justify-content:center;
   animation:bobiGlowPulse 3.5s ease-in-out infinite}
 @keyframes bobiGlowPulse{
-  0%,100%{box-shadow:0 0 10px rgba(124,58,237,.15)}
-  50%{box-shadow:0 0 20px rgba(124,58,237,.3),0 0 40px rgba(124,58,237,.1)}}
+  0%,100%{filter:drop-shadow(0 0 4px rgba(124,58,237,.2))}
+  50%{filter:drop-shadow(0 0 10px rgba(124,58,237,.45))}}
 
 .bobi-wrap{width:80%;height:80%;image-rendering:pixelated;animation:bobiIdle 1.8s ease-in-out infinite}
 .bobi-wrap.walk{animation:bobiWalk .45s ease-in-out infinite}
@@ -791,7 +799,8 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 /* ── Body ── */
 .exam-ai-body{
   flex:1;overflow-y:auto;padding:12px 14px 14px;min-height:100px;
-  scrollbar-width:thin;scrollbar-color:rgba(124,58,237,.2) transparent}
+  scrollbar-width:thin;scrollbar-color:rgba(124,58,237,.2) transparent;
+  overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .exam-ai-body::-webkit-scrollbar{width:2px}
 .exam-ai-body::-webkit-scrollbar-thumb{background:rgba(124,58,237,.25);border-radius:2px}
 
@@ -3215,7 +3224,7 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
 
 <!-- EXAM AI MODAL — BOBI v4 -->
 <div class="exam-ai-overlay" id="examAIOv" onclick="closeExamAIOnBg(event)">
-  <div class="exam-ai-modal" id="examAIModal">
+  <div class="exam-ai-modal" id="examAIModal" onclick="event.stopPropagation()" ontouchstart="event.stopPropagation()">
 
     <!-- Header -->
     <div class="exam-ai-header">
@@ -4169,8 +4178,6 @@ var SVG_IDLE  = '<svg viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg" sty
       preview.textContent = 'Pregunta ' + ((S.current||0)+1) + ': ' + areaTag + q.question.slice(0,140) + (q.question.length>140?'…':'');
       preview.classList.add('show');
     }
-    var body = document.getElementById('examAIBody');
-    body.innerHTML = '<div class="exam-ai-empty"><div class="ai-empty-glyph">◈</div><div class="exam-ai-empty-text">Presiona <strong>Analizar pregunta</strong> y BOBI estudiará el reactivo completo.</div></div>';
     var btn = document.getElementById('examAIBtn');
     btn.disabled = false;
     btn.innerHTML = '<span class="ai-btn-icon">◆</span> Analizar pregunta';
@@ -4178,12 +4185,28 @@ var SVG_IDLE  = '<svg viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg" sty
     _setBobiState('idle');
     var modelBadge = document.getElementById('aiBobiModelBadge');
     if (modelBadge) modelBadge.textContent = _selectModel().label;
+    // Defer heavy DOM mutation until after the opening animation frame
+    requestAnimationFrame(function() {
+      var body = document.getElementById('examAIBody');
+      body.innerHTML = '<div class="exam-ai-empty"><div class="ai-empty-glyph">◈</div><div class="exam-ai-empty-text">Presiona <strong>Analizar pregunta</strong> y BOBI estudiará el reactivo completo.</div></div>';
+    });
   }
 
   function _close() {
-    document.getElementById('examAIOv').classList.remove('show');
+    var ov  = document.getElementById('examAIOv');
+    var mod = document.getElementById('examAIModal');
+    ov.classList.remove('show');
     if (speechSynthesis.speaking) speechSynthesis.cancel();
     if (_abortCtrl) { try { _abortCtrl.abort(); } catch(e) {} }
+    // Reset modal position after close transition so next open starts fresh from bottom
+    setTimeout(function() {
+      if (!ov.classList.contains('show')) {
+        mod.style.transition = 'none';
+        mod.style.transform  = '';   // reverts to CSS base: translateY(72px)
+        mod.style.opacity    = '';   // reverts to CSS base: 0
+        requestAnimationFrame(function() { mod.style.transition = ''; });
+      }
+    }, 320);
   }
 
   function _updateCounter() {
@@ -4515,6 +4538,53 @@ function openExamAI()              { BobiAI.open(); }
 function closeExamAI()             { BobiAI.close(); }
 function closeExamAIOnBg(e)        { BobiAI.closeOnBg(e); }
 function askExamAI()               { BobiAI.analyze(); }
+
+// ── Drag-to-close para el modal BOBI (swipe down desde el header) ──
+(function() {
+  var modal, header, startY, currentY, dragging = false;
+  var CLOSE_THRESHOLD = 120; // px hacia abajo para cerrar
+
+  function onTouchStart(e) {
+    startY   = e.touches[0].clientY;
+    currentY = startY;
+    dragging = true;
+    modal.style.transition = 'none'; // desactivar transición durante drag
+  }
+
+  function onTouchMove(e) {
+    if (!dragging) return;
+    currentY = e.touches[0].clientY;
+    var delta = currentY - startY;
+    if (delta < 0) delta = 0; // solo hacia abajo
+    modal.style.transform = 'translateY(' + delta + 'px)';
+    modal.style.opacity   = String(Math.max(0, 1 - delta / 280));
+    e.preventDefault();
+  }
+
+  function onTouchEnd() {
+    if (!dragging) return;
+    dragging = false;
+    var delta = currentY - startY;
+    modal.style.transition = ''; // restaurar transición
+    if (delta > CLOSE_THRESHOLD) {
+      BobiAI.close();
+    } else {
+      modal.style.transform = '';
+      modal.style.opacity   = '';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    modal  = document.getElementById('examAIModal');
+    header = document.getElementById('examAIModal'); // drag desde cualquier parte del header
+    if (!modal) return;
+    var hdr = modal.querySelector('.exam-ai-header');
+    if (!hdr) return;
+    hdr.addEventListener('touchstart', onTouchStart, { passive: true });
+    document.addEventListener('touchmove',  onTouchMove,  { passive: false, capture: false });
+    document.addEventListener('touchend',   onTouchEnd,   { passive: true });
+  });
+})();
 function sendAIChat()              { BobiAI.sendChat(); }
 function askHint(level)            { BobiAI.askHint(level); }
 function openDiagModal()           { BobiAI.openDiag(); }
