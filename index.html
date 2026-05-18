@@ -684,156 +684,308 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 
 /* ── EXAM AI MODAL ── */
 /* ── EXAM AI MODAL — LIGHT PREMIUM ── */
-.exam-ai-overlay{position:fixed;inset:0;background:rgba(15,23,42,.35);backdrop-filter:blur(6px);
+/* ══════════════════════════════════════════
+   BOBI MODAL — REDISEÑO COMPLETO v3
+══════════════════════════════════════════ */
+.exam-ai-overlay{
+  position:fixed;inset:0;
+  background:rgba(6,5,18,.65);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
   z-index:600;display:none;align-items:flex-end;justify-content:center;padding:0}
 @media(min-width:640px){.exam-ai-overlay{align-items:center;padding:20px}}
 .exam-ai-overlay.show{display:flex}
-.exam-ai-modal{background:#fff;width:100%;max-width:560px;max-height:88vh;
-  display:flex;flex-direction:column;overflow:hidden;
-  border-radius:24px 24px 0 0;
-  box-shadow:0 -4px 40px rgba(0,0,0,.12),0 0 0 1px rgba(0,0,0,.06);
-  animation:slideUpAI .3s cubic-bezier(.34,1.1,.64,1) both}
-@media(min-width:640px){.exam-ai-modal{border-radius:20px;animation:fadeUp .22s ease both}}
-@keyframes slideUpAI{from{transform:translateY(60px);opacity:0}to{transform:translateY(0);opacity:1}}
 
-/* drag handle mobile */
-.exam-ai-modal::before{content:'';display:block;width:36px;height:4px;
-  background:#e2e8f0;border-radius:2px;margin:10px auto -6px;flex-shrink:0}
+.exam-ai-modal{
+  background:linear-gradient(160deg,#0f0c29 0%,#1a1040 40%,#0d1b2a 100%);
+  width:100%;max-width:580px;max-height:92vh;
+  display:flex;flex-direction:column;overflow:hidden;
+  border-radius:28px 28px 0 0;
+  border:1px solid rgba(139,92,246,.25);
+  box-shadow:0 -8px 60px rgba(124,58,237,.35),0 0 0 1px rgba(139,92,246,.1),inset 0 1px 0 rgba(255,255,255,.06);
+  animation:slideUpAI .35s cubic-bezier(.34,1.1,.64,1) both}
+@media(min-width:640px){.exam-ai-modal{border-radius:24px;animation:fadeUp .25s ease both}}
+@keyframes slideUpAI{from{transform:translateY(80px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes fadeUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* Drag handle */
+.exam-ai-modal::before{
+  content:'';display:block;width:40px;height:4px;
+  background:rgba(139,92,246,.4);border-radius:2px;
+  margin:12px auto -4px;flex-shrink:0}
 @media(min-width:640px){.exam-ai-modal::before{display:none}}
 
-/* HEADER */
-.exam-ai-header{display:flex;align-items:center;justify-content:space-between;
-  padding:16px 18px 14px}
-.exam-ai-title{display:flex;align-items:center;gap:10px}
-.exam-ai-icon{width:52px;height:52px;flex-shrink:0;image-rendering:pixelated}
-.bobi-wrap{width:100%;height:100%;image-rendering:pixelated;animation:bobiIdle 1.6s ease-in-out infinite}
+/* ── HEADER ── */
+.exam-ai-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 18px 14px;
+  background:linear-gradient(135deg,rgba(124,58,237,.18) 0%,rgba(99,102,241,.08) 100%);
+  border-bottom:1px solid rgba(139,92,246,.15);
+  position:relative;overflow:hidden}
+.exam-ai-header::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 10% 50%,rgba(167,139,250,.12) 0%,transparent 70%);
+  pointer-events:none}
+.exam-ai-title{display:flex;align-items:center;gap:12px;z-index:1}
+
+/* Bobi icon glow ring */
+.exam-ai-icon{
+  width:56px;height:56px;flex-shrink:0;
+  image-rendering:pixelated;
+  background:radial-gradient(circle,rgba(250,204,21,.18) 0%,rgba(124,58,237,.12) 60%,transparent 100%);
+  border-radius:16px;
+  border:1.5px solid rgba(250,204,21,.25);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 16px rgba(250,204,21,.2),0 0 40px rgba(124,58,237,.15);
+  animation:bobiGlowPulse 3s ease-in-out infinite}
+@keyframes bobiGlowPulse{
+  0%,100%{box-shadow:0 0 12px rgba(250,204,21,.2),0 0 30px rgba(124,58,237,.12)}
+  50%{box-shadow:0 0 22px rgba(250,204,21,.35),0 0 50px rgba(124,58,237,.22)}}
+
+.bobi-wrap{width:80%;height:80%;image-rendering:pixelated;animation:bobiIdle 1.6s ease-in-out infinite}
 .bobi-wrap.walk{animation:bobiWalk .45s ease-in-out infinite}
 .bobi-wrap.sleep{animation:bobiSleep 2.2s ease-in-out infinite}
-
-/* SMALL HEADER BOBI */
-@keyframes bobiIdle{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-3px) rotate(0deg)}}
+@keyframes bobiIdle{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 @keyframes bobiWalk{0%,100%{transform:translateY(0) rotate(-5deg) scaleX(1)}50%{transform:translateY(-4px) rotate(5deg) scaleX(.95)}}
 @keyframes bobiSleep{0%,100%{transform:rotate(-5deg) translateY(1px)}50%{transform:rotate(5deg) translateY(2px)}}
 
-/* LARGE CENTER BOBI — varied animations */
-.bobi-big{image-rendering:pixelated;animation:bobiShow 10s ease-in-out infinite}
-@keyframes bobiShow{
-  /* bounce up */
-  0%          {transform:translateY(0) rotate(0) scaleX(1) scaleY(1)}
-  8%          {transform:translateY(-12px) rotate(0) scaleX(1) scaleY(1)}
-  16%         {transform:translateY(0) rotate(0) scaleX(1) scaleY(1)}
-  /* tilt */
-  22%         {transform:rotate(-14deg)}
-  28%         {transform:rotate(14deg)}
-  34%         {transform:rotate(0deg)}
-  /* squish */
-  40%         {transform:scaleX(1) scaleY(1) translateY(0)}
-  43%         {transform:scaleX(1.4) scaleY(.6) translateY(6px)}
-  46%         {transform:scaleX(.8) scaleY(1.3) translateY(-10px)}
-  50%         {transform:scaleX(1) scaleY(1) translateY(0)}
-  /* shake */
-  56%         {transform:translateX(0)}
-  58%         {transform:translateX(-8px)}
-  60%         {transform:translateX(8px)}
-  62%         {transform:translateX(-6px)}
-  64%         {transform:translateX(6px)}
-  66%         {transform:translateX(0)}
-  /* flip */
-  72%         {transform:scaleX(1)}
-  74%         {transform:scaleX(-1)}
-  76%         {transform:scaleX(1)}
-  /* spin */
-  82%         {transform:rotate(0deg)}
-  86%         {transform:rotate(180deg)}
-  90%         {transform:rotate(360deg)}
-  /* rest */
-  100%        {transform:translateY(0) rotate(0) scaleX(1) scaleY(1)}
-}
-.exam-ai-label{font-size:14px;font-weight:700;color:#0f172a;letter-spacing:-.1px}
-.exam-ai-sub{font-size:10px;color:#7c3aed;font-weight:700;letter-spacing:.8px;text-transform:uppercase}
-.exam-ai-close{background:#f8fafc;border:1px solid #e2e8f0;color:#94a3b8;cursor:pointer;
-  width:30px;height:30px;border-radius:8px;display:flex;align-items:center;
-  justify-content:center;font-size:13px;transition:.15s}
-.exam-ai-close:hover{background:#f1f5f9;color:#64748b}
+.exam-ai-label{font-size:16px;font-weight:800;color:#f8fafc;letter-spacing:-.2px;line-height:1}
+.exam-ai-sub{
+  font-size:9px;color:#a78bfa;font-weight:700;letter-spacing:1.2px;
+  text-transform:uppercase;margin-top:3px;
+  display:flex;align-items:center;gap:5px}
+.exam-ai-sub::before{
+  content:'';width:6px;height:6px;border-radius:50%;
+  background:#a78bfa;box-shadow:0 0 6px #a78bfa;
+  animation:statusBlink 2s ease infinite}
+@keyframes statusBlink{0%,100%{opacity:1}50%{opacity:.3}}
 
-/* QUESTION PREVIEW */
-.exam-ai-q-preview{margin:0 16px 4px;padding:10px 14px;
-  background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;
-  font-size:12px;color:#64748b;line-height:1.5;font-style:italic;display:none}
+.exam-ai-close{
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.1);
+  color:rgba(255,255,255,.5);cursor:pointer;
+  width:32px;height:32px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;transition:all .15s;z-index:1}
+.exam-ai-close:hover{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:#f87171}
+
+/* ── QUESTION PREVIEW ── */
+.exam-ai-q-preview{
+  margin:10px 14px 4px;padding:10px 14px;
+  background:rgba(255,255,255,.04);
+  border-radius:12px;
+  border:1px solid rgba(139,92,246,.2);
+  font-size:12px;color:rgba(203,213,225,.8);
+  line-height:1.55;font-style:italic;display:none}
 .exam-ai-q-preview.show{display:block}
 
-/* BODY */
-.exam-ai-body{flex:1;overflow-y:auto;padding:14px 16px 16px;min-height:120px;
-  scrollbar-width:thin;scrollbar-color:#e2e8f0 transparent}
+/* ── BODY ── */
+.exam-ai-body{
+  flex:1;overflow-y:auto;padding:14px 16px 16px;min-height:120px;
+  scrollbar-width:thin;scrollbar-color:rgba(139,92,246,.3) transparent}
 .exam-ai-body::-webkit-scrollbar{width:3px}
-.exam-ai-body::-webkit-scrollbar-thumb{background:#e2e8f0;border-radius:3px}
+.exam-ai-body::-webkit-scrollbar-thumb{background:rgba(139,92,246,.3);border-radius:3px}
 
-/* EMPTY STATE */
+/* ── EMPTY STATE ── */
 .exam-ai-empty{text-align:center;padding:28px 16px}
 .exam-ai-empty-icon{font-size:38px;margin-bottom:10px}
-.exam-ai-empty-text{font-size:13px;color:#94a3b8;line-height:1.7}
-.exam-ai-empty-text strong{color:#7c3aed;font-weight:700}
+.exam-ai-empty-text{font-size:13px;color:rgba(148,163,184,.7);line-height:1.7}
+.exam-ai-empty-text strong{color:#a78bfa;font-weight:700}
 
-/* RESPONSE */
-.exam-ai-response{font-size:13.5px;color:#334155;line-height:1.8;word-break:break-word}
-.ai-section{margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #f1f5f9}
+/* ── RESPONSE — dark theme ── */
+.exam-ai-response{font-size:13.5px;color:#e2e8f0;line-height:1.85;word-break:break-word}
+.ai-section{margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid rgba(139,92,246,.1)}
 .ai-section:last-child{margin-bottom:0;border-bottom:none;padding-bottom:0}
 
-/* THINKING */
-.exam-ai-thinking{display:flex;align-items:center;gap:10px;
-  font-size:13px;font-weight:600;color:#7c3aed;padding:24px 0;justify-content:center}
-.exam-ai-thinking-dots{display:flex;gap:4px}
-.exam-ai-thinking-dots span{width:6px;height:6px;background:#7c3aed;border-radius:50%;
-  animation:dotBounce 1.2s ease infinite;opacity:.3}
+/* Rich response sections */
+.ai-resp-section{
+  margin-bottom:14px;padding:12px 14px;
+  background:rgba(255,255,255,.04);
+  border-radius:12px;border:1px solid rgba(139,92,246,.12)}
+.ai-resp-section:last-child{margin-bottom:0}
+.ai-resp-title{
+  font-size:10px;font-weight:800;letter-spacing:.9px;
+  text-transform:uppercase;color:#a78bfa;margin-bottom:8px;
+  display:flex;align-items:center;gap:5px}
+.ai-resp-body{font-size:13.5px;color:#cbd5e1;line-height:1.85;white-space:pre-wrap}
+.ai-opt-row{display:flex;gap:8px;margin:4px 0}
+.ai-opt-letter{font-weight:800;color:#818cf8;font-size:13px;flex-shrink:0;width:20px}
+.ai-opt-text{font-size:13px;color:#94a3b8;line-height:1.6}
+.ai-opt-correct .ai-opt-letter{color:#34d399}
+.ai-opt-correct .ai-opt-text{color:#6ee7b7;font-weight:700}
+.ai-opt-wrong .ai-opt-letter{color:#f87171}
+.ai-opt-wrong .ai-opt-text{color:#f87171}
+.ai-correct-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(52,211,153,.1);
+  border:1px solid rgba(52,211,153,.25);
+  border-radius:8px;padding:5px 12px;
+  font-size:12px;font-weight:700;color:#34d399;margin-bottom:8px}
+
+/* ── THINKING ── */
+.exam-ai-thinking{
+  display:flex;align-items:center;gap:10px;
+  font-size:13px;font-weight:600;color:#a78bfa;
+  padding:28px 0;justify-content:center}
+.exam-ai-thinking-dots{display:flex;gap:5px}
+.exam-ai-thinking-dots span{
+  width:7px;height:7px;background:#7c3aed;border-radius:50%;
+  animation:dotBounce 1.2s ease infinite;opacity:.4;
+  box-shadow:0 0 6px rgba(124,58,237,.6)}
 .exam-ai-thinking-dots span:nth-child(2){animation-delay:.2s}
 .exam-ai-thinking-dots span:nth-child(3){animation-delay:.4s}
-@keyframes dotBounce{0%,80%,100%{transform:translateY(0);opacity:.3}40%{transform:translateY(-5px);opacity:1}}
+@keyframes dotBounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-6px);opacity:1}}
 
-/* FOOTER */
-.exam-ai-footer{padding:10px 16px 16px;border-top:1px solid #f1f5f9}
+/* ── FOOTER ── */
+.exam-ai-footer{
+  padding:10px 16px 16px;
+  border-top:1px solid rgba(139,92,246,.15);
+  background:rgba(0,0,0,.15)}
 .exam-ai-footer-row{display:flex;gap:8px;align-items:center}
-.exam-ai-btn{flex:1;background:#7c3aed;border:none;border-radius:14px;
-  padding:13px 16px;font-size:13px;font-weight:700;color:#fff;
+.exam-ai-btn{
+  flex:1;border:none;border-radius:14px;
+  padding:14px 16px;font-size:13px;font-weight:800;color:#fff;
   cursor:pointer;transition:all .18s;font-family:'Sora',sans-serif;
-  box-shadow:0 4px 14px rgba(124,58,237,.25)}
-.exam-ai-btn:hover:not(:disabled){background:#6d28d9;box-shadow:0 6px 20px rgba(124,58,237,.35);transform:translateY(-1px)}
-.exam-ai-btn:disabled{opacity:1;cursor:not-allowed;transform:none;box-shadow:none;background:#94a3b8}
+  background:linear-gradient(135deg,#7c3aed,#6d28d9);
+  box-shadow:0 4px 20px rgba(124,58,237,.45),0 0 0 1px rgba(167,139,250,.2);
+  letter-spacing:.1px;position:relative;overflow:hidden}
+.exam-ai-btn::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.15) 0%,transparent 50%);
+  pointer-events:none}
+.exam-ai-btn:hover:not(:disabled){
+  background:linear-gradient(135deg,#6d28d9,#5b21b6);
+  box-shadow:0 6px 28px rgba(124,58,237,.6),0 0 0 1px rgba(167,139,250,.3);
+  transform:translateY(-1px)}
+.exam-ai-btn:disabled{
+  opacity:1;cursor:not-allowed;transform:none;
+  background:rgba(255,255,255,.07);
+  box-shadow:none;color:rgba(255,255,255,.3)}
 
-/* ── MODO SELECTOR (ELI5 / NORMAL / TÉCNICO) ── */
-.ai-mode-row{display:flex;gap:6px;padding:8px 16px 0;flex-shrink:0}
-.ai-mode-btn{flex:1;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;
-  padding:6px 4px;font-size:11px;font-weight:700;color:#64748b;
+/* ── TTS BTN ── */
+.exam-ai-tts-btn{
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(139,92,246,.25);
+  border-radius:14px;padding:13px 14px;
+  font-size:16px;cursor:pointer;
+  color:rgba(255,255,255,.5);transition:all .15s}
+.exam-ai-tts-btn:hover{background:rgba(167,139,250,.15);border-color:#a78bfa;color:#a78bfa}
+.exam-ai-tts-btn.speaking{background:rgba(167,139,250,.15);border-color:#7c3aed;color:#a78bfa;animation:pulse .8s ease infinite}
+
+/* ── ERROR CARD ── */
+.exam-ai-error-card{text-align:center;padding:28px 16px}
+.exam-ai-error-icon{font-size:38px;margin-bottom:10px}
+.exam-ai-error-title{font-size:15px;font-weight:700;color:#f1f5f9;margin-bottom:6px}
+.exam-ai-error-desc{font-size:13px;color:rgba(148,163,184,.7);line-height:1.6}
+
+/* ── LARGE CENTER BOBI ── */
+.bobi-big{image-rendering:pixelated;animation:bobiShow 10s ease-in-out infinite;
+  filter:drop-shadow(0 0 12px rgba(250,204,21,.4))}
+@keyframes bobiShow{
+  0%{transform:translateY(0) rotate(0) scaleX(1) scaleY(1)}
+  8%{transform:translateY(-12px) rotate(0) scaleX(1) scaleY(1)}
+  16%{transform:translateY(0) rotate(0) scaleX(1) scaleY(1)}
+  22%{transform:rotate(-14deg)}28%{transform:rotate(14deg)}34%{transform:rotate(0deg)}
+  40%{transform:scaleX(1) scaleY(1) translateY(0)}
+  43%{transform:scaleX(1.4) scaleY(.6) translateY(6px)}
+  46%{transform:scaleX(.8) scaleY(1.3) translateY(-10px)}
+  50%{transform:scaleX(1) scaleY(1) translateY(0)}
+  56%{transform:translateX(0)}58%{transform:translateX(-8px)}
+  60%{transform:translateX(8px)}62%{transform:translateX(-6px)}
+  64%{transform:translateX(6px)}66%{transform:translateX(0)}
+  72%{transform:scaleX(1)}74%{transform:scaleX(-1)}76%{transform:scaleX(1)}
+  82%{transform:rotate(0deg)}86%{transform:rotate(180deg)}90%{transform:rotate(360deg)}
+  100%{transform:translateY(0) rotate(0) scaleX(1) scaleY(1)}}
+
+/* ── MODO SELECTOR — dark ── */
+.ai-mode-row{display:flex;gap:6px;padding:8px 14px 0;flex-shrink:0}
+.ai-mode-btn{
+  flex:1;background:rgba(255,255,255,.05);
+  border:1.5px solid rgba(255,255,255,.08);border-radius:10px;
+  padding:7px 4px;font-size:11px;font-weight:700;color:rgba(148,163,184,.7);
   cursor:pointer;transition:all .15s;font-family:'Sora',sans-serif;text-align:center}
-.ai-mode-btn.active{background:rgba(124,58,237,.1);border-color:#7c3aed;color:#7c3aed}
-.ai-mode-btn:hover:not(.active){border-color:#7c3aed;color:#7c3aed}
+.ai-mode-btn.active{
+  background:rgba(124,58,237,.25);border-color:rgba(124,58,237,.5);
+  color:#c4b5fd;box-shadow:0 0 12px rgba(124,58,237,.2)}
+.ai-mode-btn:hover:not(.active){border-color:rgba(167,139,250,.3);color:#a78bfa}
 
-/* ── CHAT CONVERSACIONAL BOBI ── */
-.ai-chat-thread{display:flex;flex-direction:column;gap:10px;padding:4px 0}
-.ai-chat-bubble{max-width:92%;padding:10px 13px;border-radius:14px;font-size:13px;line-height:1.7;word-break:break-word}
-.ai-chat-bubble.user{align-self:flex-end;background:#7c3aed;color:#fff;border-radius:14px 14px 4px 14px}
-.ai-chat-bubble.bobi{align-self:flex-start;background:#f1f5f9;color:#334155;border-radius:14px 14px 14px 4px;white-space:pre-wrap}
-.ai-chat-input-row{display:flex;gap:8px;padding:8px 16px 14px;border-top:1px solid #f1f5f9;flex-shrink:0;align-items:flex-end}
-.ai-chat-inp{flex:1;border:1.5px solid #e2e8f0;border-radius:12px;padding:9px 12px;
-  font-size:13px;font-family:'Sora',sans-serif;resize:none;outline:none;
-  transition:border .15s;max-height:80px;overflow-y:auto;color:#0f172a;background:#f8fafc}
-.ai-chat-inp:focus{border-color:#7c3aed;background:#fff}
-.ai-chat-inp::placeholder{color:#94a3b8}
-.ai-chat-send{background:#7c3aed;border:none;border-radius:10px;width:36px;height:36px;
-  color:#fff;font-size:16px;cursor:pointer;transition:all .15s;display:flex;
-  align-items:center;justify-content:center;flex-shrink:0}
-.ai-chat-send:hover:not(:disabled){background:#6d28d9;transform:scale(1.05)}
-.ai-chat-send:disabled{background:#e2e8f0;cursor:not-allowed}
+/* ── SELECTOR DE MODELO — dark ── */
+.ai-model-row{display:flex;gap:8px;padding:6px 14px 0;flex-shrink:0;align-items:center}
+.ai-model-label{font-size:10px;font-weight:700;color:rgba(148,163,184,.5);letter-spacing:.5px;text-transform:uppercase;flex-shrink:0}
+.ai-model-select{
+  flex:1;background:rgba(255,255,255,.05);
+  border:1.5px solid rgba(255,255,255,.08);border-radius:10px;
+  padding:6px 28px 6px 10px;font-size:11px;font-weight:700;color:#94a3b8;
+  font-family:'Sora',sans-serif;outline:none;cursor:pointer;transition:border .15s;
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%2394a3b8' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 9px center;
+  background-color:rgba(255,255,255,.05)}
+.ai-model-select:focus{border-color:rgba(124,58,237,.5)}
+.ai-model-select option{background:#1e1b4b;color:#e2e8f0}
 
-/* ── PISTAS PROGRESIVAS ── */
-.ai-hint-row{display:flex;gap:6px;padding:0 16px 8px;flex-shrink:0;flex-wrap:wrap}
-.ai-hint-btn{background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;
-  padding:6px 10px;font-size:11px;font-weight:700;color:#64748b;
+/* ── PISTAS — dark ── */
+.ai-hint-row{display:flex;gap:6px;padding:6px 14px 4px;flex-shrink:0;flex-wrap:wrap}
+.ai-hint-btn{
+  background:rgba(255,255,255,.05);
+  border:1.5px solid rgba(255,255,255,.1);border-radius:10px;
+  padding:6px 10px;font-size:11px;font-weight:700;color:rgba(148,163,184,.7);
   cursor:pointer;transition:all .15s;font-family:'Sora',sans-serif}
-.ai-hint-btn:hover:not(:disabled){border-color:#7c3aed;color:#7c3aed}
-.ai-hint-btn:disabled{opacity:.4;cursor:not-allowed}
-.ai-hint-bubble{background:linear-gradient(135deg,rgba(124,58,237,.07),rgba(124,58,237,.03));
-  border:1px solid rgba(124,58,237,.2);border-radius:12px;padding:10px 13px;
-  font-size:13px;color:#4c1d95;line-height:1.6;margin-bottom:6px}
+.ai-hint-btn:hover:not(:disabled){border-color:rgba(167,139,250,.4);color:#a78bfa}
+.ai-hint-btn:disabled{opacity:.3;cursor:not-allowed}
+.ai-hint-bubble{
+  background:rgba(124,58,237,.1);
+  border:1px solid rgba(124,58,237,.25);border-radius:12px;
+  padding:10px 13px;font-size:13px;color:#c4b5fd;line-height:1.6;margin-bottom:8px}
+
+/* ── IMAGEN SUBIDA — dark ── */
+.ai-img-upload-row{display:flex;gap:8px;padding:4px 14px 4px;flex-shrink:0;align-items:center}
+.ai-img-upload-btn{
+  background:rgba(255,255,255,.04);
+  border:1.5px dashed rgba(139,92,246,.3);border-radius:10px;
+  padding:6px 12px;font-size:11px;font-weight:700;color:rgba(148,163,184,.6);
+  cursor:pointer;transition:all .15s;font-family:'Sora',sans-serif;
+  display:flex;align-items:center;gap:5px;flex-shrink:0}
+.ai-img-upload-btn:hover{border-color:rgba(167,139,250,.5);color:#a78bfa;border-style:solid}
+.ai-img-preview-wrap{flex:1;display:flex;align-items:center;gap:8px;min-width:0}
+.ai-img-preview{width:36px;height:36px;object-fit:cover;border-radius:8px;border:1.5px solid rgba(139,92,246,.3);flex-shrink:0}
+.ai-img-preview-name{font-size:11px;color:#64748b;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ai-img-remove{background:none;border:none;color:rgba(148,163,184,.4);cursor:pointer;font-size:14px;padding:2px;flex-shrink:0;line-height:1}
+.ai-img-remove:hover{color:#f87171}
+
+/* ── CHAT CONVERSACIONAL — dark ── */
+.ai-chat-thread{display:flex;flex-direction:column;gap:10px;padding:4px 0}
+.ai-chat-bubble{max-width:92%;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.7;word-break:break-word}
+.ai-chat-bubble.user{
+  align-self:flex-end;
+  background:linear-gradient(135deg,#7c3aed,#6d28d9);
+  color:#fff;border-radius:14px 14px 4px 14px;
+  box-shadow:0 2px 12px rgba(124,58,237,.35)}
+.ai-chat-bubble.bobi{
+  align-self:flex-start;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(139,92,246,.15);
+  color:#e2e8f0;border-radius:14px 14px 14px 4px;white-space:pre-wrap}
+.ai-msg-counter{font-size:10px;color:rgba(148,163,184,.4);font-weight:600;text-align:right;padding:2px 14px 0;flex-shrink:0}
+.ai-chat-input-row{
+  display:flex;gap:8px;padding:8px 14px 14px;
+  border-top:1px solid rgba(139,92,246,.12);
+  flex-shrink:0;align-items:flex-end}
+.ai-chat-inp{
+  flex:1;border:1.5px solid rgba(255,255,255,.08);border-radius:12px;
+  padding:9px 12px;font-size:13px;font-family:'Sora',sans-serif;
+  resize:none;outline:none;transition:border .15s;
+  max-height:80px;overflow-y:auto;
+  color:#e2e8f0;background:rgba(255,255,255,.06)}
+.ai-chat-inp:focus{border-color:rgba(124,58,237,.5);background:rgba(255,255,255,.08)}
+.ai-chat-inp::placeholder{color:rgba(148,163,184,.4)}
+.ai-chat-send{
+  background:linear-gradient(135deg,#7c3aed,#6d28d9);
+  border:none;border-radius:10px;width:36px;height:36px;
+  color:#fff;font-size:15px;cursor:pointer;transition:all .15s;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  box-shadow:0 2px 10px rgba(124,58,237,.35)}
+.ai-chat-send:hover:not(:disabled){background:linear-gradient(135deg,#6d28d9,#5b21b6);transform:scale(1.05)}
+.ai-chat-send:disabled{background:rgba(255,255,255,.06);cursor:not-allowed;box-shadow:none}
 
 /* ── DIAGNÓSTICO POST-EXAMEN ── */
 .ai-diag-btn{width:100%;background:linear-gradient(135deg,#7c3aed,#5b21b6);border:none;
@@ -861,7 +1013,7 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .ai-diag-thinking{display:flex;align-items:center;gap:10px;justify-content:center;
   font-size:13px;font-weight:600;color:#7c3aed;padding:32px 0}
 
-/* ── PRÁCTICA SIMILAR (genera preguntas) ── */
+/* ── PRÁCTICA SIMILAR ── */
 .ai-practice-btn{width:100%;background:linear-gradient(135deg,#0d9488,#065f46);border:none;
   border-radius:14px;padding:13px 16px;font-size:13px;font-weight:700;color:#fff;
   cursor:pointer;transition:all .18s;font-family:'Sora',sans-serif;margin-top:8px;
@@ -879,8 +1031,7 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
   display:flex;align-items:center;justify-content:space-between}
 .ai-practice-title{font-size:15px;font-weight:800;color:#0f172a}
 .ai-practice-body{flex:1;overflow-y:auto;padding:14px 16px}
-.ai-pq-card{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:14px;
-  padding:14px 16px;margin-bottom:12px}
+.ai-pq-card{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:14px;padding:14px 16px;margin-bottom:12px}
 .ai-pq-num{font-size:10px;font-weight:700;color:#7c3aed;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px}
 .ai-pq-text{font-size:13.5px;color:#0f172a;font-weight:600;line-height:1.5;margin-bottom:10px}
 .ai-pq-opts{display:flex;flex-direction:column;gap:6px}
@@ -893,10 +1044,34 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .ai-practice-footer{padding:10px 16px 18px;border-top:1px solid #f1f5f9;flex-shrink:0;display:flex;gap:8px}
 .ai-practice-close{flex:1;background:#f1f5f9;border:none;border-radius:12px;padding:12px;
   font-size:13px;font-weight:700;color:#64748b;cursor:pointer;font-family:'Sora',sans-serif}
-.exam-ai-tts-btn{background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;
-  font-size:17px;cursor:pointer;padding:0 14px;height:46px;transition:.15s;flex-shrink:0;color:#94a3b8}
-.exam-ai-tts-btn:hover{background:#f3f0ff;border-color:#c4b5fd;color:#7c3aed}
-.exam-ai-tts-btn.speaking{background:#f3f0ff;border-color:#7c3aed;color:#7c3aed;animation:pulse .8s ease infinite}
+
+/* ── NOTAS PERSONALES ── */
+.notes-overlay{position:fixed;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(5px);
+  z-index:650;display:none;align-items:flex-end;justify-content:center}
+@media(min-width:640px){.notes-overlay{align-items:center;padding:20px}}
+.notes-overlay.show{display:flex}
+.notes-modal{background:#fff;width:100%;max-width:480px;border-radius:24px 24px 0 0;
+  overflow:hidden;animation:slideUpAI .3s cubic-bezier(.34,1.1,.64,1) both;
+  box-shadow:0 -4px 40px rgba(0,0,0,.15)}
+@media(min-width:640px){.notes-modal{border-radius:20px}}
+.notes-header{padding:18px 18px 14px;border-bottom:1px solid #f1f5f9;
+  display:flex;align-items:center;justify-content:space-between}
+.notes-title{font-size:15px;font-weight:800;color:#0f172a;display:flex;align-items:center;gap:7px}
+.notes-q-label{font-size:11px;color:#94a3b8;font-weight:600;margin-top:2px}
+.notes-body{padding:14px 18px}
+.notes-textarea{width:100%;border:1.5px solid #e2e8f0;border-radius:12px;padding:12px 14px;
+  font-size:13px;font-family:'Sora',sans-serif;resize:none;outline:none;
+  transition:border .15s;min-height:120px;color:#0f172a;background:#f8fafc;box-sizing:border-box}
+.notes-textarea:focus{border-color:#fbbf24;background:#fff}
+.notes-textarea::placeholder{color:#94a3b8}
+.notes-footer{padding:10px 18px 18px;display:flex;gap:10px}
+.notes-save{flex:1;background:linear-gradient(135deg,#f59e0b,#d97706);border:none;
+  border-radius:12px;padding:12px;font-size:13px;font-weight:700;color:#fff;
+  cursor:pointer;font-family:'Sora',sans-serif;transition:opacity .15s}
+.notes-save:hover{opacity:.9}
+.notes-cancel{background:#f1f5f9;border:none;border-radius:12px;padding:12px 16px;
+  font-size:13px;font-weight:700;color:#64748b;cursor:pointer;font-family:'Sora',sans-serif}
+.notes-saved-msg{font-size:11px;color:#16a34a;font-weight:700;text-align:center;padding:4px 0 0;display:none}
 
 /* ERROR */
 .exam-ai-error-card{text-align:center;padding:28px 16px}
@@ -2873,6 +3048,7 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
     <div class="ctrl-group">
       <button class="btn-ctrl btn-calc" onclick="toggleCalc()">🧮 CALCULADORA</button>
       <button class="btn-ctrl btn-ai" id="btnAskAI" onclick="openExamAI()">🤖 PREGUNTAR IA</button>
+      <button class="btn-ctrl" id="btnNote" onclick="openNotesModal()" style="border:1.5px solid #fbbf24;color:#d97706;background:rgba(251,191,36,.06)" title="Nota personal">📝 <span id="notesBtnLabel">NOTA</span></button>
       <button class="btn-ctrl btn-nav-arrow" onclick="goQ(-1)" title="Anterior">◀</button>
       <button class="btn-ctrl btn-nav-arrow" onclick="goQ(1)" title="Siguiente">▶</button>
     </div>
@@ -2938,6 +3114,7 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
     <button class="mob-ctrl-btn mob-ctrl-pause" id="mobPauseBtn" onclick="togglePause()">⏸ Pausar</button>
     <button class="mob-ctrl-btn mob-ctrl-calc" onclick="toggleCalc()">🧮 Calc</button>
     <button class="mob-ctrl-btn mob-ctrl-ai" onclick="openExamAI()">🤖 IA</button>
+    <button class="mob-ctrl-btn" onclick="openNotesModal()" id="mobNoteBtn" style="border-color:#fbbf24;color:#d97706">📝</button>
   </div>
   <button class="mob-bar-btn mob-prev" onclick="goQ(-1)" id="mobPrev">◀ Anterior</button>
   <button class="mob-bar-chat" onclick="toggleChat()" id="mobChatBtn">
@@ -3035,11 +3212,32 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
       <button class="ai-mode-btn" id="modeBtnNormal" onclick="setAIMode('normal')" title="Explicación estándar">📖 Normal</button>
       <button class="ai-mode-btn" id="modeBtnTech" onclick="setAIMode('tecnico')" title="Explicación técnica y detallada">🔬 Técnico</button>
     </div>
+    <!-- SELECTOR DE MODELO -->
+    <div class="ai-model-row">
+      <span class="ai-model-label">Modelo:</span>
+      <select class="ai-model-select" id="aiModelSelect" onchange="setAIModel(this.value)">
+        <option value="auto">🤖 Auto (según tema)</option>
+        <option value="gemini">✨ Gemini (imágenes)</option>
+        <option value="grok-mat">🧮 Grok Matemáticas</option>
+        <option value="grok-red">✍️ Grok Redacción</option>
+        <option value="grok-comp">📖 Grok Comprensión</option>
+      </select>
+    </div>
     <!-- PISTAS PROGRESIVAS -->
     <div class="ai-hint-row" id="aiHintRow" style="display:none">
       <button class="ai-hint-btn" id="hintBtn1" onclick="askHint(1)">💡 Pista 1</button>
       <button class="ai-hint-btn" id="hintBtn2" onclick="askHint(2)" disabled>💡 Pista 2</button>
       <button class="ai-hint-btn" id="hintBtn3" onclick="askHint(3)" disabled>✅ Revelar</button>
+    </div>
+    <!-- SUBIR IMAGEN DEL ALUMNO -->
+    <div class="ai-img-upload-row" id="aiImgUploadRow">
+      <button class="ai-img-upload-btn" onclick="document.getElementById('aiImgFileInput').click()">📷 Subir imagen</button>
+      <input type="file" id="aiImgFileInput" accept="image/*" style="display:none" onchange="handleAIImageUpload(this)">
+      <div class="ai-img-preview-wrap" id="aiImgPreviewWrap" style="display:none">
+        <img class="ai-img-preview" id="aiImgPreview" src="" alt="">
+        <span class="ai-img-preview-name" id="aiImgPreviewName"></span>
+        <button class="ai-img-remove" onclick="clearAIImage()" title="Quitar imagen">✕</button>
+      </div>
     </div>
     <div class="exam-ai-footer">
       <div class="exam-ai-footer-row">
@@ -3051,12 +3249,34 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
     </div>
     <!-- CHAT CONVERSACIONAL (aparece tras primera respuesta) -->
     <div id="aiChatSection" style="display:none">
+      <div class="ai-msg-counter" id="aiMsgCounter"></div>
       <div class="ai-chat-input-row">
-        <textarea class="ai-chat-inp" id="aiChatInp" placeholder="Pregunta algo de seguimiento…" rows="1"
+        <textarea class="ai-chat-inp" id="aiChatInp" placeholder="Pregunta algo de seguimiento… (Enter para enviar)" rows="1"
           onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAIChat()}"
           oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,80)+'px'"></textarea>
         <button class="ai-chat-send" id="aiChatSend" onclick="sendAIChat()" title="Enviar">➤</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- NOTAS PERSONALES MODAL -->
+<div class="notes-overlay" id="notesOverlay" onclick="if(event.target===this)closeNotesModal()">
+  <div class="notes-modal">
+    <div class="notes-header">
+      <div>
+        <div class="notes-title">📝 Nota personal</div>
+        <div class="notes-q-label" id="notesQLabel"></div>
+      </div>
+      <button class="exam-ai-close" onclick="closeNotesModal()">✕</button>
+    </div>
+    <div class="notes-body">
+      <textarea class="notes-textarea" id="notesTextarea" placeholder="Escribe tu nota, mnemónico o recordatorio para esta pregunta…" maxlength="500"></textarea>
+      <div class="notes-saved-msg" id="notesSavedMsg">✅ Nota guardada</div>
+    </div>
+    <div class="notes-footer">
+      <button class="notes-cancel" onclick="closeNotesModal()">Cancelar</button>
+      <button class="notes-save" onclick="saveNote()">💾 Guardar nota</button>
     </div>
   </div>
 </div>
@@ -3514,6 +3734,25 @@ let _aiMode = 'simple';          // 'simple' | 'normal' | 'tecnico'
 let _aiConvHistory = [];          // historial conversacional
 let _aiHintLevel = 0;             // cuántas pistas se han dado (0-3)
 let _aiLastFullText = '';         // último texto completo de BOBI
+let _aiModelOverride = 'auto';    // 'auto' | 'gemini' | 'grok-mat' | 'grok-red' | 'grok-comp'
+let _aiUserImageData = null;      // { dataUrl, mime, name } imagen subida por el alumno
+let _aiMsgCount = 0;              // contador de mensajes en esta sesión
+
+// Notas: { examKey: { qIndex: "texto" } }
+function _getNotesKey() {
+  const meta = S.currentExamMeta;
+  return 'notes_' + (meta && meta.titulo ? meta.titulo.replace(/\s+/g,'_').slice(0,40) : 'exam');
+}
+function _loadNotes() {
+  try { return JSON.parse(localStorage.getItem(_getNotesKey()) || '{}'); } catch { return {}; }
+}
+function _saveNotes(notes) {
+  try { localStorage.setItem(_getNotesKey(), JSON.stringify(notes)); } catch {}
+}
+
+function setAIModel(val) {
+  _aiModelOverride = val;
+}
 
 function setAIMode(mode) {
   _aiMode = mode;
@@ -3526,8 +3765,44 @@ function setAIMode(mode) {
   if (activeBtn) activeBtn.classList.add('active');
 }
 
+// ── Imagen subida por el alumno ──
+function handleAIImageUpload(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    _aiUserImageData = { dataUrl: e.target.result, name: file.name };
+    const preview = document.getElementById('aiImgPreview');
+    const wrap = document.getElementById('aiImgPreviewWrap');
+    const nameEl = document.getElementById('aiImgPreviewName');
+    if (preview) preview.src = e.target.result;
+    if (nameEl) nameEl.textContent = file.name.slice(0, 22) + (file.name.length > 22 ? '…' : '');
+    if (wrap) wrap.style.display = 'flex';
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+function clearAIImage() {
+  _aiUserImageData = null;
+  const wrap = document.getElementById('aiImgPreviewWrap');
+  const preview = document.getElementById('aiImgPreview');
+  if (wrap) wrap.style.display = 'none';
+  if (preview) preview.src = '';
+}
+
 /* ── AI ROUTING — basado en metadatos del EXAMEN, no del reactivo ── */
 function getExamAIConfig() {
+  // Si el usuario eligió un modelo manualmente, usarlo
+  if (_aiModelOverride !== 'auto') {
+    const overrides = {
+      'gemini':    { type: 'gemini', url: 'https://gemini-proxy.donniaxel55.workers.dev', label: 'Gemini · Manual' },
+      'grok-mat':  { type: 'grok',   url: 'https://grok-mat.donniaxel55.workers.dev',    label: 'Grok · Matemáticas' },
+      'grok-red':  { type: 'grok',   url: 'https://grok-red.donniaxel55.workers.dev',    label: 'Grok · Redacción' },
+      'grok-comp': { type: 'grok',   url: 'https://grok-comp.donniaxel55.workers.dev',   label: 'Grok · Comprensión' },
+    };
+    return overrides[_aiModelOverride];
+  }
   // Leer metadatos del examen actual (titulo + materia + tags)
   const meta = S.currentExamMeta || {};
   const key = ((meta.titulo || '') + ' ' + (meta.materia || '') + ' ' + (meta.tags || []).join(' ')).toLowerCase();
@@ -3554,6 +3829,8 @@ function openExamAI() {
   _aiConvHistory = [];
   _aiHintLevel = 0;
   _aiLastFullText = '';
+  _aiMsgCount = 0;
+  // NO limpiar imagen del usuario al abrir (útil si quiere reusar)
   // Ocultar sección de chat
   const chatSec = document.getElementById('aiChatSection');
   if (chatSec) chatSec.style.display = 'none';
@@ -3687,22 +3964,91 @@ async function _callBobiAPI(aiCfg, systemPrompt, userText, imageDataUrl) {
   return { text, rawErr };
 }
 
-// ── Helper: renderiza respuesta de BOBI en el body ──
+// ── Helper: renderiza respuesta de BOBI con secciones visuales ricas ──
 function _renderBobiResponse(body, text) {
-  const el = document.createElement('div');
-  el.className = 'exam-ai-response';
-  const sections = text.split(/(?=🎯|💡|✅|Concepto:|Análisis:|Respuesta correcta:)/);
-  sections.forEach(s => {
-    if (!s.trim()) return;
+  const wrapper = document.createElement('div');
+  wrapper.className = 'exam-ai-response';
+
+  // Dividir en secciones por emojis de encabezado
+  const sectionPattern = /(?=🎯|💡|✅)/g;
+  const parts = text.split(sectionPattern).filter(s => s.trim());
+
+  if (parts.length <= 1) {
+    // Texto libre — render simple
+    const el = document.createElement('div');
+    el.className = 'ai-resp-section';
+    const b = document.createElement('div');
+    b.className = 'ai-resp-body';
+    b.textContent = text.trim();
+    el.appendChild(b);
+    wrapper.appendChild(el);
+    body.appendChild(wrapper);
+    return;
+  }
+
+  parts.forEach(part => {
     const sec = document.createElement('div');
-    sec.className = 'ai-section';
-    let txt = s.trim();
-    if (s.startsWith('💡')) txt = txt.replace(/([A-E]\))/g, '\n$1');
-    sec.style.whiteSpace = 'pre-wrap';
-    sec.textContent = txt;
-    el.appendChild(sec);
+    sec.className = 'ai-resp-section';
+
+    // Extraer título (primera línea)
+    const lines = part.trim().split('\n');
+    const titleLine = lines[0].trim();
+    const bodyLines = lines.slice(1).join('\n').trim();
+
+    // Título visual
+    const titleEl = document.createElement('div');
+    titleEl.className = 'ai-resp-title';
+    titleEl.textContent = titleLine;
+    sec.appendChild(titleEl);
+
+    // Cuerpo — si contiene opciones A) B) C) D), renderizar como filas
+    if (bodyLines && /^[A-E]\)/m.test(bodyLines)) {
+      const optLines = bodyLines.split('\n');
+      const letters = ['A','B','C','D','E'];
+      optLines.forEach(line => {
+        const lineT = line.trim();
+        if (!lineT) return;
+        const match = lineT.match(/^([A-E])\)\s*(.*)/);
+        if (match) {
+          const row = document.createElement('div');
+          row.className = 'ai-opt-row';
+          const letterEl = document.createElement('span');
+          letterEl.className = 'ai-opt-letter';
+          letterEl.textContent = match[1] + ')';
+          const textEl = document.createElement('span');
+          textEl.className = 'ai-opt-text';
+          textEl.textContent = match[2];
+          row.appendChild(letterEl);
+          row.appendChild(textEl);
+          sec.appendChild(row);
+        } else {
+          const p = document.createElement('div');
+          p.className = 'ai-resp-body';
+          p.style.marginTop = '4px';
+          p.textContent = lineT;
+          sec.appendChild(p);
+        }
+      });
+    } else if (bodyLines) {
+      // Sección ✅ — resaltar la respuesta correcta
+      if (titleLine.startsWith('✅')) {
+        const badge = document.createElement('div');
+        badge.className = 'ai-correct-badge';
+        // Extraer la letra si está al inicio
+        const letterMatch = bodyLines.match(/^([A-E])\)/);
+        badge.textContent = letterMatch ? '✅ Respuesta: ' + letterMatch[1] : '✅ Correcta';
+        sec.appendChild(badge);
+      }
+      const b = document.createElement('div');
+      b.className = 'ai-resp-body';
+      b.textContent = bodyLines;
+      sec.appendChild(b);
+    }
+
+    wrapper.appendChild(sec);
   });
-  body.appendChild(el);
+
+  body.appendChild(wrapper);
 }
 
 // ── Helper: muestra error de cooldown ──
@@ -3764,10 +4110,80 @@ async function askExamAI() {
   console.log('ExamAI → usando:', aiCfg.label, '| modo:', _aiMode);
 
   const SYSTEM_PROMPTS = {
-    gemini: `Eres un tutor del EXANI-II premedicina. Responde SIEMPRE con esta estructura exacta y SIN extenderte demasiado en cada punto:\n🎯 Concepto: [tema en 1 oración]\n💡 Análisis: [1-2 líneas por opción, solo lo esencial]\n✅ Respuesta correcta: [opción + explicación breve en 2-3 líneas]\nSin markdown, sin asteriscos. Español mexicano. Sé directo y conciso.`,
-    grok_mat: `Eres un tutor de matemáticas del EXANI-II. Responde SIEMPRE con EXACTAMENTE esta estructura, separando cada sección con una línea en blanco:\n\n🎯 Concepto: [tema en 1 oración]\n\n💡 Análisis:\nA) [evaluación con cálculo si aplica]\nB) [evaluación con cálculo si aplica]\nC) [evaluación con cálculo si aplica]\nD) [evaluación con cálculo si aplica]\n\n✅ Respuesta correcta: [opción + procedimiento paso a paso]\n\nSin asteriscos ni markdown. Español mexicano.`,
-    grok_red: `Eres un tutor de Redacción del EXANI-II. Responde SIEMPRE con EXACTAMENTE esta estructura, separando cada sección con una línea en blanco:\n\n🎯 Concepto: [habilidad gramatical evaluada]\n\n💡 Análisis:\nA) [por qué es correcta o incorrecta]\nB) [por qué es correcta o incorrecta]\nC) [por qué es correcta o incorrecta]\nD) [por qué es correcta o incorrecta]\n\n✅ Respuesta correcta: [opción + justificación gramatical]\n\nSin asteriscos ni markdown. Español mexicano.`,
-    grok_comp: `Eres un tutor de Comprensión Lectora del EXANI-II. Responde SIEMPRE con EXACTAMENTE esta estructura, separando cada sección con una línea en blanco:\n\n🎯 Concepto: [tipo de comprensión: literal / inferencial / crítica]\n\n💡 Análisis:\nA) [relación con el texto]\nB) [relación con el texto]\nC) [relación con el texto]\nD) [relación con el texto]\n\n✅ Respuesta correcta: [opción + por qué el texto la sustenta]\n\nSin asteriscos ni markdown. Español mexicano.`
+    gemini: `Eres BOBI, tutor experto del EXANI-II (premedicina). Tu misión es que el alumno ENTIENDA de verdad, no solo memorice.
+
+Responde SIEMPRE con EXACTAMENTE esta estructura (usa los emojis como encabezados):
+
+🎯 Concepto:
+[Nombra el tema central en 1 oración clara. Ejemplo: "Este reactivo evalúa la ley de conservación de energía."]
+
+💡 Análisis de opciones:
+A) [Por qué es correcta o incorrecta — sé específico, menciona el error conceptual si aplica]
+B) [ídem]
+C) [ídem]
+D) [ídem]
+
+✅ Respuesta correcta:
+[Letra + nombre de la opción. Luego explica el PORQUÉ en 2-3 oraciones con la lógica completa. Si hay cálculo, muéstralo paso a paso.]
+
+REGLAS: Sin markdown, sin asteriscos, sin negritas. Español mexicano. Directo y útil.`,
+
+    grok_mat: `Eres BOBI, tutor de matemáticas del EXANI-II. Eres meticuloso con los cálculos y siempre muestras el procedimiento.
+
+Responde con EXACTAMENTE esta estructura:
+
+🎯 Concepto:
+[Tema matemático específico: tipo de ecuación, fórmula, propiedad, etc.]
+
+💡 Análisis de opciones:
+A) [Evalúa la opción: si es incorrecta, muestra rápidamente por qué falla el cálculo]
+B) [ídem]
+C) [ídem]
+D) [ídem]
+
+✅ Respuesta correcta:
+[Letra + desarrollo completo paso a paso:
+Paso 1: ...
+Paso 2: ...
+Resultado: ...]
+
+REGLAS: Sin markdown. Si hay fracciones escríbelas como "3/4". Español mexicano.`,
+
+    grok_red: `Eres BOBI, tutor de Redacción y Español del EXANI-II. Eres experto en gramática, ortografía y estructura del español mexicano.
+
+Responde con EXACTAMENTE esta estructura:
+
+🎯 Concepto:
+[Habilidad gramatical evaluada: concordancia, puntuación, uso de conectivos, ortografía, etc.]
+
+💡 Análisis de opciones:
+A) [Explica si es correcta o incorrecta y por qué según la norma del español]
+B) [ídem]
+C) [ídem]
+D) [ídem]
+
+✅ Respuesta correcta:
+[Letra + justificación con la regla gramatical específica. Si aplica, menciona la norma de la RAE o el DRAE.]
+
+REGLAS: Sin markdown. Cita reglas concretas, no solo digas "es incorrecto". Español mexicano formal.`,
+
+    grok_comp: `Eres BOBI, tutor de Comprensión Lectora del EXANI-II. Ayudas al alumno a identificar qué tipo de comprensión se evalúa y a encontrar la evidencia en el texto.
+
+Responde con EXACTAMENTE esta estructura:
+
+🎯 Concepto:
+[Tipo de comprensión: LITERAL (está explícito), INFERENCIAL (hay que deducir), CRÍTICA (requiere evaluar/opinar) o SEMÁNTICA (significado de palabras)]
+
+💡 Análisis de opciones:
+A) [Indica si tiene evidencia en el texto o no, y cita brevemente la parte relevante]
+B) [ídem]
+C) [ídem]
+D) [ídem]
+
+✅ Respuesta correcta:
+[Letra + explica exactamente QUÉ parte del texto la sustenta y POR QUÉ las demás opciones no son válidas.]
+
+REGLAS: Sin markdown. Siempre ancla las respuestas al texto dado. Español mexicano.`
   };
 
   function getSystemPrompt(cfg) {
@@ -3781,19 +4197,31 @@ async function askExamAI() {
 
   const systemPrompt = getSystemPrompt(aiCfg);
   const userText = `${areaInfo}Pregunta: ${q.question}\n\nOpciones:\n${optsText}`;
-  const imageDataUrl = (q.image && S.images[q.image]) ? S.images[q.image] : null;
+
+  // Imagen: priorizar la del alumno, luego la del reactivo
+  const imageDataUrl = _aiUserImageData
+    ? _aiUserImageData.dataUrl
+    : (q.image && S.images[q.image]) ? S.images[q.image] : null;
+
+  // Si hay imagen del alumno pero el modelo es Grok, avisar y usar Gemini
+  let finalCfg = aiCfg;
+  if (_aiUserImageData && aiCfg.type !== 'gemini') {
+    finalCfg = { type: 'gemini', url: 'https://gemini-proxy.donniaxel55.workers.dev', label: 'Gemini · Imagen' };
+  }
 
   // Reset historial para nueva pregunta
   _aiConvHistory = [];
+  _aiMsgCount = 0;
   localStorage.setItem('bobi_last_req', Date.now());
 
   try {
-    const { text, rawErr } = await _callBobiAPI(aiCfg, systemPrompt, userText, imageDataUrl);
+    const { text, rawErr } = await _callBobiAPI(finalCfg, systemPrompt, userText, imageDataUrl);
 
     if (text) {
       body.innerHTML = '';
       _renderBobiResponse(body, text);
       _aiLastFullText = text;
+      _aiMsgCount = 1;
       // Guardar en historial
       _aiConvHistory.push({ role: 'user', content: userText });
       _aiConvHistory.push({ role: 'assistant', content: text });
@@ -3803,7 +4231,10 @@ async function askExamAI() {
       ttsBtn._text = text;
       // Activar sección de chat conversacional
       const chatSec = document.getElementById('aiChatSection');
-      if (chatSec) chatSec.style.display = '';
+      if (chatSec) {
+        chatSec.style.display = '';
+        _updateMsgCounter();
+      }
       // Mostrar pistas
       const hintRow = document.getElementById('aiHintRow');
       if (hintRow) hintRow.style.display = '';
@@ -3828,6 +4259,18 @@ async function askExamAI() {
   }
 }
 
+// ── Actualiza el contador de mensajes ──
+function _updateMsgCounter() {
+  const el = document.getElementById('aiMsgCounter');
+  if (!el) return;
+  const turns = Math.floor(_aiMsgCount / 2);
+  if (_aiMsgCount <= 1) {
+    el.textContent = 'Puedes hacer preguntas de seguimiento sin límite';
+  } else {
+    el.textContent = `${turns} pregunta${turns !== 1 ? 's' : ''} de seguimiento · Sin límite`;
+  }
+}
+
 // ══════════════════════════════════════════
 //  CHAT CONVERSACIONAL CON BOBI
 // ══════════════════════════════════════════
@@ -3838,21 +4281,21 @@ async function sendAIChat() {
   const text = inp.value.trim();
   if (!text || sendBtn.disabled) return;
 
-  // Agregar burbuja del usuario
-  const thread = body.querySelector('.ai-chat-thread') || (() => {
-    const t = document.createElement('div');
-    t.className = 'ai-chat-thread';
-    // Mover contenido actual al thread como burbuja de bobi
-    const currentContent = body.innerHTML;
+  // Primera vez: convertir el body en thread
+  let thread = body.querySelector('.ai-chat-thread');
+  if (!thread) {
+    thread = document.createElement('div');
+    thread.className = 'ai-chat-thread';
+    const existingContent = body.innerHTML;
     body.innerHTML = '';
     const bobiBubble = document.createElement('div');
     bobiBubble.className = 'ai-chat-bubble bobi';
     bobiBubble.textContent = _aiLastFullText;
-    t.appendChild(bobiBubble);
-    body.appendChild(t);
-    return t;
-  })();
+    thread.appendChild(bobiBubble);
+    body.appendChild(thread);
+  }
 
+  // Burbuja del usuario
   const userBubble = document.createElement('div');
   userBubble.className = 'ai-chat-bubble user';
   userBubble.textContent = text;
@@ -3864,7 +4307,7 @@ async function sendAIChat() {
   sendBtn.disabled = true;
   setBobiState('walk');
 
-  // Burbuja de "pensando"
+  // Burbuja "pensando"
   const thinkBubble = document.createElement('div');
   thinkBubble.className = 'ai-chat-bubble bobi';
   thinkBubble.innerHTML = '<div class="exam-ai-thinking-dots"><span></span><span></span><span></span></div>';
@@ -3873,14 +4316,20 @@ async function sendAIChat() {
 
   const aiCfg = getExamAIConfig();
   const q = S.questions && S.questions[S.current];
-  const areaInfo = q && q.area ? `(Área: ${q.area}) ` : '';
-  const systemFollowUp = `Eres BOBI, tutor del EXANI-II. Ya explicaste una pregunta al alumno. El alumno hace una pregunta de seguimiento. Responde de forma concisa y clara en español mexicano. Sin markdown, sin asteriscos.${_getModeInstruction()}`;
+  const areaCtx = q && q.area ? ` (Área: ${q.area})` : '';
 
-  // Añadir turno del usuario al historial
-  _aiConvHistory.push({ role: 'user', content: areaInfo + text });
+  const systemFollowUp = `Eres BOBI, tutor del EXANI-II. Ya le diste una explicación al alumno sobre una pregunta${areaCtx}. El alumno hace una pregunta de seguimiento sobre ese tema.
+
+Responde de forma clara y directa en español mexicano. Sin markdown ni asteriscos.
+Si te piden un ejemplo, dalo concreto.
+Si preguntan por otro concepto relacionado, explícalo brevemente y conéctalo con la pregunta original.
+Si la duda ya fue resuelta en tu respuesta anterior, señálalo amablemente y amplía si es necesario.${_getModeInstruction()}`;
+
+  // Agregar al historial
+  _aiConvHistory.push({ role: 'user', content: text });
 
   try {
-    const { text: reply, rawErr } = await _callBobiAPI(aiCfg, systemFollowUp, areaInfo + text, null);
+    const { text: reply, rawErr } = await _callBobiAPI(aiCfg, systemFollowUp, text, null);
     thinkBubble.remove();
     if (reply) {
       const replyBubble = document.createElement('div');
@@ -3889,12 +4338,14 @@ async function sendAIChat() {
       thread.appendChild(replyBubble);
       _aiConvHistory.push({ role: 'assistant', content: reply });
       _aiLastFullText = reply;
+      _aiMsgCount += 2;
+      _updateMsgCounter();
     } else {
       const errBubble = document.createElement('div');
       errBubble.className = 'ai-chat-bubble bobi';
-      errBubble.textContent = '😅 No pude responder eso. Intenta de nuevo.';
+      errBubble.textContent = '😅 No pude responder. Intenta reformular tu pregunta.';
       thread.appendChild(errBubble);
-      _aiConvHistory.pop(); // remueve el user turn fallido
+      _aiConvHistory.pop();
     }
   } catch(e) {
     thinkBubble.remove();
@@ -4133,6 +4584,81 @@ function _renderPracticeQuestions(container) {
 function closePracticeModal() {
   const overlay = document.getElementById('aiPracticeOverlay');
   if (overlay) overlay.classList.remove('show');
+}
+
+// ══════════════════════════════════════════
+//  NOTAS PERSONALES POR PREGUNTA
+// ══════════════════════════════════════════
+function openNotesModal() {
+  const overlay = document.getElementById('notesOverlay');
+  const textarea = document.getElementById('notesTextarea');
+  const label = document.getElementById('notesQLabel');
+  const savedMsg = document.getElementById('notesSavedMsg');
+  if (!overlay || !textarea) return;
+
+  const idx = S.current;
+  const q = S.questions && S.questions[idx];
+  if (label) {
+    label.textContent = q ? `Pregunta ${idx + 1}${q.area ? ' · ' + q.area : ''}` : '';
+  }
+
+  const notes = _loadNotes();
+  textarea.value = notes[idx] || '';
+  if (savedMsg) savedMsg.style.display = 'none';
+  overlay.classList.add('show');
+  setTimeout(() => textarea.focus(), 200);
+  _refreshNoteBtn(idx, notes);
+}
+
+function closeNotesModal() {
+  const overlay = document.getElementById('notesOverlay');
+  if (overlay) overlay.classList.remove('show');
+}
+
+function saveNote() {
+  const textarea = document.getElementById('notesTextarea');
+  const savedMsg = document.getElementById('notesSavedMsg');
+  if (!textarea) return;
+
+  const idx = S.current;
+  const notes = _loadNotes();
+  const noteText = textarea.value.trim();
+
+  if (noteText) {
+    notes[idx] = noteText;
+  } else {
+    delete notes[idx];
+  }
+  _saveNotes(notes);
+
+  if (savedMsg) {
+    savedMsg.style.display = 'block';
+    setTimeout(() => { savedMsg.style.display = 'none'; }, 1800);
+  }
+  _refreshNoteBtn(idx, notes);
+  setTimeout(closeNotesModal, 1000);
+}
+
+function _refreshNoteBtn(idx, notes) {
+  const hasNote = notes && !!notes[idx];
+  // Desktop
+  const btn = document.getElementById('btnNote');
+  const lbl = document.getElementById('notesBtnLabel');
+  if (btn) {
+    btn.style.background = hasNote ? 'rgba(251,191,36,.15)' : 'rgba(251,191,36,.06)';
+    btn.title = hasNote ? 'Ver/editar nota' : 'Agregar nota personal';
+  }
+  if (lbl) lbl.textContent = hasNote ? 'NOTA ✏️' : 'NOTA';
+  // Mobile
+  const mobBtn = document.getElementById('mobNoteBtn');
+  if (mobBtn) mobBtn.textContent = hasNote ? '📝✏️' : '📝';
+}
+
+// Actualizar indicador de nota al navegar preguntas — llamar desde renderQuestion
+function _refreshNoteIndicator() {
+  const idx = S.current;
+  const notes = _loadNotes();
+  _refreshNoteBtn(idx, notes);
 }
 
 function doLogout() {
@@ -4568,6 +5094,9 @@ function renderQ() {
   const total = S.questions.length;
 
   $('qBadge').textContent = `Pregunta ${S.current+1}:`;
+
+  // Actualizar indicador de nota personal
+  if (typeof _refreshNoteIndicator === 'function') _refreshNoteIndicator();
 
   const areaEl = $('qArea');
   if (q.area) { areaEl.textContent = q.area; areaEl.style.display = 'block'; }
