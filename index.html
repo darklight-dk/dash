@@ -683,367 +683,394 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .btn-ai{border:1px solid #7c3aed;color:#7c3aed;background:rgba(124,58,237,.06)}.btn-ai:hover{background:rgba(124,58,237,.14)}
 
 /* ── EXAM AI MODAL ── */
-/* ── EXAM AI MODAL — LIGHT PREMIUM ── */
 /* ══════════════════════════════════════════
-   BOBI MODAL — REDISEÑO COMPLETO v3
+   BOBI AI MODAL v4 — Professional UI
 ══════════════════════════════════════════ */
+
+/* ── Overlay ── */
 .exam-ai-overlay{
   position:fixed;inset:0;
-  background:rgba(6,5,18,.65);
-  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  background:rgba(4,4,15,.72);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   z-index:600;display:none;align-items:flex-end;justify-content:center;padding:0}
 @media(min-width:640px){.exam-ai-overlay{align-items:center;padding:20px}}
 .exam-ai-overlay.show{display:flex}
 
+/* ── Modal shell ── */
 .exam-ai-modal{
-  background:linear-gradient(160deg,#0f0c29 0%,#1a1040 40%,#0d1b2a 100%);
-  width:100%;max-width:580px;max-height:92vh;
+  background:#08061a;
+  width:100%;max-width:580px;max-height:93vh;
   display:flex;flex-direction:column;overflow:hidden;
-  border-radius:28px 28px 0 0;
-  border:1px solid rgba(139,92,246,.25);
-  box-shadow:0 -8px 60px rgba(124,58,237,.35),0 0 0 1px rgba(139,92,246,.1),inset 0 1px 0 rgba(255,255,255,.06);
-  animation:slideUpAI .35s cubic-bezier(.34,1.1,.64,1) both}
-@media(min-width:640px){.exam-ai-modal{border-radius:24px;animation:fadeUp .25s ease both}}
-@keyframes slideUpAI{from{transform:translateY(80px);opacity:0}to{transform:translateY(0);opacity:1}}
-@keyframes fadeUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+  border-radius:24px 24px 0 0;
+  border:1px solid rgba(124,58,237,.2);
+  border-bottom:none;
+  box-shadow:0 -4px 80px rgba(88,28,235,.25),0 0 0 1px rgba(139,92,246,.08);
+  animation:slideUpAI .32s cubic-bezier(.34,1.1,.64,1) both}
+@media(min-width:640px){.exam-ai-modal{border-radius:20px;border-bottom:1px solid rgba(124,58,237,.2);animation:fadeUp .22s ease both}}
+@keyframes slideUpAI{from{transform:translateY(72px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes fadeUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
 
 /* Drag handle */
 .exam-ai-modal::before{
-  content:'';display:block;width:40px;height:4px;
-  background:rgba(139,92,246,.4);border-radius:2px;
-  margin:12px auto -4px;flex-shrink:0}
+  content:'';display:block;width:36px;height:3px;
+  background:rgba(124,58,237,.35);border-radius:2px;
+  margin:10px auto -2px;flex-shrink:0}
 @media(min-width:640px){.exam-ai-modal::before{display:none}}
 
-/* ── HEADER ── */
+/* ── Header ── */
 .exam-ai-header{
   display:flex;align-items:center;justify-content:space-between;
-  padding:18px 18px 14px;
-  background:linear-gradient(135deg,rgba(124,58,237,.18) 0%,rgba(99,102,241,.08) 100%);
-  border-bottom:1px solid rgba(139,92,246,.15);
-  position:relative;overflow:hidden}
+  padding:16px 16px 12px;
+  background:rgba(124,58,237,.07);
+  border-bottom:1px solid rgba(124,58,237,.12);
+  position:relative;overflow:hidden;flex-shrink:0}
 .exam-ai-header::after{
   content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse at 10% 50%,rgba(167,139,250,.12) 0%,transparent 70%);
+  background:radial-gradient(ellipse at 0% 50%,rgba(139,92,246,.1) 0%,transparent 70%);
   pointer-events:none}
-.exam-ai-title{display:flex;align-items:center;gap:12px;z-index:1}
 
-/* Bobi icon glow ring */
+.exam-ai-title{display:flex;align-items:center;gap:12px;z-index:1;min-width:0}
+
+/* Bobi icon */
 .exam-ai-icon{
-  width:56px;height:56px;flex-shrink:0;
+  width:48px;height:48px;flex-shrink:0;
   image-rendering:pixelated;
-  background:radial-gradient(circle,rgba(250,204,21,.18) 0%,rgba(124,58,237,.12) 60%,transparent 100%);
-  border-radius:16px;
-  border:1.5px solid rgba(250,204,21,.25);
+  background:rgba(124,58,237,.12);
+  border-radius:12px;
+  border:1px solid rgba(139,92,246,.2);
   display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 16px rgba(250,204,21,.2),0 0 40px rgba(124,58,237,.15);
-  animation:bobiGlowPulse 3s ease-in-out infinite}
+  animation:bobiGlowPulse 3.5s ease-in-out infinite}
 @keyframes bobiGlowPulse{
-  0%,100%{box-shadow:0 0 12px rgba(250,204,21,.2),0 0 30px rgba(124,58,237,.12)}
-  50%{box-shadow:0 0 22px rgba(250,204,21,.35),0 0 50px rgba(124,58,237,.22)}}
+  0%,100%{box-shadow:0 0 10px rgba(124,58,237,.15)}
+  50%{box-shadow:0 0 20px rgba(124,58,237,.3),0 0 40px rgba(124,58,237,.1)}}
 
-.bobi-wrap{width:80%;height:80%;image-rendering:pixelated;animation:bobiIdle 1.6s ease-in-out infinite}
+.bobi-wrap{width:80%;height:80%;image-rendering:pixelated;animation:bobiIdle 1.8s ease-in-out infinite}
 .bobi-wrap.walk{animation:bobiWalk .45s ease-in-out infinite}
-.bobi-wrap.sleep{animation:bobiSleep 2.2s ease-in-out infinite}
+.bobi-wrap.sleep{animation:bobiSleep 2.4s ease-in-out infinite}
 @keyframes bobiIdle{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
-@keyframes bobiWalk{0%,100%{transform:translateY(0) rotate(-5deg) scaleX(1)}50%{transform:translateY(-4px) rotate(5deg) scaleX(.95)}}
-@keyframes bobiSleep{0%,100%{transform:rotate(-5deg) translateY(1px)}50%{transform:rotate(5deg) translateY(2px)}}
+@keyframes bobiWalk{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-4px) rotate(4deg)}}
+@keyframes bobiSleep{0%,100%{transform:rotate(-4deg) translateY(1px)}50%{transform:rotate(4deg) translateY(2px)}}
 
-.exam-ai-label{font-size:16px;font-weight:800;color:#f8fafc;letter-spacing:-.2px;line-height:1}
+/* Header text */
+.exam-ai-label{font-size:15px;font-weight:800;color:#f1f5f9;letter-spacing:-.2px;line-height:1}
 .exam-ai-sub{
-  font-size:9px;color:#a78bfa;font-weight:700;letter-spacing:1.2px;
+  font-size:9px;color:#8b5cf6;font-weight:700;letter-spacing:1.4px;
   text-transform:uppercase;margin-top:3px;
   display:flex;align-items:center;gap:5px}
 .exam-ai-sub::before{
-  content:'';width:6px;height:6px;border-radius:50%;
-  background:#a78bfa;box-shadow:0 0 6px #a78bfa;
-  animation:statusBlink 2s ease infinite}
-@keyframes statusBlink{0%,100%{opacity:1}50%{opacity:.3}}
+  content:'';width:5px;height:5px;border-radius:50%;
+  background:#8b5cf6;
+  animation:statusBlink 2.5s ease infinite}
+@keyframes statusBlink{0%,100%{opacity:1}50%{opacity:.25}}
 
+/* Model badge */
+.ai-model-badge{
+  font-size:9px;font-weight:700;letter-spacing:.6px;
+  color:rgba(148,163,184,.6);text-transform:uppercase;margin-top:2px}
+
+/* Close btn */
 .exam-ai-close{
-  background:rgba(255,255,255,.06);
-  border:1px solid rgba(255,255,255,.1);
-  color:rgba(255,255,255,.5);cursor:pointer;
-  width:32px;height:32px;border-radius:10px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  color:rgba(255,255,255,.4);cursor:pointer;
+  width:30px;height:30px;border-radius:8px;
   display:flex;align-items:center;justify-content:center;
-  font-size:13px;transition:all .15s;z-index:1}
-.exam-ai-close:hover{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:#f87171}
+  font-size:12px;transition:all .15s;z-index:1;flex-shrink:0}
+.exam-ai-close:hover{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.25);color:#f87171}
 
-/* ── QUESTION PREVIEW ── */
+/* ── Question preview ── */
 .exam-ai-q-preview{
-  margin:10px 14px 4px;padding:10px 14px;
-  background:rgba(255,255,255,.04);
-  border-radius:12px;
-  border:1px solid rgba(139,92,246,.2);
-  font-size:12px;color:rgba(203,213,225,.8);
-  line-height:1.55;font-style:italic;display:none}
+  margin:8px 12px 2px;padding:9px 12px;
+  background:rgba(255,255,255,.03);
+  border-radius:10px;
+  border:1px solid rgba(124,58,237,.15);
+  font-size:11.5px;color:rgba(203,213,225,.65);
+  line-height:1.55;font-style:italic;display:none;flex-shrink:0}
 .exam-ai-q-preview.show{display:block}
 
-/* ── BODY ── */
+/* ── Body ── */
 .exam-ai-body{
-  flex:1;overflow-y:auto;padding:14px 16px 16px;min-height:120px;
-  scrollbar-width:thin;scrollbar-color:rgba(139,92,246,.3) transparent}
-.exam-ai-body::-webkit-scrollbar{width:3px}
-.exam-ai-body::-webkit-scrollbar-thumb{background:rgba(139,92,246,.3);border-radius:3px}
+  flex:1;overflow-y:auto;padding:12px 14px 14px;min-height:100px;
+  scrollbar-width:thin;scrollbar-color:rgba(124,58,237,.2) transparent}
+.exam-ai-body::-webkit-scrollbar{width:2px}
+.exam-ai-body::-webkit-scrollbar-thumb{background:rgba(124,58,237,.25);border-radius:2px}
 
-/* ── EMPTY STATE ── */
-.exam-ai-empty{text-align:center;padding:28px 16px}
-.exam-ai-empty-icon{font-size:38px;margin-bottom:10px}
-.exam-ai-empty-text{font-size:13px;color:rgba(148,163,184,.7);line-height:1.7}
-.exam-ai-empty-text strong{color:#a78bfa;font-weight:700}
+/* ── Empty state ── */
+.exam-ai-empty{text-align:center;padding:32px 16px}
+.ai-empty-glyph{
+  font-size:40px;color:rgba(124,58,237,.3);margin-bottom:12px;
+  line-height:1;letter-spacing:-2px}
+.exam-ai-empty-text{font-size:13px;color:rgba(148,163,184,.55);line-height:1.7}
+.exam-ai-empty-text strong{color:#8b5cf6;font-weight:700}
 
-/* ── RESPONSE — dark theme ── */
+/* ── Response sections ── */
 .exam-ai-response{font-size:13.5px;color:#e2e8f0;line-height:1.85;word-break:break-word}
-.ai-section{margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid rgba(139,92,246,.1)}
-.ai-section:last-child{margin-bottom:0;border-bottom:none;padding-bottom:0}
+.ai-resp-free{color:#cbd5e1;line-height:1.85;white-space:pre-wrap;font-size:13.5px}
 
-/* Rich response sections */
 .ai-resp-section{
-  margin-bottom:14px;padding:12px 14px;
-  background:rgba(255,255,255,.04);
-  border-radius:12px;border:1px solid rgba(139,92,246,.12)}
+  margin-bottom:10px;padding:11px 13px 12px;
+  background:rgba(255,255,255,.035);
+  border-radius:11px;
+  border:1px solid rgba(124,58,237,.1);
+  border-left:2px solid var(--sec-accent, rgba(124,58,237,.4))}
 .ai-resp-section:last-child{margin-bottom:0}
+
 .ai-resp-title{
-  font-size:10px;font-weight:800;letter-spacing:.9px;
-  text-transform:uppercase;color:#a78bfa;margin-bottom:8px;
-  display:flex;align-items:center;gap:5px}
+  font-size:9.5px;font-weight:800;letter-spacing:1px;
+  text-transform:uppercase;color:var(--sec-accent, #a78bfa);
+  margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.ai-resp-icon{font-size:11px;line-height:1}
 .ai-resp-body{font-size:13.5px;color:#cbd5e1;line-height:1.85;white-space:pre-wrap}
-.ai-opt-row{display:flex;gap:8px;margin:4px 0}
-.ai-opt-letter{font-weight:800;color:#818cf8;font-size:13px;flex-shrink:0;width:20px}
+
+/* Option rows */
+.ai-opt-row{display:flex;gap:8px;margin:3px 0;align-items:baseline}
+.ai-opt-letter{font-weight:800;color:#818cf8;font-size:12.5px;flex-shrink:0;width:22px;font-family:monospace}
 .ai-opt-text{font-size:13px;color:#94a3b8;line-height:1.6}
 .ai-opt-correct .ai-opt-letter{color:#34d399}
-.ai-opt-correct .ai-opt-text{color:#6ee7b7;font-weight:700}
-.ai-opt-wrong .ai-opt-letter{color:#f87171}
-.ai-opt-wrong .ai-opt-text{color:#f87171}
+.ai-opt-correct .ai-opt-text{color:#6ee7b7;font-weight:600}
+.ai-opt-wrong .ai-opt-letter,.ai-opt-wrong .ai-opt-text{color:#f87171}
+
+/* Correct badge */
 .ai-correct-badge{
   display:inline-flex;align-items:center;gap:6px;
-  background:rgba(52,211,153,.1);
-  border:1px solid rgba(52,211,153,.25);
+  background:rgba(52,211,153,.08);
+  border:1px solid rgba(52,211,153,.2);
   border-radius:8px;padding:5px 12px;
-  font-size:12px;font-weight:700;color:#34d399;margin-bottom:8px}
+  font-size:12px;font-weight:700;color:#34d399;margin-bottom:8px;
+  letter-spacing:.2px}
 
-/* ── THINKING ── */
+/* ── Thinking ── */
 .exam-ai-thinking{
   display:flex;align-items:center;gap:10px;
-  font-size:13px;font-weight:600;color:#a78bfa;
-  padding:28px 0;justify-content:center}
+  font-size:12.5px;font-weight:600;color:#8b5cf6;
+  padding:30px 0;justify-content:center;letter-spacing:.3px}
 .exam-ai-thinking-dots{display:flex;gap:5px}
 .exam-ai-thinking-dots span{
-  width:7px;height:7px;background:#7c3aed;border-radius:50%;
-  animation:dotBounce 1.2s ease infinite;opacity:.4;
-  box-shadow:0 0 6px rgba(124,58,237,.6)}
-.exam-ai-thinking-dots span:nth-child(2){animation-delay:.2s}
-.exam-ai-thinking-dots span:nth-child(3){animation-delay:.4s}
-@keyframes dotBounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-6px);opacity:1}}
+  width:6px;height:6px;background:#7c3aed;border-radius:50%;
+  animation:dotBounce 1.2s ease infinite;opacity:.35}
+.exam-ai-thinking-dots span:nth-child(2){animation-delay:.18s}
+.exam-ai-thinking-dots span:nth-child(3){animation-delay:.36s}
+@keyframes dotBounce{0%,80%,100%{transform:translateY(0);opacity:.35}40%{transform:translateY(-7px);opacity:1}}
 
-/* ── FOOTER ── */
+/* ── Modo selector ── */
+.ai-mode-row{display:flex;gap:5px;padding:8px 12px 0;flex-shrink:0}
+.ai-mode-btn{
+  flex:1;background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.07);border-radius:8px;
+  padding:6px 4px;font-size:10.5px;font-weight:700;color:rgba(148,163,184,.55);
+  cursor:pointer;transition:all .14s;font-family:inherit;text-align:center}
+.ai-mode-btn.active{
+  background:rgba(124,58,237,.18);border-color:rgba(124,58,237,.4);
+  color:#c4b5fd}
+.ai-mode-btn:hover:not(.active){border-color:rgba(139,92,246,.25);color:#a78bfa}
+
+/* ── Selector de modelo ── */
+.ai-model-row{display:flex;gap:8px;padding:5px 12px 0;flex-shrink:0;align-items:center}
+.ai-model-label{font-size:9.5px;font-weight:700;color:rgba(148,163,184,.4);letter-spacing:.6px;text-transform:uppercase;flex-shrink:0}
+.ai-model-select{
+  flex:1;background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.07);border-radius:8px;
+  padding:5px 26px 5px 9px;font-size:10.5px;font-weight:700;color:#7c8a99;
+  font-family:inherit;outline:none;cursor:pointer;transition:border .14s;
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%2394a3b8' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 8px center;
+  background-color:rgba(255,255,255,.04)}
+.ai-model-select:focus{border-color:rgba(124,58,237,.4)}
+.ai-model-select option{background:#0f0c24;color:#e2e8f0}
+
+/* ── Pistas progresivas ── */
+.ai-hint-row{display:flex;gap:5px;padding:5px 12px 3px;flex-shrink:0;flex-wrap:wrap}
+.ai-hint-btn{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);border-radius:8px;
+  padding:5px 10px;font-size:10.5px;font-weight:700;color:rgba(148,163,184,.6);
+  cursor:pointer;transition:all .14s;font-family:inherit}
+.ai-hint-btn:hover:not(:disabled){border-color:rgba(139,92,246,.35);color:#a78bfa}
+.ai-hint-btn:disabled{opacity:.28;cursor:not-allowed}
+.ai-hint-bubble{
+  background:rgba(124,58,237,.08);
+  border:1px solid rgba(124,58,237,.2);border-radius:10px;
+  padding:10px 13px;margin-bottom:8px}
+.ai-hint-label{font-size:9px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:#8b5cf6;margin-bottom:5px}
+
+/* ── Imagen ── */
+.ai-img-upload-row{display:flex;gap:8px;padding:3px 12px 3px;flex-shrink:0;align-items:center}
+.ai-img-upload-btn{
+  background:rgba(255,255,255,.03);
+  border:1px dashed rgba(124,58,237,.25);border-radius:8px;
+  padding:5px 11px;font-size:10.5px;font-weight:700;color:rgba(148,163,184,.5);
+  cursor:pointer;transition:all .14s;font-family:inherit;
+  display:flex;align-items:center;gap:5px;flex-shrink:0}
+.ai-img-upload-btn:hover{border-color:rgba(139,92,246,.45);color:#a78bfa;border-style:solid}
+.ai-img-preview-wrap{flex:1;display:flex;align-items:center;gap:8px;min-width:0}
+.ai-img-preview{width:32px;height:32px;object-fit:cover;border-radius:7px;border:1px solid rgba(124,58,237,.25);flex-shrink:0}
+.ai-img-preview-name{font-size:10.5px;color:#64748b;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ai-img-remove{background:none;border:none;color:rgba(148,163,184,.35);cursor:pointer;font-size:13px;padding:2px;flex-shrink:0;line-height:1}
+.ai-img-remove:hover{color:#f87171}
+
+/* ── Footer ── */
 .exam-ai-footer{
-  padding:10px 16px 16px;
-  border-top:1px solid rgba(139,92,246,.15);
-  background:rgba(0,0,0,.15)}
+  padding:8px 14px 14px;
+  border-top:1px solid rgba(124,58,237,.1);
+  background:rgba(0,0,0,.2);flex-shrink:0}
 .exam-ai-footer-row{display:flex;gap:8px;align-items:center}
+
+/* Main CTA button */
 .exam-ai-btn{
-  flex:1;border:none;border-radius:14px;
-  padding:14px 16px;font-size:13px;font-weight:800;color:#fff;
-  cursor:pointer;transition:all .18s;font-family:'Sora',sans-serif;
-  background:linear-gradient(135deg,#7c3aed,#6d28d9);
-  box-shadow:0 4px 20px rgba(124,58,237,.45),0 0 0 1px rgba(167,139,250,.2);
-  letter-spacing:.1px;position:relative;overflow:hidden}
+  flex:1;border:none;border-radius:11px;
+  padding:13px 16px;font-size:13px;font-weight:800;color:#fff;
+  cursor:pointer;transition:all .16s;font-family:inherit;
+  background:linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%);
+  box-shadow:0 3px 16px rgba(124,58,237,.4);
+  letter-spacing:.1px;position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;gap:8px}
 .exam-ai-btn::before{
   content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(255,255,255,.15) 0%,transparent 50%);
+  background:linear-gradient(135deg,rgba(255,255,255,.12) 0%,transparent 50%);
   pointer-events:none}
 .exam-ai-btn:hover:not(:disabled){
   background:linear-gradient(135deg,#6d28d9,#5b21b6);
-  box-shadow:0 6px 28px rgba(124,58,237,.6),0 0 0 1px rgba(167,139,250,.3);
+  box-shadow:0 5px 24px rgba(124,58,237,.55);
   transform:translateY(-1px)}
 .exam-ai-btn:disabled{
   opacity:1;cursor:not-allowed;transform:none;
-  background:rgba(255,255,255,.07);
-  box-shadow:none;color:rgba(255,255,255,.3)}
-
-/* ── TTS BTN ── */
-.exam-ai-tts-btn{
   background:rgba(255,255,255,.06);
-  border:1px solid rgba(139,92,246,.25);
-  border-radius:14px;padding:13px 14px;
-  font-size:16px;cursor:pointer;
-  color:rgba(255,255,255,.5);transition:all .15s}
-.exam-ai-tts-btn:hover{background:rgba(167,139,250,.15);border-color:#a78bfa;color:#a78bfa}
-.exam-ai-tts-btn.speaking{background:rgba(167,139,250,.15);border-color:#7c3aed;color:#a78bfa;animation:pulse .8s ease infinite}
+  box-shadow:none;color:rgba(255,255,255,.25)}
 
-/* ── ERROR CARD ── */
-.exam-ai-error-card{text-align:center;padding:28px 16px}
-.exam-ai-error-icon{font-size:38px;margin-bottom:10px}
-.exam-ai-error-title{font-size:15px;font-weight:700;color:#f1f5f9;margin-bottom:6px}
-.exam-ai-error-desc{font-size:13px;color:rgba(148,163,184,.7);line-height:1.6}
+/* Btn spinner */
+.ai-btn-spinner{
+  display:inline-block;width:13px;height:13px;
+  border:2px solid rgba(255,255,255,.25);
+  border-top-color:#fff;border-radius:50%;
+  animation:spin .65s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ai-btn-icon{font-size:13px;line-height:1}
 
-/* ── LARGE CENTER BOBI ── */
-.bobi-big{image-rendering:pixelated;animation:bobiShow 10s ease-in-out infinite;
-  filter:drop-shadow(0 0 12px rgba(250,204,21,.4))}
-@keyframes bobiShow{
-  0%{transform:translateY(0) rotate(0) scaleX(1) scaleY(1)}
-  8%{transform:translateY(-12px) rotate(0) scaleX(1) scaleY(1)}
-  16%{transform:translateY(0) rotate(0) scaleX(1) scaleY(1)}
-  22%{transform:rotate(-14deg)}28%{transform:rotate(14deg)}34%{transform:rotate(0deg)}
-  40%{transform:scaleX(1) scaleY(1) translateY(0)}
-  43%{transform:scaleX(1.4) scaleY(.6) translateY(6px)}
-  46%{transform:scaleX(.8) scaleY(1.3) translateY(-10px)}
-  50%{transform:scaleX(1) scaleY(1) translateY(0)}
-  56%{transform:translateX(0)}58%{transform:translateX(-8px)}
-  60%{transform:translateX(8px)}62%{transform:translateX(-6px)}
-  64%{transform:translateX(6px)}66%{transform:translateX(0)}
-  72%{transform:scaleX(1)}74%{transform:scaleX(-1)}76%{transform:scaleX(1)}
-  82%{transform:rotate(0deg)}86%{transform:rotate(180deg)}90%{transform:rotate(360deg)}
-  100%{transform:translateY(0) rotate(0) scaleX(1) scaleY(1)}}
-
-/* ── MODO SELECTOR — dark ── */
-.ai-mode-row{display:flex;gap:6px;padding:8px 14px 0;flex-shrink:0}
-.ai-mode-btn{
-  flex:1;background:rgba(255,255,255,.05);
-  border:1.5px solid rgba(255,255,255,.08);border-radius:10px;
-  padding:7px 4px;font-size:11px;font-weight:700;color:rgba(148,163,184,.7);
-  cursor:pointer;transition:all .15s;font-family:'Sora',sans-serif;text-align:center}
-.ai-mode-btn.active{
-  background:rgba(124,58,237,.25);border-color:rgba(124,58,237,.5);
-  color:#c4b5fd;box-shadow:0 0 12px rgba(124,58,237,.2)}
-.ai-mode-btn:hover:not(.active){border-color:rgba(167,139,250,.3);color:#a78bfa}
-
-/* ── SELECTOR DE MODELO — dark ── */
-.ai-model-row{display:flex;gap:8px;padding:6px 14px 0;flex-shrink:0;align-items:center}
-.ai-model-label{font-size:10px;font-weight:700;color:rgba(148,163,184,.5);letter-spacing:.5px;text-transform:uppercase;flex-shrink:0}
-.ai-model-select{
-  flex:1;background:rgba(255,255,255,.05);
-  border:1.5px solid rgba(255,255,255,.08);border-radius:10px;
-  padding:6px 28px 6px 10px;font-size:11px;font-weight:700;color:#94a3b8;
-  font-family:'Sora',sans-serif;outline:none;cursor:pointer;transition:border .15s;
-  appearance:none;-webkit-appearance:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%2394a3b8' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 9px center;
-  background-color:rgba(255,255,255,.05)}
-.ai-model-select:focus{border-color:rgba(124,58,237,.5)}
-.ai-model-select option{background:#1e1b4b;color:#e2e8f0}
-
-/* ── PISTAS — dark ── */
-.ai-hint-row{display:flex;gap:6px;padding:6px 14px 4px;flex-shrink:0;flex-wrap:wrap}
-.ai-hint-btn{
+/* TTS button */
+.exam-ai-tts-btn{
   background:rgba(255,255,255,.05);
-  border:1.5px solid rgba(255,255,255,.1);border-radius:10px;
-  padding:6px 10px;font-size:11px;font-weight:700;color:rgba(148,163,184,.7);
-  cursor:pointer;transition:all .15s;font-family:'Sora',sans-serif}
-.ai-hint-btn:hover:not(:disabled){border-color:rgba(167,139,250,.4);color:#a78bfa}
-.ai-hint-btn:disabled{opacity:.3;cursor:not-allowed}
-.ai-hint-bubble{
-  background:rgba(124,58,237,.1);
-  border:1px solid rgba(124,58,237,.25);border-radius:12px;
-  padding:10px 13px;font-size:13px;color:#c4b5fd;line-height:1.6;margin-bottom:8px}
+  border:1px solid rgba(124,58,237,.2);
+  border-radius:11px;padding:12px 13px;
+  cursor:pointer;color:rgba(255,255,255,.4);transition:all .14s;
+  display:flex;align-items:center;justify-content:center}
+.exam-ai-tts-btn:hover{background:rgba(139,92,246,.12);border-color:#8b5cf6;color:#a78bfa}
+.exam-ai-tts-btn.speaking{background:rgba(139,92,246,.12);border-color:#7c3aed;color:#a78bfa;animation:pulse .8s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
 
-/* ── IMAGEN SUBIDA — dark ── */
-.ai-img-upload-row{display:flex;gap:8px;padding:4px 14px 4px;flex-shrink:0;align-items:center}
-.ai-img-upload-btn{
-  background:rgba(255,255,255,.04);
-  border:1.5px dashed rgba(139,92,246,.3);border-radius:10px;
-  padding:6px 12px;font-size:11px;font-weight:700;color:rgba(148,163,184,.6);
-  cursor:pointer;transition:all .15s;font-family:'Sora',sans-serif;
-  display:flex;align-items:center;gap:5px;flex-shrink:0}
-.ai-img-upload-btn:hover{border-color:rgba(167,139,250,.5);color:#a78bfa;border-style:solid}
-.ai-img-preview-wrap{flex:1;display:flex;align-items:center;gap:8px;min-width:0}
-.ai-img-preview{width:36px;height:36px;object-fit:cover;border-radius:8px;border:1.5px solid rgba(139,92,246,.3);flex-shrink:0}
-.ai-img-preview-name{font-size:11px;color:#64748b;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ai-img-remove{background:none;border:none;color:rgba(148,163,184,.4);cursor:pointer;font-size:14px;padding:2px;flex-shrink:0;line-height:1}
-.ai-img-remove:hover{color:#f87171}
+/* ── Error card ── */
+.exam-ai-error-card{text-align:center;padding:28px 16px}
+.ai-error-svg-wrap{display:flex;justify-content:center;margin-bottom:12px;color:rgba(139,92,246,.5)}
+.exam-ai-error-title{font-size:14px;font-weight:700;color:#f1f5f9;margin-bottom:5px}
+.exam-ai-error-desc{font-size:12.5px;color:rgba(148,163,184,.6);line-height:1.6}
 
-/* ── CHAT CONVERSACIONAL — dark ── */
-.ai-chat-thread{display:flex;flex-direction:column;gap:10px;padding:4px 0}
-.ai-chat-bubble{max-width:92%;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.7;word-break:break-word}
+/* ── Chat ── */
+.ai-msg-counter{font-size:9.5px;color:rgba(148,163,184,.35);font-weight:600;text-align:right;padding:2px 12px 0;flex-shrink:0}
+.ai-chat-thread{display:flex;flex-direction:column;gap:8px;padding:2px 0}
+.ai-chat-bubble{max-width:92%;padding:9px 13px;border-radius:13px;font-size:13px;line-height:1.7;word-break:break-word}
 .ai-chat-bubble.user{
   align-self:flex-end;
   background:linear-gradient(135deg,#7c3aed,#6d28d9);
-  color:#fff;border-radius:14px 14px 4px 14px;
-  box-shadow:0 2px 12px rgba(124,58,237,.35)}
+  color:#fff;border-radius:13px 13px 4px 13px;
+  box-shadow:0 2px 10px rgba(124,58,237,.3)}
 .ai-chat-bubble.bobi{
   align-self:flex-start;
-  background:rgba(255,255,255,.06);
-  border:1px solid rgba(139,92,246,.15);
-  color:#e2e8f0;border-radius:14px 14px 14px 4px;white-space:pre-wrap}
-.ai-msg-counter{font-size:10px;color:rgba(148,163,184,.4);font-weight:600;text-align:right;padding:2px 14px 0;flex-shrink:0}
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(124,58,237,.12);
+  color:#e2e8f0;border-radius:13px 13px 13px 4px;white-space:pre-wrap}
+.ai-chat-bubble.bobi.thinking{background:rgba(124,58,237,.06)}
+
 .ai-chat-input-row{
-  display:flex;gap:8px;padding:8px 14px 14px;
-  border-top:1px solid rgba(139,92,246,.12);
+  display:flex;gap:7px;padding:7px 12px 12px;
+  border-top:1px solid rgba(124,58,237,.1);
   flex-shrink:0;align-items:flex-end}
 .ai-chat-inp{
-  flex:1;border:1.5px solid rgba(255,255,255,.08);border-radius:12px;
-  padding:9px 12px;font-size:13px;font-family:'Sora',sans-serif;
-  resize:none;outline:none;transition:border .15s;
+  flex:1;border:1px solid rgba(255,255,255,.07);border-radius:10px;
+  padding:8px 11px;font-size:13px;font-family:inherit;
+  resize:none;outline:none;transition:border .14s;
   max-height:80px;overflow-y:auto;
-  color:#e2e8f0;background:rgba(255,255,255,.06)}
-.ai-chat-inp:focus{border-color:rgba(124,58,237,.5);background:rgba(255,255,255,.08)}
-.ai-chat-inp::placeholder{color:rgba(148,163,184,.4)}
+  color:#e2e8f0;background:rgba(255,255,255,.05)}
+.ai-chat-inp:focus{border-color:rgba(124,58,237,.4);background:rgba(255,255,255,.07)}
+.ai-chat-inp::placeholder{color:rgba(148,163,184,.35)}
 .ai-chat-send{
   background:linear-gradient(135deg,#7c3aed,#6d28d9);
-  border:none;border-radius:10px;width:36px;height:36px;
-  color:#fff;font-size:15px;cursor:pointer;transition:all .15s;
+  border:none;border-radius:9px;width:34px;height:34px;
+  color:#fff;font-size:14px;cursor:pointer;transition:all .14s;
   display:flex;align-items:center;justify-content:center;flex-shrink:0;
-  box-shadow:0 2px 10px rgba(124,58,237,.35)}
-.ai-chat-send:hover:not(:disabled){background:linear-gradient(135deg,#6d28d9,#5b21b6);transform:scale(1.05)}
-.ai-chat-send:disabled{background:rgba(255,255,255,.06);cursor:not-allowed;box-shadow:none}
+  box-shadow:0 2px 8px rgba(124,58,237,.3)}
+.ai-chat-send:hover:not(:disabled){background:linear-gradient(135deg,#6d28d9,#5b21b6)}
+.ai-chat-send:disabled{background:rgba(255,255,255,.05);cursor:not-allowed;box-shadow:none}
 
-/* ── DIAGNÓSTICO POST-EXAMEN ── */
+/* Bobi large (empty state) */
+.bobi-big{image-rendering:pixelated;animation:bobiShow 12s ease-in-out infinite;filter:drop-shadow(0 0 10px rgba(250,204,21,.35))}
+@keyframes bobiShow{
+  0%,100%{transform:translateY(0)}8%{transform:translateY(-12px)}16%{transform:translateY(0)}
+  22%{transform:rotate(-12deg)}28%{transform:rotate(12deg)}34%{transform:rotate(0)}
+  50%{transform:scaleX(1) scaleY(1)}53%{transform:scaleX(1.35) scaleY(.65) translateY(5px)}
+  56%{transform:scaleX(.85) scaleY(1.25) translateY(-8px)}60%{transform:scaleX(1) scaleY(1)}}
+
+/* ── Diagnóstico ── */
 .ai-diag-btn{width:100%;background:linear-gradient(135deg,#7c3aed,#5b21b6);border:none;
-  border-radius:14px;padding:13px 16px;font-size:13px;font-weight:700;color:#fff;
-  cursor:pointer;transition:all .18s;font-family:'Sora',sans-serif;margin-top:12px;
-  box-shadow:0 4px 14px rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;gap:8px}
+  border-radius:12px;padding:13px 16px;font-size:13px;font-weight:700;color:#fff;
+  cursor:pointer;transition:all .16s;font-family:inherit;margin-top:12px;
+  box-shadow:0 3px 12px rgba(124,58,237,.28);display:flex;align-items:center;justify-content:center;gap:8px}
 .ai-diag-btn:hover:not(:disabled){background:linear-gradient(135deg,#6d28d9,#4c1d95);transform:translateY(-1px)}
-.ai-diag-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
-.ai-diag-overlay{position:fixed;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(6px);
+.ai-diag-overlay{position:fixed;inset:0;background:rgba(10,10,22,.55);backdrop-filter:blur(8px);
   z-index:700;display:none;align-items:flex-end;justify-content:center}
 @media(min-width:640px){.ai-diag-overlay{align-items:center;padding:20px}}
 .ai-diag-overlay.show{display:flex}
 .ai-diag-modal{background:#fff;width:100%;max-width:540px;max-height:88vh;
-  display:flex;flex-direction:column;overflow:hidden;border-radius:24px 24px 0 0;
-  box-shadow:0 -4px 40px rgba(0,0,0,.15);animation:slideUpAI .3s cubic-bezier(.34,1.1,.64,1) both}
-@media(min-width:640px){.ai-diag-modal{border-radius:20px}}
-.ai-diag-header{padding:20px 20px 14px;border-bottom:1px solid #f1f5f9;flex-shrink:0}
-.ai-diag-title{font-size:17px;font-weight:800;color:#0f172a;display:flex;align-items:center;gap:8px}
-.ai-diag-body{flex:1;overflow-y:auto;padding:16px 20px;font-size:13.5px;color:#334155;line-height:1.8;white-space:pre-wrap}
-.ai-diag-footer{padding:12px 20px 20px;border-top:1px solid #f1f5f9;flex-shrink:0}
-.ai-diag-close-btn{width:100%;background:#f1f5f9;border:none;border-radius:12px;
+  display:flex;flex-direction:column;overflow:hidden;border-radius:20px 20px 0 0;
+  box-shadow:0 -4px 40px rgba(0,0,0,.12);animation:slideUpAI .28s cubic-bezier(.34,1.1,.64,1) both}
+@media(min-width:640px){.ai-diag-modal{border-radius:18px}}
+.ai-diag-header{padding:18px 18px 12px;border-bottom:1px solid #f1f5f9;flex-shrink:0}
+.ai-diag-title{font-size:16px;font-weight:800;color:#0f172a;display:flex;align-items:center;gap:8px}
+.ai-diag-body{flex:1;overflow-y:auto;padding:14px 18px;font-size:13.5px;color:#334155;line-height:1.8}
+.ai-diag-footer{padding:10px 18px 18px;border-top:1px solid #f1f5f9;flex-shrink:0}
+.ai-diag-close-btn{width:100%;background:#f1f5f9;border:none;border-radius:11px;
   padding:12px;font-size:13px;font-weight:700;color:#64748b;cursor:pointer;
-  font-family:'Sora',sans-serif;transition:background .15s}
+  font-family:inherit;transition:background .14s}
 .ai-diag-close-btn:hover{background:#e2e8f0}
 .ai-diag-thinking{display:flex;align-items:center;gap:10px;justify-content:center;
-  font-size:13px;font-weight:600;color:#7c3aed;padding:32px 0}
+  font-size:12.5px;font-weight:600;color:#7c3aed;padding:32px 0}
 
-/* ── PRÁCTICA SIMILAR ── */
+/* ── Práctica similar ── */
 .ai-practice-btn{width:100%;background:linear-gradient(135deg,#0d9488,#065f46);border:none;
-  border-radius:14px;padding:13px 16px;font-size:13px;font-weight:700;color:#fff;
-  cursor:pointer;transition:all .18s;font-family:'Sora',sans-serif;margin-top:8px;
-  box-shadow:0 4px 14px rgba(13,148,136,.3);display:flex;align-items:center;justify-content:center;gap:8px}
+  border-radius:12px;padding:13px 16px;font-size:13px;font-weight:700;color:#fff;
+  cursor:pointer;transition:all .16s;font-family:inherit;margin-top:8px;
+  box-shadow:0 3px 12px rgba(13,148,136,.25);display:flex;align-items:center;justify-content:center;gap:8px}
 .ai-practice-btn:hover:not(:disabled){opacity:.9;transform:translateY(-1px)}
-.ai-practice-overlay{position:fixed;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(6px);
+.ai-practice-overlay{position:fixed;inset:0;background:rgba(10,10,22,.55);backdrop-filter:blur(8px);
   z-index:700;display:none;align-items:flex-end;justify-content:center}
 @media(min-width:640px){.ai-practice-overlay{align-items:center;padding:20px}}
 .ai-practice-overlay.show{display:flex}
 .ai-practice-modal{background:#fff;width:100%;max-width:560px;max-height:92vh;
-  display:flex;flex-direction:column;overflow:hidden;border-radius:24px 24px 0 0;
-  box-shadow:0 -4px 40px rgba(0,0,0,.15);animation:slideUpAI .3s cubic-bezier(.34,1.1,.64,1) both}
-@media(min-width:640px){.ai-practice-modal{border-radius:20px}}
-.ai-practice-header{padding:18px 18px 12px;border-bottom:1px solid #f1f5f9;flex-shrink:0;
+  display:flex;flex-direction:column;overflow:hidden;border-radius:20px 20px 0 0;
+  box-shadow:0 -4px 40px rgba(0,0,0,.12);animation:slideUpAI .28s cubic-bezier(.34,1.1,.64,1) both}
+@media(min-width:640px){.ai-practice-modal{border-radius:18px}}
+.ai-practice-header{padding:16px 16px 12px;border-bottom:1px solid #f1f5f9;flex-shrink:0;
   display:flex;align-items:center;justify-content:space-between}
-.ai-practice-title{font-size:15px;font-weight:800;color:#0f172a}
-.ai-practice-body{flex:1;overflow-y:auto;padding:14px 16px}
-.ai-pq-card{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:14px;padding:14px 16px;margin-bottom:12px}
-.ai-pq-num{font-size:10px;font-weight:700;color:#7c3aed;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px}
+.ai-practice-title{font-size:14px;font-weight:800;color:#0f172a}
+.ai-practice-body{flex:1;overflow-y:auto;padding:12px 14px}
+.ai-practice-footer{padding:8px 14px 16px;border-top:1px solid #f1f5f9;flex-shrink:0;display:flex;gap:8px}
+.ai-practice-close{flex:1;background:#f1f5f9;border:none;border-radius:10px;padding:11px;
+  font-size:13px;font-weight:700;color:#64748b;cursor:pointer;font-family:inherit}
+
+/* Practice question cards */
+.ai-pq-card{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;padding:13px 14px;margin-bottom:10px}
+.ai-pq-num{font-size:9px;font-weight:800;color:#7c3aed;letter-spacing:.9px;text-transform:uppercase;margin-bottom:5px}
 .ai-pq-text{font-size:13.5px;color:#0f172a;font-weight:600;line-height:1.5;margin-bottom:10px}
-.ai-pq-opts{display:flex;flex-direction:column;gap:6px}
-.ai-pq-opt{background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;
-  padding:8px 12px;font-size:13px;color:#374151;cursor:pointer;
-  transition:all .15s;font-family:'Sora',sans-serif;text-align:left;font-weight:600}
+.ai-pq-opts{display:flex;flex-direction:column;gap:5px}
+.ai-pq-opt{background:#fff;border:1.5px solid #e2e8f0;border-radius:9px;
+  padding:7px 11px;font-size:13px;color:#374151;cursor:pointer;
+  transition:all .14s;font-family:inherit;text-align:left;font-weight:500}
 .ai-pq-opt:hover{border-color:#0d9488;color:#0d9488}
-.ai-pq-opt.correct{border-color:#16a34a;background:rgba(22,163,74,.08);color:#15803d}
-.ai-pq-opt.wrong{border-color:#dc2626;background:rgba(220,38,38,.08);color:#dc2626}
-.ai-practice-footer{padding:10px 16px 18px;border-top:1px solid #f1f5f9;flex-shrink:0;display:flex;gap:8px}
-.ai-practice-close{flex:1;background:#f1f5f9;border:none;border-radius:12px;padding:12px;
-  font-size:13px;font-weight:700;color:#64748b;cursor:pointer;font-family:'Sora',sans-serif}
+.ai-pq-opt.correct{border-color:#16a34a;background:rgba(22,163,74,.07);color:#15803d;font-weight:700}
+.ai-pq-opt.wrong{border-color:#dc2626;background:rgba(220,38,38,.07);color:#dc2626}
+.ai-pq-exp{margin-top:8px;padding:8px 11px;background:rgba(124,58,237,.06);border-radius:8px;
+  font-size:12.5px;color:#4c1d95;line-height:1.6;display:flex;align-items:flex-start;gap:6px}
+.ai-pq-exp-icon{flex-shrink:0;color:#7c3aed;font-size:11px;margin-top:2px}
+
 
 /* ── NOTAS PERSONALES ── */
 .notes-overlay{position:fixed;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(5px);
@@ -3159,7 +3186,7 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
     <div class="review-grid" id="reviewGrid"></div>
     <button class="btn-exit" onclick="exitToLogin()">Volver al inicio</button>
     <button class="btn-exit" style="background:linear-gradient(135deg,#f59e0b,#d97706);margin-top:10px" onclick="openRanking()">🏆 Ver ranking global</button>
-    <button class="ai-diag-btn" id="btnAIDiagnosis" onclick="openDiagModal()">🤖 Diagnóstico de BOBI</button>
+    <button class="ai-diag-btn" id="btnAIDiagnosis" onclick="openDiagModal()">&#x25C9; Diagnóstico de BOBI</button>
     <button class="ai-practice-btn" id="btnAIPractice" onclick="openPracticeFromResults()">🧩 Practicar mis temas débiles</button>
     <button class="btn-exit" id="btnResultsAdmin" style="display:none;background:var(--teal);color:#fff;border:none;margin-top:8px" onclick="openAdmin()">⚙️ Editar imágenes del examen</button>
   </div>
@@ -3186,77 +3213,103 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
   <div class="cg" id="calcG"></div>
 </div>
 
-<!-- EXAM AI MODAL -->
+<!-- EXAM AI MODAL — BOBI v4 -->
 <div class="exam-ai-overlay" id="examAIOv" onclick="closeExamAIOnBg(event)">
   <div class="exam-ai-modal" id="examAIModal">
+
+    <!-- Header -->
     <div class="exam-ai-header">
       <div class="exam-ai-title">
-        <div class="exam-ai-icon" id="bobiIcon"><div class="bobi-wrap" id="bobiSprite"><svg viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="9" y="0" width="2" height="1" fill="#F5A800"/><rect x="10" y="1" width="1" height="1" fill="#F5A800"/><rect x="7" y="1" width="6" height="1" fill="#FFCC00"/><rect x="6" y="2" width="8" height="1" fill="#FFCC00"/><rect x="6" y="3" width="8" height="2" fill="#FFCC00"/><rect x="7" y="5" width="6" height="1" fill="#FFCC00"/><rect x="8" y="3" width="1" height="1" fill="#1A1A1A"/><rect x="8" y="2" width="1" height="1" fill="#1A1A1A"/><rect x="9" y="2" width="1" height="1" fill="#FFFFFF"/><rect x="12" y="3" width="1" height="1" fill="#1A1A1A"/><rect x="12" y="2" width="1" height="1" fill="#1A1A1A"/><rect x="13" y="2" width="1" height="1" fill="#FFFFFF"/><rect x="10" y="5" width="2" height="1" fill="#FF7A00"/><rect x="10" y="6" width="2" height="1" fill="#CC5500"/><rect x="6" y="6" width="8" height="1" fill="#FFCC00"/><rect x="5" y="7" width="10" height="1" fill="#FFCC00"/><rect x="5" y="8" width="10" height="1" fill="#FFCC00"/><rect x="5" y="9" width="10" height="1" fill="#FFCC00"/><rect x="5" y="10" width="10" height="1" fill="#FFCC00"/><rect x="6" y="11" width="8" height="1" fill="#FFCC00"/><rect x="7" y="12" width="6" height="1" fill="#FFCC00"/><rect x="8" y="8" width="4" height="3" fill="#FFE566"/><rect x="3" y="7" width="2" height="3" fill="#F5A800"/><rect x="4" y="6" width="1" height="1" fill="#F5A800"/><rect x="3" y="10" width="3" height="1" fill="#F5A800"/><rect x="15" y="7" width="2" height="3" fill="#F5A800"/><rect x="15" y="6" width="1" height="1" fill="#F5A800"/><rect x="14" y="10" width="3" height="1" fill="#F5A800"/><rect x="8" y="13" width="2" height="1" fill="#FF7A00"/><rect x="7" y="14" width="3" height="1" fill="#FF7A00"/><rect x="11" y="13" width="2" height="1" fill="#FF7A00"/><rect x="11" y="14" width="3" height="1" fill="#FF7A00"/></svg></div></div>
+        <div class="exam-ai-icon" id="bobiIcon">
+          <div class="bobi-wrap" id="bobiSprite"></div>
+        </div>
         <div>
           <div class="exam-ai-label">BOBI</div>
-          <div class="exam-ai-sub">TUTOR AI · EXANI-II</div>
+          <div class="exam-ai-sub">TUTOR IA · EXANI-II</div>
+          <div class="ai-model-badge" id="aiBobiModelBadge">Auto</div>
         </div>
       </div>
-      <button class="exam-ai-close" onclick="closeExamAI()">✕</button>
+      <button class="exam-ai-close" onclick="closeExamAI()" aria-label="Cerrar">&#x2715;</button>
     </div>
+
+    <!-- Question preview -->
     <div class="exam-ai-q-preview" id="examAIQPreview"></div>
+
+    <!-- Body (responses render here) -->
     <div class="exam-ai-body" id="examAIBody">
       <div class="exam-ai-empty">
-        <div class="exam-ai-empty-icon" style="width:90px;height:90px;margin:0 auto 14px;image-rendering:pixelated"><div class="bobi-big"><svg viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="9" y="0" width="2" height="1" fill="#F5A800"/><rect x="10" y="1" width="1" height="1" fill="#F5A800"/><rect x="7" y="1" width="6" height="1" fill="#FFCC00"/><rect x="6" y="2" width="8" height="1" fill="#FFCC00"/><rect x="6" y="3" width="8" height="2" fill="#FFCC00"/><rect x="7" y="5" width="6" height="1" fill="#FFCC00"/><rect x="8" y="3" width="1" height="1" fill="#1A1A1A"/><rect x="8" y="2" width="1" height="1" fill="#1A1A1A"/><rect x="9" y="2" width="1" height="1" fill="#FFFFFF"/><rect x="12" y="3" width="1" height="1" fill="#1A1A1A"/><rect x="12" y="2" width="1" height="1" fill="#1A1A1A"/><rect x="13" y="2" width="1" height="1" fill="#FFFFFF"/><rect x="10" y="5" width="2" height="1" fill="#FF7A00"/><rect x="10" y="6" width="2" height="1" fill="#CC5500"/><rect x="6" y="6" width="8" height="1" fill="#FFCC00"/><rect x="5" y="7" width="10" height="1" fill="#FFCC00"/><rect x="5" y="8" width="10" height="1" fill="#FFCC00"/><rect x="5" y="9" width="10" height="1" fill="#FFCC00"/><rect x="5" y="10" width="10" height="1" fill="#FFCC00"/><rect x="6" y="11" width="8" height="1" fill="#FFCC00"/><rect x="7" y="12" width="6" height="1" fill="#FFCC00"/><rect x="8" y="8" width="4" height="3" fill="#FFE566"/><rect x="3" y="7" width="2" height="3" fill="#F5A800"/><rect x="4" y="6" width="1" height="1" fill="#F5A800"/><rect x="3" y="10" width="3" height="1" fill="#F5A800"/><rect x="15" y="7" width="2" height="3" fill="#F5A800"/><rect x="15" y="6" width="1" height="1" fill="#F5A800"/><rect x="14" y="10" width="3" height="1" fill="#F5A800"/><rect x="8" y="13" width="2" height="1" fill="#FF7A00"/><rect x="7" y="14" width="3" height="1" fill="#FF7A00"/><rect x="11" y="13" width="2" height="1" fill="#FF7A00"/><rect x="11" y="14" width="3" height="1" fill="#FF7A00"/></svg></div></div>
-        <div class="exam-ai-empty-text">Toca <strong>Explicar pregunta</strong> y la IA analiza el reactivo completo, incluyendo la imagen si hay una.</div>
+        <div class="ai-empty-glyph">&#x25C8;</div>
+        <div class="exam-ai-empty-text">Presiona <strong>Analizar pregunta</strong> y BOBI estudiará el reactivo completo.</div>
       </div>
     </div>
-    <!-- MODO SELECTOR -->
+
+    <!-- Mode selector -->
     <div class="ai-mode-row" id="aiModeRow">
-      <button class="ai-mode-btn active" id="modeBtnSimple" onclick="setAIMode('simple')" title="Explicación muy sencilla">🧒 Simple</button>
-      <button class="ai-mode-btn" id="modeBtnNormal" onclick="setAIMode('normal')" title="Explicación estándar">📖 Normal</button>
-      <button class="ai-mode-btn" id="modeBtnTech" onclick="setAIMode('tecnico')" title="Explicación técnica y detallada">🔬 Técnico</button>
+      <button class="ai-mode-btn active" id="modeBtnSimple" onclick="setAIMode('simple')">Simple</button>
+      <button class="ai-mode-btn" id="modeBtnNormal" onclick="setAIMode('normal')">Normal</button>
+      <button class="ai-mode-btn" id="modeBtnTech" onclick="setAIMode('tecnico')">Técnico</button>
     </div>
-    <!-- SELECTOR DE MODELO -->
+
+    <!-- Model selector -->
     <div class="ai-model-row">
-      <span class="ai-model-label">Modelo:</span>
+      <span class="ai-model-label">Modelo</span>
       <select class="ai-model-select" id="aiModelSelect" onchange="setAIModel(this.value)">
-        <option value="auto">🤖 Auto (según tema)</option>
-        <option value="gemini">✨ Gemini (imágenes)</option>
-        <option value="grok-mat">🧮 Grok Matemáticas</option>
-        <option value="grok-red">✍️ Grok Redacción</option>
-        <option value="grok-comp">📖 Grok Comprensión</option>
+        <option value="auto">Auto (según tema)</option>
+        <option value="gemini">Gemini · Imágenes</option>
+        <option value="grok-mat">Grok · Matemáticas</option>
+        <option value="grok-red">Grok · Redacción</option>
+        <option value="grok-comp">Grok · Comprensión</option>
       </select>
     </div>
-    <!-- PISTAS PROGRESIVAS -->
+
+    <!-- Progressive hints -->
     <div class="ai-hint-row" id="aiHintRow" style="display:none">
-      <button class="ai-hint-btn" id="hintBtn1" onclick="askHint(1)">💡 Pista 1</button>
-      <button class="ai-hint-btn" id="hintBtn2" onclick="askHint(2)" disabled>💡 Pista 2</button>
-      <button class="ai-hint-btn" id="hintBtn3" onclick="askHint(3)" disabled>✅ Revelar</button>
+      <button class="ai-hint-btn" id="hintBtn1" onclick="askHint(1)">&#x25C8; Pista 1</button>
+      <button class="ai-hint-btn" id="hintBtn2" onclick="askHint(2)" disabled>&#x25C8; Pista 2</button>
+      <button class="ai-hint-btn" id="hintBtn3" onclick="askHint(3)" disabled>&#x25C9; Revelar</button>
     </div>
-    <!-- SUBIR IMAGEN DEL ALUMNO -->
+
+    <!-- Image upload -->
     <div class="ai-img-upload-row" id="aiImgUploadRow">
-      <button class="ai-img-upload-btn" onclick="document.getElementById('aiImgFileInput').click()">📷 Subir imagen</button>
+      <button class="ai-img-upload-btn" onclick="document.getElementById('aiImgFileInput').click()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        Adjuntar imagen
+      </button>
       <input type="file" id="aiImgFileInput" accept="image/*" style="display:none" onchange="handleAIImageUpload(this)">
       <div class="ai-img-preview-wrap" id="aiImgPreviewWrap" style="display:none">
         <img class="ai-img-preview" id="aiImgPreview" src="" alt="">
         <span class="ai-img-preview-name" id="aiImgPreviewName"></span>
-        <button class="ai-img-remove" onclick="clearAIImage()" title="Quitar imagen">✕</button>
+        <button class="ai-img-remove" onclick="clearAIImage()" title="Quitar">&#x2715;</button>
       </div>
     </div>
+
+    <!-- Footer / main action -->
     <div class="exam-ai-footer">
       <div class="exam-ai-footer-row">
-        <button class="exam-ai-tts-btn" id="examAITTSBtn" onclick="toggleExamTTS()" title="Escuchar respuesta" style="display:none">🔊</button>
+        <button class="exam-ai-tts-btn" id="examAITTSBtn" onclick="toggleExamTTS()" title="Escuchar respuesta" style="display:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+        </button>
         <button class="exam-ai-btn" id="examAIBtn" onclick="askExamAI()">
-          <span id="examAIBtnIcon">⚡</span> Explicar pregunta
+          <span class="ai-btn-icon">&#x25C6;</span> Analizar pregunta
         </button>
       </div>
     </div>
-    <!-- CHAT CONVERSACIONAL (aparece tras primera respuesta) -->
+
+    <!-- Conversational chat (shown after first response) -->
     <div id="aiChatSection" style="display:none">
-      <div class="ai-msg-counter" id="aiMsgCounter"></div>
+      <div class="ai-msg-counter" id="aiMsgCounter">Preguntas de seguimiento &middot; sin límite</div>
       <div class="ai-chat-input-row">
-        <textarea class="ai-chat-inp" id="aiChatInp" placeholder="Pregunta algo de seguimiento… (Enter para enviar)" rows="1"
+        <textarea class="ai-chat-inp" id="aiChatInp"
+          placeholder="Escribe una pregunta de seguimiento&hellip;"
+          rows="1"
           onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAIChat()}"
           oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,80)+'px'"></textarea>
-        <button class="ai-chat-send" id="aiChatSend" onclick="sendAIChat()" title="Enviar">➤</button>
+        <button class="ai-chat-send" id="aiChatSend" onclick="sendAIChat()" title="Enviar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15" height="15"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
       </div>
     </div>
+
   </div>
 </div>
 
@@ -3265,7 +3318,7 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
   <div class="notes-modal">
     <div class="notes-header">
       <div>
-        <div class="notes-title">📝 Nota personal</div>
+        <div class="notes-title">&#x2394; Nota personal</div>
         <div class="notes-q-label" id="notesQLabel"></div>
       </div>
       <button class="exam-ai-close" onclick="closeNotesModal()">✕</button>
@@ -3285,7 +3338,7 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
 <div class="ai-diag-overlay" id="aiDiagOverlay" onclick="if(event.target===this)closeDiagModal()">
   <div class="ai-diag-modal">
     <div class="ai-diag-header">
-      <div class="ai-diag-title">🤖 Diagnóstico personalizado de BOBI</div>
+      <div class="ai-diag-title">&#x25C9; Diagnóstico personalizado · BOBI</div>
     </div>
     <div class="ai-diag-body" id="aiDiagBody">
       <div class="ai-diag-thinking">Analizando tu examen<div class="exam-ai-thinking-dots"><span></span><span></span><span></span></div></div>
@@ -3300,7 +3353,7 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
 <div class="ai-practice-overlay" id="aiPracticeOverlay" onclick="if(event.target===this)closePracticeModal()">
   <div class="ai-practice-modal">
     <div class="ai-practice-header">
-      <div class="ai-practice-title">🧩 Práctica similar — generada por BOBI</div>
+      <div class="ai-practice-title">&#x25C8; Práctica similar · BOBI</div>
       <button class="exam-ai-close" onclick="closePracticeModal()">✕</button>
     </div>
     <div class="ai-practice-body" id="aiPracticeBody">
@@ -3728,863 +3781,768 @@ function escapeHtml(str) {
 }
 
 // ══════════════════════════════════════════
-//  AI — ESTADO GLOBAL
+//  NOTAS — helpers globales
 // ══════════════════════════════════════════
-let _aiMode = 'simple';          // 'simple' | 'normal' | 'tecnico'
-let _aiConvHistory = [];          // historial conversacional
-let _aiHintLevel = 0;             // cuántas pistas se han dado (0-3)
-let _aiLastFullText = '';         // último texto completo de BOBI
-let _aiModelOverride = 'auto';    // 'auto' | 'gemini' | 'grok-mat' | 'grok-red' | 'grok-comp'
-let _aiUserImageData = null;      // { dataUrl, mime, name } imagen subida por el alumno
-let _aiMsgCount = 0;              // contador de mensajes en esta sesión
-
-// Notas: { examKey: { qIndex: "texto" } }
 function _getNotesKey() {
-  const meta = S.currentExamMeta;
-  return 'notes_' + (meta && meta.titulo ? meta.titulo.replace(/\s+/g,'_').slice(0,40) : 'exam');
+  const examKey = S.currentExamMeta && S.currentExamMeta.id
+    ? S.currentExamMeta.id
+    : (S.currentExamMeta && S.currentExamMeta.titulo ? S.currentExamMeta.titulo : 'exam');
+  return 'notes_' + examKey;
 }
 function _loadNotes() {
-  try { return JSON.parse(localStorage.getItem(_getNotesKey()) || '{}'); } catch { return {}; }
+  try { return JSON.parse(localStorage.getItem(_getNotesKey()) || '{}'); }
+  catch(e) { return {}; }
 }
 function _saveNotes(notes) {
-  try { localStorage.setItem(_getNotesKey(), JSON.stringify(notes)); } catch {}
+  try { localStorage.setItem(_getNotesKey(), JSON.stringify(notes)); } catch(e) {}
 }
 
+// ══════════════════════════════════════════
+//  BOBI AI ENGINE v4 — Motor centralizado
+// ══════════════════════════════════════════
+
+const BobiAI = (() => {
+  // ── Estado privado ──
+  let _mode         = 'normal';
+  let _modelOverride = 'auto';
+  let _convHistory  = [];
+  let _hintLevel    = 0;
+  let _lastFullText = '';
+  let _msgCount     = 0;
+  let _userImage    = null;
+  let _cooldown     = false;
+  let _abortCtrl    = null;
+  const _cache      = new Map();
+  const CACHE_TTL   = 10 * 60 * 1000;
+
+  const ENDPOINTS = {
+    gemini:    { type: 'gemini', url: 'https://gemini-proxy.donniaxel55.workers.dev', label: 'Gemini' },
+    'grok-mat':  { type: 'grok',   url: 'https://grok-mat.donniaxel55.workers.dev',    label: 'Grok · Mat' },
+    'grok-red':  { type: 'grok',   url: 'https://grok-red.donniaxel55.workers.dev',    label: 'Grok · Red' },
+    'grok-comp': { type: 'grok',   url: 'https://grok-comp.donniaxel55.workers.dev',   label: 'Grok · Comp' },
+  };
+
+  function _selectModel() {
+    if (_modelOverride !== 'auto') return ENDPOINTS[_modelOverride] || ENDPOINTS.gemini;
+    const meta = S && S.currentExamMeta || {};
+    const key = ((meta.titulo || '') + ' ' + (meta.materia || '') + ' ' + (meta.tags || []).join(' ')).toLowerCase();
+    if (/matem|pensamiento.mat|calc|algebra|aritm|trigo|geometr/.test(key)) return ENDPOINTS['grok-mat'];
+    if (/redac/.test(key)) return ENDPOINTS['grok-red'];
+    if (/comprens|lectura|lector/.test(key)) return ENDPOINTS['grok-comp'];
+    return ENDPOINTS.gemini;
+  }
+
+  function _modeInstruction() {
+    if (_mode === 'simple')  return '\n\nNIVEL: Básico. Lenguaje accesible, analogías cotidianas, sin tecnicismos.';
+    if (_mode === 'tecnico') return '\n\nNIVEL: Avanzado. Fundamentos teóricos, notación formal, contexto académico completo.';
+    return '\n\nNIVEL: Estándar. Claro y preciso.';
+  }
+
+  const PROMPTS = {
+    gemini: (m) => `Eres BOBI, tutor experto del EXANI-II. Tu objetivo: comprensión real, no memorización.
+
+ESTRUCTURA OBLIGATORIA (usa § como delimitador de sección):
+
+§ CONCEPTO
+[Una oración exacta con el tema central evaluado.]
+
+§ ANÁLISIS DE OPCIONES
+A) [Veredicto + razonamiento: error conceptual o por qué es válida]
+B) [ídem]
+C) [ídem]
+D) [ídem]
+
+§ RESPUESTA CORRECTA
+[Letra) Nombre de la opción]
+[Explicación causal en 2-4 oraciones. Si hay cálculo, muéstralo numerado.]
+
+REGLAS: Sin markdown. Sin asteriscos. Español mexicano.${m}`,
+
+    grok_mat: (m) => `Eres BOBI, tutor de Matemáticas del EXANI-II.
+
+ESTRUCTURA OBLIGATORIA:
+
+§ CONCEPTO
+[Tema matemático: ecuación, propiedad, fórmula aplicada.]
+
+§ ANÁLISIS DE OPCIONES
+A) [Si incorrecto: muestra en 1 línea el cálculo que falla. Si correcto: confirma.]
+B) [ídem]
+C) [ídem]
+D) [ídem]
+
+§ RESPUESTA CORRECTA
+[Letra) Nombre]
+Paso 1: [operación]
+Paso 2: [operación]
+Resultado: [valor con unidades si aplica]
+
+REGLAS: Sin markdown. Fracciones como 3/4. Español mexicano.${m}`,
+
+    grok_red: (m) => `Eres BOBI, tutor de Redacción del EXANI-II.
+
+ESTRUCTURA OBLIGATORIA:
+
+§ CONCEPTO
+[Habilidad gramatical: concordancia, puntuación, conectivos, ortografía, etc.]
+
+§ ANÁLISIS DE OPCIONES
+A) [Correcto/Incorrecto + regla específica]
+B) [ídem]
+C) [ídem]
+D) [ídem]
+
+§ RESPUESTA CORRECTA
+[Letra) Nombre]
+[Regla gramatical completa. Cita RAE/DRAE si aplica.]
+
+REGLAS: Sin markdown. Español mexicano formal.${m}`,
+
+    grok_comp: (m) => `Eres BOBI, tutor de Comprensión Lectora del EXANI-II.
+
+ESTRUCTURA OBLIGATORIA:
+
+§ CONCEPTO
+[Tipo: LITERAL | INFERENCIAL | CRÍTICA | SEMÁNTICA]
+
+§ ANÁLISIS DE OPCIONES
+A) [Evidencia en el texto: cita brevemente la parte relevante]
+B) [ídem]
+C) [ídem]
+D) [ídem]
+
+§ RESPUESTA CORRECTA
+[Letra) Nombre]
+[Extracto del texto que la sustenta + por qué las demás no son válidas.]
+
+REGLAS: Sin markdown. Todo anclado al texto. Español mexicano.${m}`,
+  };
+
+  function _getSystemPrompt(cfg) {
+    const m = _modeInstruction();
+    if (cfg.type === 'gemini') return PROMPTS.gemini(m);
+    if (cfg.url.includes('grok-mat')) return PROMPTS.grok_mat(m);
+    if (cfg.url.includes('grok-red')) return PROMPTS.grok_red(m);
+    return PROMPTS.grok_comp(m);
+  }
+
+  async function _callAPI(cfg, systemPrompt, userText, imageDataUrl, useHistory) {
+    if (_abortCtrl) { try { _abortCtrl.abort(); } catch(e) {} }
+    _abortCtrl = new AbortController();
+    const signal = _abortCtrl.signal;
+
+    if (!imageDataUrl && !useHistory) {
+      const cacheKey = cfg.url + '|' + _mode + '|' + userText.slice(0, 160);
+      const cached = _cache.get(cacheKey);
+      if (cached && (Date.now() - cached.ts) < CACHE_TTL) return { text: cached.text, rawErr: '' };
+      _abortCtrl._cacheKey = cacheKey;
+    }
+
+    let text = '', rawErr = '';
+
+    if (cfg.type === 'gemini') {
+      const userContent = [];
+      if (imageDataUrl) {
+        try {
+          let b64, mime;
+          if (imageDataUrl.startsWith('blob:')) {
+            const blobRes = await fetch(imageDataUrl, { signal });
+            const blob = await blobRes.blob();
+            mime = blob.type || 'image/png';
+            b64 = await new Promise((res, rej) => {
+              const reader = new FileReader();
+              reader.onloadend = () => res(reader.result.split(',')[1]);
+              reader.onerror = () => rej(new Error('FileReader error'));
+              reader.readAsDataURL(blob);
+            });
+          } else {
+            const comma = imageDataUrl.indexOf(',');
+            b64 = imageDataUrl.slice(comma + 1);
+            const mm = imageDataUrl.match(/data:([^;]+);/);
+            mime = mm ? mm[1] : 'image/png';
+          }
+          userContent.push({ inlineData: { mimeType: mime, data: b64 } });
+        } catch(imgErr) {
+          if (imgErr.name === 'AbortError') throw imgErr;
+        }
+      }
+      userContent.push({ text: userText });
+      var resG = await fetch(cfg.url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: systemPrompt }] },
+          contents: [{ role: 'user', parts: userContent }],
+          generationConfig: { maxOutputTokens: 2048, temperature: 0.25 }
+        }),
+        signal
+      });
+      var jsonG = await resG.json();
+      text   = jsonG && jsonG.candidates && jsonG.candidates[0] && jsonG.candidates[0].content && jsonG.candidates[0].content.parts && jsonG.candidates[0].content.parts[0] && jsonG.candidates[0].content.parts[0].text || '';
+      rawErr = jsonG && jsonG.error && jsonG.error.message || '';
+    } else {
+      var messages = [{ role: 'system', content: systemPrompt }];
+      if (useHistory) _convHistory.forEach(function(t) { messages.push(t); });
+      messages.push({ role: 'user', content: userText });
+      var resK = await fetch(cfg.url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: messages, max_tokens: 2048, temperature: 0.25 }),
+        signal
+      });
+      var jsonK = await resK.json();
+      text   = jsonK && jsonK.choices && jsonK.choices[0] && jsonK.choices[0].message && jsonK.choices[0].message.content || '';
+      rawErr = jsonK && jsonK.error && jsonK.error.message || '';
+    }
+
+    if (text && _abortCtrl && _abortCtrl._cacheKey) _cache.set(_abortCtrl._cacheKey, { text: text, ts: Date.now() });
+    return { text: text, rawErr: rawErr };
+  }
+
+  function _renderResponse(body, text) {
+    body.innerHTML = '';
+    const wrapper = document.createElement('div');
+    wrapper.className = 'exam-ai-response';
+    const sectionRaw = text.split(/(?=§\s)/u).filter(function(s) { return s.trim(); });
+
+    const SECTION_ACCENTS = {
+      'CONCEPTO': '#818cf8',
+      'ANÁLISIS': '#a78bfa',
+      'RESPUESTA': '#34d399',
+    };
+    const SECTION_ICONS = {
+      'CONCEPTO': '◆',
+      'ANÁLISIS': '◈',
+      'RESPUESTA': '◉',
+    };
+
+    if (sectionRaw.length <= 1) {
+      const p = document.createElement('div');
+      p.className = 'ai-resp-free';
+      p.textContent = text.trim();
+      wrapper.appendChild(p);
+    } else {
+      sectionRaw.forEach(function(part) {
+        const lines = part.trim().split('\n');
+        const titleLine = lines[0].replace(/^§\s*/, '').trim();
+        const bodyText  = lines.slice(1).join('\n').trim();
+        const metaKey   = Object.keys(SECTION_ACCENTS).find(function(k) { return titleLine.toUpperCase().indexOf(k) !== -1; });
+        const accent    = SECTION_ACCENTS[metaKey] || '#94a3b8';
+        const icon      = SECTION_ICONS[metaKey] || '▸';
+
+        const sec = document.createElement('div');
+        sec.className = 'ai-resp-section';
+        sec.style.setProperty('--sec-accent', accent);
+
+        const titleEl = document.createElement('div');
+        titleEl.className = 'ai-resp-title';
+        titleEl.innerHTML = '<span class="ai-resp-icon">' + icon + '</span>' + titleLine;
+        sec.appendChild(titleEl);
+
+        if (bodyText) {
+          if (/^[A-E]\)/m.test(bodyText)) {
+            bodyText.split('\n').forEach(function(line) {
+              const t = line.trim();
+              if (!t) return;
+              const m = t.match(/^([A-E])\)\s*(.*)/);
+              if (m) {
+                const row = document.createElement('div');
+                row.className = 'ai-opt-row';
+                const ltr = document.createElement('span');
+                ltr.className = 'ai-opt-letter';
+                ltr.textContent = m[1] + ')';
+                const txt = document.createElement('span');
+                txt.className = 'ai-opt-text';
+                txt.textContent = m[2];
+                row.appendChild(ltr);
+                row.appendChild(txt);
+                sec.appendChild(row);
+              } else {
+                const freeEl = document.createElement('div');
+                freeEl.className = 'ai-resp-body';
+                freeEl.textContent = t;
+                sec.appendChild(freeEl);
+              }
+            });
+          } else if (titleLine.toUpperCase().indexOf('RESPUESTA') !== -1) {
+            const blines = bodyText.split('\n');
+            const firstLine = blines[0].trim();
+            const rest = blines.slice(1).join('\n').trim();
+            const badge = document.createElement('div');
+            badge.className = 'ai-correct-badge';
+            badge.textContent = firstLine;
+            sec.appendChild(badge);
+            if (rest) {
+              const b = document.createElement('div');
+              b.className = 'ai-resp-body';
+              b.textContent = rest;
+              sec.appendChild(b);
+            }
+          } else {
+            const b = document.createElement('div');
+            b.className = 'ai-resp-body';
+            b.textContent = bodyText;
+            sec.appendChild(b);
+          }
+        }
+        wrapper.appendChild(sec);
+      });
+    }
+    body.appendChild(wrapper);
+  }
+
+  function _showCooldown(body, btn, rawErr) {
+    const isQuota = /quota|rate|limit/i.test(rawErr);
+    if (isQuota) _setBobiState('sleep');
+    const m = rawErr.match(/retry in ([\d.]+)s/i);
+    const secs = m ? Math.ceil(parseFloat(m[1])) : 45;
+    body.innerHTML = '<div class="exam-ai-error-card"><div class="ai-error-svg-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="28" height="28"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l2 2"/></svg></div><div class="exam-ai-error-title">' + (isQuota ? 'Límite de consultas alcanzado' : 'Error de conexión') + '</div><div class="exam-ai-error-desc">' + (isQuota ? 'Reintentando en <strong id="bobiCountdown">' + secs + '</strong>s' : 'No se obtuvo respuesta. Reintenta.') + '</div></div>';
+    if (isQuota) {
+      _cooldown = true;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="ai-btn-icon">◷</span> Espera ' + secs + 's';
+      var s = secs;
+      var iv = setInterval(function() {
+        s--;
+        var el = document.getElementById('bobiCountdown');
+        if (el) el.textContent = s;
+        btn.innerHTML = '<span class="ai-btn-icon">◷</span> Espera ' + s + 's';
+        if (s <= 0) {
+          clearInterval(iv);
+          _cooldown = false;
+          _setBobiState('idle');
+          btn.disabled = false;
+          btn.innerHTML = '<span class="ai-btn-icon">↺</span> Reintentar';
+        }
+      }, 1000);
+    }
+    return isQuota;
+  }
+
+  // sprite SVGs
+var SVG_IDLE  = '<svg viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="9" y="0" width="2" height="1" fill="#F5A800"/><rect x="10" y="1" width="1" height="1" fill="#F5A800"/><rect x="7" y="1" width="6" height="1" fill="#FFCC00"/><rect x="6" y="2" width="8" height="1" fill="#FFCC00"/><rect x="6" y="3" width="8" height="2" fill="#FFCC00"/><rect x="7" y="5" width="6" height="1" fill="#FFCC00"/><rect x="8" y="3" width="1" height="1" fill="#1A1A1A"/><rect x="8" y="2" width="1" height="1" fill="#1A1A1A"/><rect x="9" y="2" width="1" height="1" fill="#FFFFFF"/><rect x="12" y="3" width="1" height="1" fill="#1A1A1A"/><rect x="12" y="2" width="1" height="1" fill="#1A1A1A"/><rect x="13" y="2" width="1" height="1" fill="#FFFFFF"/><rect x="10" y="5" width="2" height="1" fill="#FF7A00"/><rect x="10" y="6" width="2" height="1" fill="#CC5500"/><rect x="6" y="6" width="8" height="1" fill="#FFCC00"/><rect x="5" y="7" width="10" height="1" fill="#FFCC00"/><rect x="5" y="8" width="10" height="1" fill="#FFCC00"/><rect x="5" y="9" width="10" height="1" fill="#FFCC00"/><rect x="5" y="10" width="10" height="1" fill="#FFCC00"/><rect x="6" y="11" width="8" height="1" fill="#FFCC00"/><rect x="7" y="12" width="6" height="1" fill="#FFCC00"/><rect x="8" y="8" width="4" height="3" fill="#FFE566"/><rect x="3" y="7" width="2" height="3" fill="#F5A800"/><rect x="4" y="6" width="1" height="1" fill="#F5A800"/><rect x="3" y="10" width="3" height="1" fill="#F5A800"/><rect x="15" y="7" width="2" height="3" fill="#F5A800"/><rect x="15" y="6" width="1" height="1" fill="#F5A800"/><rect x="14" y="10" width="3" height="1" fill="#F5A800"/><rect x="8" y="13" width="2" height="1" fill="#FF7A00"/><rect x="7" y="14" width="3" height="1" fill="#FF7A00"/><rect x="11" y="13" width="2" height="1" fill="#FF7A00"/><rect x="11" y="14" width="3" height="1" fill="#FF7A00"/></svg>';
+  var SVG_WALK  = '<svg viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="9" y="0" width="2" height="1" fill="#F5A800"/><rect x="10" y="1" width="1" height="1" fill="#F5A800"/><rect x="7" y="1" width="6" height="1" fill="#FFCC00"/><rect x="6" y="2" width="8" height="1" fill="#FFCC00"/><rect x="6" y="3" width="8" height="2" fill="#FFCC00"/><rect x="7" y="5" width="6" height="1" fill="#FFCC00"/><rect x="8" y="3" width="1" height="1" fill="#1A1A1A"/><rect x="8" y="2" width="1" height="1" fill="#1A1A1A"/><rect x="9" y="2" width="1" height="1" fill="#FFFFFF"/><rect x="12" y="3" width="1" height="1" fill="#1A1A1A"/><rect x="12" y="2" width="1" height="1" fill="#1A1A1A"/><rect x="13" y="2" width="1" height="1" fill="#FFFFFF"/><rect x="10" y="5" width="2" height="1" fill="#FF7A00"/><rect x="10" y="6" width="2" height="1" fill="#CC5500"/><rect x="6" y="6" width="8" height="1" fill="#FFCC00"/><rect x="5" y="7" width="10" height="1" fill="#FFCC00"/><rect x="5" y="8" width="10" height="1" fill="#FFCC00"/><rect x="5" y="9" width="10" height="1" fill="#FFCC00"/><rect x="5" y="10" width="10" height="1" fill="#FFCC00"/><rect x="6" y="11" width="8" height="1" fill="#FFCC00"/><rect x="7" y="12" width="6" height="1" fill="#FFCC00"/><rect x="8" y="8" width="4" height="3" fill="#FFE566"/><rect x="2" y="5" width="2" height="2" fill="#F5A800"/><rect x="3" y="7" width="2" height="2" fill="#F5A800"/><rect x="2" y="7" width="1" height="1" fill="#F5A800"/><rect x="15" y="7" width="2" height="3" fill="#F5A800"/><rect x="15" y="6" width="1" height="1" fill="#F5A800"/><rect x="14" y="10" width="3" height="1" fill="#F5A800"/><rect x="8" y="11" width="2" height="1" fill="#FF7A00"/><rect x="7" y="10" width="2" height="1" fill="#FF7A00"/><rect x="11" y="13" width="2" height="1" fill="#FF7A00"/><rect x="11" y="14" width="3" height="1" fill="#FF7A00"/></svg>';
+  var SVG_SLEEP = '<svg viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="9" y="0" width="2" height="1" fill="#F5A800"/><rect x="7" y="1" width="6" height="1" fill="#FFCC00"/><rect x="6" y="2" width="8" height="1" fill="#FFCC00"/><rect x="6" y="3" width="8" height="2" fill="#FFCC00"/><rect x="7" y="5" width="6" height="1" fill="#FFCC00"/><rect x="8" y="3" width="2" height="1" fill="#1A1A1A"/><rect x="12" y="3" width="2" height="1" fill="#1A1A1A"/><rect x="10" y="5" width="2" height="1" fill="#FF7A00"/><rect x="5" y="6" width="10" height="1" fill="#FFCC00"/><rect x="4" y="7" width="12" height="1" fill="#FFCC00"/><rect x="4" y="8" width="12" height="1" fill="#FFCC00"/><rect x="4" y="9" width="12" height="1" fill="#FFCC00"/><rect x="4" y="10" width="12" height="1" fill="#FFCC00"/><rect x="5" y="11" width="10" height="1" fill="#FFCC00"/><rect x="6" y="12" width="8" height="1" fill="#FFCC00"/><rect x="7" y="8" width="6" height="3" fill="#FFE566"/><rect x="2" y="8" width="3" height="3" fill="#F5A800"/><rect x="15" y="8" width="3" height="3" fill="#F5A800"/><rect x="7" y="13" width="3" height="1" fill="#FF7A00"/><rect x="6" y="14" width="4" height="1" fill="#FF7A00"/><rect x="11" y="13" width="3" height="1" fill="#FF7A00"/><rect x="11" y="14" width="4" height="1" fill="#FF7A00"/><rect x="16" y="1" width="3" height="1" fill="#94a3b8"/><rect x="18" y="2" width="1" height="1" fill="#94a3b8"/><rect x="16" y="3" width="3" height="1" fill="#94a3b8"/></svg>';
+
+  function _setBobiState(state) {
+    var sp = document.getElementById('bobiSprite');
+    if (!sp) return;
+    sp.className = 'bobi-wrap ' + (state === 'walk' ? 'walk' : state === 'sleep' ? 'sleep' : '');
+    sp.innerHTML = state === 'walk' ? SVG_WALK : state === 'sleep' ? SVG_SLEEP : SVG_IDLE;
+  }
+
+  var _ttsUtterance = null;
+  function _toggleTTS() {
+    var btn = document.getElementById('examAITTSBtn');
+    if (speechSynthesis.speaking) {
+      speechSynthesis.cancel();
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>';
+      btn.classList.remove('speaking'); return;
+    }
+    var text = btn._text; if (!text) return;
+    _ttsUtterance = new SpeechSynthesisUtterance(text);
+    _ttsUtterance.lang = 'es-MX'; _ttsUtterance.rate = 0.95; _ttsUtterance.pitch = 1;
+    var playIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>';
+    var stopIcon = '<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
+    _ttsUtterance.onstart = function() { btn.innerHTML = stopIcon; btn.classList.add('speaking'); };
+    _ttsUtterance.onend   = function() { btn.innerHTML = playIcon;  btn.classList.remove('speaking'); };
+    _ttsUtterance.onerror = function() { btn.innerHTML = playIcon;  btn.classList.remove('speaking'); };
+    speechSynthesis.speak(_ttsUtterance);
+  }
+
+  function _open() {
+    var ov = document.getElementById('examAIOv');
+    ov.classList.add('show');
+    _convHistory = []; _hintLevel = 0; _lastFullText = ''; _msgCount = 0;
+    var chatSec = document.getElementById('aiChatSection');
+    if (chatSec) chatSec.style.display = 'none';
+    var hintRow = document.getElementById('aiHintRow');
+    if (hintRow) hintRow.style.display = 'none';
+    ['hintBtn1','hintBtn2','hintBtn3'].forEach(function(id, i) {
+      var b = document.getElementById(id);
+      if (b) { b.disabled = (i > 0); b.style.opacity = ''; }
+    });
+    var q = S && S.questions && S.questions[S.current];
+    var preview = document.getElementById('examAIQPreview');
+    if (q && preview) {
+      var areaTag = q.area ? '[' + q.area + '] ' : '';
+      preview.textContent = 'Pregunta ' + ((S.current||0)+1) + ': ' + areaTag + q.question.slice(0,140) + (q.question.length>140?'…':'');
+      preview.classList.add('show');
+    }
+    var body = document.getElementById('examAIBody');
+    body.innerHTML = '<div class="exam-ai-empty"><div class="ai-empty-glyph">◈</div><div class="exam-ai-empty-text">Presiona <strong>Analizar pregunta</strong> y BOBI estudiará el reactivo completo.</div></div>';
+    var btn = document.getElementById('examAIBtn');
+    btn.disabled = false;
+    btn.innerHTML = '<span class="ai-btn-icon">◆</span> Analizar pregunta';
+    document.getElementById('examAITTSBtn').style.display = 'none';
+    _setBobiState('idle');
+    var modelBadge = document.getElementById('aiBobiModelBadge');
+    if (modelBadge) modelBadge.textContent = _selectModel().label;
+  }
+
+  function _close() {
+    document.getElementById('examAIOv').classList.remove('show');
+    if (speechSynthesis.speaking) speechSynthesis.cancel();
+    if (_abortCtrl) { try { _abortCtrl.abort(); } catch(e) {} }
+  }
+
+  function _updateCounter() {
+    var el = document.getElementById('aiMsgCounter');
+    if (!el) return;
+    var turns = Math.floor(_msgCount / 2);
+    el.textContent = turns <= 0 ? 'Preguntas de seguimiento · sin límite' : turns + ' pregunta' + (turns !== 1 ? 's' : '') + ' de seguimiento';
+  }
+
+  async function _analyzeQuestion() {
+    var q = S && S.questions && S.questions[S.current];
+    if (!q) return;
+    var btn  = document.getElementById('examAIBtn');
+    var body = document.getElementById('examAIBody');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="ai-btn-spinner"></span> Analizando';
+    _setBobiState('walk');
+    body.innerHTML = '<div class="exam-ai-thinking">Procesando reactivo<div class="exam-ai-thinking-dots"><span></span><span></span><span></span></div></div>';
+
+    var letters  = ['A','B','C','D','E'];
+    var optsText = q.options.map(function(o,i) { return letters[i] + ') ' + o; }).join('\n');
+    var areaInfo = q.area ? 'Área temática: ' + q.area + '\n' : '';
+    var examTitle = S && S.currentExamMeta && S.currentExamMeta.titulo ? 'Examen: ' + S.currentExamMeta.titulo + '\n' : '';
+
+    var cfg = _selectModel();
+    var imageDataUrl = _userImage ? _userImage.dataUrl : (q.image && S && S.images && S.images[q.image]) ? S.images[q.image] : null;
+    if (_userImage && cfg.type !== 'gemini') cfg = ENDPOINTS.gemini;
+
+    var modelBadge = document.getElementById('aiBobiModelBadge');
+    if (modelBadge) modelBadge.textContent = cfg.label;
+
+    var systemPrompt = _getSystemPrompt(cfg);
+    var userText = examTitle + areaInfo + 'Pregunta: ' + q.question + '\n\nOpciones:\n' + optsText;
+    _convHistory = []; _msgCount = 0;
+
+    try {
+      var result = await _callAPI(cfg, systemPrompt, userText, imageDataUrl, false);
+      var text = result.text; var rawErr = result.rawErr;
+      if (text) {
+        body.innerHTML = '';
+        _renderResponse(body, text);
+        _lastFullText = text; _msgCount = 1;
+        _convHistory.push({ role: 'user', content: userText });
+        _convHistory.push({ role: 'assistant', content: text });
+        var ttsBtn = document.getElementById('examAITTSBtn');
+        ttsBtn.style.display = ''; ttsBtn._text = text;
+        var chatSec = document.getElementById('aiChatSection');
+        if (chatSec) { chatSec.style.display = ''; _updateCounter(); }
+        var hintRow = document.getElementById('aiHintRow');
+        if (hintRow) hintRow.style.display = '';
+        _hintLevel = 0;
+      } else {
+        var isQ = _showCooldown(body, btn, rawErr);
+        if (isQ) return;
+      }
+    } catch(e) {
+      if (e.name === 'AbortError') return;
+      body.innerHTML = '<div class="exam-ai-error-card"><div class="ai-error-svg-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="28" height="28"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div class="exam-ai-error-title">' + (e.message && e.message.includes('fetch') ? 'Sin conexión' : 'Error inesperado') + '</div><div class="exam-ai-error-desc">Verifica tu conexión e intenta de nuevo.</div></div>';
+    }
+    if (!_cooldown) {
+      _setBobiState('idle'); btn.disabled = false;
+      btn.innerHTML = '<span class="ai-btn-icon">↺</span> Volver a analizar';
+    }
+  }
+
+  var _chatDebounce = null;
+  async function _sendChat() {
+    var inp = document.getElementById('aiChatInp');
+    var sendBtn = document.getElementById('aiChatSend');
+    var body = document.getElementById('examAIBody');
+    var text = inp.value.trim();
+    if (!text || sendBtn.disabled) return;
+    if (_chatDebounce) return;
+    _chatDebounce = setTimeout(function() { _chatDebounce = null; }, 800);
+
+    var thread = body.querySelector('.ai-chat-thread');
+    if (!thread) {
+      thread = document.createElement('div');
+      thread.className = 'ai-chat-thread';
+      var bobiFirst = document.createElement('div');
+      bobiFirst.className = 'ai-chat-bubble bobi';
+      bobiFirst.textContent = _lastFullText;
+      thread.appendChild(bobiFirst);
+      body.innerHTML = '';
+      body.appendChild(thread);
+    }
+    var userBubble = document.createElement('div');
+    userBubble.className = 'ai-chat-bubble user';
+    userBubble.textContent = text;
+    thread.appendChild(userBubble);
+    inp.value = ''; inp.style.height = 'auto';
+    body.scrollTop = body.scrollHeight;
+    sendBtn.disabled = true;
+    _setBobiState('walk');
+
+    var thinkBubble = document.createElement('div');
+    thinkBubble.className = 'ai-chat-bubble bobi thinking';
+    thinkBubble.innerHTML = '<div class="exam-ai-thinking-dots"><span></span><span></span><span></span></div>';
+    thread.appendChild(thinkBubble);
+    body.scrollTop = body.scrollHeight;
+
+    var cfg = _selectModel();
+    var q = S && S.questions && S.questions[S.current];
+    var areaCtx = q && q.area ? ' (Área: ' + q.area + ')' : '';
+    var systemFollowUp = 'Eres BOBI, tutor del EXANI-II. Ya explicaste una pregunta' + areaCtx + ' al alumno. Responde la consulta de seguimiento de forma directa y concisa. Sin markdown. Español mexicano.' + _modeInstruction();
+    _convHistory.push({ role: 'user', content: text });
+
+    try {
+      var result = await _callAPI(cfg, systemFollowUp, text, null, true);
+      var reply = result.text;
+      thinkBubble.remove();
+      if (reply) {
+        var replyBubble = document.createElement('div');
+        replyBubble.className = 'ai-chat-bubble bobi';
+        replyBubble.textContent = reply;
+        thread.appendChild(replyBubble);
+        _convHistory.push({ role: 'assistant', content: reply });
+        _lastFullText = reply; _msgCount += 2; _updateCounter();
+      } else {
+        var errBubble = document.createElement('div');
+        errBubble.className = 'ai-chat-bubble bobi';
+        errBubble.textContent = 'No se obtuvo respuesta. Reformula e intenta de nuevo.';
+        thread.appendChild(errBubble);
+        _convHistory.pop();
+      }
+    } catch(e) {
+      thinkBubble.remove();
+      if (e.name !== 'AbortError') {
+        var errBubble2 = document.createElement('div');
+        errBubble2.className = 'ai-chat-bubble bobi';
+        errBubble2.textContent = 'Error de conexión.';
+        thread.appendChild(errBubble2);
+        _convHistory.pop();
+      }
+    }
+    _setBobiState('idle'); sendBtn.disabled = false;
+    body.scrollTop = body.scrollHeight;
+  }
+
+  async function _askHint(level) {
+    if (level <= _hintLevel) return;
+    var q = S && S.questions && S.questions[S.current];
+    if (!q) return;
+    var btn = document.getElementById('hintBtn' + level);
+    if (btn) { btn.disabled = true; btn.style.opacity = '.4'; }
+    var cfg = _selectModel();
+    var letters = ['A','B','C','D','E'];
+    var optsText = q.options.map(function(o,i) { return letters[i] + ') ' + o; }).join('\n');
+    var hintPrompts = {
+      1: 'Eres BOBI. Da SOLO el concepto o área temática central en 1-2 oraciones. NO menciones cuál opción es correcta. Sin markdown.',
+      2: 'Eres BOBI. Indica cuáles opciones son incorrectas y por qué brevemente. NO reveles la correcta. Sin markdown.',
+      3: 'Eres BOBI. Revela la respuesta correcta con explicación completa y concisa. Sin markdown.'
+    };
+    var HINT_LABELS = { 1: '◈ Pista 1', 2: '◈ Pista 2', 3: '◉ Respuesta' };
+    var userText = 'Pregunta: ' + q.question + '\n\nOpciones:\n' + optsText;
+    var body = document.getElementById('examAIBody');
+    _setBobiState('walk');
+    try {
+      var result = await _callAPI(cfg, hintPrompts[level] + _modeInstruction(), userText, null, false);
+      if (result.text) {
+        var hintEl = document.createElement('div');
+        hintEl.className = 'ai-hint-bubble';
+        var labelEl = document.createElement('div');
+        labelEl.className = 'ai-hint-label';
+        labelEl.textContent = HINT_LABELS[level];
+        var textEl = document.createElement('div');
+        textEl.textContent = result.text;
+        hintEl.appendChild(labelEl); hintEl.appendChild(textEl);
+        body.appendChild(hintEl); body.scrollTop = body.scrollHeight;
+        _hintLevel = level;
+        if (level < 3) { var nextBtn = document.getElementById('hintBtn' + (level+1)); if (nextBtn) nextBtn.disabled = false; }
+      }
+    } catch(e) { if (btn && e.name !== 'AbortError') { btn.disabled = false; btn.style.opacity = ''; } }
+    _setBobiState('idle');
+  }
+
+  async function _openDiag() {
+    var overlay = document.getElementById('aiDiagOverlay');
+    var diagBody = document.getElementById('aiDiagBody');
+    if (!overlay || !diagBody) return;
+    overlay.classList.add('show');
+    diagBody.innerHTML = '<div class="ai-diag-thinking">Analizando resultados<div class="exam-ai-thinking-dots"><span></span><span></span><span></span></div></div>';
+    var qs = (S && S.questions) || [];
+    var ans = (S && S.answers) || {};
+    var total = qs.length;
+    var ok = qs.filter(function(q,i) { return ans[i] === q.answer; }).length;
+    var fail = Object.keys(ans).length - ok;
+    var blank = total - Object.keys(ans).length;
+    var pct = Math.round((ok / total) * 100);
+    var areaErrors = {};
+    qs.forEach(function(q, i) {
+      if (ans[i] !== q.answer) { var area = q.area || 'General'; areaErrors[area] = (areaErrors[area] || 0) + 1; }
+    });
+    var weakAreas = Object.entries(areaErrors).sort(function(a,b){return b[1]-a[1];}).slice(0,5).map(function(e){return e[0]+' ('+e[1]+' errores)';}).join(', ') || 'No determinado';
+    var examTitle = (S && S.currentExamMeta && S.currentExamMeta.titulo) || 'EXANI-II';
+    var prompt = 'Eres BOBI, tutor del EXANI-II. Genera un diagnóstico estructurado.\n\nDatos del simulacro "' + examTitle + '":\n- Puntaje: ' + pct + '% (' + ok + ' de ' + total + ')\n- Incorrectas: ' + fail + ' | Sin responder: ' + blank + '\n- Áreas débiles: ' + weakAreas + '\n\nESTRUCTURA OBLIGATORIA:\n\n§ DIAGNÓSTICO GENERAL\n[2-3 oraciones honestas y empáticas.]\n\n§ ÁREAS A REFORZAR\n[Top 3 con recomendación específica cada una.]\n\n§ FORTALEZAS\n[Áreas de mejor desempeño.]\n\n§ PLAN DE ESTUDIO\n[3 acciones concretas para la próxima semana.]\n\n§ PROYECCIÓN\n[Nivel actual vs corte de admisión + motivación calibrada.]\n\nSin markdown. Español mexicano.';
+    var cfg = _selectModel();
+    try {
+      var result = await _callAPI(cfg, prompt, 'Genera el diagnóstico.', null, false);
+      diagBody.innerHTML = '';
+      if (result.text) _renderResponse(diagBody, result.text);
+      else diagBody.textContent = 'No se pudo generar el diagnóstico. Verifica tu conexión.';
+    } catch(e) { diagBody.textContent = 'Error de conexión.'; }
+  }
+
+  function _closeDiag() { var o = document.getElementById('aiDiagOverlay'); if (o) o.classList.remove('show'); }
+
+  var _practiceQuestions = [];
+
+  async function _openPracticeFromResults() {
+    var qs = (S && S.questions) || [];
+    var ans = (S && S.answers) || {};
+    var failedQs = qs.filter(function(q,i) { return ans[i] !== q.answer && ans[i] !== undefined; }).slice(0,3);
+    var context = failedQs.length > 0 ? failedQs.map(function(q) { return 'Tema: ' + (q.area||'General') + ' — ' + q.question.slice(0,100); }).join('\n') : 'Examen: ' + ((S && S.currentExamMeta && S.currentExamMeta.titulo) || 'EXANI-II');
+    await _openPractice(context, (S && S.currentExamMeta && S.currentExamMeta.materia) || 'general');
+  }
+
+  async function _openPracticeFromQuestion() {
+    var q = S && S.questions && S.questions[S.current];
+    if (!q) return;
+    await _openPractice('Área: ' + (q.area||'General') + '\nPregunta: ' + q.question.slice(0,120), q.area || 'general');
+  }
+
+  async function _openPractice(context, area) {
+    var overlay = document.getElementById('aiPracticeOverlay');
+    var practiceBody = document.getElementById('aiPracticeBody');
+    if (!overlay || !practiceBody) return;
+    overlay.classList.add('show');
+    practiceBody.innerHTML = '<div class="ai-diag-thinking">Generando reactivos<div class="exam-ai-thinking-dots"><span></span><span></span><span></span></div></div>';
+    _practiceQuestions = [];
+    var prompt = 'Eres BOBI, generador de reactivos EXANI-II. Genera exactamente 4 preguntas de opción múltiple sobre:\n' + context + '\n\nResponde ÚNICAMENTE con JSON válido. Sin texto extra:\n[\n  {"q":"Texto","opts":["A","B","C","D"],"ans":0,"exp":"Explicación"}\n]\n\n"ans" es el índice (0-3) de la opción correcta. Solo el JSON.';
+    var cfg = _selectModel();
+    try {
+      var result = await _callAPI(cfg, prompt, 'Genera los reactivos.', null, false);
+      var jsonStr = result.text.replace(/```json|```/g,'').trim();
+      var si = jsonStr.indexOf('['), ei = jsonStr.lastIndexOf(']');
+      if (si !== -1 && ei !== -1) jsonStr = jsonStr.slice(si, ei+1);
+      _practiceQuestions = JSON.parse(jsonStr);
+      _renderPracticeQ(practiceBody);
+    } catch(e) { practiceBody.innerHTML = '<div style="text-align:center;padding:24px;color:#64748b;font-size:13px">No se pudieron generar los reactivos. Intenta de nuevo.</div>'; }
+  }
+
+  function _renderPracticeQ(container) {
+    if (!_practiceQuestions.length) return;
+    container.innerHTML = '';
+    var letters = ['A','B','C','D'];
+    _practiceQuestions.forEach(function(pq, qi) {
+      var card = document.createElement('div');
+      card.className = 'ai-pq-card';
+      var numEl = document.createElement('div');
+      numEl.className = 'ai-pq-num';
+      numEl.textContent = 'Reactivo ' + (qi+1);
+      var qEl = document.createElement('div');
+      qEl.className = 'ai-pq-text';
+      qEl.textContent = pq.q;
+      card.appendChild(numEl); card.appendChild(qEl);
+      var optsEl = document.createElement('div');
+      optsEl.className = 'ai-pq-opts';
+      pq.opts.forEach(function(opt, oi) {
+        var btn = document.createElement('button');
+        btn.className = 'ai-pq-opt';
+        btn.textContent = letters[oi] + ') ' + opt;
+        btn.onclick = function() {
+          optsEl.querySelectorAll('.ai-pq-opt').forEach(function(b) { b.classList.remove('correct','wrong'); b.disabled = true; });
+          btn.classList.add(oi === pq.ans ? 'correct' : 'wrong');
+          if (oi !== pq.ans) optsEl.children[pq.ans].classList.add('correct');
+          if (pq.exp) {
+            var expEl = document.createElement('div');
+            expEl.className = 'ai-pq-exp';
+            expEl.innerHTML = '<span class="ai-pq-exp-icon">◉</span>' + pq.exp;
+            card.appendChild(expEl);
+          }
+        };
+        optsEl.appendChild(btn);
+      });
+      card.appendChild(optsEl);
+      container.appendChild(card);
+    });
+  }
+
+  function _closePractice() { var o = document.getElementById('aiPracticeOverlay'); if (o) o.classList.remove('show'); }
+
+  function _handleImageUpload(input) {
+    var file = input.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      _userImage = { dataUrl: e.target.result, mime: file.type || 'image/png', name: file.name };
+      var wrap = document.getElementById('aiImgPreviewWrap');
+      var preview = document.getElementById('aiImgPreview');
+      var name = document.getElementById('aiImgPreviewName');
+      if (wrap) wrap.style.display = 'flex';
+      if (preview) preview.src = e.target.result;
+      if (name) name.textContent = file.name;
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+  }
+
+  function _clearImage() {
+    _userImage = null;
+    var wrap = document.getElementById('aiImgPreviewWrap');
+    if (wrap) wrap.style.display = 'none';
+    var preview = document.getElementById('aiImgPreview');
+    if (preview) preview.src = '';
+  }
+
+  return {
+    setMode: function(m) { _mode = m; },
+    setModel: function(m) { _modelOverride = m; },
+    open: _open, close: _close,
+    closeOnBg: function(e) { if (e.target === document.getElementById('examAIOv')) _close(); },
+    analyze: _analyzeQuestion,
+    sendChat: _sendChat,
+    askHint: _askHint,
+    openDiag: _openDiag, closeDiag: _closeDiag,
+    openPracticeFromResults: _openPracticeFromResults,
+    openPracticeFromQuestion: _openPracticeFromQuestion,
+    closePractice: _closePractice,
+    handleImageUpload: _handleImageUpload,
+    clearImage: _clearImage,
+    toggleTTS: _toggleTTS,
+    setBobiState: _setBobiState,
+  };
+})();
+
+// ── Compatibilidad global ──
+function openExamAI()              { BobiAI.open(); }
+function closeExamAI()             { BobiAI.close(); }
+function closeExamAIOnBg(e)        { BobiAI.closeOnBg(e); }
+function askExamAI()               { BobiAI.analyze(); }
+function sendAIChat()              { BobiAI.sendChat(); }
+function askHint(level)            { BobiAI.askHint(level); }
+function openDiagModal()           { BobiAI.openDiag(); }
+function closeDiagModal()          { BobiAI.closeDiag(); }
+function openPracticeFromResults() { BobiAI.openPracticeFromResults(); }
+function openPracticeFromQuestion(){ BobiAI.openPracticeFromQuestion(); }
+function closePracticeModal()      { BobiAI.closePractice(); }
+function handleAIImageUpload(inp)  { BobiAI.handleImageUpload(inp); }
+function clearAIImage()            { BobiAI.clearImage(); }
+function toggleExamTTS()           { BobiAI.toggleTTS(); }
+function setBobiState(s)           { BobiAI.setBobiState(s); }
 function setAIModel(val) {
-  _aiModelOverride = val;
+  BobiAI.setModel(val);
+  var badge = document.getElementById('aiBobiModelBadge');
+  if (badge) { var m={'auto':'Auto','gemini':'Gemini','grok-mat':'Grok · Mat','grok-red':'Grok · Red','grok-comp':'Grok · Comp'}; badge.textContent = m[val]||val; }
 }
-
 function setAIMode(mode) {
-  _aiMode = mode;
-  ['Simple','Normal','Tech'].forEach(m => {
-    const btn = document.getElementById('modeBtn' + m);
-    if (btn) btn.classList.remove('active');
-  });
-  const active = {simple:'Simple', normal:'Normal', tecnico:'Tech'}[mode];
-  const activeBtn = document.getElementById('modeBtn' + active);
+  BobiAI.setMode(mode);
+  ['Simple','Normal','Tech'].forEach(function(n) { var b=document.getElementById('modeBtn'+n); if(b) b.classList.remove('active'); });
+  var activeMap = { simple:'Simple', normal:'Normal', tecnico:'Tech' };
+  var activeBtn = document.getElementById('modeBtn' + (activeMap[mode]||'Normal'));
   if (activeBtn) activeBtn.classList.add('active');
 }
 
-// ── Imagen subida por el alumno ──
-function handleAIImageUpload(input) {
-  const file = input.files && input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    _aiUserImageData = { dataUrl: e.target.result, name: file.name };
-    const preview = document.getElementById('aiImgPreview');
-    const wrap = document.getElementById('aiImgPreviewWrap');
-    const nameEl = document.getElementById('aiImgPreviewName');
-    if (preview) preview.src = e.target.result;
-    if (nameEl) nameEl.textContent = file.name.slice(0, 22) + (file.name.length > 22 ? '…' : '');
-    if (wrap) wrap.style.display = 'flex';
-  };
-  reader.readAsDataURL(file);
-  input.value = '';
-}
+// Init BOBI sprite on load
+document.addEventListener('DOMContentLoaded', function() { BobiAI.setBobiState('idle'); });
 
-function clearAIImage() {
-  _aiUserImageData = null;
-  const wrap = document.getElementById('aiImgPreviewWrap');
-  const preview = document.getElementById('aiImgPreview');
-  if (wrap) wrap.style.display = 'none';
-  if (preview) preview.src = '';
-}
 
-/* ── AI ROUTING — basado en metadatos del EXAMEN, no del reactivo ── */
-function getExamAIConfig() {
-  // Si el usuario eligió un modelo manualmente, usarlo
-  if (_aiModelOverride !== 'auto') {
-    const overrides = {
-      'gemini':    { type: 'gemini', url: 'https://gemini-proxy.donniaxel55.workers.dev', label: 'Gemini · Manual' },
-      'grok-mat':  { type: 'grok',   url: 'https://grok-mat.donniaxel55.workers.dev',    label: 'Grok · Matemáticas' },
-      'grok-red':  { type: 'grok',   url: 'https://grok-red.donniaxel55.workers.dev',    label: 'Grok · Redacción' },
-      'grok-comp': { type: 'grok',   url: 'https://grok-comp.donniaxel55.workers.dev',   label: 'Grok · Comprensión' },
-    };
-    return overrides[_aiModelOverride];
-  }
-  // Leer metadatos del examen actual (titulo + materia + tags)
-  const meta = S.currentExamMeta || {};
-  const key = ((meta.titulo || '') + ' ' + (meta.materia || '') + ' ' + (meta.tags || []).join(' ')).toLowerCase();
-
-  if (key.includes('matem') || key.includes('pensamiento mat') || key.includes('calc') ||
-      key.includes('algebra') || key.includes('aritm') || key.includes('trigo') || key.includes('geometr')) {
-    return { type: 'grok', url: 'https://grok-mat.donniaxel55.workers.dev', label: 'Grok · Matemáticas' };
-  }
-  if (key.includes('redac')) {
-    return { type: 'grok', url: 'https://grok-red.donniaxel55.workers.dev', label: 'Grok · Redacción' };
-  }
-  if (key.includes('comprens') || key.includes('lectura') || key.includes('lector')) {
-    return { type: 'grok', url: 'https://grok-comp.donniaxel55.workers.dev', label: 'Grok · Comprensión' };
-  }
-  // default: premedicina → Gemini
-  return { type: 'gemini', url: 'https://gemini-proxy.donniaxel55.workers.dev', label: 'Gemini · Premedicina' };
-}
-
-/* ── EXAM AI ── */
-function openExamAI() {
-  const ov = document.getElementById('examAIOv');
-  ov.classList.add('show');
-  // Reset estado conversacional
-  _aiConvHistory = [];
-  _aiHintLevel = 0;
-  _aiLastFullText = '';
-  _aiMsgCount = 0;
-  // NO limpiar imagen del usuario al abrir (útil si quiere reusar)
-  // Ocultar sección de chat
-  const chatSec = document.getElementById('aiChatSection');
-  if (chatSec) chatSec.style.display = 'none';
-  // Ocultar pistas hasta la primera respuesta
-  const hintRow = document.getElementById('aiHintRow');
-  if (hintRow) hintRow.style.display = 'none';
-  // Resetear pistas
-  ['hintBtn1','hintBtn2','hintBtn3'].forEach((id,i) => {
-    const b = document.getElementById(id);
-    if (b) { b.disabled = (i > 0); b.style.opacity = ''; }
-  });
-  // Show question preview
-  const q = S.questions && S.questions[S.current];
-  const preview = document.getElementById('examAIQPreview');
-  if (q) {
-    const areaTag = q.area ? `[${q.area}] ` : '';
-    preview.textContent = `Pregunta ${S.current+1}: ${areaTag}${q.question.slice(0,140)}${q.question.length>140?'…':''}`;
-    preview.classList.add('show');
-  }
-  // Reset body and button
-  const body = document.getElementById('examAIBody');
-  body.innerHTML = '<div class="exam-ai-empty"><div class="exam-ai-empty-icon" style="width:64px;height:64px;margin:0 auto 10px;image-rendering:pixelated"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated"><rect x="5" y="1" width="6" height="5" fill="#FFCC00"/><rect x="4" y="2" width="8" height="4" fill="#FFCC00"/><rect x="7" y="0" width="2" height="2" fill="#FFAA00"/><rect x="6" y="0" width="1" height="1" fill="#FFAA00"/><rect x="9" y="0" width="1" height="1" fill="#FFAA00"/><rect x="6" y="3" width="1" height="1" fill="#111"/><rect x="9" y="3" width="1" height="1" fill="#111"/><rect x="7" y="5" width="2" height="1" fill="#FF7700"/><rect x="7" y="6" width="2" height="1" fill="#FF5500"/><rect x="4" y="6" width="8" height="7" fill="#FFCC00"/><rect x="3" y="7" width="10" height="5" fill="#FFCC00"/><rect x="6" y="8" width="4" height="3" fill="#FFE066"/><rect x="2" y="7" width="2" height="3" fill="#FFAA00"/><rect x="3" y="6" width="1" height="1" fill="#FFAA00"/><rect x="12" y="7" width="2" height="3" fill="#FFAA00"/><rect x="12" y="6" width="1" height="1" fill="#FFAA00"/><rect x="5" y="13" width="2" height="1" fill="#FF7700"/><rect x="4" y="14" width="3" height="1" fill="#FF7700"/><rect x="9" y="13" width="2" height="1" fill="#FF7700"/><rect x="9" y="14" width="3" height="1" fill="#FF7700"/></svg></div><div class="exam-ai-empty-text">Toca <strong>Explicar pregunta</strong> y la IA analiza el reactivo completo.</div></div>';
-  const btn = document.getElementById('examAIBtn');
-  btn.disabled = false;
-  btn.innerHTML = '<span id="examAIBtnIcon">⚡</span> Explicar pregunta';
-  document.getElementById('examAITTSBtn').style.display = 'none';
-  setBobiState('idle');
-}
-
-function closeExamAI() {
-  document.getElementById('examAIOv').classList.remove('show');
-  if (speechSynthesis.speaking) speechSynthesis.cancel();
-}
-
-function closeExamAIOnBg(e) {
-  if (e.target === document.getElementById('examAIOv')) closeExamAI();
-}
-
-const _BOBI_IDLE  = '<svg viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="9" y="0" width="2" height="1" fill="#F5A800"/><rect x="10" y="1" width="1" height="1" fill="#F5A800"/><rect x="7" y="1" width="6" height="1" fill="#FFCC00"/><rect x="6" y="2" width="8" height="1" fill="#FFCC00"/><rect x="6" y="3" width="8" height="2" fill="#FFCC00"/><rect x="7" y="5" width="6" height="1" fill="#FFCC00"/><rect x="8" y="3" width="1" height="1" fill="#1A1A1A"/><rect x="8" y="2" width="1" height="1" fill="#1A1A1A"/><rect x="9" y="2" width="1" height="1" fill="#FFFFFF"/><rect x="12" y="3" width="1" height="1" fill="#1A1A1A"/><rect x="12" y="2" width="1" height="1" fill="#1A1A1A"/><rect x="13" y="2" width="1" height="1" fill="#FFFFFF"/><rect x="10" y="5" width="2" height="1" fill="#FF7A00"/><rect x="10" y="6" width="2" height="1" fill="#CC5500"/><rect x="6" y="6" width="8" height="1" fill="#FFCC00"/><rect x="5" y="7" width="10" height="1" fill="#FFCC00"/><rect x="5" y="8" width="10" height="1" fill="#FFCC00"/><rect x="5" y="9" width="10" height="1" fill="#FFCC00"/><rect x="5" y="10" width="10" height="1" fill="#FFCC00"/><rect x="6" y="11" width="8" height="1" fill="#FFCC00"/><rect x="7" y="12" width="6" height="1" fill="#FFCC00"/><rect x="8" y="8" width="4" height="3" fill="#FFE566"/><rect x="3" y="7" width="2" height="3" fill="#F5A800"/><rect x="4" y="6" width="1" height="1" fill="#F5A800"/><rect x="3" y="10" width="3" height="1" fill="#F5A800"/><rect x="15" y="7" width="2" height="3" fill="#F5A800"/><rect x="15" y="6" width="1" height="1" fill="#F5A800"/><rect x="14" y="10" width="3" height="1" fill="#F5A800"/><rect x="8" y="13" width="2" height="1" fill="#FF7A00"/><rect x="7" y="14" width="3" height="1" fill="#FF7A00"/><rect x="11" y="13" width="2" height="1" fill="#FF7A00"/><rect x="11" y="14" width="3" height="1" fill="#FF7A00"/></svg>';
-const _BOBI_WALK  = '<svg viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="9" y="0" width="2" height="1" fill="#F5A800"/><rect x="10" y="1" width="1" height="1" fill="#F5A800"/><rect x="7" y="1" width="6" height="1" fill="#FFCC00"/><rect x="6" y="2" width="8" height="1" fill="#FFCC00"/><rect x="6" y="3" width="8" height="2" fill="#FFCC00"/><rect x="7" y="5" width="6" height="1" fill="#FFCC00"/><rect x="8" y="3" width="1" height="1" fill="#1A1A1A"/><rect x="8" y="2" width="1" height="1" fill="#1A1A1A"/><rect x="9" y="2" width="1" height="1" fill="#FFFFFF"/><rect x="12" y="3" width="1" height="1" fill="#1A1A1A"/><rect x="12" y="2" width="1" height="1" fill="#1A1A1A"/><rect x="13" y="2" width="1" height="1" fill="#FFFFFF"/><rect x="10" y="5" width="2" height="1" fill="#FF7A00"/><rect x="10" y="6" width="2" height="1" fill="#CC5500"/><rect x="6" y="6" width="8" height="1" fill="#FFCC00"/><rect x="5" y="7" width="10" height="1" fill="#FFCC00"/><rect x="5" y="8" width="10" height="1" fill="#FFCC00"/><rect x="5" y="9" width="10" height="1" fill="#FFCC00"/><rect x="5" y="10" width="10" height="1" fill="#FFCC00"/><rect x="6" y="11" width="8" height="1" fill="#FFCC00"/><rect x="7" y="12" width="6" height="1" fill="#FFCC00"/><rect x="8" y="8" width="4" height="3" fill="#FFE566"/><rect x="2" y="5" width="2" height="2" fill="#F5A800"/><rect x="3" y="7" width="2" height="2" fill="#F5A800"/><rect x="2" y="7" width="1" height="1" fill="#F5A800"/><rect x="15" y="7" width="2" height="3" fill="#F5A800"/><rect x="15" y="6" width="1" height="1" fill="#F5A800"/><rect x="14" y="10" width="3" height="1" fill="#F5A800"/><rect x="8" y="11" width="2" height="1" fill="#FF7A00"/><rect x="7" y="10" width="2" height="1" fill="#FF7A00"/><rect x="11" y="13" width="2" height="1" fill="#FF7A00"/><rect x="11" y="14" width="3" height="1" fill="#FF7A00"/></svg>';
-const _BOBI_SLEEP = '<svg viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="9" y="0" width="2" height="1" fill="#F5A800"/><rect x="7" y="1" width="6" height="1" fill="#FFCC00"/><rect x="6" y="2" width="8" height="1" fill="#FFCC00"/><rect x="6" y="3" width="8" height="2" fill="#FFCC00"/><rect x="7" y="5" width="6" height="1" fill="#FFCC00"/><rect x="8" y="3" width="2" height="1" fill="#1A1A1A"/><rect x="12" y="3" width="2" height="1" fill="#1A1A1A"/><rect x="10" y="5" width="2" height="1" fill="#FF7A00"/><rect x="5" y="6" width="10" height="1" fill="#FFCC00"/><rect x="4" y="7" width="12" height="1" fill="#FFCC00"/><rect x="4" y="8" width="12" height="1" fill="#FFCC00"/><rect x="4" y="9" width="12" height="1" fill="#FFCC00"/><rect x="4" y="10" width="12" height="1" fill="#FFCC00"/><rect x="5" y="11" width="10" height="1" fill="#FFCC00"/><rect x="6" y="12" width="8" height="1" fill="#FFCC00"/><rect x="7" y="8" width="6" height="3" fill="#FFE566"/><rect x="2" y="8" width="3" height="3" fill="#F5A800"/><rect x="15" y="8" width="3" height="3" fill="#F5A800"/><rect x="7" y="13" width="3" height="1" fill="#FF7A00"/><rect x="6" y="14" width="4" height="1" fill="#FF7A00"/><rect x="11" y="13" width="3" height="1" fill="#FF7A00"/><rect x="11" y="14" width="4" height="1" fill="#FF7A00"/><rect x="16" y="1" width="3" height="1" fill="#94a3b8"/><rect x="18" y="2" width="1" height="1" fill="#94a3b8"/><rect x="16" y="3" width="3" height="1" fill="#94a3b8"/></svg>';
-
-function setBobiState(state) {
-  const sp = document.getElementById('bobiSprite');
-  if (!sp) return;
-  sp.className = 'bobi-wrap ' + (state === 'walk' ? 'walk' : state === 'sleep' ? 'sleep' : '');
-  sp.innerHTML = state === 'walk' ? _BOBI_WALK : state === 'sleep' ? _BOBI_SLEEP : _BOBI_IDLE;
-}
-
-/* ── TTS ── */
-let _ttsUtterance = null;
-function toggleExamTTS() {
-  const btn = document.getElementById('examAITTSBtn');
-  if (speechSynthesis.speaking) {
-    speechSynthesis.cancel();
-    btn.textContent = '🔊';
-    btn.classList.remove('speaking');
-    return;
-  }
-  const text = btn._text;
-  if (!text) return;
-  _ttsUtterance = new SpeechSynthesisUtterance(text);
-  _ttsUtterance.lang = 'es-MX';
-  _ttsUtterance.rate = 0.95;
-  _ttsUtterance.pitch = 1;
-  _ttsUtterance.onstart = () => { btn.textContent = '⏹️'; btn.classList.add('speaking'); };
-  _ttsUtterance.onend = () => { btn.textContent = '🔊'; btn.classList.remove('speaking'); };
-  _ttsUtterance.onerror = () => { btn.textContent = '🔊'; btn.classList.remove('speaking'); };
-  speechSynthesis.speak(_ttsUtterance);
-}
-
-// ── Helper: llama al API según config ──
-async function _callBobiAPI(aiCfg, systemPrompt, userText, imageDataUrl) {
-  let text = '', rawErr = '';
-  if (aiCfg.type === 'gemini') {
-    const userContent = [];
-    if (imageDataUrl) {
-      try {
-        let b64, mime;
-        if (imageDataUrl.startsWith('blob:')) {
-          const blobRes = await fetch(imageDataUrl);
-          const blob = await blobRes.blob();
-          mime = blob.type || 'image/png';
-          b64 = await new Promise(resolve => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result.split(',')[1]);
-            reader.readAsDataURL(blob);
-          });
-        } else {
-          const comma = imageDataUrl.indexOf(',');
-          b64 = imageDataUrl.slice(comma+1);
-          const mimeMatch = imageDataUrl.match(/data:([^;]+);/);
-          mime = mimeMatch ? mimeMatch[1] : 'image/png';
-        }
-        userContent.push({ inlineData: { mimeType: mime, data: b64 } });
-      } catch(imgErr) { console.warn('No se pudo cargar la imagen:', imgErr); }
-    }
-    userContent.push({ text: userText });
-    const res = await fetch(aiCfg.url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        system_instruction: { parts: [{ text: systemPrompt }] },
-        contents: [{ role: 'user', parts: userContent }],
-        generationConfig: { maxOutputTokens: 2048, temperature: 0.3 }
-      })
-    });
-    const json = await res.json();
-    text = json?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    rawErr = json?.error?.message || json?.candidates?.[0]?.finishReason || '';
-  } else {
-    // Construir mensajes para Grok — soporta historial
-    const messages = [{ role: 'system', content: systemPrompt }];
-    // Si hay historial previo, incluirlo (sin imagen en turns anteriores)
-    _aiConvHistory.forEach(turn => messages.push(turn));
-    messages.push({ role: 'user', content: userText });
-    const res = await fetch(aiCfg.url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        messages,
-        max_tokens: 2048,
-        temperature: 0.3
-      })
-    });
-    const json = await res.json();
-    text = json?.choices?.[0]?.message?.content || '';
-    rawErr = json?.error?.message || '';
-  }
-  return { text, rawErr };
-}
-
-// ── Helper: renderiza respuesta de BOBI con secciones visuales ricas ──
-function _renderBobiResponse(body, text) {
-  const wrapper = document.createElement('div');
-  wrapper.className = 'exam-ai-response';
-
-  // Dividir en secciones por emojis de encabezado
-  const sectionPattern = /(?=🎯|💡|✅)/g;
-  const parts = text.split(sectionPattern).filter(s => s.trim());
-
-  if (parts.length <= 1) {
-    // Texto libre — render simple
-    const el = document.createElement('div');
-    el.className = 'ai-resp-section';
-    const b = document.createElement('div');
-    b.className = 'ai-resp-body';
-    b.textContent = text.trim();
-    el.appendChild(b);
-    wrapper.appendChild(el);
-    body.appendChild(wrapper);
-    return;
-  }
-
-  parts.forEach(part => {
-    const sec = document.createElement('div');
-    sec.className = 'ai-resp-section';
-
-    // Extraer título (primera línea)
-    const lines = part.trim().split('\n');
-    const titleLine = lines[0].trim();
-    const bodyLines = lines.slice(1).join('\n').trim();
-
-    // Título visual
-    const titleEl = document.createElement('div');
-    titleEl.className = 'ai-resp-title';
-    titleEl.textContent = titleLine;
-    sec.appendChild(titleEl);
-
-    // Cuerpo — si contiene opciones A) B) C) D), renderizar como filas
-    if (bodyLines && /^[A-E]\)/m.test(bodyLines)) {
-      const optLines = bodyLines.split('\n');
-      const letters = ['A','B','C','D','E'];
-      optLines.forEach(line => {
-        const lineT = line.trim();
-        if (!lineT) return;
-        const match = lineT.match(/^([A-E])\)\s*(.*)/);
-        if (match) {
-          const row = document.createElement('div');
-          row.className = 'ai-opt-row';
-          const letterEl = document.createElement('span');
-          letterEl.className = 'ai-opt-letter';
-          letterEl.textContent = match[1] + ')';
-          const textEl = document.createElement('span');
-          textEl.className = 'ai-opt-text';
-          textEl.textContent = match[2];
-          row.appendChild(letterEl);
-          row.appendChild(textEl);
-          sec.appendChild(row);
-        } else {
-          const p = document.createElement('div');
-          p.className = 'ai-resp-body';
-          p.style.marginTop = '4px';
-          p.textContent = lineT;
-          sec.appendChild(p);
-        }
-      });
-    } else if (bodyLines) {
-      // Sección ✅ — resaltar la respuesta correcta
-      if (titleLine.startsWith('✅')) {
-        const badge = document.createElement('div');
-        badge.className = 'ai-correct-badge';
-        // Extraer la letra si está al inicio
-        const letterMatch = bodyLines.match(/^([A-E])\)/);
-        badge.textContent = letterMatch ? '✅ Respuesta: ' + letterMatch[1] : '✅ Correcta';
-        sec.appendChild(badge);
-      }
-      const b = document.createElement('div');
-      b.className = 'ai-resp-body';
-      b.textContent = bodyLines;
-      sec.appendChild(b);
-    }
-
-    wrapper.appendChild(sec);
-  });
-
-  body.appendChild(wrapper);
-}
-
-// ── Helper: muestra error de cooldown ──
-function _showBobiCooldown(body, btn, rawErr) {
-  const isQuota = rawErr.toLowerCase().includes('quota') || rawErr.toLowerCase().includes('rate') || rawErr.toLowerCase().includes('limit');
-  if (isQuota) setBobiState('sleep');
-  const isRetry = rawErr.match(/retry in ([\d.]+)s/i);
-  const segundos = isRetry ? Math.ceil(parseFloat(isRetry[1])) : 30;
-  const msg = isQuota
-    ? `<div class="exam-ai-error-card"><div class="exam-ai-error-icon">☕</div><div class="exam-ai-error-title">La IA necesita un respiro</div><div class="exam-ai-error-desc">Demasiadas preguntas seguidas. Reintentando en <strong id="bobiCountdown">${segundos}</strong>s…</div></div>`
-    : `<div class="exam-ai-error-card"><div class="exam-ai-error-icon">😅</div><div class="exam-ai-error-title">Algo salió mal</div><div class="exam-ai-error-desc">No se pudo obtener una respuesta. Intenta de nuevo en un momento.</div></div>`;
-  body.innerHTML = msg;
-  if (isQuota) {
-    btn.disabled = true;
-    btn.innerHTML = '⏳ Espera ' + segundos + 's…';
-    let secs = segundos;
-    window._bobiCooldown = true;
-    const cdInterval = setInterval(() => {
-      secs--;
-      const cdEl = document.getElementById('bobiCountdown');
-      if (cdEl) cdEl.textContent = secs;
-      btn.innerHTML = '⏳ Espera ' + secs + 's…';
-      if (secs <= 0) {
-        clearInterval(cdInterval);
-        window._bobiCooldown = false;
-        setBobiState('idle');
-        btn.disabled = false;
-        btn.innerHTML = '<span>🔄</span> Reintentar';
-      }
-    }, 1000);
-  }
-  return isQuota;
-}
-
-// ── Sufijo de modo para el system prompt ──
-function _getModeInstruction() {
-  if (_aiMode === 'simple') return '\n\nMUY IMPORTANTE: Explica como si el alumno tuviera 12 años. Usa analogías cotidianas, ejemplos simples y lenguaje coloquial. Evita tecnicismos. Sé cálido y motivador.';
-  if (_aiMode === 'tecnico') return '\n\nMUY IMPORTANTE: Da una explicación técnica y profunda. Incluye fundamentos teóricos, fórmulas si aplica, y contexto académico completo.';
-  return ''; // normal — sin modificación
-}
-
-async function askExamAI() {
-  const q = S.questions && S.questions[S.current];
-  if (!q) return;
-
-  const btn = document.getElementById('examAIBtn');
-  const body = document.getElementById('examAIBody');
-  btn.disabled = true;
-  btn.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.5);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px"></span> Analizando…';
-
-  setBobiState('walk');
-  body.innerHTML = '<div class="exam-ai-thinking">Analizando<div class="exam-ai-thinking-dots"><span></span><span></span><span></span></div></div>';
-
-  const letters = ['A','B','C','D','E'];
-  const optsText = q.options.map((o,i) => `${letters[i]}) ${o}`).join('\n');
-  const areaInfo = q.area ? `Área: ${q.area}\n` : '';
-
-  const aiCfg = getExamAIConfig();
-  console.log('ExamAI → usando:', aiCfg.label, '| modo:', _aiMode);
-
-  const SYSTEM_PROMPTS = {
-    gemini: `Eres BOBI, tutor experto del EXANI-II (premedicina). Tu misión es que el alumno ENTIENDA de verdad, no solo memorice.
-
-Responde SIEMPRE con EXACTAMENTE esta estructura (usa los emojis como encabezados):
-
-🎯 Concepto:
-[Nombra el tema central en 1 oración clara. Ejemplo: "Este reactivo evalúa la ley de conservación de energía."]
-
-💡 Análisis de opciones:
-A) [Por qué es correcta o incorrecta — sé específico, menciona el error conceptual si aplica]
-B) [ídem]
-C) [ídem]
-D) [ídem]
-
-✅ Respuesta correcta:
-[Letra + nombre de la opción. Luego explica el PORQUÉ en 2-3 oraciones con la lógica completa. Si hay cálculo, muéstralo paso a paso.]
-
-REGLAS: Sin markdown, sin asteriscos, sin negritas. Español mexicano. Directo y útil.`,
-
-    grok_mat: `Eres BOBI, tutor de matemáticas del EXANI-II. Eres meticuloso con los cálculos y siempre muestras el procedimiento.
-
-Responde con EXACTAMENTE esta estructura:
-
-🎯 Concepto:
-[Tema matemático específico: tipo de ecuación, fórmula, propiedad, etc.]
-
-💡 Análisis de opciones:
-A) [Evalúa la opción: si es incorrecta, muestra rápidamente por qué falla el cálculo]
-B) [ídem]
-C) [ídem]
-D) [ídem]
-
-✅ Respuesta correcta:
-[Letra + desarrollo completo paso a paso:
-Paso 1: ...
-Paso 2: ...
-Resultado: ...]
-
-REGLAS: Sin markdown. Si hay fracciones escríbelas como "3/4". Español mexicano.`,
-
-    grok_red: `Eres BOBI, tutor de Redacción y Español del EXANI-II. Eres experto en gramática, ortografía y estructura del español mexicano.
-
-Responde con EXACTAMENTE esta estructura:
-
-🎯 Concepto:
-[Habilidad gramatical evaluada: concordancia, puntuación, uso de conectivos, ortografía, etc.]
-
-💡 Análisis de opciones:
-A) [Explica si es correcta o incorrecta y por qué según la norma del español]
-B) [ídem]
-C) [ídem]
-D) [ídem]
-
-✅ Respuesta correcta:
-[Letra + justificación con la regla gramatical específica. Si aplica, menciona la norma de la RAE o el DRAE.]
-
-REGLAS: Sin markdown. Cita reglas concretas, no solo digas "es incorrecto". Español mexicano formal.`,
-
-    grok_comp: `Eres BOBI, tutor de Comprensión Lectora del EXANI-II. Ayudas al alumno a identificar qué tipo de comprensión se evalúa y a encontrar la evidencia en el texto.
-
-Responde con EXACTAMENTE esta estructura:
-
-🎯 Concepto:
-[Tipo de comprensión: LITERAL (está explícito), INFERENCIAL (hay que deducir), CRÍTICA (requiere evaluar/opinar) o SEMÁNTICA (significado de palabras)]
-
-💡 Análisis de opciones:
-A) [Indica si tiene evidencia en el texto o no, y cita brevemente la parte relevante]
-B) [ídem]
-C) [ídem]
-D) [ídem]
-
-✅ Respuesta correcta:
-[Letra + explica exactamente QUÉ parte del texto la sustenta y POR QUÉ las demás opciones no son válidas.]
-
-REGLAS: Sin markdown. Siempre ancla las respuestas al texto dado. Español mexicano.`
-  };
-
-  function getSystemPrompt(cfg) {
-    let base = '';
-    if (cfg.type === 'gemini') base = SYSTEM_PROMPTS.gemini;
-    else if (cfg.url.includes('grok-mat')) base = SYSTEM_PROMPTS.grok_mat;
-    else if (cfg.url.includes('grok-red')) base = SYSTEM_PROMPTS.grok_red;
-    else base = SYSTEM_PROMPTS.grok_comp;
-    return base + _getModeInstruction();
-  }
-
-  const systemPrompt = getSystemPrompt(aiCfg);
-  const userText = `${areaInfo}Pregunta: ${q.question}\n\nOpciones:\n${optsText}`;
-
-  // Imagen: priorizar la del alumno, luego la del reactivo
-  const imageDataUrl = _aiUserImageData
-    ? _aiUserImageData.dataUrl
-    : (q.image && S.images[q.image]) ? S.images[q.image] : null;
-
-  // Si hay imagen del alumno pero el modelo es Grok, avisar y usar Gemini
-  let finalCfg = aiCfg;
-  if (_aiUserImageData && aiCfg.type !== 'gemini') {
-    finalCfg = { type: 'gemini', url: 'https://gemini-proxy.donniaxel55.workers.dev', label: 'Gemini · Imagen' };
-  }
-
-  // Reset historial para nueva pregunta
-  _aiConvHistory = [];
-  _aiMsgCount = 0;
-  localStorage.setItem('bobi_last_req', Date.now());
-
-  try {
-    const { text, rawErr } = await _callBobiAPI(finalCfg, systemPrompt, userText, imageDataUrl);
-
-    if (text) {
-      body.innerHTML = '';
-      _renderBobiResponse(body, text);
-      _aiLastFullText = text;
-      _aiMsgCount = 1;
-      // Guardar en historial
-      _aiConvHistory.push({ role: 'user', content: userText });
-      _aiConvHistory.push({ role: 'assistant', content: text });
-      // TTS
-      const ttsBtn = document.getElementById('examAITTSBtn');
-      ttsBtn.style.display = '';
-      ttsBtn._text = text;
-      // Activar sección de chat conversacional
-      const chatSec = document.getElementById('aiChatSection');
-      if (chatSec) {
-        chatSec.style.display = '';
-        _updateMsgCounter();
-      }
-      // Mostrar pistas
-      const hintRow = document.getElementById('aiHintRow');
-      if (hintRow) hintRow.style.display = '';
-      _aiHintLevel = 0;
-    } else {
-      const isQuota = _showBobiCooldown(body, btn, rawErr);
-      if (isQuota) return;
-    }
-  } catch(e) {
-    const isNet = e.message && e.message.includes('fetch');
-    body.innerHTML = `<div class="exam-ai-error-card">
-      <div class="exam-ai-error-icon">${isNet ? '📡' : '😅'}</div>
-      <div class="exam-ai-error-title">${isNet ? 'Sin conexión' : 'Algo salió mal'}</div>
-      <div class="exam-ai-error-desc">${isNet ? 'Revisa tu internet e intenta de nuevo.' : 'Ocurrió un error inesperado. Intenta de nuevo.'}</div>
-    </div>`;
-  }
-
-  if (!window._bobiCooldown) {
-    setBobiState('idle');
-    btn.disabled = false;
-    btn.innerHTML = '<span>🔄</span> Volver a preguntar';
-  }
-}
-
-// ── Actualiza el contador de mensajes ──
-function _updateMsgCounter() {
-  const el = document.getElementById('aiMsgCounter');
-  if (!el) return;
-  const turns = Math.floor(_aiMsgCount / 2);
-  if (_aiMsgCount <= 1) {
-    el.textContent = 'Puedes hacer preguntas de seguimiento sin límite';
-  } else {
-    el.textContent = `${turns} pregunta${turns !== 1 ? 's' : ''} de seguimiento · Sin límite`;
-  }
-}
-
-// ══════════════════════════════════════════
-//  CHAT CONVERSACIONAL CON BOBI
-// ══════════════════════════════════════════
-async function sendAIChat() {
-  const inp = document.getElementById('aiChatInp');
-  const sendBtn = document.getElementById('aiChatSend');
-  const body = document.getElementById('examAIBody');
-  const text = inp.value.trim();
-  if (!text || sendBtn.disabled) return;
-
-  // Primera vez: convertir el body en thread
-  let thread = body.querySelector('.ai-chat-thread');
-  if (!thread) {
-    thread = document.createElement('div');
-    thread.className = 'ai-chat-thread';
-    const existingContent = body.innerHTML;
-    body.innerHTML = '';
-    const bobiBubble = document.createElement('div');
-    bobiBubble.className = 'ai-chat-bubble bobi';
-    bobiBubble.textContent = _aiLastFullText;
-    thread.appendChild(bobiBubble);
-    body.appendChild(thread);
-  }
-
-  // Burbuja del usuario
-  const userBubble = document.createElement('div');
-  userBubble.className = 'ai-chat-bubble user';
-  userBubble.textContent = text;
-  thread.appendChild(userBubble);
-  inp.value = '';
-  inp.style.height = 'auto';
-  body.scrollTop = body.scrollHeight;
-
-  sendBtn.disabled = true;
-  setBobiState('walk');
-
-  // Burbuja "pensando"
-  const thinkBubble = document.createElement('div');
-  thinkBubble.className = 'ai-chat-bubble bobi';
-  thinkBubble.innerHTML = '<div class="exam-ai-thinking-dots"><span></span><span></span><span></span></div>';
-  thread.appendChild(thinkBubble);
-  body.scrollTop = body.scrollHeight;
-
-  const aiCfg = getExamAIConfig();
-  const q = S.questions && S.questions[S.current];
-  const areaCtx = q && q.area ? ` (Área: ${q.area})` : '';
-
-  const systemFollowUp = `Eres BOBI, tutor del EXANI-II. Ya le diste una explicación al alumno sobre una pregunta${areaCtx}. El alumno hace una pregunta de seguimiento sobre ese tema.
-
-Responde de forma clara y directa en español mexicano. Sin markdown ni asteriscos.
-Si te piden un ejemplo, dalo concreto.
-Si preguntan por otro concepto relacionado, explícalo brevemente y conéctalo con la pregunta original.
-Si la duda ya fue resuelta en tu respuesta anterior, señálalo amablemente y amplía si es necesario.${_getModeInstruction()}`;
-
-  // Agregar al historial
-  _aiConvHistory.push({ role: 'user', content: text });
-
-  try {
-    const { text: reply, rawErr } = await _callBobiAPI(aiCfg, systemFollowUp, text, null);
-    thinkBubble.remove();
-    if (reply) {
-      const replyBubble = document.createElement('div');
-      replyBubble.className = 'ai-chat-bubble bobi';
-      replyBubble.textContent = reply;
-      thread.appendChild(replyBubble);
-      _aiConvHistory.push({ role: 'assistant', content: reply });
-      _aiLastFullText = reply;
-      _aiMsgCount += 2;
-      _updateMsgCounter();
-    } else {
-      const errBubble = document.createElement('div');
-      errBubble.className = 'ai-chat-bubble bobi';
-      errBubble.textContent = '😅 No pude responder. Intenta reformular tu pregunta.';
-      thread.appendChild(errBubble);
-      _aiConvHistory.pop();
-    }
-  } catch(e) {
-    thinkBubble.remove();
-    const errBubble = document.createElement('div');
-    errBubble.className = 'ai-chat-bubble bobi';
-    errBubble.textContent = '📡 Sin conexión. Revisa tu internet.';
-    thread.appendChild(errBubble);
-    _aiConvHistory.pop();
-  }
-
-  setBobiState('idle');
-  sendBtn.disabled = false;
-  body.scrollTop = body.scrollHeight;
-}
-
-// ══════════════════════════════════════════
-//  PISTAS PROGRESIVAS
-// ══════════════════════════════════════════
-async function askHint(level) {
-  if (level <= _aiHintLevel) return; // ya se dio esta pista
-  const q = S.questions && S.questions[S.current];
-  if (!q) return;
-
-  const btn = document.getElementById('hintBtn' + level);
-  if (btn) { btn.disabled = true; btn.style.opacity = '.5'; }
-
-  const aiCfg = getExamAIConfig();
-  const letters = ['A','B','C','D','E'];
-  const optsText = q.options.map((o,i) => `${letters[i]}) ${o}`).join('\n');
-
-  const hintPrompts = {
-    1: `Eres BOBI, tutor del EXANI-II. Para esta pregunta, da SOLO el concepto o tema central en 1-2 oraciones. NO menciones qué opción es correcta. Solo orienta al alumno sobre el tema.`,
-    2: `Eres BOBI, tutor del EXANI-II. Para esta pregunta, di SOLO cuáles opciones son claramente incorrectas y por qué en pocas palabras, SIN revelar la respuesta correcta.`,
-    3: `Eres BOBI, tutor del EXANI-II. Revela la respuesta correcta con una explicación completa y concisa.`
-  };
-
-  const userText = `Pregunta: ${q.question}\n\nOpciones:\n${optsText}`;
-  const body = document.getElementById('examAIBody');
-
-  setBobiState('walk');
-  try {
-    const { text } = await _callBobiAPI(aiCfg, hintPrompts[level] + _getModeInstruction(), userText, null);
-    if (text) {
-      const hintEl = document.createElement('div');
-      hintEl.className = 'ai-hint-bubble';
-      hintEl.textContent = (level === 1 ? '💡 Pista 1: ' : level === 2 ? '🔎 Pista 2: ' : '✅ Respuesta: ') + text;
-      body.appendChild(hintEl);
-      body.scrollTop = body.scrollHeight;
-      _aiHintLevel = level;
-      // Activar siguiente pista
-      if (level < 3) {
-        const nextBtn = document.getElementById('hintBtn' + (level + 1));
-        if (nextBtn) nextBtn.disabled = false;
-      }
-      // Desactivar la pista actual permanentemente
-      if (btn) btn.style.opacity = '.4';
-    }
-  } catch(e) {
-    if (btn) { btn.disabled = false; btn.style.opacity = ''; }
-  }
-  setBobiState('idle');
-}
-
-// ══════════════════════════════════════════
-//  DIAGNÓSTICO POST-EXAMEN
-// ══════════════════════════════════════════
-async function openDiagModal() {
-  const overlay = document.getElementById('aiDiagOverlay');
-  const diagBody = document.getElementById('aiDiagBody');
-  if (!overlay || !diagBody) return;
-  overlay.classList.add('show');
-  diagBody.innerHTML = '<div class="ai-diag-thinking">Analizando tu examen<div class="exam-ai-thinking-dots"><span></span><span></span><span></span></div></div>';
-
-  const qs = S.questions;
-  const ans = S.answers;
-  const total = qs.length;
-  const ok = qs.filter((q,i) => ans[i] === q.answer).length;
-  const fail = Object.keys(ans).length - ok;
-  const blank = total - Object.keys(ans).length;
-  const pct = Math.round((ok / total) * 100);
-
-  // Calcular áreas con más errores
-  const areaErrors = {};
-  qs.forEach((q, i) => {
-    if (ans[i] !== q.answer) {
-      const area = q.area || 'General';
-      areaErrors[area] = (areaErrors[area] || 0) + 1;
-    }
-  });
-  const weakAreas = Object.entries(areaErrors).sort((a,b) => b[1]-a[1]).slice(0,5).map(([a,c]) => `${a} (${c} errores)`).join(', ');
-  const examTitle = (S.currentExamMeta && S.currentExamMeta.titulo) || 'EXANI-II';
-
-  const prompt = `Eres BOBI, tutor experto del EXANI-II. Un alumno acaba de terminar un simulacro llamado "${examTitle}".
-Resultados:
-- Puntaje: ${pct}% (${ok} de ${total} correctas)
-- Incorrectas: ${fail}
-- Sin responder: ${blank}
-- Áreas con más errores: ${weakAreas || 'No determinado'}
-
-Genera un diagnóstico personalizado CON EXACTAMENTE esta estructura:
-
-📊 DIAGNÓSTICO GENERAL
-[2-3 oraciones evaluando el desempeño global honestamente pero con empatía]
-
-🔴 ÁREAS A REFORZAR
-[Lista las 3 áreas más débiles con una recomendación específica de estudio para cada una]
-
-✅ FORTALEZAS
-[Menciona qué hizo bien el alumno o qué áreas domina mejor]
-
-📅 PLAN DE ESTUDIO
-[3 pasos concretos y accionables para mejorar antes del próximo simulacro]
-
-💪 MOTIVACIÓN
-[1-2 oraciones motivadoras y personalizadas]
-
-Sin markdown ni asteriscos. Español mexicano. Sé directo, honesto y motivador.`;
-
-  const aiCfg = getExamAIConfig();
-  try {
-    const { text } = await _callBobiAPI(aiCfg, prompt, 'Genera el diagnóstico del alumno.', null);
-    diagBody.textContent = text || 'No se pudo generar el diagnóstico. Intenta de nuevo.';
-  } catch(e) {
-    diagBody.textContent = '📡 Sin conexión. Verifica tu internet e intenta de nuevo.';
-  }
-}
-
-function closeDiagModal() {
-  const overlay = document.getElementById('aiDiagOverlay');
-  if (overlay) overlay.classList.remove('show');
-}
-
-// ══════════════════════════════════════════
-//  PRÁCTICA SIMILAR (preguntas generadas)
-// ══════════════════════════════════════════
-let _practiceQuestions = [];
-
-async function openPracticeFromResults() {
-  const qs = S.questions;
-  const ans = S.answers;
-  // Tomar hasta 3 preguntas fallidas para contexto
-  const failedQs = qs.filter((q,i) => ans[i] !== q.answer && ans[i] !== undefined).slice(0,3);
-  const context = failedQs.length > 0
-    ? failedQs.map(q => `Tema: ${q.area || 'General'} — Pregunta: ${q.question.slice(0,100)}`).join('\n')
-    : `Examen: ${(S.currentExamMeta && S.currentExamMeta.titulo) || 'EXANI-II'}`;
-  await _openPracticeModal(context, (S.currentExamMeta && S.currentExamMeta.materia) || 'general');
-}
-
-async function openPracticeFromQuestion() {
-  const q = S.questions && S.questions[S.current];
-  if (!q) return;
-  const context = `Área: ${q.area || 'General'}\nPregunta similar a: ${q.question.slice(0,120)}`;
-  await _openPracticeModal(context, q.area || 'general');
-}
-
-async function _openPracticeModal(context, area) {
-  const overlay = document.getElementById('aiPracticeOverlay');
-  const practiceBody = document.getElementById('aiPracticeBody');
-  if (!overlay || !practiceBody) return;
-  overlay.classList.add('show');
-  practiceBody.innerHTML = '<div class="ai-diag-thinking">Generando preguntas…<div class="exam-ai-thinking-dots"><span></span><span></span><span></span></div></div>';
-  _practiceQuestions = [];
-
-  const prompt = `Eres BOBI, generador de reactivos del estilo EXANI-II. Genera exactamente 4 preguntas de opción múltiple sobre estos temas:
-${context}
-
-Responde ÚNICAMENTE con JSON válido, sin texto extra, sin markdown, sin explicaciones fuera del JSON:
-[
-  {
-    "q": "texto de la pregunta",
-    "opts": ["opción A", "opción B", "opción C", "opción D"],
-    "ans": 0,
-    "exp": "explicación breve de por qué esa es la correcta"
-  }
-]
-
-El campo "ans" es el índice (0-3) de la opción correcta. 4 preguntas. Solo el JSON.`;
-
-  const aiCfg = getExamAIConfig();
-  try {
-    const { text } = await _callBobiAPI(aiCfg, prompt, 'Genera las preguntas.', null);
-    let jsonStr = text.replace(/```json|```/g, '').trim();
-    const startIdx = jsonStr.indexOf('[');
-    const endIdx = jsonStr.lastIndexOf(']');
-    if (startIdx !== -1 && endIdx !== -1) jsonStr = jsonStr.slice(startIdx, endIdx + 1);
-    _practiceQuestions = JSON.parse(jsonStr);
-    _renderPracticeQuestions(practiceBody);
-  } catch(e) {
-    practiceBody.innerHTML = '<div style="text-align:center;padding:24px;color:#64748b;font-size:13px">😅 No se pudieron generar las preguntas. Intenta de nuevo.</div>';
-  }
-}
-
-function _renderPracticeQuestions(container) {
-  if (!_practiceQuestions.length) return;
-  container.innerHTML = '';
-  const letters = ['A','B','C','D'];
-  _practiceQuestions.forEach((pq, qi) => {
-    const card = document.createElement('div');
-    card.className = 'ai-pq-card';
-    const numEl = document.createElement('div');
-    numEl.className = 'ai-pq-num';
-    numEl.textContent = `Pregunta ${qi + 1}`;
-    const textEl = document.createElement('div');
-    textEl.className = 'ai-pq-text';
-    textEl.textContent = pq.q;
-    const optsEl = document.createElement('div');
-    optsEl.className = 'ai-pq-opts';
-    pq.opts.forEach((opt, oi) => {
-      const btn = document.createElement('button');
-      btn.className = 'ai-pq-opt';
-      btn.textContent = `${letters[oi]}) ${opt}`;
-      btn.onclick = function() {
-        // Desactivar todos los botones de esta pregunta
-        optsEl.querySelectorAll('.ai-pq-opt').forEach(b => b.onclick = null);
-        if (oi === pq.ans) {
-          btn.classList.add('correct');
-        } else {
-          btn.classList.add('wrong');
-          optsEl.querySelectorAll('.ai-pq-opt')[pq.ans].classList.add('correct');
-        }
-        // Mostrar explicación
-        const expEl = document.createElement('div');
-        expEl.style.cssText = 'font-size:12px;color:#475569;margin-top:8px;padding:8px 10px;background:#f0fdf4;border-radius:8px;line-height:1.5';
-        expEl.textContent = '💡 ' + (pq.exp || '');
-        card.appendChild(expEl);
-      };
-      optsEl.appendChild(btn);
-    });
-    card.appendChild(numEl);
-    card.appendChild(textEl);
-    card.appendChild(optsEl);
-    container.appendChild(card);
-  });
-}
-
-function closePracticeModal() {
-  const overlay = document.getElementById('aiPracticeOverlay');
-  if (overlay) overlay.classList.remove('show');
-}
 
 // ══════════════════════════════════════════
 //  NOTAS PERSONALES POR PREGUNTA
