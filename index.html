@@ -380,6 +380,13 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
   transition:all .2s;font-family:'Sora',sans-serif;opacity:.4;pointer-events:none}
 .btn-export-new.ready{opacity:1;pointer-events:auto}
 .btn-export-new.ready:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(13,148,136,.3)}
+.btn-save-server{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;border:none;
+  border-radius:10px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;
+  transition:all .2s;font-family:'Sora',sans-serif;opacity:.4;pointer-events:none;display:flex;align-items:center;gap:8px}
+.btn-save-server.ready{opacity:1;pointer-events:auto}
+.btn-save-server.ready:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(37,99,235,.4)}
+.btn-save-server.saving{opacity:.7;pointer-events:none}
+.builder-export-btns{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 
 /* ── QUESTION EDITOR MODAL ── */
 .qed-overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(4px);
@@ -2808,9 +2815,14 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
     <!-- Export bar -->
     <div class="builder-export-bar">
       <div class="builder-export-info" id="bldExportInfo">Necesitas al menos un título y una pregunta</div>
-      <button class="btn-export-new" id="btnExportNew" onclick="exportNewExamZip()">
-        📦 Exportar exams-update.zip
-      </button>
+      <div class="builder-export-btns">
+        <button class="btn-save-server" id="btnSaveServer" onclick="saveExamToServer()">
+          ☁️ Guardar en servidor
+        </button>
+        <button class="btn-export-new" id="btnExportNew" onclick="exportNewExamZip()">
+          📦 Exportar ZIP (respaldo)
+        </button>
+      </div>
     </div>
 
   </div>
@@ -7693,14 +7705,85 @@ function saveQuestion() {
 function updateBuilderExportBtn() {
   const titulo = ($('bldTitulo') && $('bldTitulo').value.trim()) || '';
   const ready  = titulo.length > 0 && EB.questions.length > 0;
-  const btn    = $('btnExportNew');
-  if (!btn) return;
-  btn.classList.toggle('ready', ready);
+  const btnZip = $('btnExportNew');
+  const btnSrv = $('btnSaveServer');
+  if (btnZip) btnZip.classList.toggle('ready', ready);
+  if (btnSrv) btnSrv.classList.toggle('ready', ready);
   const info = $('bldExportInfo');
   if (!ready) {
-    info.textContent = titulo ? `Agrega al menos 1 pregunta para exportar` : 'Necesitas un título y al menos 1 pregunta';
+    info.textContent = titulo ? `Agrega al menos 1 pregunta para guardar` : 'Necesitas un título y al menos 1 pregunta';
   } else {
-    info.textContent = `${EB.questions.length} pregunta(s) lista(s) para exportar`;
+    info.textContent = `${EB.questions.length} pregunta(s) lista(s) — ☁️ Guardar en servidor o 📦 exportar ZIP`;
+  }
+}
+
+// ── Guardar examen directamente en Firebase (sin ZIP) ──
+async function saveExamToServer() {
+  const titulo = $('bldTitulo') && $('bldTitulo').value.trim();
+  if (!titulo || !EB.questions.length) return;
+  if (!window._fbSaveExam) {
+    showToast('⚠️ Firebase no está disponible. Usa exportar ZIP.');
+    return;
+  }
+
+  const btn  = $('btnSaveServer');
+  const orig = btn.textContent;
+  btn.textContent = '⏳ Guardando…';
+  btn.classList.add('saving');
+  btn.classList.remove('ready');
+
+  try {
+    const h       = parseInt($('bldHoras')?.value)   || 0;
+    const m       = parseInt($('bldMins')?.value)    || 0;
+    const total   = h * 60 + m;
+    const materia = $('bldMateria')?.value.trim()    || '';
+    const area    = $('bldArea')?.value.trim()        || '';
+    const ver     = $('bldVersion')?.value.trim()     || '';
+
+    const examData = {
+      titulo,
+      materia,
+      icono:          guessIcon(area || materia),
+      tags:           buildTags(area, ver),
+      preguntas:      EB.questions.length,
+      horas:          `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`,
+      tiempo_minutos: total,
+      imagenes:       EB.questions.filter(q => q.imageName).length,
+      version:        ver,
+      nuevo:          true,
+      agregado:       new Date().toISOString(),
+      updatedAt:      new Date().toISOString(),
+      updatedBy:      (typeof S !== 'undefined' && S.user) ? S.user : 'admin',
+      questions:      EB.questions,
+    };
+
+    // Si estamos editando un examen existente, actualizar en vez de duplicar
+    const existingFb = CATALOG.find(e => e.titulo === titulo && e._fbId);
+    await window._fbSaveExam(examData, existingFb ? existingFb._fbId : null);
+
+    showToast(`✅ "${titulo}" guardado en el servidor — visible para todos en tiempo real`);
+
+    // Limpiar builder si es examen nuevo
+    if (!existingFb) {
+      if (confirm('¿Limpiar el editor para crear otro examen?')) {
+        EB.questions = [];
+        if ($('bldTitulo'))   $('bldTitulo').value   = '';
+        if ($('bldMateria'))  $('bldMateria').value  = '';
+        if ($('bldArea'))     $('bldArea').value      = '';
+        if ($('bldVersion'))  $('bldVersion').value   = '';
+        if ($('bldHoras'))    $('bldHoras').value     = '0';
+        if ($('bldMins'))     $('bldMins').value      = '0';
+        renderBuilder();
+        updateBuilderExportBtn();
+      }
+    }
+  } catch(err) {
+    console.error('saveExamToServer error:', err);
+    showToast(`❌ Error al guardar: ${err.message}`);
+  } finally {
+    btn.textContent = orig;
+    btn.classList.remove('saving');
+    updateBuilderExportBtn();
   }
 }
 
