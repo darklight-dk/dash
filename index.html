@@ -8148,6 +8148,10 @@ const firebaseConfig = {
 const fbApp   = initializeApp(firebaseConfig);
 const db      = getDatabase(fbApp);
 const auth    = getAuth(fbApp);
+window._auth  = auth;
+window._db    = db;
+window._ref   = ref;
+window._get   = get;
 const msgsRef  = ref(db, 'chat/messages');
 const presRef  = ref(db, 'chat/presence');
 const usersRef = ref(db, 'users');
@@ -10813,21 +10817,12 @@ const NOVA = {
 
 // ── Configuración multi-modelo ────────────────────
 const NOVA_GEMINI_URL = 'https://gemini-proxy.donniaxel55.workers.dev';
-// 3 workers Groq — se rotan round-robin para no saturar uno solo
-const NOVA_GROQ_WORKERS = [
-  'https://grok-mat.donniaxel55.workers.dev',
-  'https://grok-red.donniaxel55.workers.dev',
-  'https://grok-comp.donniaxel55.workers.dev',
-];
-let _novaGroqIdx = 0; // índice del worker actual
-function novaNextGroqURL() {
-  const url = NOVA_GROQ_WORKERS[_novaGroqIdx % NOVA_GROQ_WORKERS.length];
-  _novaGroqIdx++;
-  return url;
-}
+// Groq actúa como red de respaldo y verificador de JSON — usa el mismo worker proxy que BOBI
+const NOVA_GROQ_URL   = 'https://grok-mat.donniaxel55.workers.dev'; // worker proxy (sin API key necesaria)
+const NOVA_GROQ_KEY   = ''; // no se necesita — el worker maneja la autenticación
 
 // Indica qué modelo se usó en el último turno
-let NOVA_LAST_MODEL = 'groq';
+let NOVA_LAST_MODEL = 'gemini';
 
 const NOVA_SYSTEM = "Eres NOVA, asistente de estudio IA para el EXANI-II (México).\n"
   + "Personalidad: directa, precisa, motivadora. Explicas paso a paso.\n"
@@ -10912,7 +10907,7 @@ async function novaCallGemini(geminiContents) {
 
 // ── Llamada a Groq (red de respaldo / verificador) ─
 async function novaCallGroq(messages) {
-  const res = await fetch(novaNextGroqURL(), {
+  const res = await fetch(NOVA_GROQ_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -11049,22 +11044,19 @@ async function novaSendMessage(text) {
     const hasMedia = NOVA.pdfBase64 || (Array.isArray(userContent) && userContent.some(c => c.type === 'image'));
 
     let raw = '';
-    let modelUsed = 'groq';
+    let modelUsed = 'gemini';
 
-    // --- Paso 1: Groq para texto puro, Gemini solo si hay PDF/imagen ---
-    if (hasMedia) {
-      // Solo Gemini puede leer archivos visuales
+    // --- Paso 1: Gemini (lee PDF e imágenes) ---
+    try {
       raw = await novaCallGemini(novaMsgsToGemini(NOVA.messages));
       modelUsed = 'gemini';
-    } else {
-      // Texto puro → Groq (más rápido, sin costo de tokens Gemini)
-      try {
+    } catch(geminiErr) {
+      // Si Gemini falla y NO hay media, intentar Groq directamente
+      if (!hasMedia) {
         raw = await novaCallGroq(novaMsgsToGroq(NOVA.messages));
         modelUsed = 'groq';
-      } catch(groqErr) {
-        // Groq falla → Gemini como respaldo
-        raw = await novaCallGemini(novaMsgsToGemini(NOVA.messages));
-        modelUsed = 'gemini';
+      } else {
+        throw geminiErr; // Media requiere Gemini
       }
     }
 
