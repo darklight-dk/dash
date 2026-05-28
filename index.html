@@ -5802,20 +5802,89 @@ function minutosToHoras(min) {
 async function loadCatalogExam(idx) {
   const ex = CATALOG[idx];
   if (!ex) return;
-  const path = ex.path || `exams/${ex.archivo || ex.file}`;
+
   const btns = [...document.querySelectorAll('.exam-card-btn')].filter(b => b.textContent.includes('Iniciar'));
   btns.forEach(b => { b.textContent = '⏳ Cargando…'; b.style.pointerEvents = 'none'; });
+
   try {
+    // ── Opción A: preguntas en Firebase (nuevo sistema) ──
+    if (ex.questions && Array.isArray(ex.questions) && ex.questions.length > 0) {
+      // Convertir formato Firebase al formato esperado por handleFile/startExam
+      const questions = ex.questions.map(q => ({
+        question:    q.text    || q.question   || '',
+        options:     q.options || [],
+        answer:      q.answerIdx !== undefined ? (LETTERS[q.answerIdx] || 'A') : (q.answer || 'A'),
+        explanation: q.explanation || '',
+        area:        q.area || '',
+        image:       q.imageName || q.image || null,
+        imageDataUrl:q.imageDataUrl || null,
+        passage:     q.passage || '',
+        passage_id:  q.passage_id || '',
+        passage_title: q.passage_title || '',
+      }));
+
+      const totalMins = ex.tiempo_minutos || 0;
+      const metaObj = {
+        titulo:         ex.titulo,
+        materia:        ex.materia,
+        version:        ex.version,
+        tiempo_minutos: totalMins,
+        area:           ex.tags && ex.tags[0],
+      };
+
+      // Iniciar examen directamente con los datos
+      startExamFromData({ meta: metaObj, questions }, ex.titulo);
+      return;
+    }
+
+    // ── Opción B: cargar desde ZIP (sistema anterior) ──
+    const path = ex.path || `exams/${ex.archivo || ex.file}`;
     const resp = await fetch(path);
     if (!resp.ok) throw new Error('No se pudo cargar: ' + path);
     const blob = await resp.blob();
     const name = path.split('/').pop();
     const file = new File([blob], name, { type: 'application/zip' });
     await handleFile(file);
+
   } catch(e) {
-    alert('⚠️ Error al cargar el examen.\n\nAsegúrate de abrir el HTML desde un servidor local (Live Server) y que el ZIP esté en la ruta indicada en catalog.json.');
+    alert('⚠️ Error al cargar el examen.\n\n' + e.message);
   } finally {
     btns.forEach(b => { b.textContent = '▶ Iniciar examen'; b.style.pointerEvents = ''; });
+  }
+}
+
+// ── Iniciar examen desde datos directos (Firebase) ──
+function startExamFromData(data, titleOverride) {
+  try {
+    hideDashError();
+    load(true, 'Cargando examen…', titleOverride || '');
+
+    const meta      = data.meta || {};
+    const questions = data.questions || [];
+
+    if (!questions.length) throw new Error('El examen no tiene preguntas.');
+
+    // Cargar en el state global igual que handleFile
+    S.questions = questions;
+    S.currentExamMeta = meta;
+    S.rawZip = null;
+
+    // Cargar imágenes embebidas (dataURL) en S.images
+    S.images = {};
+    questions.forEach(q => {
+      if (q.imageDataUrl && q.image) S.images[q.image] = q.imageDataUrl;
+      if (q.imageDataUrl && q.imageName) S.images[q.imageName] = q.imageDataUrl;
+    });
+
+    // Tiempo
+    if (meta.tiempo_minutos) S.timerSecs = meta.tiempo_minutos * 60;
+
+    load(false);
+    startExam();
+  } catch(e) {
+    load(false);
+    alert('Error al iniciar examen: ' + e.message);
+    console.error(e);
   }
 }
 
@@ -5824,7 +5893,9 @@ async function editCatalogExam(idx) {
   if (S.role !== 'Administrador') return;
   const ex = CATALOG[idx];
   if (!ex) return;
-  const examPath = ex.path || ('exams/' + (ex.archivo || ex.file));
+
+  // Guardar el _fbId del examen que estamos editando para actualizar en vez de duplicar
+  window._editingFbId = ex._fbId || null;
 
   const editBtns = document.querySelectorAll('.exam-card-btn');
   editBtns.forEach(b => {
@@ -5832,54 +5903,71 @@ async function editCatalogExam(idx) {
   });
 
   try {
-    const resp = await fetch(examPath);
-    if (!resp.ok) throw new Error('No se pudo cargar: ' + examPath);
-    const zip = await JSZip.loadAsync(await resp.arrayBuffer());
+    let questions = null;
+    let meta = {};
 
-    const jsonFile = Object.values(zip.files).find(f => !f.dir && f.name.match(/(questions|preguntas)\.json$/i));
-    if (!jsonFile) throw new Error('No se encontro questions.json ni preguntas.json en el ZIP.');
+    // ── Opción A: preguntas ya en Firebase (nuevo sistema) ──
+    if (ex.questions && Array.isArray(ex.questions) && ex.questions.length > 0) {
+      questions = ex.questions;
+      meta = {
+        titulo:         ex.titulo,
+        version:        ex.version,
+        materia:        ex.materia,
+        area:           ex.tags && ex.tags[0],
+        tiempo_minutos: ex.tiempo_minutos,
+      };
+    }
+    // ── Opción B: cargar desde ZIP (sistema anterior) ──
+    else {
+      const examPath = ex.path || ('exams/' + (ex.archivo || ex.file));
+      const resp = await fetch(examPath);
+      if (!resp.ok) throw new Error('No se pudo cargar: ' + examPath);
+      const zip = await JSZip.loadAsync(await resp.arrayBuffer());
 
-    const parsedAdmin = JSON.parse(await jsonFile.async('string'));
-    const data = Array.isArray(parsedAdmin)
-      ? { meta: {}, questions: parsedAdmin }
-      : parsedAdmin;
-    if (!data.questions || !data.questions.length) throw new Error('El JSON no contiene preguntas.');
+      const jsonFile = Object.values(zip.files).find(f => !f.dir && f.name.match(/(questions|preguntas)\.json$/i));
+      if (!jsonFile) throw new Error('No se encontró questions.json ni preguntas.json en el ZIP.');
 
-    // Cargar imágenes como dataURLs
-    const imgMap = {};
-    const imgFiles = Object.values(zip.files).filter(f => !f.dir && f.name.match(/\.(jpe?g|png|gif|webp|svg)$/i));
-    for (const imgFile of imgFiles) {
-      const b64 = await imgFile.async('base64');
-      const ext = imgFile.name.split('.').pop().toLowerCase();
-      const mime = ext === 'svg' ? 'image/svg+xml' : ext === 'png' ? 'image/png' : 'image/jpeg';
-      imgMap[imgFile.name.split('/').pop()] = 'data:' + mime + ';base64,' + b64;
+      const parsedAdmin = JSON.parse(await jsonFile.async('string'));
+      const data = Array.isArray(parsedAdmin) ? { meta: {}, questions: parsedAdmin } : parsedAdmin;
+      if (!data.questions || !data.questions.length) throw new Error('El JSON no contiene preguntas.');
+
+      // Cargar imágenes como dataURLs
+      const imgMap = {};
+      const imgFiles = Object.values(zip.files).filter(f => !f.dir && f.name.match(/\.(jpe?g|png|gif|webp|svg)$/i));
+      for (const imgFile of imgFiles) {
+        const b64 = await imgFile.async('base64');
+        const ext = imgFile.name.split('.').pop().toLowerCase();
+        const mime = ext === 'svg' ? 'image/svg+xml' : ext === 'png' ? 'image/png' : 'image/jpeg';
+        imgMap[imgFile.name.split('/').pop()] = 'data:' + mime + ';base64,' + b64;
+      }
+      questions = data.questions.map(q => ({ ...q, imageDataUrl: (q.image && imgMap[q.image]) ? imgMap[q.image] : null }));
+      meta = data.meta || {};
     }
 
-    // Precarga el builder (EB) con los datos del examen
-    const meta = data.meta || {};
-    EB.questions = data.questions.map(function(q) {
-      var answerIdx = Math.max(0, LETTERS.indexOf((q.answer || 'A').toUpperCase()));
-      var imgName = q.image || null;
+    // Mapear preguntas al formato del builder
+    EB.questions = questions.map(function(q) {
+      var answerIdx = Math.max(0, LETTERS.indexOf((q.answer || q.answerIdx !== undefined ? LETTERS[q.answerIdx || 0] : 'A').toUpperCase()));
+      if (q.answerIdx !== undefined) answerIdx = q.answerIdx;
       return {
-        text:         q.question || '',
-        area:         q.area || '',
-        options:      q.options || [],
-        answerIdx:    answerIdx,
-        explanation:  q.explanation || '',
-        imageName:    imgName,
-        imageDataUrl: (imgName && imgMap[imgName]) ? imgMap[imgName] : null,
+        text:          q.text  || q.question || '',
+        area:          q.area  || '',
+        options:       q.options || [],
+        answerIdx:     answerIdx,
+        explanation:   q.explanation || '',
+        imageName:     q.imageName || q.image || null,
+        imageDataUrl:  q.imageDataUrl || null,
         passage:       q.passage || '',
         passage_id:    q.passage_id || '',
         passage_title: q.passage_title || '',
       };
     });
 
-    // Abrir panel admin PRIMERO para que los elementos existan en el DOM
+    // Abrir panel admin
     openAdmin();
     switchAdminTab('create');
 
-    // Rellenar campos de metadata del builder
-    var totalMins = meta.tiempo_minutos || 0;
+    // Rellenar metadata
+    var totalMins = meta.tiempo_minutos || ex.tiempo_minutos || 0;
     var bh = Math.floor(totalMins / 60);
     var bm = totalMins % 60;
     $('bldTitulo').value  = meta.titulo  || ex.titulo  || '';
@@ -5890,10 +5978,12 @@ async function editCatalogExam(idx) {
     $('bldMins').value    = bm;
     updateTimePreview();
     renderBuilderQList();
-    showToast('✏️ ' + data.questions.length + ' preguntas cargadas — edita y exporta el ZIP');
+    updateBuilderExportBtn();
+    showToast('✏️ ' + EB.questions.length + ' preguntas cargadas — edita y guarda en servidor');
 
   } catch(e) {
     alert('Error al cargar el examen para editar:\n\n' + e.message);
+    window._editingFbId = null;
   } finally {
     editBtns.forEach(b => {
       if (b.textContent.includes('Cargando')) { b.textContent = '✏️ Editar examen'; b.style.pointerEvents = ''; }
@@ -6712,6 +6802,7 @@ function saveCanvas() {
 // ══════════════════════════════════════════
 
 function openAdmin() {
+  window._editingFbId = null; // limpiar al abrir admin manualmente
   // FIX: verificación doble - rol en memoria y elemento de UI
   if (S.role !== 'Administrador') {
     console.warn('[Security] Intento de acceso a adminScreen sin rol Administrador');
@@ -7807,14 +7898,25 @@ async function saveExamToServer() {
       questions:      EB.questions,
     };
 
-    // Si estamos editando un examen existente, actualizar en vez de duplicar
-    const existingFb = CATALOG.find(e => e.titulo === titulo && e._fbId);
-    await window._fbSaveExam(examData, existingFb ? existingFb._fbId : null);
+    // Usar el _fbId guardado al abrir edición, o buscar por título como fallback
+    const editingId = window._editingFbId || null;
+    const existingFb = editingId
+      ? CATALOG.find(e => e._fbId === editingId)
+      : CATALOG.find(e => e.titulo === titulo && e._fbId);
+    const targetFbId = editingId || (existingFb ? existingFb._fbId : null);
 
-    showToast(`✅ "${titulo}" guardado en el servidor — visible para todos en tiempo real`);
+    await window._fbSaveExam(examData, targetFbId);
+
+    // Limpiar el _editingFbId después de guardar
+    window._editingFbId = null;
+
+    const isUpdate = !!targetFbId;
+    showToast(isUpdate
+      ? `✅ "${titulo}" actualizado en el servidor`
+      : `✅ "${titulo}" guardado — visible para todos en tiempo real`);
 
     // Limpiar builder si es examen nuevo
-    if (!existingFb) {
+    if (!isUpdate) {
       if (confirm('¿Limpiar el editor para crear otro examen?')) {
         EB.questions = [];
         if ($('bldTitulo'))   $('bldTitulo').value   = '';
@@ -7940,11 +8042,18 @@ async function exportNewExamZip() {
         // Guardar preguntas completas en Firebase
         questions:      questions,
       };
-      // Si es edición, buscar el _fbId existente para actualizar en vez de duplicar
-      const existingFb = CATALOG.find(e => e.titulo === titulo && e._fbId);
+      // Usar _editingFbId si venimos de editar, o buscar por título
+      const editingId2 = window._editingFbId || null;
+      const existingFb2 = editingId2
+        ? CATALOG.find(e => e._fbId === editingId2)
+        : CATALOG.find(e => e.titulo === titulo && e._fbId);
+      const targetId2 = editingId2 || (existingFb2 ? existingFb2._fbId : null);
+      window._editingFbId = null;
       try {
-        await window._fbSaveExam(fbExamData, existingFb ? existingFb._fbId : null);
-        showToast(`✅ Examen guardado en servidor — todos los usuarios lo ven en tiempo real`);
+        await window._fbSaveExam(fbExamData, targetId2);
+        showToast(targetId2
+          ? `✅ "${titulo}" actualizado en el servidor`
+          : `✅ Examen guardado en servidor — todos los usuarios lo ven en tiempo real`);
       } catch(fbErr) {
         console.error('Firebase save error:', fbErr);
         // Aunque falle Firebase, el ZIP ya se descargó
