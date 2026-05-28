@@ -5550,25 +5550,53 @@ let CATALOG = [];   // se llena al cargar
 async function loadCatalog() {
   const grid  = $('examsGrid');
   const badge = $('examsBadge');
-  try {
-    const resp = await fetch('exams/catalog.json?_=' + Date.now());
-    if (!resp.ok) throw new Error('No se encontró catalog.json');
-    CATALOG = await resp.json();
-    renderExamCards();
-    badge.textContent = `${CATALOG.length} disponible${CATALOG.length !== 1 ? 's' : ''}`;
-  } catch(e) {
-    // Fallback silencioso: muestra mensaje amigable
-    grid.innerHTML = `
-      <div style="grid-column:1/-1;text-align:center;padding:48px 24px;color:var(--muted)">
-        <div style="font-size:40px;margin-bottom:12px">📂</div>
-        <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px">No se encontró el catálogo</div>
-        <div style="font-size:13px;line-height:1.6;max-width:340px;margin:0 auto">
-          Asegúrate de abrir desde un servidor local y que exista<br>
-          <code style="background:#f1f5f9;padding:2px 8px;border-radius:6px;font-size:12px">exams/catalog.json</code>
-        </div>
-      </div>`;
-    badge.textContent = '0 disponibles';
+
+  // Mostrar spinner mientras carga
+  grid.innerHTML = `
+    <div style="grid-column:1/-1;text-align:center;padding:48px 24px;color:var(--muted)">
+      <div style="font-size:32px;margin-bottom:12px">⏳</div>
+      <div style="font-size:14px;font-weight:600;color:var(--muted)">Cargando exámenes…</div>
+    </div>`;
+
+  // Si Firebase ya está listo, suscribirse en tiempo real
+  if (window._fbListenExams) {
+    window._fbListenExams();
+    return;
   }
+
+  // Firebase aún no cargó — esperar hasta 3s y reintentar
+  let waited = 0;
+  const waitForFb = setInterval(() => {
+    waited += 200;
+    if (window._fbListenExams) {
+      clearInterval(waitForFb);
+      window._fbListenExams();
+      return;
+    }
+    if (waited >= 3000) {
+      clearInterval(waitForFb);
+      // Fallback: archivo local
+      fetch('exams/catalog.json?_=' + Date.now())
+        .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+        .then(data => {
+          CATALOG = data;
+          renderExamCards();
+          badge.textContent = `${CATALOG.length} disponible${CATALOG.length !== 1 ? 's' : ''}`;
+        })
+        .catch(() => {
+          grid.innerHTML = `
+            <div style="grid-column:1/-1;text-align:center;padding:48px 24px;color:var(--muted)">
+              <div style="font-size:40px;margin-bottom:12px">📂</div>
+              <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px">No se encontró el catálogo</div>
+              <div style="font-size:13px;line-height:1.6;max-width:340px;margin:0 auto">
+                Verifica tu conexión a internet o que exista
+                <code style="background:#f1f5f9;padding:2px 8px;border-radius:6px;font-size:12px">exams/catalog.json</code>
+              </div>
+            </div>`;
+          badge.textContent = '0 disponibles';
+        });
+    }
+  }, 200);
 }
 
 // ── Secciones de Premedicina ──
@@ -5635,7 +5663,7 @@ function buildExamCardHTML(ex, idx) {
         <div class="ec-stat"><div class="ec-val">${imgCount}</div><div class="ec-lbl">Imágenes</div></div>
       </div>
       <button class="exam-card-btn" onclick="event.stopPropagation();loadCatalogExam(${idx})">▶ Iniciar examen</button>
-      ${S.role === 'Administrador' ? `<button class="exam-card-btn" style="background:linear-gradient(135deg,#0f766e,#0e7490);margin-top:6px;font-size:12px;padding:9px" onclick="event.stopPropagation();editCatalogExam(${idx})">✏️ Editar examen</button>` : ''}
+      ${S.role === 'Administrador' ? `<button class="exam-card-btn" style="background:linear-gradient(135deg,#0f766e,#0e7490);margin-top:6px;font-size:12px;padding:9px" onclick="event.stopPropagation();editCatalogExam(${idx})">✏️ Editar examen</button><button class="exam-card-btn" style="background:linear-gradient(135deg,#dc2626,#b91c1c);margin-top:6px;font-size:12px;padding:9px" onclick="event.stopPropagation();deleteCatalogExam(${idx})">🗑 Eliminar del servidor</button>` : ''}
     </div>`;
 }
 
@@ -5808,6 +5836,31 @@ async function editCatalogExam(idx) {
     editBtns.forEach(b => {
       if (b.textContent.includes('Cargando')) { b.textContent = '✏️ Editar examen'; b.style.pointerEvents = ''; }
     });
+  }
+}
+
+// ── Eliminar examen del servidor (solo admin) ──
+async function deleteCatalogExam(idx) {
+  if (S.role !== 'Administrador') return;
+  const ex = CATALOG[idx];
+  if (!ex) return;
+
+  const confirmed = await (window.spConfirm
+    ? window.spConfirm(`¿Eliminar "${ex.titulo}" del servidor?`, 'Esta acción borrará el examen para todos los usuarios.', '🗑', 'danger')
+    : Promise.resolve(confirm(`¿Eliminar "${ex.titulo}" del servidor?\nEsta acción no se puede deshacer.`)));
+
+  if (!confirmed) return;
+
+  if (ex._fbId && window._fbDeleteExam) {
+    try {
+      await window._fbDeleteExam(ex._fbId);
+      showToast(`🗑 "${ex.titulo}" eliminado del servidor`);
+      // El onValue listener actualizará CATALOG y renderExamCards automáticamente
+    } catch(e) {
+      alert('Error al eliminar: ' + e.message);
+    }
+  } else {
+    alert('Este examen no tiene ID de Firebase. Solo se puede eliminar desde la consola de Firebase.');
   }
 }
 
@@ -7728,18 +7781,52 @@ async function exportNewExamZip() {
       type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 }
     });
 
-    // ── 4. Descargar ───────────────────────────────────
+    // ── 4. Descargar ZIP como respaldo local ────────────
     const a    = document.createElement('a');
     a.href     = URL.createObjectURL(updateBlob);
     a.download = `exams-update-${ts}.zip`;
     a.click();
     URL.revokeObjectURL(a.href);
 
-    // Reflejar en el dashboard sin recargar
-    CATALOG = updatedCatalog;
-    renderExamCards();
-    $('examsBadge').textContent = `${CATALOG.length} disponible${CATALOG.length !== 1 ? 's' : ''}`;
-    showToast(`✅ exams-update-${ts}.zip listo — extrae en tu carpeta exams/ y recarga`);
+    // ── 5. Guardar en Firebase (tiempo real para todos) ──
+    if (window._fbSaveExam) {
+      const fbExamData = {
+        titulo,
+        materia,
+        icono:          guessIcon(area || materia),
+        tags:           buildTags(area, ver),
+        preguntas:      EB.questions.length,
+        horas:          minutosToHoras(total),
+        imagenes:       EB.questions.filter(q => q.imageName).length,
+        tiempo_minutos: total,
+        version:        ver,
+        path:           `exams/${zipFileName}`,
+        nuevo:          true,
+        agregado:       ts,
+        updatedBy:      (typeof S !== 'undefined' && S.user) ? S.user : 'admin',
+        // Guardar preguntas completas en Firebase
+        questions:      questions,
+      };
+      // Si es edición, buscar el _fbId existente para actualizar en vez de duplicar
+      const existingFb = CATALOG.find(e => e.titulo === titulo && e._fbId);
+      try {
+        await window._fbSaveExam(fbExamData, existingFb ? existingFb._fbId : null);
+        showToast(`✅ Examen guardado en servidor — todos los usuarios lo ven en tiempo real`);
+      } catch(fbErr) {
+        console.error('Firebase save error:', fbErr);
+        // Aunque falle Firebase, el ZIP ya se descargó
+        CATALOG = updatedCatalog;
+        renderExamCards();
+        $('examsBadge').textContent = `${CATALOG.length} disponible${CATALOG.length !== 1 ? 's' : ''}`;
+        showToast(`⚠️ ZIP descargado pero no se pudo guardar en servidor: ${fbErr.message}`);
+      }
+    } else {
+      // Firebase no disponible — solo actualizar local
+      CATALOG = updatedCatalog;
+      renderExamCards();
+      $('examsBadge').textContent = `${CATALOG.length} disponible${CATALOG.length !== 1 ? 's' : ''}`;
+      showToast(`✅ exams-update-${ts}.zip listo — extrae en tu carpeta exams/ y recarga`);
+    }
 
   } catch(err) {
     console.error(err);
@@ -7800,6 +7887,55 @@ const usersRef = ref(db, 'users');
 
 // Exponer funciones de Firebase al scope global para funciones fuera del módulo
 window._fbDB = { db, ref, set, update, get, push };
+
+// ══════════════════════════════════════════
+//  EXÁMENES EN TIEMPO REAL — Firebase
+// ══════════════════════════════════════════
+const examsRef = ref(db, 'exams');
+
+// Escuchar cambios en tiempo real → actualiza el catálogo automáticamente para todos
+window._fbListenExams = function() {
+  onValue(examsRef, (snapshot) => {
+    if (!snapshot.exists()) {
+      // No hay exámenes en Firebase aún
+      const grid  = document.getElementById('examsGrid');
+      const badge = document.getElementById('examsBadge');
+      if (grid) grid.innerHTML = `
+        <div style="grid-column:1/-1;text-align:center;padding:48px 24px;color:var(--muted)">
+          <div style="font-size:40px;margin-bottom:12px">📂</div>
+          <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px">No hay exámenes todavía</div>
+          <div style="font-size:13px;color:var(--muted)">El administrador aún no ha publicado ningún examen.</div>
+        </div>`;
+      if (badge) badge.textContent = '0 disponibles';
+      return;
+    }
+    const data = snapshot.val();
+    // Convertir objeto Firebase a array, más recientes primero
+    CATALOG = Object.entries(data)
+      .map(([id, ex]) => ({ ...ex, _fbId: id }))
+      .sort((a, b) => (b.agregado || '').localeCompare(a.agregado || ''));
+    if (typeof renderExamCards === 'function') renderExamCards();
+    const badge = document.getElementById('examsBadge');
+    if (badge) badge.textContent = `${CATALOG.length} disponible${CATALOG.length !== 1 ? 's' : ''}`;
+  });
+};
+
+// Guardar o actualizar un examen en Firebase
+window._fbSaveExam = async function(examData, fbId = null) {
+  if (fbId) {
+    // Actualizar examen existente
+    await update(ref(db, 'exams/' + fbId), examData);
+  } else {
+    // Crear nuevo examen
+    await push(examsRef, examData);
+  }
+};
+
+// Eliminar un examen de Firebase (solo admin)
+window._fbDeleteExam = async function(fbId) {
+  await set(ref(db, 'exams/' + fbId), null);
+};
+
 window._fbSignOut = () => signOut(auth);
 window._fbSignInWithCredential = (credential) => signInWithCredential(auth, credential);
 window._fbGoogleProvider = GoogleAuthProvider;
