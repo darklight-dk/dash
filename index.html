@@ -10789,20 +10789,18 @@ const NOVA = {
 // Reutiliza el proxy Gemini que ya tiene el proyecto
 const NOVA_API_URL = 'https://gemini-proxy.donniaxel55.workers.dev';
 
-const NOVA_SYSTEM = `Eres NOVA, asistente de estudio IA para el EXANI-II (México).
-Personalidad: amable, paciente, motivadora. Explicas paso a paso con ejemplos.
-Idioma: español mexicano.
-
-CUANDO TE PIDAN PREGUNTAS O EXAMEN — usa EXACTAMENTE este bloque JSON:
-\`\`\`exam
-{"titulo":"Título","preguntas":[{"id":1,"texto":"¿Pregunta?","opciones":[{"letra":"a","texto":"Opción A"},{"letra":"b","texto":"Opción B"},{"letra":"c","texto":"Opción C"}],"correcta":"a","explicacion":"Explicación didáctica aquí."}]}
-\`\`\`
-Reglas: SIEMPRE 3 opciones (a,b,c). Explicación clara de 2-4 oraciones.
-
-CUANDO TE PIDAN FLASHCARDS — usa este bloque:
-\`\`\`flashcards
-[{"frente":"Concepto o pregunta","reverso":"Definición o respuesta"}]
-\`\`\``;
+const NOVA_SYSTEM = "Eres NOVA, asistente de estudio IA para el EXANI-II (México).\n"
+  + "Personalidad: amable, paciente, motivadora. Explicas paso a paso con ejemplos.\n"
+  + "Idioma: español mexicano.\n\n"
+  + "CUANDO TE PIDAN PREGUNTAS O EXAMEN — usa EXACTAMENTE este bloque JSON:\n"
+  + "```exam\n"
+  + '{"titulo":"Título","preguntas":[{"id":1,"texto":"¿Pregunta?","opciones":[{"letra":"a","texto":"Opción A"},{"letra":"b","texto":"Opción B"},{"letra":"c","texto":"Opción C"}],"correcta":"a","explicacion":"Explicación didáctica aquí."}]}\n'
+  + "```\n"
+  + "Reglas: SIEMPRE 3 opciones (a,b,c). Explicación clara de 2-4 oraciones.\n\n"
+  + "CUANDO TE PIDAN FLASHCARDS — usa este bloque:\n"
+  + "```flashcards\n"
+  + '[{"frente":"Concepto o pregunta","reverso":"Definición o respuesta"}]\n'
+  + "```";
 
 function openNova() {
   show('novaScreen');
@@ -10949,7 +10947,7 @@ function novaParseResponse(raw) {
       NOVA.flashcards = cards;
       NOVA.flashIdx = 0;
       NOVA.flashKnown = 0;
-      novaAppendAI('✅ ¡Generé <strong>' + cards.length + ' flashcards</strong>! <button class="nova-ebtn nova-ebtn-primary" style="margin-left:8px" onclick="novaSetMode('flash')">Ver flashcards →</button>');
+      novaAppendAI('✅ ¡Generé <strong>' + cards.length + ' flashcards</strong>! <button class="nova-ebtn nova-ebtn-primary" style="margin-left:8px" onclick="novaSetMode(\x27flash\x27)">Ver flashcards →</button>');
     } catch(e) { novaAppendAI(novaFmt(raw)); }
   } else {
     novaAppendAI(novaFmt(raw));
