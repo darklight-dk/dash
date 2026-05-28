@@ -2349,6 +2349,31 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
 #novaInputBox:focus-within{border-color:#7c6fff !important;box-shadow:0 0 0 3px rgba(124,111,255,.1) !important}
 #novaScreen ::-webkit-scrollbar{width:5px}
 #novaScreen ::-webkit-scrollbar-thumb{background:#1e1e28;border-radius:5px}
+/* ── NOVA RESPONSIVE MÓVIL ── */
+@media(max-width:640px){
+  #novaScreen .nova-topbar-modes{gap:4px}
+  #novaScreen .nova-topbar-modes button{padding:4px 8px;font-size:11px}
+  #novaMsgs{padding:14px 12px}
+  .nova-msg-row{max-width:100%;padding:0}
+  .nova-bubble{max-width:90%;font-size:13px;padding:9px 12px}
+  .nova-exam-card{padding:12px 10px;margin:6px 0}
+  .nova-q-opt{font-size:12px;padding:8px 10px}
+  #novaInputBox{padding:8px 8px 8px 12px}
+  #novaInput{font-size:15px}
+  #novaScreen>div:first-child{padding:0 12px;height:48px}
+  #novaScreen>div:first-child button:first-child{padding:5px 9px;font-size:12px}
+  .nova-msg-row{gap:7px}
+  .nova-avatar{width:26px;height:26px;font-size:11px;border-radius:7px}
+}
+@media(max-width:600px){
+  #novaScreen{overflow:hidden}
+  .nova-msg-row{max-width:100%;padding:0 4px}
+  .nova-bubble{max-width:88%;font-size:13px;padding:10px 12px}
+  .nova-exam-card{padding:12px;margin:6px 4px}
+  .nova-q-opt{font-size:12px;padding:8px 10px}
+  #novaInputBox{border-radius:12px !important;padding:8px 8px 8px 12px !important}
+  #novaInput{font-size:14px !important}
+}
 </style>
 </head>
 <body>
@@ -10786,17 +10811,34 @@ const NOVA = {
   examAnswers:   {},
 };
 
-// Reutiliza el proxy Gemini que ya tiene el proyecto
-const NOVA_API_URL = 'https://gemini-proxy.donniaxel55.workers.dev';
+// ── Configuración multi-modelo ────────────────────
+const NOVA_GEMINI_URL = 'https://gemini-proxy.donniaxel55.workers.dev';
+// 3 workers Groq — se rotan round-robin para no saturar uno solo
+const NOVA_GROQ_WORKERS = [
+  'https://grok-mat.donniaxel55.workers.dev',
+  'https://grok-red.donniaxel55.workers.dev',
+  'https://grok-comp.donniaxel55.workers.dev',
+];
+let _novaGroqIdx = 0; // índice del worker actual
+function novaNextGroqURL() {
+  const url = NOVA_GROQ_WORKERS[_novaGroqIdx % NOVA_GROQ_WORKERS.length];
+  _novaGroqIdx++;
+  return url;
+}
+
+// Indica qué modelo se usó en el último turno
+let NOVA_LAST_MODEL = 'groq';
 
 const NOVA_SYSTEM = "Eres NOVA, asistente de estudio IA para el EXANI-II (México).\n"
-  + "Personalidad: amable, paciente, motivadora. Explicas paso a paso con ejemplos.\n"
-  + "Idioma: español mexicano.\n\n"
-  + "CUANDO TE PIDAN PREGUNTAS O EXAMEN — usa EXACTAMENTE este bloque JSON:\n"
+  + "Personalidad: directa, precisa, motivadora. Explicas paso a paso.\n"
+  + "Idioma: español mexicano. Sin emojis excesivos, usa símbolos tipográficos (→ · ✓ ✗ ◆).\n\n"
+  + "CUANDO TE PIDAN PREGUNTAS O EXAMEN — responde PRIMERO con un mensaje breve (1 línea), luego el bloque JSON COMPLETO:\n"
   + "```exam\n"
-  + '{"titulo":"Título","preguntas":[{"id":1,"texto":"¿Pregunta?","opciones":[{"letra":"a","texto":"Opción A"},{"letra":"b","texto":"Opción B"},{"letra":"c","texto":"Opción C"}],"correcta":"a","explicacion":"Explicación didáctica aquí."}]}\n'
+  + '{"titulo":"Título","preguntas":[{"id":1,"texto":"¿Pregunta?","opciones":[{"letra":"a","texto":"Opción A"},{"letra":"b","texto":"Opción B"},{"letra":"c","texto":"Opción C"}],"correcta":"a","explicacion":"Explicación clara de 2-3 oraciones."}]}\n'
   + "```\n"
-  + "Reglas: SIEMPRE 3 opciones (a,b,c). Explicación clara de 2-4 oraciones.\n\n"
+  + "REGLAS CRÍTICAS: (1) El JSON debe estar 100% completo y bien cerrado. "
+  + "(2) SIEMPRE 3 opciones (a,b,c). (3) No truncar bajo ninguna circunstancia. "
+  + "(4) Si el usuario pide 5 preguntas, el array 'preguntas' debe tener exactamente 5 elementos.\n\n"
   + "CUANDO TE PIDAN FLASHCARDS — usa este bloque:\n"
   + "```flashcards\n"
   + '[{"frente":"Concepto o pregunta","reverso":"Definición o respuesta"}]\n'
@@ -10852,6 +10894,127 @@ function novaSendSuggestion(el) {
   novaSendMessage();
 }
 
+// ── Llamada a Gemini ──────────────────────────────
+async function novaCallGemini(geminiContents) {
+  const res = await fetch(NOVA_GEMINI_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      system_instruction: { parts: [{ text: NOVA_SYSTEM }] },
+      contents: geminiContents,
+      generationConfig: { maxOutputTokens: 8192, temperature: 0.25 }
+    })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error('Gemini: ' + (data.error.message || JSON.stringify(data.error)));
+  return data.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('') || '';
+}
+
+// ── Llamada a Groq (red de respaldo / verificador) ─
+async function novaCallGroq(messages) {
+  const res = await fetch(novaNextGroqURL(), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages,
+      max_tokens: 8192,
+      temperature: 0.1
+    })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error('Groq: ' + (data.error.message || JSON.stringify(data.error)));
+  return data.choices?.[0]?.message?.content || '';
+}
+
+// ── Reparar JSON truncado con Groq ────────────────
+async function novaRepairJSON(brokenRaw, tipo) {
+  const instruccion = tipo === 'exam'
+    ? 'Recibirás un JSON de examen INCOMPLETO o MAL FORMADO. Tu única tarea es devolver el JSON COMPLETO y VÁLIDO, '
+      + 'manteniendo exactamente el mismo formato: {"titulo":"...","preguntas":[{...}]}. '
+      + 'Completa las preguntas faltantes si el array quedó truncado. Devuelve SOLO el JSON, sin explicaciones ni markdown.'
+    : 'Recibirás un JSON de flashcards INCOMPLETO. Devuelve el array JSON completo y válido: [{"frente":"...","reverso":"..."}]. '
+      + 'Solo el JSON, sin markdown.';
+  const raw = await novaCallGroq([
+    { role: 'system', content: instruccion },
+    { role: 'user',   content: brokenRaw }
+  ]);
+  return raw.replace(/```[a-z]*\n?/g, '').replace(/```/g, '').trim();
+}
+
+// ── Extraer JSON del texto de forma robusta ───────
+function novaExtractJSON(raw, tipo) {
+  // 1. Buscar bloque ```exam o ```flashcards
+  const tag = tipo === 'exam' ? 'exam' : 'flashcards';
+  const blockRe = new RegExp('```' + tag + '[\\s\\S]*?({[\\s\\S]*?}|\\[[\\s\\S]*?\\])\\s*```');
+  const blockMatch = raw.match(blockRe);
+  if (blockMatch) {
+    try { return JSON.parse(blockMatch[1]); } catch(e) { /* fallthrough */ }
+  }
+
+  // 2. Buscar cualquier bloque ```json o sin etiqueta
+  const genericRe = /```(?:json)?\s*(\{[\s\S]*?\}|\[[\s\S]*?\])\s*```/;
+  const genericMatch = raw.match(genericRe);
+  if (genericMatch) {
+    try { return JSON.parse(genericMatch[1]); } catch(e) { /* fallthrough */ }
+  }
+
+  // 3. Buscar el JSON directamente en el texto (puede estar truncado)
+  const startObj = raw.indexOf(tipo === 'exam' ? '{"titulo"' : '[{"frente"');
+  if (startObj !== -1) {
+    let chunk = raw.slice(startObj);
+    // Intentar parsear directo
+    try { return JSON.parse(chunk); } catch(e) { /* truncado */ }
+    // Devolver el fragmento para que Groq lo repare
+    return { _truncated: true, _raw: chunk, _tipo: tipo };
+  }
+
+  return null;
+}
+
+// ── Mensaje de modelo activo ──────────────────────
+function novaModelBadge(model) {
+  return '<span style="font-size:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);'
+    + 'border-radius:20px;padding:2px 8px;color:#606078;margin-left:6px;vertical-align:middle">'
+    + (model === 'groq' ? '◆ Groq Llama-3' : '◆ Gemini') + '</span>';
+}
+
+// ── Convertir historial → formato Gemini ──────────
+function novaMsgsToGemini(msgs) {
+  return msgs.map((m, i) => {
+    const geminiRole = m.role === 'assistant' ? 'model' : 'user';
+    let parts = [];
+    if (i === 0 && NOVA.pdfBase64 && m.role === 'user') {
+      parts.push({ inline_data: { mime_type: 'application/pdf', data: NOVA.pdfBase64 } });
+      const txt = typeof m.content === 'string' ? m.content
+        : (Array.isArray(m.content) ? (m.content.find(c => c.type === 'text')?.text || '') : '');
+      if (txt) parts.push({ text: txt });
+    } else if (Array.isArray(m.content)) {
+      m.content.forEach(c => {
+        if (c.type === 'text') parts.push({ text: c.text });
+        else if (c.type === 'image' && c.source) parts.push({ inline_data: { mime_type: c.source.media_type, data: c.source.data } });
+      });
+    } else {
+      parts.push({ text: typeof m.content === 'string' ? m.content : '' });
+    }
+    return { role: geminiRole, parts };
+  });
+}
+
+// ── Convertir historial → formato Groq/OpenAI ────
+function novaMsgsToGroq(msgs) {
+  const result = [{ role: 'system', content: NOVA_SYSTEM }];
+  msgs.forEach(m => {
+    if (Array.isArray(m.content)) {
+      const txt = m.content.filter(c => c.type === 'text').map(c => c.text).join('\n');
+      if (txt) result.push({ role: m.role, content: txt });
+    } else if (typeof m.content === 'string') {
+      result.push({ role: m.role, content: m.content });
+    }
+  });
+  return result;
+}
+
 // ── Send message ──────────────────────────────────
 async function novaSendMessage(text) {
   if (NOVA.isLoading) return;
@@ -10861,7 +11024,7 @@ async function novaSendMessage(text) {
 
   document.getElementById('novaEmpty').style.display = 'none';
 
-  // Build content
+  // Construir contenido del mensaje
   let userContent;
   if (NOVA.attachedImgs.length) {
     userContent = NOVA.attachedImgs.map(img => ({ type:'image', source:{ type:'base64', media_type:img.type, data:img.data } }));
@@ -10873,7 +11036,7 @@ async function novaSendMessage(text) {
   }
 
   NOVA.messages.push({ role:'user', content: userContent });
-  novaAppendUser(msg || '🖼 Imagen adjunta');
+  novaAppendUser(msg || '[imagen adjunta]');
   if (!text) { input.value = ''; input.style.height = 'auto'; }
 
   novaShowTyping();
@@ -10882,43 +11045,87 @@ async function novaSendMessage(text) {
   document.getElementById('novaSendBtn').style.pointerEvents = 'none';
 
   try {
-    // Build messages — inject PDF on first message if present
-    const apiMessages = NOVA.messages.map((m, i) => {
-      if (i === 0 && NOVA.pdfBase64 && m.role === 'user') {
-        return { role:'user', content:[
-          { type:'document', source:{ type:'base64', media_type:'application/pdf', data:NOVA.pdfBase64 } },
-          { type:'text', text: typeof m.content === 'string' ? m.content : (m.content.find(c=>c.type==='text')?.text || '') }
-        ]};
+    // Determinar si el mensaje involucra archivos visuales (PDF/imagen)
+    const hasMedia = NOVA.pdfBase64 || (Array.isArray(userContent) && userContent.some(c => c.type === 'image'));
+
+    let raw = '';
+    let modelUsed = 'groq';
+
+    // --- Paso 1: Groq para texto puro, Gemini solo si hay PDF/imagen ---
+    if (hasMedia) {
+      // Solo Gemini puede leer archivos visuales
+      raw = await novaCallGemini(novaMsgsToGemini(NOVA.messages));
+      modelUsed = 'gemini';
+    } else {
+      // Texto puro → Groq (más rápido, sin costo de tokens Gemini)
+      try {
+        raw = await novaCallGroq(novaMsgsToGroq(NOVA.messages));
+        modelUsed = 'groq';
+      } catch(groqErr) {
+        // Groq falla → Gemini como respaldo
+        raw = await novaCallGemini(novaMsgsToGemini(NOVA.messages));
+        modelUsed = 'gemini';
       }
-      return m;
-    });
+    }
 
-    const res = await fetch(NOVA_API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        system: NOVA_SYSTEM,
-        messages: apiMessages,
-      })
-    });
-
-    const data = await res.json();
     novaRemoveTyping();
 
-    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+    // --- Paso 2: Detectar si hay JSON de examen/flashcard ---
+    const needsExam  = raw.includes('```exam') || raw.includes('"preguntas"');
+    const needsFlash = raw.includes('```flashcards') || raw.includes('"frente"');
+    const tipo = needsExam ? 'exam' : needsFlash ? 'flashcards' : null;
 
-    // Handle Gemini proxy response format
-    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text
-             || data.content?.[0]?.text
-             || data.text
-             || JSON.stringify(data);
+    if (tipo) {
+      const parsed = novaExtractJSON(raw, tipo);
 
-    NOVA.messages.push({ role:'assistant', content: raw });
-    novaParseResponse(raw);
+      if (parsed && parsed._truncated) {
+        // --- Paso 3: JSON incompleto → Groq repara ---
+        novaShowTyping();
+        novaAppendAI('· Completando con red neuronal de respaldo...' + novaModelBadge('groq'));
+        try {
+          const repaired = await novaRepairJSON(parsed._raw, tipo);
+          novaRemoveTyping();
+          const fixed = JSON.parse(repaired);
+          NOVA.messages.push({ role:'assistant', content: raw + '\n[reparado por Groq]' });
+          novaHandleParsed(fixed, tipo, 'groq');
+        } catch(repairErr) {
+          novaRemoveTyping();
+          NOVA.messages.push({ role:'assistant', content: raw });
+          novaAppendAI(novaFmt(raw) + novaModelBadge(modelUsed));
+          novaAppendAI('· No se pudo completar el JSON: ' + repairErr.message);
+        }
+      } else if (parsed && !parsed._truncated) {
+        NOVA.messages.push({ role:'assistant', content: raw });
+        novaHandleParsed(parsed, tipo, modelUsed);
+      } else {
+        // No se encontró JSON → Groq genera desde cero
+        novaShowTyping();
+        novaAppendAI('· Regenerando estructura con Groq...' + novaModelBadge('groq'));
+        try {
+          const groqRaw = await novaCallGroq(novaMsgsToGroq(NOVA.messages));
+          novaRemoveTyping();
+          const parsed2 = novaExtractJSON(groqRaw, tipo);
+          NOVA.messages.push({ role:'assistant', content: groqRaw });
+          if (parsed2 && !parsed2._truncated) {
+            novaHandleParsed(parsed2, tipo, 'groq');
+          } else {
+            novaAppendAI(novaFmt(groqRaw) + novaModelBadge('groq'));
+          }
+        } catch(groqErr) {
+          novaRemoveTyping();
+          novaAppendAI(novaFmt(raw) + novaModelBadge(modelUsed));
+        }
+      }
+    } else {
+      // Respuesta de texto normal
+      NOVA.messages.push({ role:'assistant', content: raw });
+      const before = raw.split(/```exam|```flashcards/)[0].trim();
+      novaAppendAI(novaFmt(before || raw) + novaModelBadge(modelUsed));
+    }
 
   } catch(err) {
     novaRemoveTyping();
-    novaAppendAI('❌ Error: ' + err.message);
+    novaAppendAI('· Error: ' + err.message);
   } finally {
     NOVA.isLoading = false;
     document.getElementById('novaSendBtn').style.opacity = '';
@@ -10927,30 +11134,44 @@ async function novaSendMessage(text) {
   }
 }
 
-// ── Parse AI response ─────────────────────────────
-function novaParseResponse(raw) {
+// ── Despachar JSON parseado al widget correcto ────
+function novaHandleParsed(data, tipo, model) {
+  const badge = novaModelBadge(model);
+  if (tipo === 'exam') {
+    const before = (NOVA.messages[NOVA.messages.length-1]?.content || '').split('```exam')[0].trim();
+    if (before) novaAppendAI(novaFmt(before) + badge);
+    novaRenderExam(data);
+  } else {
+    NOVA.flashcards = data;
+    NOVA.flashIdx   = 0;
+    NOVA.flashKnown = 0;
+    novaAppendAI('✓ Generé <strong>' + data.length + ' flashcards</strong>' + badge
+      + ' <button class="nova-ebtn nova-ebtn-primary" style="margin-left:8px" onclick="novaSetMode(\'flash\')">Ver →</button>');
+  }
+}
+
+// ── Parse AI response (legacy, usado por novaPdfAction) ──
+function novaParseResponse(raw, model) {
   const examMatch  = raw.match(/```exam[\s\S]*?({[\s\S]*?})\s*```/);
   const flashMatch = raw.match(/```flashcards[\s\S]*?(\[[\s\S]*?\])\s*```/);
+  const badge = novaModelBadge(model || 'gemini');
 
   if (examMatch) {
     const before = raw.split('```exam')[0].trim();
-    if (before) novaAppendAI(novaFmt(before));
-    try {
-      const data = JSON.parse(examMatch[1]);
-      novaRenderExam(data);
-    } catch(e) { novaAppendAI(novaFmt(raw)); }
+    if (before) novaAppendAI(novaFmt(before) + badge);
+    try { novaRenderExam(JSON.parse(examMatch[1])); }
+    catch(e) { novaAppendAI(novaFmt(raw) + badge); }
   } else if (flashMatch) {
     const before = raw.split('```flashcards')[0].trim();
-    if (before) novaAppendAI(novaFmt(before));
+    if (before) novaAppendAI(novaFmt(before) + badge);
     try {
       const cards = JSON.parse(flashMatch[1]);
-      NOVA.flashcards = cards;
-      NOVA.flashIdx = 0;
-      NOVA.flashKnown = 0;
-      novaAppendAI('✅ ¡Generé <strong>' + cards.length + ' flashcards</strong>! <button class="nova-ebtn nova-ebtn-primary" style="margin-left:8px" onclick="novaSetMode(\x27flash\x27)">Ver flashcards →</button>');
-    } catch(e) { novaAppendAI(novaFmt(raw)); }
+      NOVA.flashcards = cards; NOVA.flashIdx = 0; NOVA.flashKnown = 0;
+      novaAppendAI('✓ <strong>' + cards.length + ' flashcards</strong>' + badge
+        + ' <button class="nova-ebtn nova-ebtn-primary" style="margin-left:8px" onclick="novaSetMode(\'flash\')">Ver →</button>');
+    } catch(e) { novaAppendAI(novaFmt(raw) + badge); }
   } else {
-    novaAppendAI(novaFmt(raw));
+    novaAppendAI(novaFmt(raw) + badge);
   }
 }
 
@@ -11023,8 +11244,8 @@ function novaRenderExam(data) {
     + '<div><div style="font-weight:800;font-size:15px;color:#f0f0f5">' + novaEsc(data.titulo || 'Examen') + '</div>'
     + '<div style="font-size:11px;color:#606078;margin-top:2px">' + preguntas.length + ' preguntas</div></div>'
     + '<div style="display:flex;gap:6px;flex-wrap:wrap">'
-    + '<button class="nova-ebtn nova-ebtn-save" onclick="novaSaveExam('' + eid + '',' + JSON.stringify(data).replace(/'/g,"&#39;") + ')">💾 Guardar</button>'
-    + '<button class="nova-ebtn nova-ebtn-secondary" onclick="novaRetryExam('' + eid + '')">↺ Reintentar</button>'
+    + '<button class="nova-ebtn nova-ebtn-save" onclick="novaSaveExam(\'' + eid + '\', ' + JSON.stringify(data).replace(/'/g,"&#39;") + ')">💾 Guardar</button>'
+    + '<button class="nova-ebtn nova-ebtn-secondary" onclick="novaRetryExam(\'' + eid + '\')">↺ Reintentar</button>'
     + '</div></div>'
     + preguntas.map((q, i) => novaQHTML(q, i, eid)).join('')
     + '<div id="' + eid + '_score" style="display:none;margin-top:12px;padding:14px;background:#17171f;border-radius:10px;text-align:center;font-weight:800;font-size:16px"></div>';
@@ -11041,7 +11262,7 @@ function novaQHTML(q, i, eid) {
     + '<div style="font-size:14px;font-weight:500;color:#f0f0f5;line-height:1.6">' + novaEsc(q.texto) + '</div></div>'
     + '<div id="' + qid + '_opts">'
     + (q.opciones||[]).map(op =>
-      '<div class="nova-q-opt" id="' + qid + '_' + op.letra + '" onclick="novaSelect('' + qid + '','' + op.letra + '','' + q.correcta + '','' + eid + '')">'
+      '<div class="nova-q-opt" id="' + qid + '_' + op.letra + '" onclick="novaSelect(\'' + qid + '\',\'' + op.letra + '\',\'' + q.correcta + '\',\'' + eid + '\')">'
       + '<div class="nova-opt-letter">' + op.letra + '</div>'
       + '<div>' + novaEsc(op.texto) + '</div></div>'
     ).join('')
@@ -11141,11 +11362,12 @@ async function novaPdfAction(action) {
   document.getElementById('novaEmpty').style.display = 'none';
 
   const prompt = prompts[action];
+  // Inyectar el PDF en el primer mensaje del historial para Gemini
   NOVA.messages.push({ role:'user', content:[
     { type:'document', source:{ type:'base64', media_type:'application/pdf', data:NOVA.pdfBase64 } },
     { type:'text', text: prompt }
   ]});
-  novaAppendUser('📄 ' + NOVA.pdfName + ' — ' + prompt);
+  novaAppendUser('[PDF] ' + NOVA.pdfName + ' → ' + prompt);
 
   novaShowTyping();
   NOVA.isLoading = true;
@@ -11153,20 +11375,59 @@ async function novaPdfAction(action) {
   document.getElementById('novaSendBtn').style.pointerEvents = 'none';
 
   try {
-    const res = await fetch(NOVA_API_URL, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ system: NOVA_SYSTEM, messages: NOVA.messages })
+    // Construir contenidos Gemini con el PDF en la primera posición
+    const geminiContents = NOVA.messages.map((m, i) => {
+      const geminiRole = m.role === 'assistant' ? 'model' : 'user';
+      let parts = [];
+      if (i === NOVA.messages.length - 1 && m.role === 'user' && Array.isArray(m.content)) {
+        // Último mensaje del usuario: incluye el PDF
+        m.content.forEach(c => {
+          if (c.type === 'document') parts.push({ inline_data: { mime_type: 'application/pdf', data: NOVA.pdfBase64 } });
+          else if (c.type === 'text') parts.push({ text: c.text });
+        });
+      } else if (Array.isArray(m.content)) {
+        m.content.forEach(c => {
+          if (c.type === 'text') parts.push({ text: c.text });
+        });
+      } else {
+        parts.push({ text: typeof m.content === 'string' ? m.content : '' });
+      }
+      return { role: geminiRole, parts };
     });
-    const data = await res.json();
+
+    const raw = await novaCallGemini(geminiContents);
     novaRemoveTyping();
-    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
-    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || data.content?.[0]?.text || data.text || '';
     NOVA.messages.push({ role:'assistant', content: raw });
-    novaParseResponse(raw);
+
+    // Usar el parser robusto
+    const tipo = raw.includes('```exam') || raw.includes('"preguntas"') ? 'exam'
+               : raw.includes('```flashcards') || raw.includes('"frente"') ? 'flashcards'
+               : null;
+
+    if (tipo) {
+      const parsed = novaExtractJSON(raw, tipo);
+      if (parsed && parsed._truncated) {
+        novaShowTyping();
+        novaAppendAI('· Completando JSON con Groq...' + novaModelBadge('groq'));
+        try {
+          const repaired = await novaRepairJSON(parsed._raw, tipo);
+          novaRemoveTyping();
+          novaHandleParsed(JSON.parse(repaired), tipo, 'groq');
+        } catch(e) {
+          novaRemoveTyping();
+          novaAppendAI(novaFmt(raw) + novaModelBadge('gemini'));
+        }
+      } else if (parsed) {
+        novaHandleParsed(parsed, tipo, 'gemini');
+      } else {
+        novaAppendAI(novaFmt(raw) + novaModelBadge('gemini'));
+      }
+    } else {
+      novaParseResponse(raw, 'gemini');
+    }
   } catch(err) {
     novaRemoveTyping();
-    novaAppendAI('❌ Error: ' + err.message);
+    novaAppendAI('· Error: ' + err.message);
   } finally {
     NOVA.isLoading = false;
     document.getElementById('novaSendBtn').style.opacity = '';
