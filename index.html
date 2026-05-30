@@ -4916,13 +4916,22 @@ function handleGoogleCredential(response) {
   }
 }
 
-function showGoogleRoleModal() {
+async function showGoogleRoleModal() {
   if (!_googleProfile) return;
   $('grAvatar').src   = _googleProfile.picture || '';
   $('grName').textContent  = _googleProfile.name;
   $('grEmail').textContent = _googleProfile.email;
-  // Mostrar opción Admin solo si el email está en la lista
-  const isAdmin = ADMIN_EMAILS.includes(_googleProfile.email.toLowerCase());
+  // Verificar rol existente en Firebase para mostrar botón Administrador si ya fue asignado
+  const isAdminEmail = ADMIN_EMAILS.includes(_googleProfile.email.toLowerCase());
+  let isAdmin = isAdminEmail;
+  if (!isAdmin) {
+    try {
+      const gKey = 'g_' + _googleProfile.email.toLowerCase().replace(/[^a-z0-9]/g, '_');
+      const r = await fetch(`https://exani-dash-adeff-default-rtdb.firebaseio.com/googleUsers/${gKey}/role.json`);
+      const savedRole = await r.json();
+      if (savedRole === 'Administrador') isAdmin = true;
+    } catch(e) {}
+  }
   $('grAdminBtn').style.display = isAdmin ? 'block' : 'none';
   $('googleRoleModal').style.display = 'flex';
 }
@@ -4970,7 +4979,8 @@ async function finishGoogleLogin(roleSelected) {
     // 3. Rol: admin por email hardcoded > existente en Firebase > seleccionado > Aspirante
     const isAdminEmail = ADMIN_EMAILS.includes(_googleProfile.email.toLowerCase());
     let role = isAdminEmail ? 'Administrador' : (existingData?.role || roleSelected || 'Aspirante');
-    if (!isAdminEmail && role === 'Administrador') role = 'Aspirante';
+    // NO revertir a Aspirante si Firebase ya tiene Administrador asignado por el panel
+    // if (!isAdminEmail && role === 'Administrador') role = 'Aspirante';
 
     S.user = _googleProfile.name;
     S.role = role;
