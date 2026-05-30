@@ -1115,6 +1115,12 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .notes-cancel{background:#f1f5f9;border:none;border-radius:12px;padding:12px 16px;
   font-size:13px;font-weight:700;color:#64748b;cursor:pointer;font-family:'Sora',sans-serif}
 .notes-saved-msg{font-size:11px;color:#16a34a;font-weight:700;text-align:center;padding:4px 0 0;display:none}
+.notes-actions-row{display:flex;gap:8px;padding:0 18px 10px}
+.notes-action-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:8px 6px;font-size:11px;font-weight:700;color:#64748b;cursor:pointer;transition:all .18s}
+.notes-action-btn:hover{background:#f1f5f9;border-color:#cbd5e1;color:#374151}
+.notes-save{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:linear-gradient(135deg,#f59e0b,#d97706);border:none;border-radius:12px;padding:12px 16px;font-weight:800;font-size:13px;color:#fff;cursor:pointer}
+.bobi-gen-note-btn{width:100%;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(139,92,246,.08);border:1.5px solid rgba(139,92,246,.25);border-radius:10px;padding:9px 14px;font-size:12px;font-weight:700;color:#a78bfa;cursor:pointer;transition:all .18s}
+.bobi-gen-note-btn:hover{background:rgba(139,92,246,.14);border-color:rgba(139,92,246,.4)}
 
 /* ERROR */
 .exam-ai-error-card{text-align:center;padding:28px 16px}
@@ -3389,6 +3395,10 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
           <span class="ai-btn-icon">&#x25C6;</span> Analizar pregunta
         </button>
       </div>
+      <button class="bobi-gen-note-btn" id="bobiGenNoteBtn" onclick="bobiGenerarNota()" style="display:none" title="Guardar explicación de BOBI como nota">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        Guardar como nota
+      </button>
     </div>
 
     <!-- Conversational chat (shown after first response) -->
@@ -3414,18 +3424,46 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
   <div class="notes-modal">
     <div class="notes-header">
       <div>
-        <div class="notes-title">&#x2394; Nota personal</div>
+        <div class="notes-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="16" height="16"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          Nota personal
+        </div>
         <div class="notes-q-label" id="notesQLabel"></div>
       </div>
       <button class="exam-ai-close" onclick="closeNotesModal()">✕</button>
     </div>
     <div class="notes-body">
-      <textarea class="notes-textarea" id="notesTextarea" placeholder="Escribe tu nota, mnemónico o recordatorio para esta pregunta…" maxlength="500"></textarea>
+      <textarea class="notes-textarea" id="notesTextarea" placeholder="Escribe tu nota, mnemónico o recordatorio para esta pregunta…" maxlength="1000"></textarea>
+      <!-- Preview imagen adjunta -->
+      <div id="notesImgPreview" style="display:none;margin-top:10px;position:relative">
+        <img id="notesImgTag" style="width:100%;max-height:180px;object-fit:cover;border-radius:10px;border:1.5px solid #e2e8f0" />
+        <button onclick="removeNoteImg()" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:999px;width:24px;height:24px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+      </div>
       <div class="notes-saved-msg" id="notesSavedMsg">✅ Nota guardada</div>
+      <!-- Input imagen oculto -->
+      <input type="file" id="notesImgInput" accept="image/*" style="display:none" onchange="previewNoteImg(event)">
+    </div>
+    <!-- Acciones secundarias -->
+    <div class="notes-actions-row">
+      <button class="notes-action-btn" onclick="document.getElementById('notesImgInput').click()" title="Adjuntar imagen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        Imagen
+      </button>
+      <button class="notes-action-btn" onclick="exportNote()" title="Exportar nota como texto">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Exportar
+      </button>
+      <button class="notes-action-btn" onclick="shareNote()" title="Compartir nota">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Compartir
+      </button>
     </div>
     <div class="notes-footer">
       <button class="notes-cancel" onclick="closeNotesModal()">Cancelar</button>
-      <button class="notes-save" onclick="saveNote()">💾 Guardar nota</button>
+      <button class="notes-save" onclick="saveNote()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="14" height="14"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Guardar nota
+      </button>
     </div>
   </div>
 </div>
@@ -4269,6 +4307,8 @@ var SVG_IDLE  = '<svg viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg" sty
     btn.disabled = false;
     btn.innerHTML = '<span class="ai-btn-icon">◆</span> Analizar pregunta';
     document.getElementById('examAITTSBtn').style.display = 'none';
+    var _gnb = document.getElementById('bobiGenNoteBtn');
+    if (_gnb) _gnb.style.display = 'none';
     _setBobiState('idle');
     var modelBadge = document.getElementById('aiBobiModelBadge');
     if (modelBadge) modelBadge.textContent = _selectModel().label;
@@ -4340,6 +4380,9 @@ var SVG_IDLE  = '<svg viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg" sty
         _convHistory.push({ role: 'assistant', content: text });
         var ttsBtn = document.getElementById('examAITTSBtn');
         ttsBtn.style.display = ''; ttsBtn._text = text;
+        // Mostrar botón Guardar como nota
+        var genNoteBtn = document.getElementById('bobiGenNoteBtn');
+        if (genNoteBtn) genNoteBtn.style.display = '';
         var chatSec = document.getElementById('aiChatSection');
         if (chatSec) { chatSec.style.display = ''; _updateCounter(); }
         var hintRow = document.getElementById('aiHintRow');
@@ -4776,6 +4819,92 @@ function _refreshNoteIndicator() {
   _refreshNoteBtn(idx, notes);
 }
 
+// ── Guardar nota generada por BOBI ────────────────────────────────
+window.bobiGenerarNota = function() {
+  var text = window._lastFullText || '';
+  if (!text) return;
+  // Limpiar formato § y dejar texto limpio
+  var clean = text.replace(/§\s*(CONCEPTO|ANÁLISIS|RESPUESTA)\s*/gi, '
+── $1 ──
+').trim();
+  // Abrir modal de notas con el contenido prellenado
+  openNotesModal();
+  setTimeout(function() {
+    var ta = document.getElementById('notesTextarea');
+    if (ta && !ta.value.trim()) {
+      ta.value = clean;
+    } else if (ta) {
+      // Ya hay nota: preguntar si añadir al final
+      if (confirm('Ya tienes una nota en esta pregunta. ¿Añadir la explicación de BOBI al final?')) {
+        ta.value = ta.value + '
+
+── BOBI ──
+' + clean;
+      }
+    }
+  }, 250);
+};
+
+// ── Imagen en notas ───────────────────────────────────────────────
+window._noteImgData = null;
+window.previewNoteImg = function(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    window._noteImgData = ev.target.result;
+    var img = document.getElementById('notesImgTag');
+    var prev = document.getElementById('notesImgPreview');
+    if (img) img.src = ev.target.result;
+    if (prev) prev.style.display = '';
+  };
+  reader.readAsDataURL(file);
+};
+window.removeNoteImg = function() {
+  window._noteImgData = null;
+  var prev = document.getElementById('notesImgPreview');
+  var inp = document.getElementById('notesImgInput');
+  if (prev) prev.style.display = 'none';
+  if (inp) inp.value = '';
+};
+
+// ── Exportar nota ─────────────────────────────────────────────────
+window.exportNote = function() {
+  var idx = S.current;
+  var q = S.questions && S.questions[idx];
+  var ta = document.getElementById('notesTextarea');
+  var text = ta ? ta.value.trim() : '';
+  if (!text) { alert('Escribe algo en la nota primero.'); return; }
+  var titulo = q ? 'Pregunta ' + (idx+1) + (q.area ? ' · ' + q.area : '') : 'Nota';
+  var blob = new Blob([titulo + '
+' + '─'.repeat(40) + '
+
+' + text], { type: 'text/plain' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'nota_p' + (idx+1) + '.txt';
+  a.click();
+};
+
+// ── Compartir nota ────────────────────────────────────────────────
+window.shareNote = function() {
+  var idx = S.current;
+  var q = S.questions && S.questions[idx];
+  var ta = document.getElementById('notesTextarea');
+  var text = ta ? ta.value.trim() : '';
+  if (!text) { alert('Escribe algo en la nota primero.'); return; }
+  var titulo = q ? 'Pregunta ' + (idx+1) : 'Mi nota';
+  if (navigator.share) {
+    navigator.share({ title: titulo, text: text }).catch(function(){});
+  } else {
+    navigator.clipboard.writeText(text).then(function() {
+      var msg = document.getElementById('notesSavedMsg');
+      if (msg) { msg.textContent = '📋 Copiado al portapapeles'; msg.style.display = 'block'; setTimeout(function(){ msg.style.display='none'; msg.textContent='✅ Nota guardada'; }, 2000); }
+    });
+  }
+};
+
+
 function doLogout() {
   stopTimer();
   stopChat();
@@ -4916,22 +5045,13 @@ function handleGoogleCredential(response) {
   }
 }
 
-async function showGoogleRoleModal() {
+function showGoogleRoleModal() {
   if (!_googleProfile) return;
   $('grAvatar').src   = _googleProfile.picture || '';
   $('grName').textContent  = _googleProfile.name;
   $('grEmail').textContent = _googleProfile.email;
-  // Verificar rol existente en Firebase para mostrar botón Administrador si ya fue asignado
-  const isAdminEmail = ADMIN_EMAILS.includes(_googleProfile.email.toLowerCase());
-  let isAdmin = isAdminEmail;
-  if (!isAdmin) {
-    try {
-      const gKey = 'g_' + _googleProfile.email.toLowerCase().replace(/[^a-z0-9]/g, '_');
-      const r = await fetch(`https://exani-dash-adeff-default-rtdb.firebaseio.com/googleUsers/${gKey}/role.json`);
-      const savedRole = await r.json();
-      if (savedRole === 'Administrador') isAdmin = true;
-    } catch(e) {}
-  }
+  // Mostrar opción Admin solo si el email está en la lista
+  const isAdmin = ADMIN_EMAILS.includes(_googleProfile.email.toLowerCase());
   $('grAdminBtn').style.display = isAdmin ? 'block' : 'none';
   $('googleRoleModal').style.display = 'flex';
 }
@@ -4979,8 +5099,7 @@ async function finishGoogleLogin(roleSelected) {
     // 3. Rol: admin por email hardcoded > existente en Firebase > seleccionado > Aspirante
     const isAdminEmail = ADMIN_EMAILS.includes(_googleProfile.email.toLowerCase());
     let role = isAdminEmail ? 'Administrador' : (existingData?.role || roleSelected || 'Aspirante');
-    // NO revertir a Aspirante si Firebase ya tiene Administrador asignado por el panel
-    // if (!isAdminEmail && role === 'Administrador') role = 'Aspirante';
+    if (!isAdminEmail && role === 'Administrador') role = 'Aspirante';
 
     S.user = _googleProfile.name;
     S.role = role;
@@ -5002,15 +5121,6 @@ async function finishGoogleLogin(roleSelected) {
         isGoogle: true,
         firebaseUid: fbUser?.uid || null,
       }).catch(() => {});
-      // Espejo de role en users/{firebaseUid} para que las Security Rules puedan validarlo
-      if (fbUser?.uid) {
-        _upd(_ref(_db, `users/${fbUser.uid}`), {
-          role,
-          username: S.user,
-          isGoogle: true,
-          lastLogin: Date.now(),
-        }).catch(() => {});
-      }
     }
 
     if (loadEl) loadEl.style.display = 'none';
@@ -6371,35 +6481,42 @@ loadCatalog();   // carga exams/catalog.json y renderiza las tarjetas
     };
     setTimeout(_tryBubble, 300);
 
-    // ── Listener en tiempo real para cambios de rol y ban ──
-    function _applyRoleChange(data) {
-      if (!data) return;
-      if (data.banned) { doLogout(); return; }
-      const newRole = data.role;
-      if (!newRole || !VALID_ROLES || !VALID_ROLES.includes(newRole)) return;
-      if (newRole === S.role) return;
-      S.role = newRole;
-      localStorage.setItem('exani_session', JSON.stringify({ ...sess, role: newRole }));
-      updateProfileUI();
-      const ab = document.getElementById('chatAdminBar');
-      if (ab) ab.classList.toggle('visible', newRole === 'Administrador');
-      window._spInitBubble && window._spInitBubble();
-      // Toast de notificación
-      const t = document.createElement('div');
-      t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#0d9488;color:#fff;padding:10px 22px;border-radius:999px;font-size:13px;z-index:99999;box-shadow:0 4px 14px rgba(0,0,0,.3);white-space:nowrap';
-      t.textContent = `🔄 Tu rol fue actualizado a: ${newRole}`;
-      document.body.appendChild(t);
-      setTimeout(() => t.remove(), 4000);
-    }
-    // Desuscribir listener anterior si existía
-    if (window._roleListener) { window._roleListener(); window._roleListener = null; }
-    if (sess.googleEmail) {
-      const gKey = 'g_' + sess.googleEmail.toLowerCase().replace(/[^a-z0-9]/g, '_');
-      window._roleListener = onValue(ref(db, `googleUsers/${gKey}`), snap => _applyRoleChange(snap.val()));
-    } else if (window._fbCurrentUser) {
-      const uid = window._fbCurrentUser.uid;
-      window._roleListener = onValue(ref(db, `users/${uid}`), snap => _applyRoleChange(snap.val()));
-    }
+    // Verificar rol y ban en Firebase de forma asíncrona (silenciosa)
+    setTimeout(async () => {
+      try {
+        if (sess.googleEmail) {
+          // Usuario Google: verificar en googleUsers
+          const gKey = 'g_' + sess.googleEmail.toLowerCase().replace(/[^a-z0-9]/g, '_');
+          const r = await fetch(`https://exani-dash-adeff-default-rtdb.firebaseio.com/googleUsers/${gKey}.json`);
+          const data = await r.json();
+          if (data?.banned) { doLogout(); return; }
+          // Actualizar rol si cambió en Firebase
+          if (data?.role && VALID_ROLES && VALID_ROLES.includes(data.role) && data.role !== S.role) {
+            S.role = data.role;
+            localStorage.setItem('exani_session', JSON.stringify({ ...sess, role: data.role }));
+            updateProfileUI();
+            const ab = document.getElementById('chatAdminBar');
+            if (ab) ab.classList.toggle('visible', data.role === 'Administrador');
+            window._spInitBubble && window._spInitBubble();
+          }
+        } else if (window._fbCurrentUser) {
+          // FIX: Usuario nativo — verificar ban en Firebase también
+          const uid = window._fbCurrentUser.uid;
+          const r = await fetch(`https://exani-dash-adeff-default-rtdb.firebaseio.com/users/${uid}.json`);
+          const data = await r.json();
+          if (data?.banned) { doLogout(); return; }
+          // Sincronizar rol si cambió
+          if (data?.role && VALID_ROLES && VALID_ROLES.includes(data.role) && data.role !== S.role) {
+            S.role = data.role;
+            localStorage.setItem('exani_session', JSON.stringify({ ...sess, role: data.role }));
+            updateProfileUI();
+            const ab = document.getElementById('chatAdminBar');
+            if (ab) ab.classList.toggle('visible', data.role === 'Administrador');
+            window._spInitBubble && window._spInitBubble();
+          }
+        }
+      } catch(e) { /* red no disponible, continuar con sesión en memoria */ }
+    }, 1500);
 
   } catch(e) {
     localStorage.removeItem('exani_session');
@@ -9680,14 +9797,6 @@ window.spChangeUserRole = async function(uid, username, newRole) {
   try {
     const dbPath = uid.startsWith('g_') ? `googleUsers/${uid}/role` : `users/${uid}/role`;
     await set(ref(db, dbPath), newRole);
-    // Si es Google, también espejar en users/{firebaseUid}/role para que las Security Rules lo lean
-    if (uid.startsWith('g_')) {
-      const gSnap = await get(ref(db, `googleUsers/${uid}/firebaseUid`));
-      const firebaseUid = gSnap.val();
-      if (firebaseUid) {
-        await set(ref(db, `users/${firebaseUid}/role`), newRole);
-      }
-    }
     _spLog_push('action', `Rol de "${username}" → ${newRole} (por ${S.user})`);
     spShowFeedback('spUserFeedback', 'ok', `✅ Rol de ${username} actualizado a ${newRole}`);
   } catch(e) {
