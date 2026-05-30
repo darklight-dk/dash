@@ -6371,42 +6371,35 @@ loadCatalog();   // carga exams/catalog.json y renderiza las tarjetas
     };
     setTimeout(_tryBubble, 300);
 
-    // Verificar rol y ban en Firebase de forma asíncrona (silenciosa)
-    setTimeout(async () => {
-      try {
-        if (sess.googleEmail) {
-          // Usuario Google: verificar en googleUsers
-          const gKey = 'g_' + sess.googleEmail.toLowerCase().replace(/[^a-z0-9]/g, '_');
-          const r = await fetch(`https://exani-dash-adeff-default-rtdb.firebaseio.com/googleUsers/${gKey}.json`);
-          const data = await r.json();
-          if (data?.banned) { doLogout(); return; }
-          // Actualizar rol si cambió en Firebase
-          if (data?.role && VALID_ROLES && VALID_ROLES.includes(data.role) && data.role !== S.role) {
-            S.role = data.role;
-            localStorage.setItem('exani_session', JSON.stringify({ ...sess, role: data.role }));
-            updateProfileUI();
-            const ab = document.getElementById('chatAdminBar');
-            if (ab) ab.classList.toggle('visible', data.role === 'Administrador');
-            window._spInitBubble && window._spInitBubble();
-          }
-        } else if (window._fbCurrentUser) {
-          // FIX: Usuario nativo — verificar ban en Firebase también
-          const uid = window._fbCurrentUser.uid;
-          const r = await fetch(`https://exani-dash-adeff-default-rtdb.firebaseio.com/users/${uid}.json`);
-          const data = await r.json();
-          if (data?.banned) { doLogout(); return; }
-          // Sincronizar rol si cambió
-          if (data?.role && VALID_ROLES && VALID_ROLES.includes(data.role) && data.role !== S.role) {
-            S.role = data.role;
-            localStorage.setItem('exani_session', JSON.stringify({ ...sess, role: data.role }));
-            updateProfileUI();
-            const ab = document.getElementById('chatAdminBar');
-            if (ab) ab.classList.toggle('visible', data.role === 'Administrador');
-            window._spInitBubble && window._spInitBubble();
-          }
-        }
-      } catch(e) { /* red no disponible, continuar con sesión en memoria */ }
-    }, 1500);
+    // ── Listener en tiempo real para cambios de rol y ban ──
+    function _applyRoleChange(data) {
+      if (!data) return;
+      if (data.banned) { doLogout(); return; }
+      const newRole = data.role;
+      if (!newRole || !VALID_ROLES || !VALID_ROLES.includes(newRole)) return;
+      if (newRole === S.role) return;
+      S.role = newRole;
+      localStorage.setItem('exani_session', JSON.stringify({ ...sess, role: newRole }));
+      updateProfileUI();
+      const ab = document.getElementById('chatAdminBar');
+      if (ab) ab.classList.toggle('visible', newRole === 'Administrador');
+      window._spInitBubble && window._spInitBubble();
+      // Toast de notificación
+      const t = document.createElement('div');
+      t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#0d9488;color:#fff;padding:10px 22px;border-radius:999px;font-size:13px;z-index:99999;box-shadow:0 4px 14px rgba(0,0,0,.3);white-space:nowrap';
+      t.textContent = `🔄 Tu rol fue actualizado a: ${newRole}`;
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 4000);
+    }
+    // Desuscribir listener anterior si existía
+    if (window._roleListener) { window._roleListener(); window._roleListener = null; }
+    if (sess.googleEmail) {
+      const gKey = 'g_' + sess.googleEmail.toLowerCase().replace(/[^a-z0-9]/g, '_');
+      window._roleListener = onValue(ref(db, `googleUsers/${gKey}`), snap => _applyRoleChange(snap.val()));
+    } else if (window._fbCurrentUser) {
+      const uid = window._fbCurrentUser.uid;
+      window._roleListener = onValue(ref(db, `users/${uid}`), snap => _applyRoleChange(snap.val()));
+    }
 
   } catch(e) {
     localStorage.removeItem('exani_session');
