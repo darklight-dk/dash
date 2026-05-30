@@ -9677,6 +9677,14 @@ window.spChangeUserRole = async function(uid, username, newRole) {
   try {
     const dbPath = uid.startsWith('g_') ? `googleUsers/${uid}/role` : `users/${uid}/role`;
     await set(ref(db, dbPath), newRole);
+    // Si es Google, también espejar en users/{firebaseUid}/role para que las Security Rules lo lean
+    if (uid.startsWith('g_')) {
+      const gSnap = await get(ref(db, `googleUsers/${uid}/firebaseUid`));
+      const firebaseUid = gSnap.val();
+      if (firebaseUid) {
+        await set(ref(db, `users/${firebaseUid}/role`), newRole);
+      }
+    }
     _spLog_push('action', `Rol de "${username}" → ${newRole} (por ${S.user})`);
     spShowFeedback('spUserFeedback', 'ok', `✅ Rol de ${username} actualizado a ${newRole}`);
   } catch(e) {
