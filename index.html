@@ -4992,6 +4992,15 @@ async function finishGoogleLogin(roleSelected) {
         isGoogle: true,
         firebaseUid: fbUser?.uid || null,
       }).catch(() => {});
+      // Espejo de role en users/{firebaseUid} para que las Security Rules puedan validarlo
+      if (fbUser?.uid) {
+        _upd(_ref(_db, `users/${fbUser.uid}`), {
+          role,
+          username: S.user,
+          isGoogle: true,
+          lastLogin: Date.now(),
+        }).catch(() => {});
+      }
     }
 
     if (loadEl) loadEl.style.display = 'none';
@@ -8148,10 +8157,6 @@ const firebaseConfig = {
 const fbApp   = initializeApp(firebaseConfig);
 const db      = getDatabase(fbApp);
 const auth    = getAuth(fbApp);
-window._auth  = auth;
-window._db    = db;
-window._ref   = ref;
-window._get   = get;
 const msgsRef  = ref(db, 'chat/messages');
 const presRef  = ref(db, 'chat/presence');
 const usersRef = ref(db, 'users');
