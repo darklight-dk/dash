@@ -3588,7 +3588,7 @@ const NAV_WIN = 10;
 // ══════════════════════════════════════════
 //  STATE
 // ══════════════════════════════════════════
-let S = {
+window.S = {
   user: null,
   role: null,          // 'Administrador' | 'Tutor / Revisor' | 'Aspirante'
   googlePicture: null,
@@ -4375,7 +4375,7 @@ var SVG_IDLE  = '<svg viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg" sty
       if (text) {
         body.innerHTML = '';
         _renderResponse(body, text);
-        _lastFullText = text; _msgCount = 1;
+        _lastFullText = text; window._lastFullText = text; _msgCount = 1;
         _convHistory.push({ role: 'user', content: userText });
         _convHistory.push({ role: 'assistant', content: text });
         var ttsBtn = document.getElementById('examAITTSBtn');
@@ -4454,7 +4454,7 @@ var SVG_IDLE  = '<svg viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg" sty
         replyBubble.textContent = reply;
         thread.appendChild(replyBubble);
         _convHistory.push({ role: 'assistant', content: reply });
-        _lastFullText = reply; _msgCount += 2; _updateCounter();
+        _lastFullText = reply; window._lastFullText = reply; _msgCount += 2; _updateCounter();
       } else {
         var errBubble = document.createElement('div');
         errBubble.className = 'ai-chat-bubble bobi';
@@ -4822,27 +4822,22 @@ function _refreshNoteIndicator() {
 // ── Guardar nota generada por BOBI ────────────────────────────────
 window.bobiGenerarNota = function() {
   var text = window._lastFullText || '';
-  if (!text) return;
+  if (!text) { if(typeof showToast==='function') showToast('⚠️ No hay explicación de IA para guardar'); return; }
   // Limpiar formato § y dejar texto limpio
-  var clean = text.replace(/§\s*(CONCEPTO|ANÁLISIS|RESPUESTA)\s*/gi, '
-── $1 ──
-').trim();
-  // Abrir modal de notas con el contenido prellenado
-  openNotesModal();
-  setTimeout(function() {
-    var ta = document.getElementById('notesTextarea');
-    if (ta && !ta.value.trim()) {
-      ta.value = clean;
-    } else if (ta) {
-      // Ya hay nota: preguntar si añadir al final
-      if (confirm('Ya tienes una nota en esta pregunta. ¿Añadir la explicación de BOBI al final?')) {
-        ta.value = ta.value + '
-
-── BOBI ──
-' + clean;
-      }
-    }
-  }, 250);
+  var clean = text.replace(/§\s*(CONCEPTO|ANÁLISIS|RESPUESTA)\s*/gi, '\n── $1 ──\n').trim();
+  // Guardar directamente en notas sin abrir modal
+  var idx = typeof S !== 'undefined' ? S.current : (window.S ? window.S.current : 0);
+  var notes = _loadNotes();
+  if (notes[idx] && notes[idx].trim()) {
+    if (confirm('Ya tienes una nota en esta pregunta. ¿Añadir la explicación de BOBI al final?')) {
+      notes[idx] = notes[idx] + '\n\n── BOBI ──\n' + clean;
+    } else { return; }
+  } else {
+    notes[idx] = clean;
+  }
+  _saveNotes(notes);
+  _refreshNoteBtn(idx, notes);
+  if (typeof showToast === 'function') showToast('📝 Nota guardada correctamente');
 };
 
 // ── Imagen en notas ───────────────────────────────────────────────
@@ -4876,10 +4871,7 @@ window.exportNote = function() {
   var text = ta ? ta.value.trim() : '';
   if (!text) { alert('Escribe algo en la nota primero.'); return; }
   var titulo = q ? 'Pregunta ' + (idx+1) + (q.area ? ' · ' + q.area : '') : 'Nota';
-  var blob = new Blob([titulo + '
-' + '─'.repeat(40) + '
-
-' + text], { type: 'text/plain' });
+  var blob = new Blob([titulo + '\n' + '─'.repeat(40) + '\n\n' + text], { type: 'text/plain' });
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'nota_p' + (idx+1) + '.txt';
@@ -5761,7 +5753,7 @@ function cEq(){
 // ══════════════════════════════════════════
 //  CATÁLOGO DINÁMICO — lee exams/catalog.json
 // ══════════════════════════════════════════
-let CATALOG = [];   // se llena al cargar
+window.CATALOG = [];   // se llena al cargar
 
 async function loadCatalog() {
   const grid  = $('examsGrid');
@@ -6193,8 +6185,8 @@ function initChat() {
   // Set admin/mod class for conditional UI
   const panel = $('chatPanel');
   if (panel) {
-    panel.classList.toggle('is-admin-viewer', S.role === 'Administrador');
-    panel.classList.toggle('is-mod-viewer',   S.role === 'Moderador');
+    panel.classList.toggle('is-admin-viewer', window.S.role === 'Administrador');
+    panel.classList.toggle('is-mod-viewer',   window.S.role === 'Moderador');
   }
 }
 function stopChat() {
@@ -6225,15 +6217,15 @@ const RANKING_REF = FB_URL + '/ranking';
 let rankingTab = 'global';
 
 async function saveScoreToRanking(pct, ok, total) {
-  if (!S.user) return;
-  const examTitle = (S.currentExamMeta?.titulo || S.meta?.titulo || 'Examen sin nombre').trim();
-  const safeKey = S.googleEmail
-    ? S.googleEmail.replace(/[.#$[\]]/g, '_')
-    : 'u_' + S.user.toLowerCase().replace(/[^a-z0-9]/g, '_');
+  if (!window.S.user) return;
+  const examTitle = (window.S.currentExamMeta?.titulo || window.S.meta?.titulo || 'Examen sin nombre').trim();
+  const safeKey = window.S.googleEmail
+    ? window.S.googleEmail.replace(/[.#$[\]]/g, '_')
+    : 'u_' + window.S.user.toLowerCase().replace(/[^a-z0-9]/g, '_');
   const entry = {
-    user:    S.user,
-    email:   S.googleEmail || '',
-    picture: S.googlePicture || null,
+    user:    window.S.user,
+    email:   window.S.googleEmail || '',
+    picture: window.S.googlePicture || null,
     pct, ok, total,
     exam:    examTitle,
     ts:      Date.now(),
@@ -6365,14 +6357,14 @@ async function loadRankingByExam() {
 
 async function loadRankingMine() {
   $('rankingBody').innerHTML = '<div class="ranking-loading">⏳ Cargando…</div>';
-  if (!S.user) {
+  if (!window.S.user) {
     $('rankingBody').innerHTML = '<div class="ranking-empty">🔒 Inicia sesión para ver tu historial</div>';
     return;
   }
   try {
-    const safeKey = S.googleEmail
-      ? S.googleEmail.replace(/[.#$[\]]/g, '_')
-      : 'u_' + S.user.toLowerCase().replace(/[^a-z0-9]/g, '_');
+    const safeKey = window.S.googleEmail
+      ? window.S.googleEmail.replace(/[.#$[\]]/g, '_')
+      : 'u_' + window.S.user.toLowerCase().replace(/[^a-z0-9]/g, '_');
     const data = await fetch(FB_URL + '/history/' + safeKey + '.json').then(r => r.json());
     if (!data) { $('rankingBody').innerHTML = '<div class="ranking-empty">Aún no tienes exámenes completados 📚<br><span style="font-size:12px;color:var(--muted)">¡Termina un examen para ver tu historial!</span></div>'; return; }
     const entries = Object.values(data).sort((a,b) => b.ts - a.ts);
@@ -6397,7 +6389,7 @@ async function loadRankingMine() {
 }
 
 function renderRankingList(entries) {
-  const myEmail = S.googleEmail;
+  const myEmail = window.S.googleEmail;
   const myPos = myEmail ? entries.findIndex(e => e.email === myEmail) : -1;
   let html = '';
 
@@ -6457,10 +6449,10 @@ loadCatalog();   // carga exams/catalog.json y renderiza las tarjetas
     if (!saved) return;
     const sess = JSON.parse(saved);
     if (!sess.user || !sess.role) return;
-    S.user          = sess.user;
-    S.role          = sess.role;
-    S.googlePicture = sess.googlePicture || null;
-    S.googleEmail   = sess.googleEmail   || '';
+    window.S.user          = sess.user;
+    window.S.role          = sess.role;
+    window.S.googlePicture = sess.googlePicture || null;
+    window.S.googleEmail   = sess.googleEmail   || '';
     localStorage.setItem('exani_loginTs', Date.now());
     updateProfileUI();
     const adminBar = document.getElementById('chatAdminBar');
@@ -6491,8 +6483,8 @@ loadCatalog();   // carga exams/catalog.json y renderiza las tarjetas
           const data = await r.json();
           if (data?.banned) { doLogout(); return; }
           // Actualizar rol si cambió en Firebase
-          if (data?.role && VALID_ROLES && VALID_ROLES.includes(data.role) && data.role !== S.role) {
-            S.role = data.role;
+          if (data?.role && VALID_ROLES && VALID_ROLES.includes(data.role) && data.role !== window.S.role) {
+            window.S.role = data.role;
             localStorage.setItem('exani_session', JSON.stringify({ ...sess, role: data.role }));
             updateProfileUI();
             const ab = document.getElementById('chatAdminBar');
@@ -6506,8 +6498,8 @@ loadCatalog();   // carga exams/catalog.json y renderiza las tarjetas
           const data = await r.json();
           if (data?.banned) { doLogout(); return; }
           // Sincronizar rol si cambió
-          if (data?.role && VALID_ROLES && VALID_ROLES.includes(data.role) && data.role !== S.role) {
-            S.role = data.role;
+          if (data?.role && VALID_ROLES && VALID_ROLES.includes(data.role) && data.role !== window.S.role) {
+            window.S.role = data.role;
             localStorage.setItem('exani_session', JSON.stringify({ ...sess, role: data.role }));
             updateProfileUI();
             const ab = document.getElementById('chatAdminBar');
@@ -6552,17 +6544,17 @@ let fw = {
 };
 
 // ── Clave única por pregunta+modo ──
-function fwKey() { return `${S.current}-${fw.mode}`; }
+function fwKey() { return `${window.S.current}-${fw.mode}`; }
 
 // ── Renderizar contenido del panel ──
 function fwRenderPanel() {
-  const q        = S.questions[S.current];
+  const q        = window.S.questions[window.S.current];
   const letters  = ['A','B','C','D','E'];
-  const selected = S.answers[S.current];
+  const selected = window.S.answers[window.S.current];
 
   if (fw.mode === 'pregunta') {
-    $('fwTitle').textContent = 'Pregunta ' + (S.current+1) + (q?.area ? '  ·  ' + q.area : '');
-    $('fwPanelLabel').textContent = 'PREGUNTA ' + (S.current+1);
+    $('fwTitle').textContent = 'Pregunta ' + (window.S.current+1) + (q?.area ? '  ·  ' + q.area : '');
+    $('fwPanelLabel').textContent = 'PREGUNTA ' + (window.S.current+1);
     const txt = q?.question || '—';
     let imgHtml = '';
     const imgEl = $('qImg');
@@ -6571,7 +6563,7 @@ function fwRenderPanel() {
     $('fwPanelText').innerHTML = txt.replace(/\n/g,'<br>') + imgHtml;
 
   } else {
-    $('fwTitle').textContent = 'Pregunta ' + (S.current+1) + '  ·  Opciones';
+    $('fwTitle').textContent = 'Pregunta ' + (window.S.current+1) + '  ·  Opciones';
     $('fwPanelLabel').textContent = 'OPCIONES — toca para seleccionar';
     let html = '';
     if (q?.options) {
@@ -6597,12 +6589,12 @@ function fwRenderPanel() {
 
 // ── Seleccionar respuesta desde la ventana flotante ──
 function fwSelectAnswer(letter) {
-  S.answers[S.current] = letter;
+  window.S.answers[window.S.current] = letter;
   // Actualizar botones del examen principal
   document.querySelectorAll('#optsCont .opt-btn').forEach(b =>
     b.classList.toggle('selected', b.dataset.letter === letter)
   );
-  $('answeredCount').textContent = Object.keys(S.answers).length;
+  $('answeredCount').textContent = Object.keys(window.S.answers).length;
   renderNav();
   fwRenderPanel();
 }
@@ -6697,13 +6689,13 @@ function fwUpdateHistoryBtns() {
 // ── Guardar canvas actual al cerrar o cambiar modo ──
 function fwSaveSnapshot() {
   const canvas = $('fwCanvas');
-  if (!fw.snapshots[S.current]) fw.snapshots[S.current] = {};
-  fw.snapshots[S.current][fw.mode] = canvas.toDataURL();
+  if (!fw.snapshots[window.S.current]) fw.snapshots[window.S.current] = {};
+  fw.snapshots[window.S.current][fw.mode] = canvas.toDataURL();
 }
 
 // ── Restaurar snapshot guardado (siempre limpia primero) ──
 function fwLoadSnapshot(callback) {
-  const saved  = fw.snapshots[S.current]?.[fw.mode];
+  const saved  = fw.snapshots[window.S.current]?.[fw.mode];
   const canvas = $('fwCanvas');
   const ctx    = canvas.getContext('2d');
   // Siempre limpiar — evita que el dibujo del modo anterior se filtre
@@ -6724,7 +6716,7 @@ function clearCanvas() {
   const key = fwKey();
   fw.history[key]  = [];
   fw.histIdx[key]  = -1;
-  delete fw.snapshots[S.current]?.[fw.mode];
+  delete fw.snapshots[window.S.current]?.[fw.mode];
   fwPushHistory();
 }
 
@@ -6946,7 +6938,7 @@ function saveCanvas() {
   ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,out.width,out.height);
   ctx.drawImage(src, 0, 0);
   const a = document.createElement('a');
-  a.download = `pizarron-q${S.current+1}.png`;
+  a.download = `pizarron-q${window.S.current+1}.png`;
   a.href = out.toDataURL('image/png');
   a.click();
 }
@@ -6958,7 +6950,7 @@ function saveCanvas() {
 function openAdmin() {
   window._editingFbId = null; // limpiar al abrir admin manualmente
   // FIX: verificación doble - rol en memoria y elemento de UI
-  if (S.role !== 'Administrador') {
+  if (window.S.role !== 'Administrador') {
     console.warn('[Security] Intento de acceso a adminScreen sin rol Administrador');
     return;
   }
@@ -6972,7 +6964,7 @@ function closeAdmin() {
 }
 
 function renderAdminPanel() {
-  const hasExam = S.questions.length > 0;
+  const hasExam = window.S.questions.length > 0;
   $('adminNoExam').style.display  = hasExam ? 'none'  : 'flex';
   $('adminQList').style.display   = hasExam ? 'flex'  : 'none';
 
@@ -6982,16 +6974,16 @@ function renderAdminPanel() {
     return;
   }
 
-  const meta = S.currentExamMeta || {};
+  const meta = window.S.currentExamMeta || {};
   $('adminSubtitle').textContent =
-    `${meta.titulo || 'Examen'} · ${S.questions.length} preguntas`;
+    `${meta.titulo || 'Examen'} · ${window.S.questions.length} preguntas`;
 
   const list = $('adminQList');
   list.innerHTML = '';
 
-  S.questions.forEach((q, idx) => {
-    const edit    = S.adminEdits[idx];
-    const origImg = q.image ? S.images[q.image] : null;
+  window.S.questions.forEach((q, idx) => {
+    const edit    = window.S.adminEdits[idx];
+    const origImg = q.image ? window.S.images[q.image] : null;
     const newImg  = edit ? edit.dataUrl : null;
 
     const card = document.createElement('div');
@@ -7079,15 +7071,15 @@ function pickImageForQuestion(qIdx) {
     const dataUrl = await fileToDataUrl(file);
     // Nombre de archivo: preguntaX.ext
     const ext  = file.name.split('.').pop().toLowerCase() || 'jpg';
-    const name = `pregunta${(S.questions[qIdx].id || (qIdx + 1))}.${ext}`;
-    S.adminEdits[qIdx] = { imageName: name, dataUrl };
+    const name = `pregunta${(window.S.questions[qIdx].id || (qIdx + 1))}.${ext}`;
+    window.S.adminEdits[qIdx] = { imageName: name, dataUrl };
     renderAdminPanel();
   };
   inp.click();
 }
 
 function removeAdminImage(qIdx) {
-  delete S.adminEdits[qIdx];
+  delete window.S.adminEdits[qIdx];
   renderAdminPanel();
 }
 
@@ -7101,7 +7093,7 @@ function fileToDataUrl(file) {
 }
 
 function updateAdminEditCount() {
-  const count = Object.keys(S.adminEdits).length;
+  const count = Object.keys(window.S.adminEdits).length;
   const counter = $('adminEditCount');
   const btn     = $('btnDownloadZip');
 
@@ -7118,7 +7110,7 @@ function updateAdminEditCount() {
 }
 
 async function downloadModifiedZip() {
-  if (!S.rawZip || !S.questions.length) return;
+  if (!window.S.rawZip || !window.S.questions.length) return;
 
   const btn = $('btnDownloadZip');
   const orig = btn.textContent;
@@ -7131,9 +7123,9 @@ async function downloadModifiedZip() {
     const newZip = new JSZip();
 
     // Copiar todos los archivos excepto questions/preguntas.json e imágenes que vamos a reemplazar
-    const replacedImages = new Set(Object.values(S.adminEdits).map(e => e.imageName));
+    const replacedImages = new Set(Object.values(window.S.adminEdits).map(e => e.imageName));
 
-    for (const [path, file] of Object.entries(S.rawZip.files)) {
+    for (const [path, file] of Object.entries(window.S.rawZip.files)) {
       if (file.dir) continue;
       const fname = path.split('/').pop();
 
@@ -7145,26 +7137,26 @@ async function downloadModifiedZip() {
     }
 
     // Construir questions.json modificado
-    const updatedQuestions = S.questions.map((q, idx) => {
-      if (S.adminEdits[idx]) {
-        return { ...q, image: S.adminEdits[idx].imageName };
+    const updatedQuestions = window.S.questions.map((q, idx) => {
+      if (window.S.adminEdits[idx]) {
+        return { ...q, image: window.S.adminEdits[idx].imageName };
       }
       return { ...q };
     });
 
-    const meta = S.currentExamMeta || {};
+    const meta = window.S.currentExamMeta || {};
     const updatedJson = JSON.stringify({ meta, questions: updatedQuestions }, null, 2);
 
     // Detectar ruta original del json para mantener estructura de carpetas
-    const origJsonPath = Object.keys(S.rawZip.files).find(p =>
-      !S.rawZip.files[p].dir && /(questions|preguntas)\.json$/i.test(p)
+    const origJsonPath = Object.keys(window.S.rawZip.files).find(p =>
+      !window.S.rawZip.files[p].dir && /(questions|preguntas)\.json$/i.test(p)
     ) || 'questions.json';
     const basePath = origJsonPath.includes('/') ? origJsonPath.split('/').slice(0,-1).join('/') + '/' : '';
 
     newZip.file(origJsonPath, updatedJson);
 
     // Agregar imágenes nuevas
-    for (const [qIdx, edit] of Object.entries(S.adminEdits)) {
+    for (const [qIdx, edit] of Object.entries(window.S.adminEdits)) {
       const base64 = edit.dataUrl.split(',')[1];
       newZip.file(`${basePath}images/${edit.imageName}`, base64, { base64: true });
     }
@@ -7242,7 +7234,7 @@ function selectExpFormat(fmt, el) {
 }
 
 function initExportTab() {
-  const qs = S.questions || [];
+  const qs = window.S.questions || [];
   $('expTotalCount').textContent = qs.length;
   const hasExam = qs.length > 0;
   $('expNoExam').style.display  = hasExam ? 'none' : '';
@@ -7261,7 +7253,7 @@ function getExpOptions() {
 }
 
 function updateExpPreview() {
-  const qs  = S.questions || [];
+  const qs  = window.S.questions || [];
   if (!qs.length) return;
   const opt = getExpOptions();
   const q   = qs[0];
@@ -7297,7 +7289,7 @@ function buildJsonExport(qs, opt) {
     if (q.image) o.image = q.image;
     return o;
   })};
-  if (opt.meta && S.meta) out.meta = S.meta;
+  if (opt.meta && window.S.meta) out.meta = window.S.meta;
   return out;
 }
 
@@ -7321,11 +7313,11 @@ function buildCsvExport(qs, opt) {
 
 function buildTxtExport(qs, opt) {
   let out = '';
-  if (opt.meta && S.meta) {
+  if (opt.meta && window.S.meta) {
     out += `═══════════════════════════════════\n`;
-    out += `  ${S.meta.titulo || 'Examen'}\n`;
-    if (S.meta.materia) out += `  ${S.meta.materia}\n`;
-    if (S.meta.tiempo_minutos) out += `  Tiempo: ${S.meta.tiempo_minutos} min\n`;
+    out += `  ${window.S.meta.titulo || 'Examen'}\n`;
+    if (window.S.meta.materia) out += `  ${window.S.meta.materia}\n`;
+    if (window.S.meta.tiempo_minutos) out += `  Tiempo: ${window.S.meta.tiempo_minutos} min\n`;
     out += `═══════════════════════════════════\n\n`;
   }
   qs.forEach((q, i) => {
@@ -7344,11 +7336,11 @@ function buildTxtExport(qs, opt) {
 
 function buildMdExport(qs, opt) {
   let out = '';
-  if (opt.meta && S.meta) {
-    out += `# ${S.meta.titulo || 'Examen'}\n\n`;
-    if (S.meta.materia)        out += `**Materia:** ${S.meta.materia}  \n`;
-    if (S.meta.tiempo_minutos) out += `**Tiempo:** ${S.meta.tiempo_minutos} min  \n`;
-    if (S.meta.version)        out += `**Versión:** ${S.meta.version}  \n`;
+  if (opt.meta && window.S.meta) {
+    out += `# ${window.S.meta.titulo || 'Examen'}\n\n`;
+    if (window.S.meta.materia)        out += `**Materia:** ${window.S.meta.materia}  \n`;
+    if (window.S.meta.tiempo_minutos) out += `**Tiempo:** ${window.S.meta.tiempo_minutos} min  \n`;
+    if (window.S.meta.version)        out += `**Versión:** ${window.S.meta.version}  \n`;
     out += '\n---\n\n';
   }
   qs.forEach((q, i) => {
@@ -7369,11 +7361,11 @@ function buildMdExport(qs, opt) {
 }
 
 function doExportQuestions() {
-  const qs  = S.questions || [];
+  const qs  = window.S.questions || [];
   if (!qs.length) return;
   const opt = getExpOptions();
   const ts  = new Date().toISOString().slice(0,10);
-  const base = (S.meta && S.meta.titulo ? S.meta.titulo.toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,30) : 'preguntas') + '-' + ts;
+  const base = (window.S.meta && window.S.meta.titulo ? window.S.meta.titulo.toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,30) : 'preguntas') + '-' + ts;
 
   let content, filename, mime;
 
@@ -7407,7 +7399,7 @@ function doExportQuestions() {
 // 📊 ESTADÍSTICAS
 // ══════════════════════════════════════════════
 function initStatsTab() {
-  const qs = S.questions || [];
+  const qs = window.S.questions || [];
   const hasExam = qs.length > 0;
   $('statsNoExam').style.display  = hasExam ? 'none' : '';
   $('statsContent').style.display = hasExam ? 'flex' : 'none';
@@ -7426,7 +7418,7 @@ function initStatsTab() {
     ['🖼️', withImg, 'CON IMAGEN'],
     ['💡', withExpl, 'CON EXPLICACIÓN'],
     ['📝', avgOpts, 'OPC. PROMEDIO'],
-    ['⏱️', S.meta ? S.meta.tiempo_minutos + ' min' : '—', 'TIEMPO'],
+    ['⏱️', window.S.meta ? window.S.meta.tiempo_minutos + ' min' : '—', 'TIEMPO'],
   ].map(([icon, num, label]) => `
     <div class="stat-card">
       <div style="font-size:24px">${icon}</div>
@@ -7532,7 +7524,7 @@ function toggleUsername(i) {
 }
 async function clearLoadedExam() {
   if (!(await spConfirm('Se eliminará el examen de la memoria. El archivo ZIP no se borra.', {title:'¿Eliminar examen cargado?', icon:'📋', okLabel:'Sí, eliminar', danger:false}))) return;
-  S.questions = []; S.meta = null; S.rawZip = null; S.fileName = null;
+  window.S.questions = []; window.S.meta = null; window.S.rawZip = null; window.S.fileName = null;
   alert('Examen eliminado de la memoria. Recarga el Dashboard.');
 }
 async function resetConfig() {
@@ -8048,15 +8040,15 @@ async function saveExamToServer() {
       nuevo:          true,
       agregado:       new Date().toISOString(),
       updatedAt:      new Date().toISOString(),
-      updatedBy:      (typeof S !== 'undefined' && S.user) ? S.user : 'admin',
+      updatedBy:      (typeof S !== 'undefined' && window.S.user) ? window.S.user : 'admin',
       questions:      EB.questions,
     };
 
     // Usar el _fbId guardado al abrir edición, o buscar por título como fallback
     const editingId = window._editingFbId || null;
     const existingFb = editingId
-      ? CATALOG.find(e => e._fbId === editingId)
-      : CATALOG.find(e => e.titulo === titulo && e._fbId);
+      ? window.CATALOG.find(e => e._fbId === editingId)
+      : window.CATALOG.find(e => e.titulo === titulo && e._fbId);
     const targetFbId = editingId || (existingFb ? existingFb._fbId : null);
 
     await window._fbSaveExam(examData, targetFbId);
@@ -8157,7 +8149,7 @@ async function exportNewExamZip() {
       nuevo: true, agregado: ts,
     };
     const updatedCatalog = [
-      ...CATALOG.filter(e => e.path !== newEntry.path),
+      ...window.CATALOG.filter(e => e.path !== newEntry.path),
       newEntry,
     ];
     const catalogJson = JSON.stringify(updatedCatalog, null, 2);
@@ -8192,15 +8184,15 @@ async function exportNewExamZip() {
         path:           `exams/${zipFileName}`,
         nuevo:          true,
         agregado:       ts,
-        updatedBy:      (typeof S !== 'undefined' && S.user) ? S.user : 'admin',
+        updatedBy:      (typeof S !== 'undefined' && window.S.user) ? window.S.user : 'admin',
         // Guardar preguntas completas en Firebase
         questions:      questions,
       };
       // Usar _editingFbId si venimos de editar, o buscar por título
       const editingId2 = window._editingFbId || null;
       const existingFb2 = editingId2
-        ? CATALOG.find(e => e._fbId === editingId2)
-        : CATALOG.find(e => e.titulo === titulo && e._fbId);
+        ? window.CATALOG.find(e => e._fbId === editingId2)
+        : window.CATALOG.find(e => e.titulo === titulo && e._fbId);
       const targetId2 = editingId2 || (existingFb2 ? existingFb2._fbId : null);
       window._editingFbId = null;
       try {
@@ -8211,16 +8203,16 @@ async function exportNewExamZip() {
       } catch(fbErr) {
         console.error('Firebase save error:', fbErr);
         // Aunque falle Firebase, el ZIP ya se descargó
-        CATALOG = updatedCatalog;
+        window.CATALOG = updatedCatalog;
         renderExamCards();
-        $('examsBadge').textContent = `${CATALOG.length} disponible${CATALOG.length !== 1 ? 's' : ''}`;
+        $('examsBadge').textContent = `${window.CATALOG.length} disponible${window.CATALOG.length !== 1 ? 's' : ''}`;
         showToast(`⚠️ ZIP descargado pero no se pudo guardar en servidor: ${fbErr.message}`);
       }
     } else {
       // Firebase no disponible — solo actualizar local
-      CATALOG = updatedCatalog;
+      window.CATALOG = updatedCatalog;
       renderExamCards();
-      $('examsBadge').textContent = `${CATALOG.length} disponible${CATALOG.length !== 1 ? 's' : ''}`;
+      $('examsBadge').textContent = `${window.CATALOG.length} disponible${window.CATALOG.length !== 1 ? 's' : ''}`;
       showToast(`✅ exams-update-${ts}.zip listo — extrae en tu carpeta exams/ y recarga`);
     }
 
