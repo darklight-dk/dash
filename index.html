@@ -3360,10 +3360,17 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
       <span class="ai-model-label">Modelo</span>
       <select class="ai-model-select" id="aiModelSelect" onchange="setAIModel(this.value)">
         <option value="auto">Auto (según tema)</option>
-        <option value="gemini">Gemini · Imágenes</option>
+        <optgroup label="── Gemini ──">
+        <option value="gemini-flash-lite">Gemini 2.5 Flash Lite · Texto</option>
+        <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash Lite · Premedicina</option>
+        <option value="gemini-3.5-flash">Gemini 3.5 Flash · Potente</option>
+        <option value="gemini">Gemini 2.5 Flash · Imágenes</option>
+        </optgroup>
+        <optgroup label="── Grok ──">
         <option value="grok-mat">Grok · Matemáticas</option>
         <option value="grok-red">Grok · Redacción</option>
         <option value="grok-comp">Grok · Comprensión</option>
+        </optgroup>
       </select>
     </div>
 
@@ -3967,20 +3974,31 @@ const BobiAI = (() => {
   const CACHE_TTL   = 10 * 60 * 1000;
 
   const ENDPOINTS = {
-    gemini:    { type: 'gemini', url: 'https://gemini-proxy.donniaxel55.workers.dev', label: 'Gemini' },
+    gemini:             { type: 'gemini', url: 'https://gemini-proxy.donniaxel55.workers.dev', label: 'Gemini 2.5 Flash', model: 'gemini-2.5-flash' },
+    'gemini-flash-lite':{ type: 'gemini', url: 'https://gemini-proxy.donniaxel55.workers.dev', label: 'Gemini 2.5 Lite',  model: 'gemini-2.5-flash-lite' },
+    'gemini-3.1-flash-lite': { type: 'gemini', url: 'https://gemini-proxy.donniaxel55.workers.dev', label: 'Gemini 3.1 Lite', model: 'gemini-3.1-flash-lite', thinking: 'medium' },
+    'gemini-3.5-flash': { type: 'gemini', url: 'https://gemini-proxy.donniaxel55.workers.dev', label: 'Gemini 3.5 Flash', model: 'gemini-3.5-flash' },
     'grok-mat':  { type: 'grok',   url: 'https://grok-mat.donniaxel55.workers.dev',    label: 'Grok · Mat' },
     'grok-red':  { type: 'grok',   url: 'https://grok-red.donniaxel55.workers.dev',    label: 'Grok · Red' },
     'grok-comp': { type: 'grok',   url: 'https://grok-comp.donniaxel55.workers.dev',   label: 'Grok · Comp' },
   };
 
-  function _selectModel() {
+  function _selectModel(hasImage) {
     if (_modelOverride !== 'auto') return ENDPOINTS[_modelOverride] || ENDPOINTS.gemini;
+    // Con imagen siempre Gemini 2.5 Flash
+    if (hasImage) return ENDPOINTS.gemini;
     const meta = S && S.currentExamMeta || {};
     const key = ((meta.titulo || '') + ' ' + (meta.materia || '') + ' ' + (meta.tags || []).join(' ')).toLowerCase();
+    // Áreas específicas con Grok
     if (/matem|pensamiento.mat|calc|algebra|aritm|trigo|geometr/.test(key)) return ENDPOINTS['grok-mat'];
     if (/redac/.test(key)) return ENDPOINTS['grok-red'];
     if (/comprens|lectura|lector/.test(key)) return ENDPOINTS['grok-comp'];
-    return ENDPOINTS.gemini;
+    // Premedicina con 3.1 Flash Lite (thinking)
+    if (/premed|medicina|anatom|fisiol|bioquim|celular|salud|patol|cardio|respir|digest|nervios|endocrin/.test(key)) return ENDPOINTS['gemini-3.1-flash-lite'];
+    // Modo técnico activo → 3.5 Flash
+    if (_mode === 'tecnico') return ENDPOINTS['gemini-3.5-flash'];
+    // Default → 2.5 Flash Lite
+    return ENDPOINTS['gemini-flash-lite'];
   }
 
   function _modeInstruction() {
@@ -4122,10 +4140,14 @@ REGLAS: Sin markdown. Todo anclado al texto. Español mexicano.${m}`,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: imageDataUrl ? 'gemini-2.5-flash' : 'gemini-2.0-flash',
+          model: imageDataUrl ? 'gemini-2.5-flash' : (cfg.model || 'gemini-2.5-flash-lite'),
           system_instruction: { parts: [{ text: systemPrompt }] },
           contents: [{ role: 'user', parts: userContent }],
-          generationConfig: { maxOutputTokens: 2048, temperature: 0.25 }
+          generationConfig: {
+            maxOutputTokens: 2048,
+            temperature: 0.25,
+            ...(cfg.thinking && !imageDataUrl ? { thinkingConfig: { thinkingBudget: cfg.thinking === 'medium' ? 8192 : 4096 } } : {})
+          }
         }),
         signal
       });
@@ -4377,9 +4399,9 @@ var SVG_IDLE  = '<svg viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg" sty
     var areaInfo = q.area ? 'Área temática: ' + q.area + '\n' : '';
     var examTitle = S && S.currentExamMeta && S.currentExamMeta.titulo ? 'Examen: ' + S.currentExamMeta.titulo + '\n' : '';
 
-    var cfg = _selectModel();
     var imageDataUrl = _userImage ? _userImage.dataUrl : (q.image && S && S.images && S.images[q.image]) ? S.images[q.image] : null;
-    if (_userImage && cfg.type !== 'gemini') cfg = ENDPOINTS.gemini;
+    var cfg = _selectModel(!!imageDataUrl);
+    if (imageDataUrl && cfg.type !== 'gemini') cfg = ENDPOINTS.gemini;
 
     var modelBadge = document.getElementById('aiBobiModelBadge');
     if (modelBadge) modelBadge.textContent = cfg.label;
