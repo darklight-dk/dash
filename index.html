@@ -821,6 +821,9 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
   background:rgba(255,255,255,.025);
   border-left:1px solid rgba(124,58,237,.15);
   padding:14px 6px;align-items:center}
+@media(max-width:639px){
+  .exam-ai-side-nav{display:none !important}
+}
 .bobi-nav-btn{
   width:40px;height:40px;border-radius:12px;border:none;
   background:rgba(255,255,255,.04);
@@ -4348,8 +4351,12 @@ REGLAS: Sin markdown. Todo anclado al texto. Español mexicano.${m}`,
 
     if (sections.length < 2) { nav.style.display = 'none'; modal && modal.classList.remove('has-response'); return; }
 
-    // Show nav and expand modal
-    nav.style.display = 'flex';
+    // Show nav and expand modal — only on desktop (≥640px)
+    if (window.innerWidth >= 640) {
+      nav.style.display = 'flex';
+    } else {
+      nav.style.display = 'none';
+    }
     modal && modal.classList.add('has-response');
 
     // Scroll to top btn
