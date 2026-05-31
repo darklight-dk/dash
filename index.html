@@ -4025,7 +4025,7 @@ D) [ídem]
 [Letra) Nombre de la opción]
 [Explicación causal en 2-4 oraciones. Si hay cálculo, muéstralo numerado.]
 
-REGLAS: Sin markdown. Sin asteriscos. Español mexicano.${m}`,
+REGLAS: Sin markdown. Sin asteriscos. Usa LaTeX para fórmulas: inline $...$ y bloque $$...$$. Español mexicano.${m}`,
 
     grok_mat: (m) => `Eres BOBI, tutor de Matemáticas del EXANI-II.
 
@@ -4046,7 +4046,7 @@ Paso 1: [operación]
 Paso 2: [operación]
 Resultado: [valor con unidades si aplica]
 
-REGLAS: Sin markdown. Fracciones como 3/4. Español mexicano.${m}`,
+REGLAS: Sin markdown. Usa LaTeX para fórmulas: inline $...$ y bloque $$...$$. Ejemplo: $\\frac{1}{4}$, $x^2$, $\\sqrt{x}$. Español mexicano.${m}`,
 
     grok_red: (m) => `Eres BOBI, tutor de Redacción del EXANI-II.
 
@@ -4193,7 +4193,7 @@ REGLAS: Sin markdown. Todo anclado al texto. Español mexicano.${m}`,
     if (sectionRaw.length <= 1) {
       const p = document.createElement('div');
       p.className = 'ai-resp-free';
-      p.textContent = text.trim();
+      p.innerHTML = text.trim();
       wrapper.appendChild(p);
     } else {
       sectionRaw.forEach(function(part) {
@@ -4227,7 +4227,7 @@ REGLAS: Sin markdown. Todo anclado al texto. Español mexicano.${m}`,
                 ltr.textContent = m[1] + ')';
                 const txt = document.createElement('span');
                 txt.className = 'ai-opt-text';
-                txt.textContent = m[2];
+                txt.innerHTML = m[2];
                 row.appendChild(ltr);
                 row.appendChild(txt);
                 sec.appendChild(row);
@@ -4255,7 +4255,7 @@ REGLAS: Sin markdown. Todo anclado al texto. Español mexicano.${m}`,
           } else {
             const b = document.createElement('div');
             b.className = 'ai-resp-body';
-            b.textContent = bodyText;
+            b.innerHTML = bodyText;
             sec.appendChild(b);
           }
         }
@@ -4263,6 +4263,18 @@ REGLAS: Sin markdown. Todo anclado al texto. Español mexicano.${m}`,
       });
     }
     body.appendChild(wrapper);
+    // Renderizar LaTeX en toda la respuesta de BOBI
+    if (typeof renderMathInElement !== 'undefined') {
+      renderMathInElement(body, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '$', right: '$', display: false },
+          { left: '\\(', right: '\\)', display: false },
+          { left: '\\[', right: '\\]', display: true }
+        ],
+        throwOnError: false
+      });
+    }
   }
 
   function _showCooldown(body, btn, rawErr) {
