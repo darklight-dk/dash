@@ -3391,6 +3391,9 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
         <button class="exam-ai-tts-btn" id="examAITTSBtn" onclick="toggleExamTTS()" title="Escuchar respuesta" style="display:none">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
         </button>
+        <button class="exam-ai-tts-btn" id="bobiResetBtn" onclick="resetBobiCache()" title="Limpiar caché y regenerar respuesta" style="display:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        </button>
         <button class="exam-ai-btn" id="examAIBtn" onclick="askExamAI()">
           <span class="ai-btn-icon">&#x25C6;</span> Analizar pregunta
         </button>
@@ -4307,6 +4310,7 @@ var SVG_IDLE  = '<svg viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg" sty
     btn.disabled = false;
     btn.innerHTML = '<span class="ai-btn-icon">◆</span> Analizar pregunta';
     document.getElementById('examAITTSBtn').style.display = 'none';
+    var _rb = document.getElementById('bobiResetBtn'); if (_rb) _rb.style.display = 'none';
     var _gnb = document.getElementById('bobiGenNoteBtn');
     if (_gnb) _gnb.style.display = 'none';
     _setBobiState('idle');
@@ -4380,6 +4384,8 @@ var SVG_IDLE  = '<svg viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg" sty
         _convHistory.push({ role: 'assistant', content: text });
         var ttsBtn = document.getElementById('examAITTSBtn');
         ttsBtn.style.display = ''; ttsBtn._text = text;
+        var resetBtn = document.getElementById('bobiResetBtn');
+        if (resetBtn) resetBtn.style.display = '';
         // Mostrar botón Guardar como nota
         var genNoteBtn = document.getElementById('bobiGenNoteBtn');
         if (genNoteBtn) genNoteBtn.style.display = '';
@@ -4644,12 +4650,25 @@ var SVG_IDLE  = '<svg viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg" sty
     if (preview) preview.src = '';
   }
 
+  function _resetCache() {
+    _cache.clear();
+    _convHistory = [];
+    _hintLevel = 0;
+    _lastFullText = '';
+    window._lastFullText = '';
+    _msgCount = 0;
+    if (typeof showToast === 'function') showToast('🔄 Historial limpiado — la IA responderá sin caché');
+    // Re-analyze automatically
+    setTimeout(_analyzeQuestion, 200);
+  }
+
   return {
     setMode: function(m) { _mode = m; },
     setModel: function(m) { _modelOverride = m; },
     open: _open, close: _close,
     closeOnBg: function(e) { if (e.target === document.getElementById('examAIOv')) _close(); },
     analyze: _analyzeQuestion,
+    reset: _resetCache,
     sendChat: _sendChat,
     askHint: _askHint,
     openDiag: _openDiag, closeDiag: _closeDiag,
@@ -4725,6 +4744,7 @@ function closePracticeModal()      { BobiAI.closePractice(); }
 function handleAIImageUpload(inp)  { BobiAI.handleImageUpload(inp); }
 function clearAIImage()            { BobiAI.clearImage(); }
 function toggleExamTTS()           { BobiAI.toggleTTS(); }
+function resetBobiCache()          { BobiAI.reset(); }
 function setBobiState(s)           { BobiAI.setBobiState(s); }
 function setAIModel(val) {
   BobiAI.setModel(val);
