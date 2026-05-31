@@ -2394,20 +2394,25 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
 #novaScreen ::-webkit-scrollbar{width:5px}
 #novaScreen ::-webkit-scrollbar-thumb{background:#1e1e28;border-radius:5px}
 /* ── NOVA RESPONSIVE MÓVIL ── */
+#novaTopbar { display:flex; align-items:center; gap:8px; padding:0 12px; height:54px; flex-shrink:0; overflow:hidden; }
+#novaTopbarLeft { display:flex; align-items:center; gap:6px; flex-shrink:0; }
+#novaTopbarModes { display:flex; gap:5px; overflow-x:auto; flex:1; scrollbar-width:none; -ms-overflow-style:none; }
+#novaTopbarModes::-webkit-scrollbar { display:none; }
+#novaTopbarModes button { flex-shrink:0; }
+
 @media(max-width:640px){
-  #novaScreen .nova-topbar-modes{gap:4px}
-  #novaScreen .nova-topbar-modes button{padding:4px 8px;font-size:11px}
+  #novaTopbar { padding:0 8px; height:48px; gap:6px; }
+  #novaTopbarModes button { padding:4px 9px !important; font-size:11px !important; }
+  #novaTopbarLeft button { padding:5px 8px !important; font-size:11px !important; }
   #novaMsgs{padding:14px 12px}
-  .nova-msg-row{max-width:100%;padding:0}
+  .nova-msg-row{max-width:100%;padding:0;gap:7px}
   .nova-bubble{max-width:90%;font-size:13px;padding:9px 12px}
   .nova-exam-card{padding:12px 10px;margin:6px 0}
   .nova-q-opt{font-size:12px;padding:8px 10px}
   #novaInputBox{padding:8px 8px 8px 12px}
   #novaInput{font-size:15px}
-  #novaScreen>div:first-child{padding:0 12px;height:48px}
-  #novaScreen>div:first-child button:first-child{padding:5px 9px;font-size:12px}
-  .nova-msg-row{gap:7px}
   .nova-avatar{width:26px;height:26px;font-size:11px;border-radius:7px}
+  #novaHistorySidebar{display:none !important}
 }
 @media(max-width:600px){
   #novaScreen{overflow:hidden}
@@ -10977,21 +10982,23 @@ window._enterDash = function(user, role, picture, email) {
 <div id="novaScreen" class="screen" style="flex-direction:column;background:#09090f;overflow:hidden">
 
   <!-- Topbar -->
-  <div style="height:54px;background:rgba(9,9,15,.95);border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0;backdrop-filter:blur(12px)">
-    <button onclick="show('dashScreen')" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#a0a0b8;font-size:13px;font-weight:600;padding:6px 12px;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a0a0b8'">← Dashboard</button>
-    <button onclick="novaToggleSidebar()" id="novaHistBtn" title="Historial" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#a0a0b8;font-size:15px;padding:6px 10px;cursor:pointer;font-family:inherit;transition:all .2s">☰</button>
-    <button onclick="novaNewChat()" title="Nuevo chat" style="background:rgba(124,111,255,.15);border:1px solid rgba(124,111,255,.3);border-radius:8px;color:#c4bbff;font-size:13px;font-weight:700;padding:6px 12px;cursor:pointer;font-family:inherit;transition:all .2s">✦ Nuevo</button>
-    <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:17px;background:linear-gradient(135deg,#fff 40%,#7c6fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">✦ NOVA</div>
-    <span style="font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;background:rgba(124,111,255,.15);color:#7c6fff;border:1px solid rgba(124,111,255,.25)" id="novaBadge">Chat IA</span>
-    <div style="flex:1"></div>
-    <!-- Mode buttons -->
-    <div style="display:flex;gap:6px">
-      <button class="nova-mode-btn nova-active" id="novaBtnChat"  onclick="novaSetMode('chat')"  style="background:rgba(124,111,255,.15);border:1px solid rgba(124,111,255,.35);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:#c4bbff;cursor:pointer;font-family:inherit;transition:all .2s">💬 Chat</button>
-      <button class="nova-mode-btn"              id="novaBtnPDF"   onclick="novaSetMode('pdf')"   style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:#606078;cursor:pointer;font-family:inherit;transition:all .2s">📄 PDF</button>
-      <button class="nova-mode-btn"              id="novaBtnFlash" onclick="novaSetMode('flash')" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:#606078;cursor:pointer;font-family:inherit;transition:all .2s">🃏 Flash</button>
-      <button class="nova-mode-btn"              id="novaBtnSaved" onclick="novaSetMode('saved')" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:#606078;cursor:pointer;font-family:inherit;transition:all .2s">📚 Guardados</button>
-      <button id="novaBtnExamen" onclick="novaSetMode('examen')" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:#606078;cursor:pointer;font-family:inherit;transition:all .2s">📝 Examen</button>
-      <button id="novaBtnExani" onclick="novaToggleExani()" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:#606078;cursor:pointer;font-family:inherit;transition:all .2s">📖 EXANI</button>
+  <div id="novaTopbar" style="background:rgba(9,9,15,.95);border-bottom:1px solid rgba(255,255,255,.07);backdrop-filter:blur(12px)">
+    <!-- Izquierda: nav fijo -->
+    <div id="novaTopbarLeft">
+      <button onclick="show('dashScreen')" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#a0a0b8;font-size:12px;font-weight:600;padding:5px 9px;cursor:pointer;font-family:inherit;white-space:nowrap">← Dashboard</button>
+      <button onclick="novaToggleSidebar()" id="novaHistBtn" title="Historial" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#a0a0b8;font-size:14px;padding:5px 9px;cursor:pointer;font-family:inherit">☰</button>
+      <button onclick="novaNewChat()" style="background:rgba(124,111,255,.15);border:1px solid rgba(124,111,255,.3);border-radius:8px;color:#c4bbff;font-size:12px;font-weight:700;padding:5px 10px;cursor:pointer;font-family:inherit;white-space:nowrap">✦ Nuevo</button>
+      <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:16px;background:linear-gradient(135deg,#fff 40%,#7c6fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;white-space:nowrap">✦ NOVA</div>
+      <span id="novaBadge" style="font-size:10px;padding:3px 8px;border-radius:20px;font-weight:600;background:rgba(124,111,255,.15);color:#7c6fff;border:1px solid rgba(124,111,255,.25);white-space:nowrap">Chat IA</span>
+    </div>
+    <!-- Modos: scroll horizontal en móvil -->
+    <div id="novaTopbarModes">
+      <button class="nova-mode-btn nova-active" id="novaBtnChat"  onclick="novaSetMode('chat')"  style="background:rgba(124,111,255,.15);border:1px solid rgba(124,111,255,.35);border-radius:8px;padding:5px 11px;font-size:12px;font-weight:600;color:#c4bbff;cursor:pointer;font-family:inherit;transition:all .2s">💬 Chat</button>
+      <button class="nova-mode-btn" id="novaBtnPDF"   onclick="novaSetMode('pdf')"   style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 11px;font-size:12px;font-weight:600;color:#606078;cursor:pointer;font-family:inherit;transition:all .2s">📄 PDF</button>
+      <button class="nova-mode-btn" id="novaBtnFlash" onclick="novaSetMode('flash')" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 11px;font-size:12px;font-weight:600;color:#606078;cursor:pointer;font-family:inherit;transition:all .2s">🃏 Flash</button>
+      <button class="nova-mode-btn" id="novaBtnSaved" onclick="novaSetMode('saved')" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 11px;font-size:12px;font-weight:600;color:#606078;cursor:pointer;font-family:inherit;transition:all .2s">📚 Guardados</button>
+      <button class="nova-mode-btn" id="novaBtnExamen" onclick="novaSetMode('examen')" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 11px;font-size:12px;font-weight:600;color:#606078;cursor:pointer;font-family:inherit;transition:all .2s">📝 Examen</button>
+      <button id="novaBtnExani" onclick="novaToggleExani()" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 11px;font-size:12px;font-weight:600;color:#606078;cursor:pointer;font-family:inherit;transition:all .2s">📖 EXANI</button>
     </div>
   </div>
 
@@ -11600,21 +11607,66 @@ function novaSendSuggestion(el) {
   novaSendMessage();
 }
 
-// ── Llamada a Gemini ──────────────────────────────
+// ── Llamada a Gemini con rotación automática de modelos ──
+const NOVA_GEMINI_MODELS = [
+  'gemini-2.5-flash',
+  'gemini-2.0-flash',
+  'gemini-3.1-flash-lite',
+  'gemini-2.5-flash-lite',
+];
+let NOVA_MODEL_IDX = 0; // índice actual
+
 async function novaCallGemini(geminiContents, hasImage = false) {
-  const res = await fetch(NOVA_GEMINI_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: hasImage ? 'gemini-2.5-flash' : 'gemini-2.0-flash',
-      system_instruction: { parts: [{ text: novaGetSystem() }] },
-      contents: geminiContents,
-      generationConfig: { maxOutputTokens: 8192, temperature: 0.25 }
-    })
-  });
-  const data = await res.json();
-  if (data.error) throw new Error('Gemini: ' + (data.error.message || JSON.stringify(data.error)));
-  return data.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('') || '';
+  const startIdx = NOVA_MODEL_IDX;
+  let lastError = null;
+
+  for (let attempt = 0; attempt < NOVA_GEMINI_MODELS.length; attempt++) {
+    const modelIdx = (startIdx + attempt) % NOVA_GEMINI_MODELS.length;
+    const model = NOVA_GEMINI_MODELS[modelIdx];
+
+    try {
+      const res = await fetch(NOVA_GEMINI_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model,
+          system_instruction: { parts: [{ text: novaGetSystem() }] },
+          contents: geminiContents,
+          generationConfig: { maxOutputTokens: 8192, temperature: 0.25 }
+        })
+      });
+      const data = await res.json();
+
+      // Si es rate limit, rotar al siguiente modelo
+      if (data.error) {
+        const msg = data.error.message || '';
+        const isRateLimit = msg.includes('429') || msg.includes('quota') || msg.includes('rate') || msg.toLowerCase().includes('limit');
+        if (isRateLimit) {
+          console.warn('⚠️ Rate limit en ' + model + ', rotando...');
+          NOVA_MODEL_IDX = (modelIdx + 1) % NOVA_GEMINI_MODELS.length;
+          lastError = new Error('Gemini [' + model + ']: ' + msg);
+          continue; // intenta el siguiente
+        }
+        throw new Error('Gemini [' + model + ']: ' + msg);
+      }
+
+      // Éxito — guardar modelo usado
+      NOVA_LAST_MODEL = 'gemini';
+      NOVA_MODEL_IDX = modelIdx; // quedarse en el que funcionó
+      console.log('✅ Respondió: ' + model);
+      return data.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('') || '';
+
+    } catch(err) {
+      if (err.message.includes('Rate limit') || err.message.includes('rate') || err.message.includes('429')) {
+        lastError = err;
+        NOVA_MODEL_IDX = (modelIdx + 1) % NOVA_GEMINI_MODELS.length;
+        continue;
+      }
+      throw err; // error real, no de rate limit
+    }
+  }
+
+  throw lastError || new Error('Todos los modelos Gemini alcanzaron su límite. Intenta en unos minutos.');
 }
 
 // ── Llamada a Groq (red de respaldo / verificador) ─
@@ -11681,9 +11733,14 @@ function novaExtractJSON(raw, tipo) {
 
 // ── Mensaje de modelo activo ──────────────────────
 function novaModelBadge(model) {
+  const labels = {
+    'groq': '◆ Groq Llama-3',
+    'gemini': '◆ ' + (NOVA_GEMINI_MODELS[NOVA_MODEL_IDX] || 'Gemini'),
+  };
+  const label = labels[model] || ('◆ ' + model);
   return '<span style="font-size:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);'
     + 'border-radius:20px;padding:2px 8px;color:#606078;margin-left:6px;vertical-align:middle">'
-    + (model === 'groq' ? '◆ Groq Llama-3' : '◆ Gemini') + '</span>';
+    + label + '</span>';
 }
 
 // ── Convertir historial → formato Gemini ──────────
