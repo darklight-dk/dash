@@ -10978,6 +10978,8 @@ window._enterDash = function(user, role, picture, email) {
       <button class="nova-mode-btn"              id="novaBtnPDF"   onclick="novaSetMode('pdf')"   style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:#606078;cursor:pointer;font-family:inherit;transition:all .2s">📄 PDF</button>
       <button class="nova-mode-btn"              id="novaBtnFlash" onclick="novaSetMode('flash')" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:#606078;cursor:pointer;font-family:inherit;transition:all .2s">🃏 Flash</button>
       <button class="nova-mode-btn"              id="novaBtnSaved" onclick="novaSetMode('saved')" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:#606078;cursor:pointer;font-family:inherit;transition:all .2s">📚 Guardados</button>
+      <button id="novaBtnExamen" onclick="novaSetMode('examen')" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:#606078;cursor:pointer;font-family:inherit;transition:all .2s">📝 Examen</button>
+      <button id="novaBtnExani" onclick="novaToggleExani()" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:#606078;cursor:pointer;font-family:inherit;transition:all .2s">📖 EXANI</button>
     </div>
   </div>
 
@@ -11068,7 +11070,7 @@ window._enterDash = function(user, role, picture, email) {
         <div style="width:200px;height:4px;background:#17171f;border-radius:4px;overflow:hidden"><div id="novaFlashFill" style="height:100%;background:linear-gradient(90deg,#7c6fff,#2dd4bf);border-radius:4px;transition:width .4s;width:0%"></div></div>
         <div id="novaFlashCard" onclick="novaFlipCard()" style="width:100%;height:240px;perspective:1000px;cursor:pointer">
           <div id="novaFlashInner" style="width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.4,0,.2,1)">
-            <div id="novaFlashFront" style="position:absolute;inset:0;backface-visibility:hidden;border-radius:20px;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;font-size:16px;line-height:1.6;font-weight:500;background:linear-gradient(135deg,#111118,#17171f);border:1px solid rgba(255,255,255,.1);box-shadow:0 16px 40px rgba(0,0,0,.4)">Haz clic para ver la pregunta</div>
+            <div id="novaFlashFront" style="position:absolute;inset:0;backface-visibility:hidden;border-radius:20px;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;font-size:16px;line-height:1.6;font-weight:500;background:linear-gradient(135deg,#111118,#17171f);border:1px solid rgba(255,255,255,.1);box-shadow:0 16px 40px rgba(0,0,0,.4);color:#f0f0f5">Haz clic para ver la pregunta</div>
             <div id="novaFlashBack" style="position:absolute;inset:0;backface-visibility:hidden;border-radius:20px;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;font-size:15px;line-height:1.6;font-weight:500;background:linear-gradient(135deg,rgba(124,111,255,.12),rgba(45,212,191,.06));border:1px solid rgba(124,111,255,.2);transform:rotateY(180deg);color:#2dd4bf;box-shadow:0 16px 40px rgba(124,111,255,.15)">Respuesta</div>
           </div>
         </div>
@@ -11089,6 +11091,90 @@ window._enterDash = function(user, role, picture, email) {
       </div>
       <div id="novaSavedList"></div>
     </div>
+
+    <!-- ── EXAMEN PANEL ── -->
+    <div id="novaExamenPanel" style="flex:1;display:none;flex-direction:column;min-height:0;overflow-y:auto">
+
+      <!-- Upload zone -->
+      <div id="novaExamenUpload" style="padding:32px;display:flex;flex-direction:column;gap:20px">
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:800;color:#f0f0f5">📝 Generador de Examen</div>
+        <div style="font-size:13px;color:#606078">Sube un PDF, imagen o escribe un tema y NOVA generará un examen completo al instante.</div>
+
+        <!-- Drop zone -->
+        <div id="novaExDrop" ondragover="event.preventDefault();this.style.borderColor='#7c6fff'" ondragleave="this.style.borderColor='rgba(255,255,255,.1)'" ondrop="novaExHandleDrop(event)"
+          style="border:2px dashed rgba(255,255,255,.1);border-radius:16px;padding:40px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(255,255,255,.02)"
+          onclick="document.getElementById('novaExFileInput').click()">
+          <div style="font-size:36px;margin-bottom:12px">📂</div>
+          <div style="font-size:15px;font-weight:700;color:#a0a0b8;margin-bottom:6px">Arrastra tu archivo aquí</div>
+          <div style="font-size:12px;color:#404058">PDF, imagen (JPG/PNG) — o haz clic para seleccionar</div>
+        </div>
+        <input type="file" id="novaExFileInput" accept=".pdf,image/*" style="display:none" onchange="novaExHandleFile(event)">
+
+        <!-- Loaded file chip -->
+        <div id="novaExLoaded" style="display:none;background:#1a1a24;border:1px solid rgba(124,111,255,.3);border-radius:12px;padding:14px 18px;display:none;align-items:center;gap:12px">
+          <div style="font-size:22px">📄</div>
+          <div style="flex:1">
+            <div id="novaExFileName" style="font-size:13px;font-weight:700;color:#f0f0f5"></div>
+            <div id="novaExFileSize" style="font-size:11px;color:#606078;margin-top:2px"></div>
+          </div>
+          <button onclick="novaExClearFile()" style="background:none;border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#606078;font-size:12px;padding:5px 10px;cursor:pointer;font-family:inherit">✕ Quitar</button>
+        </div>
+
+        <!-- Tema de texto -->
+        <div style="display:flex;align-items:center;gap:12px;color:#404058;font-size:12px">
+          <div style="flex:1;height:1px;background:rgba(255,255,255,.06)"></div>o escribe un tema<div style="flex:1;height:1px;background:rgba(255,255,255,.06)"></div>
+        </div>
+        <textarea id="novaExTema" placeholder="Ej: Fotosíntesis, Derivadas, Revolución Mexicana..." rows="3"
+          style="background:#1a1a24;border:1px solid rgba(255,255,255,.08);border-radius:12px;color:#f0f0f5;font-size:14px;font-family:inherit;padding:14px;resize:none;outline:none;transition:border .2s"
+          onfocus="this.style.borderColor='rgba(124,111,255,.4)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'"></textarea>
+
+        <!-- Config -->
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:11px;color:#606078;font-weight:600;letter-spacing:.5px">PREGUNTAS</div>
+            <select id="novaExCount" style="background:#1a1a24;border:1px solid rgba(255,255,255,.08);border-radius:8px;color:#f0f0f5;font-size:13px;padding:8px 12px;font-family:inherit;outline:none">
+              <option value="5">5 preguntas</option>
+              <option value="10" selected>10 preguntas</option>
+              <option value="15">15 preguntas</option>
+              <option value="20">20 preguntas</option>
+            </select>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:11px;color:#606078;font-weight:600;letter-spacing:.5px">DIFICULTAD</div>
+            <select id="novaExDiff" style="background:#1a1a24;border:1px solid rgba(255,255,255,.08);border-radius:8px;color:#f0f0f5;font-size:13px;padding:8px 12px;font-family:inherit;outline:none">
+              <option value="básica">Básica</option>
+              <option value="media" selected>Media</option>
+              <option value="avanzada">Avanzada</option>
+              <option value="mixta">Mixta</option>
+            </select>
+          </div>
+          <button onclick="novaExGenerar()" id="novaExBtn"
+            style="margin-top:18px;flex:1;min-width:160px;background:linear-gradient(135deg,#7c6fff,#2dd4bf);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:800;padding:14px;cursor:pointer;font-family:inherit;transition:all .2s;letter-spacing:.5px">
+            ⚡ Generar Examen
+          </button>
+        </div>
+      </div>
+
+      <!-- Results zone -->
+      <div id="novaExResults" style="display:none;flex-direction:column;padding:24px;gap:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <div id="novaExResultTitle" style="font-size:18px;font-weight:800;color:#f0f0f5"></div>
+          <div style="display:flex;gap:8px">
+            <button onclick="novaExNuevo()" style="background:#1e1e28;border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#a0a0b8;font-size:12px;font-weight:600;padding:8px 14px;cursor:pointer;font-family:inherit">↺ Nuevo</button>
+            <button onclick="novaExGuardar()" style="background:rgba(124,111,255,.15);border:1px solid rgba(124,111,255,.3);border-radius:8px;color:#c4bbff;font-size:12px;font-weight:600;padding:8px 14px;cursor:pointer;font-family:inherit">💾 Guardar</button>
+          </div>
+        </div>
+        <div id="novaExQList" style="display:flex;flex-direction:column;gap:14px"></div>
+        <div id="novaExScore" style="display:none;margin-top:8px;padding:20px;background:#17171f;border-radius:14px;text-align:center;font-weight:800;font-size:20px;border:1px solid rgba(255,255,255,.06)"></div>
+      </div>
+
+      <!-- Loading -->
+      <div id="novaExLoading" style="display:none;flex:1;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:60px">
+        <div style="width:48px;height:48px;border:3px solid rgba(124,111,255,.2);border-top-color:#7c6fff;border-radius:50%;animation:spin .8s linear infinite"></div>
+        <div style="font-size:14px;color:#606078;font-weight:600">Generando tu examen...</div>
+      </div>
+
+    </div><!-- /novaExamenPanel -->
 
   </div><!-- /content -->
 </div><!-- /novaScreen -->
@@ -11188,14 +11274,51 @@ function openNova() {
   }
 }
 
+
+// ── Modo EXANI-CONOCIMIENTO ───────────────────────
+let NOVA_EXANI_MODE = false;
+
+function novaToggleExani() {
+  NOVA_EXANI_MODE = !NOVA_EXANI_MODE;
+  const btn = document.getElementById("novaBtnExani");
+  if (NOVA_EXANI_MODE) {
+    btn.style.background = "rgba(251,191,36,.15)";
+    btn.style.borderColor = "rgba(251,191,36,.4)";
+    btn.style.color = "#fbbf24";
+    btn.textContent = "📖 EXANI ✓";
+    document.getElementById("novaBadge").textContent = "EXANI-Conocimiento";
+    document.getElementById("novaBadge").style.background = "rgba(251,191,36,.15)";
+    document.getElementById("novaBadge").style.color = "#fbbf24";
+    document.getElementById("novaBadge").style.borderColor = "rgba(251,191,36,.3)";
+    if (!NOVA_PDF_READY) novaPrecargarPDFs();
+    if (typeof showToast === "function") showToast("📖 Modo EXANI activado — NOVA usará las guías como base");
+  } else {
+    btn.style.background = "rgba(255,255,255,.04)";
+    btn.style.borderColor = "rgba(255,255,255,.08)";
+    btn.style.color = "#606078";
+    btn.textContent = "📖 EXANI";
+    document.getElementById("novaBadge").textContent = "Chat IA";
+    document.getElementById("novaBadge").style.background = "rgba(124,111,255,.15)";
+    document.getElementById("novaBadge").style.color = "#7c6fff";
+    document.getElementById("novaBadge").style.borderColor = "rgba(124,111,255,.25)";
+    if (typeof showToast === "function") showToast("💬 Modo normal activado");
+  }
+}
+
+function novaGetSystem() {
+  if (NOVA_EXANI_MODE) {
+    return "Eres NOVA en modo EXANI-CONOCIMIENTO. Tu unica fuente de verdad son las dos guias del EXANI-II (Premedicina y Matematicas).\nREGLAS: Responde SIEMPRE basandote en las guias. Si el usuario pide preguntas, genera reactivos AL ESTILO EXANI-II: opciones a, b, c; redaccion formal; dificultad progresiva. Prioriza temas de mayor peso: razonamiento matematico, comprension lectora, ciencias naturales. Si algo NO esta en las guias, dilo.\nIdioma: espanol mexicano formal. Sin emojis. Usa simbolos tipograficos.\n\nCUANDO TE PIDAN PREGUNTAS — responde con mensaje breve y luego JSON:\n```exam\n{\"titulo\":\"Titulo\",\"preguntas\":[{\"id\":1,\"texto\":\"Pregunta?\",\"opciones\":[{\"letra\":\"a\",\"texto\":\"Opcion A\"},{\"letra\":\"b\",\"texto\":\"Opcion B\"},{\"letra\":\"c\",\"texto\":\"Opcion C\"}],\"correcta\":\"a\",\"explicacion\":\"Explicacion basada en la guia.\"}]}\n```\nREGLAS JSON: completo, 3 opciones siempre, no truncar.\n\nFLASHCARDS:\n```flashcards\n[{\"frente\":\"Concepto\",\"reverso\":\"Definicion de la guia\"}]\n```\nFORMULAS: LaTeX inline $...$ bloque $$...$$";
+  }
+  return NOVA_SYSTEM;
+}
 // ── Modo ──────────────────────────────────────────
 function novaSetMode(mode) {
-  const panels = { chat: 'novaChatPanel', pdf: 'novaPdfPanel', flash: 'novaFlashPanel', saved: 'novaSavedPanel' };
+  const panels = { chat: 'novaChatPanel', pdf: 'novaPdfPanel', flash: 'novaFlashPanel', saved: 'novaSavedPanel', examen: 'novaExamenPanel' };
   Object.entries(panels).forEach(([m, id]) => {
     const el = document.getElementById(id);
     if (el) el.style.display = m === mode ? 'flex' : 'none';
   });
-  const btns = { chat:'novaBtnChat', pdf:'novaBtnPDF', flash:'novaBtnFlash', saved:'novaBtnSaved' };
+  const btns = { chat:'novaBtnChat', pdf:'novaBtnPDF', flash:'novaBtnFlash', saved:'novaBtnSaved', examen:'novaBtnExamen' };
   Object.entries(btns).forEach(([m, id]) => {
     const btn = document.getElementById(id);
     if (!btn) return;
@@ -11204,7 +11327,7 @@ function novaSetMode(mode) {
     btn.style.borderColor = active ? 'rgba(124,111,255,.35)' : 'rgba(255,255,255,.08)';
     btn.style.color = active ? '#c4bbff' : '#606078';
   });
-  const badges = { chat:'Chat IA', pdf:'Lector PDF', flash:'Flashcards', saved:'Guardados' };
+  const badges = { chat:'Chat IA', pdf:'Lector PDF', flash:'Flashcards', saved:'Guardados', examen:'Generador de Examen' };
   const badge = document.getElementById('novaBadge');
   if (badge) badge.textContent = badges[mode];
   if (mode === 'saved') novaRenderSaved();
@@ -11232,7 +11355,7 @@ async function novaCallGemini(geminiContents, hasImage = false) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: hasImage ? 'gemini-2.5-flash' : 'gemini-2.0-flash',
-      system_instruction: { parts: [{ text: NOVA_SYSTEM }] },
+      system_instruction: { parts: [{ text: novaGetSystem() }] },
       contents: geminiContents,
       generationConfig: { maxOutputTokens: 8192, temperature: 0.25 }
     })
@@ -11344,7 +11467,7 @@ function novaMsgsToGemini(msgs) {
 
 // ── Convertir historial → formato Groq/OpenAI ────
 function novaMsgsToGroq(msgs) {
-  const result = [{ role: 'system', content: NOVA_SYSTEM }];
+  const result = [{ role: 'system', content: novaGetSystem() }];
   msgs.forEach(m => {
     if (Array.isArray(m.content)) {
       const txt = m.content.filter(c => c.type === 'text').map(c => c.text).join('\n');
@@ -11387,7 +11510,7 @@ async function novaSendMessage(text) {
 
   try {
     // Determinar si el mensaje involucra archivos visuales (PDF/imagen)
-    const hasMedia = NOVA.pdfBase64 || (Array.isArray(userContent) && userContent.some(c => c.type === 'image'));
+    const hasMedia = NOVA_PDF_READY || NOVA.pdfBase64 || (Array.isArray(userContent) && userContent.some(c => c.type === 'image'));
 
     let raw = '';
     let modelUsed = 'gemini';
@@ -11684,6 +11807,181 @@ function novaSaveExam(eid, data) {
   if (typeof showToast === 'function') showToast('💾 Examen guardado localmente');
 }
 
+
+// ── EXAMEN PANEL ─────────────────────────────────
+let novaExData = null;
+let novaExAnswers = {};
+let novaExFileB64 = null;
+let novaExFileMime = null;
+
+function novaExHandleFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  novaExSetFile(file);
+}
+
+function novaExHandleDrop(event) {
+  event.preventDefault();
+  document.getElementById('novaExDrop').style.borderColor = 'rgba(255,255,255,.1)';
+  const file = event.dataTransfer.files[0];
+  if (file) novaExSetFile(file);
+}
+
+async function novaExSetFile(file) {
+  const b64 = await novaFileB64(file);
+  novaExFileB64 = b64;
+  novaExFileMime = file.type || 'application/pdf';
+  document.getElementById('novaExFileName').textContent = file.name;
+  document.getElementById('novaExFileSize').textContent = (file.size/1024).toFixed(1) + ' KB';
+  document.getElementById('novaExDrop').style.display = 'none';
+  const loaded = document.getElementById('novaExLoaded');
+  loaded.style.display = 'flex';
+}
+
+function novaExClearFile() {
+  novaExFileB64 = null; novaExFileMime = null;
+  document.getElementById('novaExDrop').style.display = '';
+  document.getElementById('novaExLoaded').style.display = 'none';
+  document.getElementById('novaExFileInput').value = '';
+}
+
+function novaExNuevo() {
+  novaExClearFile();
+  document.getElementById('novaExTema').value = '';
+  document.getElementById('novaExResults').style.display = 'none';
+  document.getElementById('novaExamenUpload').style.display = 'flex';
+  novaExData = null; novaExAnswers = {};
+}
+
+async function novaExGenerar() {
+  const tema = document.getElementById('novaExTema').value.trim();
+  const count = document.getElementById('novaExCount').value;
+  const diff  = document.getElementById('novaExDiff').value;
+
+  if (!novaExFileB64 && !tema) {
+    if (typeof showToast === 'function') showToast('⚠️ Sube un archivo o escribe un tema');
+    return;
+  }
+
+  // Show loading
+  document.getElementById('novaExamenUpload').style.display = 'none';
+  document.getElementById('novaExResults').style.display = 'none';
+  document.getElementById('novaExLoading').style.display = 'flex';
+
+  const prompt = `Genera exactamente ${count} preguntas de examen con dificultad ${diff}.`
+    + (tema ? ` Tema: ${tema}.` : ' Basándote en el archivo adjunto.')
+    + ' Responde SOLO con el JSON completo:\n```exam\n{"titulo":"Título del examen","preguntas":[{"id":1,"texto":"¿Pregunta?","opciones":[{"letra":"a","texto":"Opción A"},{"letra":"b","texto":"Opción B"},{"letra":"c","texto":"Opción C"}],"correcta":"a","explicacion":"Explicación de 2-3 oraciones."}]}\n```'
+    + ' REGLAS: exactamente ' + count + ' preguntas, siempre 3 opciones (a,b,c), JSON completo sin truncar.';
+
+  try {
+    let parts = [];
+    if (novaExFileB64) {
+      parts.push({ inline_data: { mime_type: novaExFileMime, data: novaExFileB64 } });
+    }
+    parts.push({ text: prompt });
+
+    const contents = [{ role: 'user', parts }];
+    const raw = await novaCallGemini(contents, !!novaExFileB64);
+    const parsed = novaExtractJSON(raw, 'exam');
+
+    if (parsed && parsed._truncated) {
+      const repaired = await novaRepairJSON(parsed._raw, 'exam');
+      novaExData = JSON.parse(repaired);
+    } else if (parsed && !parsed._truncated) {
+      novaExData = parsed;
+    } else {
+      throw new Error('No se pudo generar el examen. Intenta de nuevo.');
+    }
+
+    novaExRenderResults();
+  } catch(err) {
+    document.getElementById('novaExLoading').style.display = 'none';
+    document.getElementById('novaExamenUpload').style.display = 'flex';
+    if (typeof showToast === 'function') showToast('❌ ' + err.message);
+  }
+}
+
+function novaExRenderResults() {
+  document.getElementById('novaExLoading').style.display = 'none';
+  document.getElementById('novaExamenUpload').style.display = 'none';
+  novaExAnswers = {};
+  const results = document.getElementById('novaExResults');
+  results.style.display = 'flex';
+  document.getElementById('novaExResultTitle').textContent = novaExData.titulo || 'Examen';
+  document.getElementById('novaExScore').style.display = 'none';
+
+  const list = document.getElementById('novaExQList');
+  list.innerHTML = (novaExData.preguntas || []).map((q, i) => {
+    const qid = 'exq_' + i;
+    return '<div style="background:#13131a;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px">'
+      + '<div style="display:flex;gap:10px;align-items:flex-start">'
+      + '<div style="width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#7c6fff,#2dd4bf);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0">' + (i+1) + '</div>'
+      + '<div style="font-size:14px;color:#f0f0f5;font-weight:500;line-height:1.6">' + novaEsc(q.texto) + '</div></div>'
+      + '<div id="' + qid + '_opts" style="display:flex;flex-direction:column;gap:8px">'
+      + (q.opciones||[]).map(op =>
+        '<div id="' + qid + '_' + op.letra + '" onclick="novaExSelect('' + qid + '','' + op.letra + '','' + q.correcta + '')"'
+        + ' style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;cursor:pointer;transition:all .15s">'
+        + '<div style="width:22px;height:22px;border-radius:6px;background:#1e1e28;border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#7c6fff;flex-shrink:0">' + op.letra + '</div>'
+        + '<div style="font-size:13px;color:#c0c0d8">' + novaEsc(op.texto) + '</div></div>'
+      ).join('')
+      + '</div>'
+      + '<div id="' + qid + '_exp" style="display:none;background:rgba(45,212,191,.06);border:1px solid rgba(45,212,191,.15);border-radius:10px;padding:12px;font-size:13px;color:#2dd4bf;line-height:1.5"><strong>📖 Explicación:</strong> ' + novaEsc(q.explicacion||'') + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+function novaExSelect(qid, letra, correcta) {
+  const optsEl = document.getElementById(qid + '_opts');
+  if (!optsEl || optsEl.dataset.answered) return;
+  optsEl.dataset.answered = '1';
+  const ok = letra === correcta;
+  novaExAnswers[qid] = ok;
+
+  optsEl.querySelectorAll('[id^="' + qid + '_"]').forEach(el => {
+    el.style.cursor = 'default';
+  });
+
+  const selEl = document.getElementById(qid + '_' + letra);
+  if (selEl) {
+    selEl.style.background = ok ? 'rgba(52,211,153,.1)' : 'rgba(248,113,113,.1)';
+    selEl.style.borderColor = ok ? '#34d399' : '#f87171';
+  }
+  if (!ok) {
+    const corrEl = document.getElementById(qid + '_' + correcta);
+    if (corrEl) { corrEl.style.background = 'rgba(52,211,153,.08)'; corrEl.style.borderColor = '#34d399'; }
+  }
+  const expEl = document.getElementById(qid + '_exp');
+  if (expEl) expEl.style.display = 'block';
+
+  // Check if all answered
+  const total = (novaExData.preguntas || []).length;
+  const answered = Object.keys(novaExAnswers).length;
+  if (answered === total) {
+    const correct = Object.values(novaExAnswers).filter(Boolean).length;
+    const pct = Math.round((correct/total)*100);
+    const scoreEl = document.getElementById('novaExScore');
+    const emoji = pct >= 80 ? '🎉' : pct >= 60 ? '👍' : '💪';
+    scoreEl.textContent = emoji + ' ' + correct + '/' + total + ' correctas — ' + pct + '%';
+    scoreEl.style.color = pct >= 80 ? '#34d399' : pct >= 60 ? '#fbbf24' : '#f87171';
+    scoreEl.style.display = 'block';
+    scoreEl.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  }
+}
+
+function novaExGuardar() {
+  if (!novaExData) return;
+  const entry = {
+    id: Date.now(),
+    title: novaExData.titulo || 'Examen',
+    questions: (novaExData.preguntas||[]).length,
+    data: novaExData,
+    date: new Date().toLocaleDateString('es-MX'),
+  };
+  NOVA.savedExams.push(entry);
+  localStorage.setItem('nova_exams', JSON.stringify(NOVA.savedExams));
+  if (typeof showToast === 'function') showToast('💾 Examen guardado en Mis Guardados');
+}
+
 // ── PDF ───────────────────────────────────────────
 async function novaLoadPDF(event) {
   const file = event.target.files[0];
@@ -11836,8 +12134,8 @@ function novaRenderFlash() {
   const active = document.getElementById('novaFlashActive');
   active.style.display = 'flex';
   const card = cards[NOVA.flashIdx];
-  document.getElementById('novaFlashFront').innerHTML = card.frente;
-  document.getElementById('novaFlashBack').innerHTML  = card.reverso;
+  const frontEl = document.getElementById('novaFlashFront'); frontEl.innerHTML = card.frente; frontEl.style.color = '#f0f0f5';
+  const backEl = document.getElementById('novaFlashBack'); backEl.innerHTML = card.reverso; backEl.style.color = '#2dd4bf';
   document.getElementById('novaFlashCard').classList.remove('flipped');
   document.getElementById('novaFlashInner').style.transform = '';
   document.getElementById('novaFlashProgress').textContent = 'Tarjeta ' + (NOVA.flashIdx+1) + ' de ' + cards.length + ' · ' + NOVA.flashKnown + ' dominadas';
