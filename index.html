@@ -720,11 +720,14 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
   box-shadow:0 -4px 80px rgba(88,28,235,.25),0 0 0 1px rgba(139,92,246,.08);
   will-change:transform,opacity;
   transform:translateY(72px);opacity:0;
-  transition:transform .3s cubic-bezier(.34,1.1,.64,1),opacity .22s ease}
+  transition:transform .3s cubic-bezier(.34,1.1,.64,1),opacity .22s ease,max-width .3s ease}
+.exam-ai-modal.has-response{max-width:720px}
 .exam-ai-overlay.show .exam-ai-modal{transform:translateY(0);opacity:1}
 @media(min-width:640px){
   .exam-ai-modal{border-radius:20px;border-bottom:1px solid rgba(124,58,237,.2);transform:translateY(16px)}
-  .exam-ai-overlay.show .exam-ai-modal{transform:translateY(0);opacity:1}}
+  .exam-ai-overlay.show .exam-ai-modal{transform:translateY(0);opacity:1}
+  .exam-ai-modal.has-response .exam-ai-inner{flex-direction:row}
+  .exam-ai-side-nav{display:flex}}
 @keyframes slideUpAI{from{transform:translateY(72px);opacity:0}to{transform:translateY(0);opacity:1}}
 @keyframes fadeUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
 
@@ -807,6 +810,28 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .exam-ai-q-preview.show{display:block}
 
 /* ── Body ── */
+/* ── Inner layout (main + side nav) ── */
+.exam-ai-inner{display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0}
+.exam-ai-main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+
+/* ── Side nav ── */
+.exam-ai-side-nav{
+  display:none;flex-direction:column;gap:6px;
+  width:52px;flex-shrink:0;
+  background:rgba(255,255,255,.025);
+  border-left:1px solid rgba(124,58,237,.15);
+  padding:14px 6px;align-items:center}
+.bobi-nav-btn{
+  width:40px;height:40px;border-radius:12px;border:none;
+  background:rgba(255,255,255,.04);
+  color:#606078;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;transition:all .18s;padding:0;font-family:inherit}
+.bobi-nav-btn:hover{background:rgba(124,58,237,.15);color:#a78bfa}
+.bobi-nav-btn.active{background:rgba(124,58,237,.2);color:#a78bfa;border:1px solid rgba(124,58,237,.3)}
+.bobi-nav-icon{font-size:14px;line-height:1}
+.bobi-nav-label{font-size:7px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;line-height:1}
+
 .exam-ai-body{
   flex:1;overflow-y:auto;padding:12px 14px 14px;min-height:100px;
   scrollbar-width:thin;scrollbar-color:rgba(124,58,237,.2) transparent;
@@ -3340,12 +3365,19 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
     <!-- Question preview -->
     <div class="exam-ai-q-preview" id="examAIQPreview"></div>
 
-    <!-- Body (responses render here) -->
-    <div class="exam-ai-body" id="examAIBody">
-      <div class="exam-ai-empty">
-        <div class="ai-empty-glyph">&#x25C8;</div>
-        <div class="exam-ai-empty-text">Presiona <strong>Analizar pregunta</strong> y BOBI estudiará el reactivo completo.</div>
+    <!-- Inner: main content + side nav -->
+    <div class="exam-ai-inner" id="examAIInner">
+      <div class="exam-ai-main">
+        <!-- Body (responses render here) -->
+        <div class="exam-ai-body" id="examAIBody">
+          <div class="exam-ai-empty">
+            <div class="ai-empty-glyph">&#x25C8;</div>
+            <div class="exam-ai-empty-text">Presiona <strong>Analizar pregunta</strong> y BOBI estudiará el reactivo completo.</div>
+          </div>
+        </div>
       </div>
+      <!-- Side nav (visible after response) -->
+      <div class="exam-ai-side-nav" id="bobiSideNav"></div>
     </div>
 
     <!-- Mode selector -->
@@ -4275,6 +4307,84 @@ REGLAS: Sin markdown. Todo anclado al texto. Español mexicano.${m}`,
         throwOnError: false
       });
     }
+    // Build side nav
+    _buildBobiSideNav(sectionRaw);
+  }
+
+  function _buildBobiSideNav(sectionRaw) {
+    const nav = document.getElementById('bobiSideNav');
+    const modal = document.getElementById('examAIModal');
+    if (!nav) return;
+    nav.innerHTML = '';
+
+    const NAV_META = {
+      'CONCEPTO':  { icon: '◆', label: 'Idea' },
+      'ANÁLISIS':  { icon: '◈', label: 'Opts' },
+      'RESPUESTA': { icon: '◉', label: 'Resp' },
+    };
+
+    // Collect sections
+    const sections = [];
+    sectionRaw.forEach(function(part, i) {
+      const titleLine = part.trim().split('\n')[0].replace(/^§\s*/, '').trim();
+      const metaKey = Object.keys(NAV_META).find(function(k) { return titleLine.toUpperCase().indexOf(k) !== -1; });
+      if (metaKey) sections.push({ key: metaKey, index: i, title: titleLine });
+    });
+
+    if (sections.length < 2) { nav.style.display = 'none'; modal && modal.classList.remove('has-response'); return; }
+
+    // Show nav and expand modal
+    nav.style.display = 'flex';
+    modal && modal.classList.add('has-response');
+
+    // Scroll to top btn
+    const topBtn = document.createElement('button');
+    topBtn.className = 'bobi-nav-btn';
+    topBtn.title = 'Inicio';
+    topBtn.innerHTML = '<span class="bobi-nav-icon">⬆</span><span class="bobi-nav-label">Top</span>';
+    topBtn.onclick = function() {
+      var body = document.getElementById('examAIBody');
+      if (body) body.scrollTop = 0;
+      nav.querySelectorAll('.bobi-nav-btn').forEach(function(b) { b.classList.remove('active'); });
+      topBtn.classList.add('active');
+    };
+    nav.appendChild(topBtn);
+
+    // Section btns
+    sections.forEach(function(sec) {
+      const meta = NAV_META[sec.key] || { icon: '▸', label: sec.key.slice(0,4) };
+      const btn = document.createElement('button');
+      btn.className = 'bobi-nav-btn';
+      btn.title = sec.title;
+      btn.innerHTML = '<span class="bobi-nav-icon">' + meta.icon + '</span><span class="bobi-nav-label">' + meta.label + '</span>';
+      btn.onclick = function() {
+        var body = document.getElementById('examAIBody');
+        var allSecs = body && body.querySelectorAll('.ai-resp-section');
+        if (allSecs && allSecs[sec.index]) {
+          allSecs[sec.index].scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        nav.querySelectorAll('.bobi-nav-btn').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+      };
+      nav.appendChild(btn);
+    });
+
+    // Divider + scroll down btn
+    const divider = document.createElement('div');
+    divider.style.cssText = 'width:24px;height:1px;background:rgba(124,58,237,.2);margin:4px 0';
+    nav.appendChild(divider);
+
+    const botBtn = document.createElement('button');
+    botBtn.className = 'bobi-nav-btn';
+    botBtn.title = 'Ir abajo';
+    botBtn.innerHTML = '<span class="bobi-nav-icon">⬇</span><span class="bobi-nav-label">Bot</span>';
+    botBtn.onclick = function() {
+      var body = document.getElementById('examAIBody');
+      if (body) body.scrollTop = body.scrollHeight;
+      nav.querySelectorAll('.bobi-nav-btn').forEach(function(b) { b.classList.remove('active'); });
+      botBtn.classList.add('active');
+    };
+    nav.appendChild(botBtn);
   }
 
   function _showCooldown(body, btn, rawErr) {
@@ -4378,12 +4488,16 @@ var SVG_IDLE  = '<svg viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg" sty
     ov.classList.remove('show');
     if (speechSynthesis.speaking) speechSynthesis.cancel();
     if (_abortCtrl) { try { _abortCtrl.abort(); } catch(e) {} }
+    // Hide side nav and shrink modal
+    var nav = document.getElementById('bobiSideNav');
+    if (nav) { nav.innerHTML = ''; nav.style.display = 'none'; }
+    mod && mod.classList.remove('has-response');
     // Reset modal position after close transition so next open starts fresh from bottom
     setTimeout(function() {
       if (!ov.classList.contains('show')) {
         mod.style.transition = 'none';
-        mod.style.transform  = '';   // reverts to CSS base: translateY(72px)
-        mod.style.opacity    = '';   // reverts to CSS base: 0
+        mod.style.transform  = '';
+        mod.style.opacity    = '';
         requestAnimationFrame(function() { mod.style.transition = ''; });
       }
     }, 320);
