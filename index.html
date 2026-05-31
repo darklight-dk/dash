@@ -2340,6 +2340,16 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
 /* ══ NOVA — Estilos integrados ══ */
 @keyframes nova-pulse{0%,100%{box-shadow:0 0 40px rgba(124,111,255,.3)}50%{box-shadow:0 0 80px rgba(124,111,255,.45)}}
 @keyframes nova-msg-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* NOVA History Sidebar */
+#novaHistorySidebar{width:240px;min-width:240px;background:#0d0d14;border-right:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;overflow:hidden;transition:width .25s}
+#novaHistorySidebar.collapsed{width:0;min-width:0}
+.nova-hist-item{padding:10px 14px;border-radius:10px;cursor:pointer;transition:all .15s;border:1px solid transparent;margin-bottom:4px}
+.nova-hist-item:hover{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.06)}
+.nova-hist-item.active{background:rgba(124,111,255,.12);border-color:rgba(124,111,255,.25)}
+.nova-hist-title{font-size:13px;font-weight:600;color:#d0d0e8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nova-hist-date{font-size:11px;color:#404058;margin-top:2px}
+
 #novaScreen{font-family:'DM Sans','Sora',sans-serif}
 .nova-msg-row{display:flex;gap:10px;margin-bottom:18px;max-width:820px;margin-left:auto;margin-right:auto;width:100%;animation:nova-msg-in .28s ease}
 .nova-msg-row.nova-user{flex-direction:row-reverse}
@@ -10969,6 +10979,8 @@ window._enterDash = function(user, role, picture, email) {
   <!-- Topbar -->
   <div style="height:54px;background:rgba(9,9,15,.95);border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0;backdrop-filter:blur(12px)">
     <button onclick="show('dashScreen')" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#a0a0b8;font-size:13px;font-weight:600;padding:6px 12px;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a0a0b8'">← Dashboard</button>
+    <button onclick="novaToggleSidebar()" id="novaHistBtn" title="Historial" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#a0a0b8;font-size:15px;padding:6px 10px;cursor:pointer;font-family:inherit;transition:all .2s">☰</button>
+    <button onclick="novaNewChat()" title="Nuevo chat" style="background:rgba(124,111,255,.15);border:1px solid rgba(124,111,255,.3);border-radius:8px;color:#c4bbff;font-size:13px;font-weight:700;padding:6px 12px;cursor:pointer;font-family:inherit;transition:all .2s">✦ Nuevo</button>
     <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:17px;background:linear-gradient(135deg,#fff 40%,#7c6fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">✦ NOVA</div>
     <span style="font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;background:rgba(124,111,255,.15);color:#7c6fff;border:1px solid rgba(124,111,255,.25)" id="novaBadge">Chat IA</span>
     <div style="flex:1"></div>
@@ -10985,6 +10997,15 @@ window._enterDash = function(user, role, picture, email) {
 
   <!-- Content -->
   <div style="flex:1;display:flex;min-height:0;overflow:hidden">
+
+    <!-- ── HISTORY SIDEBAR ── -->
+    <div id="novaHistorySidebar" class="collapsed">
+      <div style="padding:14px 14px 8px;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0">
+        <div style="font-size:12px;font-weight:700;color:#606078;letter-spacing:.8px;text-transform:uppercase;margin-bottom:2px">Conversaciones</div>
+      </div>
+      <div id="novaHistList" style="flex:1;overflow-y:auto;padding:10px 8px"></div>
+    </div>
+
 
     <!-- ── CHAT PANEL ── -->
     <div id="novaChatPanel" style="flex:1;display:flex;flex-direction:column;min-height:0">
@@ -11208,29 +11229,80 @@ const NOVA_GROQ_URL   = 'https://grok-mat.donniaxel55.workers.dev'; // worker pr
 const NOVA_GROQ_KEY   = ''; // no se necesita — el worker maneja la autenticación
 
 // ── PDFs del EXANI en GitHub ──────────────────────
-const NOVA_PDF_URLS = [
+// ── Gemini Files API URIs (subidos una sola vez, duran 48h) ──
+// ── PDFs del EXANI — Auto-renovación cada 47h ────
+const NOVA_FILES_WORKER = 'https://nova-files-api.donniaxel55.workers.dev';
+const NOVA_PDF_GITHUB_URLS = [
   'https://raw.githubusercontent.com/darklight-dk/dash/main/pdfs/premedicina_compressed.pdf',
   'https://raw.githubusercontent.com/darklight-dk/dash/main/pdfs/guia%20mate%20exani_compressed.pdf'
 ];
-
-// Base64 de los PDFs precargados (se llenan al iniciar)
-let NOVA_PDF_PRELOADED = [];
+let NOVA_PDF_FILE_URIS = [
+  'https://generativelanguage.googleapis.com/v1beta/files/iiti3j27ipfy',
+  'https://generativelanguage.googleapis.com/v1beta/files/a09wc30vr0tb'
+];
 let NOVA_PDF_READY = false;
 
 async function novaPrecargarPDFs() {
+  // 1. Revisar Firestore si hay URIs válidos (menos de 47h)
+  const uid = novaGetUID ? novaGetUID() : null;
+  const storageKey = 'nova_pdf_uris'; // fallback localStorage
   try {
+    let cached = null;
+    if (uid && window._fbDB) {
+      const { db: _db, ref: _ref, get: _get } = window._fbDB;
+      const snap = await _get(_ref(_db, 'novaConfig/pdfUris'));
+      if (snap.exists()) cached = snap.val();
+    } else {
+      const raw = localStorage.getItem(storageKey);
+      if (raw) cached = JSON.parse(raw);
+    }
+
+    if (cached && cached.uris && cached.uris.length === 2) {
+      const horas = (Date.now() - cached.savedAt) / 3600000;
+      if (horas < 47) {
+        NOVA_PDF_FILE_URIS = cached.uris;
+        NOVA_PDF_READY = true;
+        console.log('✅ PDFs EXANI — URIs válidos desde caché (' + horas.toFixed(1) + 'h)');
+        return;
+      }
+      console.log('⏰ URIs vencidos (' + horas.toFixed(1) + 'h), renovando...');
+    }
+  } catch(e) {
+    console.warn('novaPrecargarPDFs cache error:', e);
+  }
+
+  // 2. Renovar — subir desde GitHub via Worker
+  try {
+    console.log('🔄 Subiendo PDFs a Gemini Files API...');
     const results = await Promise.all(
-      NOVA_PDF_URLS.map(async (url) => {
-        const res = await fetch(url);
-        const blob = await res.blob();
-        return await novaFileB64(blob);
+      NOVA_PDF_GITHUB_URLS.map(async (pdfUrl) => {
+        const res = await fetch(NOVA_FILES_WORKER + '/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pdfUrl, mimeType: 'application/pdf' })
+        });
+        const data = await res.json();
+        if (!data.file?.uri) throw new Error('No URI en respuesta: ' + JSON.stringify(data));
+        return data.file.uri;
       })
     );
-    NOVA_PDF_PRELOADED = results;
+
+    NOVA_PDF_FILE_URIS = results;
     NOVA_PDF_READY = true;
-    console.log('✅ PDFs del EXANI precargados correctamente');
-  } catch (err) {
-    console.warn('⚠️ No se pudieron precargar los PDFs:', err.message);
+
+    // 3. Guardar nuevos URIs
+    const payload = { uris: results, savedAt: Date.now() };
+    if (uid && window._fbDB) {
+      const { db: _db, ref: _ref, set: _set } = window._fbDB;
+      await _set(_ref(_db, 'novaConfig/pdfUris'), payload);
+    } else {
+      localStorage.setItem(storageKey, JSON.stringify(payload));
+    }
+    console.log('✅ PDFs renovados y guardados:', results);
+  } catch(err) {
+    // Fallback a URIs hardcodeados si falla
+    NOVA_PDF_READY = true;
+    console.warn('⚠️ No se pudieron renovar los PDFs, usando URIs anteriores:', err.message);
   }
 }
 
@@ -11257,10 +11329,190 @@ const NOVA_SYSTEM = "Eres NOVA, asistente de estudio IA para el EXANI-II (Méxic
   + "Inline entre $...$ (ej: $\\frac{1}{4}$, $x^2$, $\\sqrt{x}$). "
   + "En bloque (centrado) entre $$...$$ (ej: $$x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}$$).";
 
+
+// ══════════════════════════════════════════════════
+//  NOVA — Historial de Conversaciones (Firebase)
+// ══════════════════════════════════════════════════
+let NOVA_CURRENT_CHAT_ID = null;
+let NOVA_SIDEBAR_OPEN = false;
+let NOVA_CHATS_CACHE = {};
+
+function novaGetUID() {
+  return window._fbCurrentUser ? window._fbCurrentUser.uid : null;
+}
+
+function novaToggleSidebar() {
+  NOVA_SIDEBAR_OPEN = !NOVA_SIDEBAR_OPEN;
+  const sb = document.getElementById('novaHistorySidebar');
+  if (NOVA_SIDEBAR_OPEN) {
+    sb.classList.remove('collapsed');
+    novaLoadHistory();
+  } else {
+    sb.classList.add('collapsed');
+  }
+}
+
+async function novaLoadHistory() {
+  const uid = novaGetUID();
+  if (!uid) return;
+  const { db: _db, ref: _ref, get: _get } = window._fbDB;
+  try {
+    const snap = await _get(_ref(_db, 'novaChats/' + uid));
+    if (!snap.exists()) {
+      document.getElementById('novaHistList').innerHTML = '<div style="text-align:center;color:#404058;font-size:12px;padding:20px">Sin conversaciones aún</div>';
+      return;
+    }
+    const chats = [];
+    snap.forEach(child => {
+      chats.push({ id: child.key, ...child.val() });
+    });
+    chats.sort((a,b) => (b.updatedAt||0) - (a.updatedAt||0));
+    NOVA_CHATS_CACHE = {};
+    chats.forEach(c => NOVA_CHATS_CACHE[c.id] = c);
+    novaRenderHistory(chats);
+  } catch(e) {
+    console.warn('novaLoadHistory error:', e);
+  }
+}
+
+function novaRenderHistory(chats) {
+  const list = document.getElementById('novaHistList');
+  if (!chats.length) {
+    list.innerHTML = '<div style="text-align:center;color:#404058;font-size:12px;padding:20px">Sin conversaciones aun</div>';
+    return;
+  }
+  list.innerHTML = '';
+  chats.forEach(c => {
+    const item = document.createElement('div');
+    item.className = 'nova-hist-item' + (c.id === NOVA_CURRENT_CHAT_ID ? ' active' : '');
+    item.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;gap:6px">'
+      + '<div class="nova-hist-title">' + novaEsc(c.title || 'Conversacion') + '</div>'
+      + '<div class="nova-hist-del" style="color:#303048;font-size:14px;cursor:pointer;padding:2px 4px;border-radius:4px">x</div>'
+      + '</div><div class="nova-hist-date">' + novaTimeAgo(c.updatedAt) + '</div>';
+    item.addEventListener('click', () => novaLoadChat(c.id));
+    item.querySelector('.nova-hist-del').addEventListener('click', e => {
+      e.stopPropagation();
+      novaDeleteChat(c.id);
+    });
+    item.querySelector('.nova-hist-del').addEventListener('mouseover', function(){ this.style.color='#f87171'; });
+    item.querySelector('.nova-hist-del').addEventListener('mouseout',  function(){ this.style.color='#303048'; });
+    list.appendChild(item);
+  });
+}
+
+function novaTimeAgo(ts) {
+  if (!ts) return '';
+  const diff = Date.now() - ts;
+  const m = Math.floor(diff/60000);
+  const h = Math.floor(diff/3600000);
+  const d = Math.floor(diff/86400000);
+  if (m < 1) return 'ahora';
+  if (m < 60) return 'hace ' + m + 'm';
+  if (h < 24) return 'hace ' + h + 'h';
+  return 'hace ' + d + 'd';
+}
+
+async function novaSaveChat() {
+  const uid = novaGetUID();
+  if (!uid || !NOVA.messages.length) return;
+  const { db: _db, ref: _ref, set: _set } = window._fbDB;
+  if (!NOVA_CURRENT_CHAT_ID) {
+    NOVA_CURRENT_CHAT_ID = 'chat_' + Date.now();
+  }
+  const firstMsg = NOVA.messages.find(m => m.role === 'user');
+  const rawTitle = typeof firstMsg?.content === 'string'
+    ? firstMsg.content
+    : (Array.isArray(firstMsg?.content) ? (firstMsg.content.find(c=>c.type==='text')?.text||'Conversación') : 'Conversación');
+  const title = rawTitle.slice(0,45) + (rawTitle.length > 45 ? '…' : '');
+
+  const payload = {
+    title,
+    updatedAt: Date.now(),
+    createdAt: NOVA_CHATS_CACHE[NOVA_CURRENT_CHAT_ID]?.createdAt || Date.now(),
+    messages: NOVA.messages.map(m => ({
+      role: m.role,
+      content: typeof m.content === 'string' ? m.content : JSON.stringify(m.content)
+    }))
+  };
+
+  try {
+    await _set(_ref(_db, 'novaChats/' + uid + '/' + NOVA_CURRENT_CHAT_ID), payload);
+    if (NOVA_SIDEBAR_OPEN) novaLoadHistory();
+  } catch(e) {
+    console.warn('novaSaveChat error:', e);
+  }
+}
+
+async function novaLoadChat(chatId) {
+  const uid = novaGetUID();
+  if (!uid) return;
+  const { db: _db, ref: _ref, get: _get } = window._fbDB;
+  try {
+    const snap = await _get(_ref(_db, 'novaChats/' + uid + '/' + chatId));
+    if (!snap.exists()) return;
+    const data = snap.val();
+    NOVA_CURRENT_CHAT_ID = chatId;
+    NOVA.messages = (data.messages||[]).map(m => ({
+      role: m.role,
+      content: (() => { try { return JSON.parse(m.content); } catch { return m.content; } })()
+    }));
+    NOVA.pdfBase64 = null; NOVA.attachedImgs = [];
+    // Render messages
+    const msgs = document.getElementById('novaMsgs');
+    msgs.innerHTML = '';
+    document.getElementById('novaEmpty').style.display = 'none';
+    NOVA.messages.forEach(m => {
+      if (m.role === 'user') {
+        const txt = typeof m.content === 'string' ? m.content : (Array.isArray(m.content) ? (m.content.find(c=>c.type==='text')?.text||'') : '');
+        novaAppendUser(txt);
+      } else {
+        novaAppendAI(novaFmt(typeof m.content === 'string' ? m.content : ''));
+      }
+    });
+    novaScrollBottom();
+    // Update sidebar active state
+    novaRenderHistory(Object.values(NOVA_CHATS_CACHE).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0)));
+    // Switch to chat panel
+    novaSetMode('chat');
+  } catch(e) {
+    console.warn('novaLoadChat error:', e);
+  }
+}
+
+async function novaDeleteChat(chatId) {
+  const uid = novaGetUID();
+  if (!uid) return;
+  if (!confirm('¿Eliminar esta conversación?')) return;
+  const { db: _db, ref: _ref } = window._fbDB;
+  const { remove } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js');
+  try {
+    await remove(_ref(_db, 'novaChats/' + uid + '/' + chatId));
+    if (chatId === NOVA_CURRENT_CHAT_ID) novaNewChat();
+    delete NOVA_CHATS_CACHE[chatId];
+    novaRenderHistory(Object.values(NOVA_CHATS_CACHE).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0)));
+  } catch(e) {
+    console.warn('novaDeleteChat error:', e);
+  }
+}
+
+function novaNewChat() {
+  NOVA_CURRENT_CHAT_ID = null;
+  NOVA.messages = [];
+  NOVA.pdfBase64 = null;
+  NOVA.attachedImgs = [];
+  NOVA.flashcards = [];
+  const msgs = document.getElementById('novaMsgs');
+  msgs.innerHTML = '';
+  document.getElementById('novaEmpty').style.display = 'flex';
+  novaSetMode('chat');
+  if (NOVA_SIDEBAR_OPEN) novaLoadHistory();
+  if (typeof showToast === 'function') showToast('✦ Nuevo chat iniciado');
+}
+
 function openNova() {
   show('novaScreen');
-  // Precargar PDFs del EXANI en background (solo la primera vez)
-  if (!NOVA_PDF_READY && NOVA_PDF_PRELOADED.length === 0) {
+  // Precargar/renovar PDFs del EXANI en background
+  if (!NOVA_PDF_READY) {
     novaPrecargarPDFs();
   }
   // Saluda con el nombre del usuario si está disponible
@@ -11440,10 +11692,10 @@ function novaMsgsToGemini(msgs) {
     const geminiRole = m.role === 'assistant' ? 'model' : 'user';
     let parts = [];
     if (i === 0 && m.role === 'user') {
-      // Inyectar PDFs precargados del EXANI si están disponibles
-      if (NOVA_PDF_READY && NOVA_PDF_PRELOADED.length) {
-        NOVA_PDF_PRELOADED.forEach(b64 => {
-          parts.push({ inline_data: { mime_type: 'application/pdf', data: b64 } });
+      // Inyectar PDFs del EXANI via Gemini Files API (sin gastar tokens extra)
+      if (NOVA_PDF_READY) {
+        NOVA_PDF_FILE_URIS.forEach(uri => {
+          parts.push({ file_data: { mime_type: 'application/pdf', file_uri: uri } });
         });
       }
       // También inyectar PDF subido manualmente si existe
@@ -11592,6 +11844,7 @@ async function novaSendMessage(text) {
     document.getElementById('novaSendBtn').style.opacity = '';
     document.getElementById('novaSendBtn').style.pointerEvents = '';
     novaScrollBottom();
+    novaSaveChat(); // guardar conversación en Firebase
   }
 }
 
@@ -11685,6 +11938,18 @@ function novaAppendAI(html) {
   d.className = 'nova-msg-row nova-ai';
   d.innerHTML = '<div class="nova-avatar nova-ai-av">✦</div><div class="nova-bubble">' + html + '</div>';
   c.appendChild(d);
+  if (typeof renderMathInElement !== 'undefined') {
+    const bubble = d.querySelector('.nova-bubble');
+    renderMathInElement(bubble, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '$',  right: '$',  display: false },
+        { left: '\\(', right: '\\)', display: false },
+        { left: '\\[', right: '\\]', display: true }
+      ],
+      throwOnError: false
+    });
+  }
   novaScrollBottom();
 }
 
@@ -11919,7 +12184,7 @@ function novaExRenderResults() {
       + '<div style="font-size:14px;color:#f0f0f5;font-weight:500;line-height:1.6">' + novaEsc(q.texto) + '</div></div>'
       + '<div id="' + qid + '_opts" style="display:flex;flex-direction:column;gap:8px">'
       + (q.opciones||[]).map(op =>
-        '<div id="' + qid + '_' + op.letra + '" onclick="novaExSelect('' + qid + '','' + op.letra + '','' + q.correcta + '')"'
+        '<div id="' + qid + '_' + op.letra + '" data-qid="' + qid + '" data-letra="' + op.letra + '" data-correcta="' + q.correcta + '" onclick="novaExSelect(this.dataset.qid,this.dataset.letra,this.dataset.correcta)"'
         + ' style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;cursor:pointer;transition:all .15s">'
         + '<div style="width:22px;height:22px;border-radius:6px;background:#1e1e28;border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#7c6fff;flex-shrink:0">' + op.letra + '</div>'
         + '<div style="font-size:13px;color:#c0c0d8">' + novaEsc(op.texto) + '</div></div>'
