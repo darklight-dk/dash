@@ -8,6 +8,9 @@
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
 <title>DASH</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
@@ -3850,7 +3853,7 @@ async function solveMath() {
   const topicLabel = _mtTopicLabels[_mtCurrentTopic] || 'matemáticas';
 
   
-  const systemPrompt = `Eres un tutor de matemáticas experto, didáctico y paciente, especializado en ${topicLabel}. Tu misión es explicar paso a paso el procedimiento completo para resolver el problema o ecuación que el estudiante escribe. Usa un tono amigable y motivador, como si estuvieras sentado junto al alumno. REGLAS DE FORMATO: Estructura tu respuesta con pasos numerados claros: "Paso 1:", "Paso 2:", etc. Explica el PORQUÉ de cada paso, no solo el cómo. Usa ➜ para indicar transformaciones o resultados intermedios. Termina siempre con "✅ Resultado:" y la respuesta final en una línea sola. Si hay un error en la ecuación, dilo amablemente y corrige. Usa lenguaje en español mexicano. Sé conciso pero completo — no uses asteriscos ni markdown, solo texto plano y numeración.`;
+  const systemPrompt = `Eres un tutor de matemáticas experto, didáctico y paciente, especializado en ${topicLabel}. Tu misión es explicar paso a paso el procedimiento completo para resolver el problema o ecuación que el estudiante escribe. Usa un tono amigable y motivador, como si estuvieras sentado junto al alumno. REGLAS DE FORMATO: Estructura tu respuesta con pasos numerados claros: "Paso 1:", "Paso 2:", etc. Explica el PORQUÉ de cada paso, no solo el cómo. Usa ➜ para indicar transformaciones o resultados intermedios. Termina siempre con "✅ Resultado:" y la respuesta final en una línea sola. Si hay un error en la ecuación, dilo amablemente y corrige. Usa lenguaje en español mexicano. Sé conciso pero completo. IMPORTANTE: Usa notación LaTeX para TODAS las fórmulas y expresiones matemáticas. Las expresiones inline van entre $...$ y las fórmulas en bloque entre $$...$$. Ejemplos: fracciones como $\frac{1}{4}$, raíces como $\sqrt{x}$, potencias como $x^2$, ecuaciones centradas como $$x = \frac{-b \pm \sqrt{b^2-4ac}}{2a}$$.`;
 
   try {
     const response = await fetch(
@@ -3884,7 +3887,18 @@ async function solveMath() {
 
     const fullText = json?.choices?.[0]?.message?.content || '';
     if (fullText) {
-      bubble.textContent = fullText;
+      bubble.innerHTML = fullText.replace(/\n/g,'<br>');
+      if (typeof renderMathInElement !== 'undefined') {
+        renderMathInElement(bubble, {
+          delimiters: [
+            { left: '$$', right: '$$', display: true },
+            { left: '$', right: '$', display: false },
+            { left: '\\(', right: '\\)', display: false },
+            { left: '\\[', right: '\\]', display: true }
+          ],
+          throwOnError: false
+        });
+      }
     } else {
       const reason = json?.error?.message || 'Sin respuesta';
       bubble.textContent = '⚠️ ' + reason + ' — Revisa consola (F12).';
@@ -4108,6 +4122,7 @@ REGLAS: Sin markdown. Todo anclado al texto. Español mexicano.${m}`,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          model: imageDataUrl ? 'gemini-2.5-flash' : 'gemini-2.0-flash',
           system_instruction: { parts: [{ text: systemPrompt }] },
           contents: [{ role: 'user', parts: userContent }],
           generationConfig: { maxOutputTokens: 2048, temperature: 0.25 }
@@ -10974,7 +10989,10 @@ const NOVA_SYSTEM = "Eres NOVA, asistente de estudio IA para el EXANI-II (Méxic
   + "CUANDO TE PIDAN FLASHCARDS — usa este bloque:\n"
   + "```flashcards\n"
   + '[{"frente":"Concepto o pregunta","reverso":"Definición o respuesta"}]\n'
-  + "```";
+  + "```"
+  + "\n\nFÓRMULAS MATEMÁTICAS: Cuando incluyas expresiones o fórmulas matemáticas, usa notación LaTeX. "
+  + "Inline entre $...$ (ej: $\\frac{1}{4}$, $x^2$, $\\sqrt{x}$). "
+  + "En bloque (centrado) entre $$...$$ (ej: $$x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}$$).";
 
 function openNova() {
   show('novaScreen');
@@ -11027,11 +11045,12 @@ function novaSendSuggestion(el) {
 }
 
 // ── Llamada a Gemini ──────────────────────────────
-async function novaCallGemini(geminiContents) {
+async function novaCallGemini(geminiContents, hasImage = false) {
   const res = await fetch(NOVA_GEMINI_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
+      model: hasImage ? 'gemini-2.5-flash' : 'gemini-2.0-flash',
       system_instruction: { parts: [{ text: NOVA_SYSTEM }] },
       contents: geminiContents,
       generationConfig: { maxOutputTokens: 8192, temperature: 0.25 }
@@ -11185,7 +11204,7 @@ async function novaSendMessage(text) {
 
     // --- Paso 1: Gemini (lee PDF e imágenes) ---
     try {
-      raw = await novaCallGemini(novaMsgsToGemini(NOVA.messages));
+      raw = await novaCallGemini(novaMsgsToGemini(NOVA.messages), !!hasMedia);
       modelUsed = 'gemini';
     } catch(geminiErr) {
       // Si Gemini falla y NO hay media, intentar Groq directamente
@@ -11305,7 +11324,7 @@ function novaParseResponse(raw, model) {
 }
 
 function novaFmt(t) {
-  return t
+  let html = t
     .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
     .replace(/\*(.+?)\*/g,'<em>$1</em>')
     .replace(/`([^`]+)`/g,'<code>$1</code>')
@@ -11315,6 +11334,22 @@ function novaFmt(t) {
     .replace(/(<li>[\s\S]*?<\/li>\n?)+/g, m => '<ul>' + m + '</ul>')
     .replace(/\n\n/g,'</p><p>')
     .replace(/\n/g,'<br>');
+  // Renderizar fórmulas matemáticas con KaTeX
+  if (typeof renderMathInElement !== 'undefined') {
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    renderMathInElement(div, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '$', right: '$', display: false },
+        { left: '\\(', right: '\\)', display: false },
+        { left: '\\[', right: '\\]', display: true }
+      ],
+      throwOnError: false
+    });
+    return div.innerHTML;
+  }
+  return html;
 }
 
 function novaEsc(s) {
@@ -11524,7 +11559,7 @@ async function novaPdfAction(action) {
       return { role: geminiRole, parts };
     });
 
-    const raw = await novaCallGemini(geminiContents);
+    const raw = await novaCallGemini(geminiContents, true); // PDF siempre usa 2.5-flash
     novaRemoveTyping();
     NOVA.messages.push({ role:'assistant', content: raw });
 
