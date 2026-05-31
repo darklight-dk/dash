@@ -11121,10 +11121,39 @@ const NOVA_GEMINI_URL = 'https://gemini-proxy.donniaxel55.workers.dev';
 const NOVA_GROQ_URL   = 'https://grok-mat.donniaxel55.workers.dev'; // worker proxy (sin API key necesaria)
 const NOVA_GROQ_KEY   = ''; // no se necesita — el worker maneja la autenticación
 
+// ── PDFs del EXANI en GitHub ──────────────────────
+const NOVA_PDF_URLS = [
+  'https://raw.githubusercontent.com/darklight-dk/dash/main/pdfs/premedicina_compressed.pdf',
+  'https://raw.githubusercontent.com/darklight-dk/dash/main/pdfs/guia%20mate%20exani_compressed.pdf'
+];
+
+// Base64 de los PDFs precargados (se llenan al iniciar)
+let NOVA_PDF_PRELOADED = [];
+let NOVA_PDF_READY = false;
+
+async function novaPrecargarPDFs() {
+  try {
+    const results = await Promise.all(
+      NOVA_PDF_URLS.map(async (url) => {
+        const res = await fetch(url);
+        const blob = await res.blob();
+        return await novaFileB64(blob);
+      })
+    );
+    NOVA_PDF_PRELOADED = results;
+    NOVA_PDF_READY = true;
+    console.log('✅ PDFs del EXANI precargados correctamente');
+  } catch (err) {
+    console.warn('⚠️ No se pudieron precargar los PDFs:', err.message);
+  }
+}
+
 // Indica qué modelo se usó en el último turno
 let NOVA_LAST_MODEL = 'gemini';
 
 const NOVA_SYSTEM = "Eres NOVA, asistente de estudio IA para el EXANI-II (México).\n"
+  + "Tienes acceso directo a dos documentos de estudio: la Guía de Premedicina y la Guía de Matemáticas del EXANI. "
+  + "Úsalos como base principal para responder preguntas del EXANI-II. Si el usuario pregunta algo relacionado, cita y explica con base en esos documentos.\n"
   + "Personalidad: directa, precisa, motivadora. Explicas paso a paso.\n"
   + "Idioma: español mexicano. Sin emojis excesivos, usa símbolos tipográficos (→ · ✓ ✗ ◆).\n\n"
   + "CUANDO TE PIDAN PREGUNTAS O EXAMEN — responde PRIMERO con un mensaje breve (1 línea), luego el bloque JSON COMPLETO:\n"
@@ -11144,6 +11173,10 @@ const NOVA_SYSTEM = "Eres NOVA, asistente de estudio IA para el EXANI-II (Méxic
 
 function openNova() {
   show('novaScreen');
+  // Precargar PDFs del EXANI en background (solo la primera vez)
+  if (!NOVA_PDF_READY && NOVA_PDF_PRELOADED.length === 0) {
+    novaPrecargarPDFs();
+  }
   // Saluda con el nombre del usuario si está disponible
   if (NOVA.messages.length === 0 && typeof S !== 'undefined' && S.user) {
     const nombre = S.user.split(' ')[0];
@@ -11283,8 +11316,17 @@ function novaMsgsToGemini(msgs) {
   return msgs.map((m, i) => {
     const geminiRole = m.role === 'assistant' ? 'model' : 'user';
     let parts = [];
-    if (i === 0 && NOVA.pdfBase64 && m.role === 'user') {
-      parts.push({ inline_data: { mime_type: 'application/pdf', data: NOVA.pdfBase64 } });
+    if (i === 0 && m.role === 'user') {
+      // Inyectar PDFs precargados del EXANI si están disponibles
+      if (NOVA_PDF_READY && NOVA_PDF_PRELOADED.length) {
+        NOVA_PDF_PRELOADED.forEach(b64 => {
+          parts.push({ inline_data: { mime_type: 'application/pdf', data: b64 } });
+        });
+      }
+      // También inyectar PDF subido manualmente si existe
+      if (NOVA.pdfBase64) {
+        parts.push({ inline_data: { mime_type: 'application/pdf', data: NOVA.pdfBase64 } });
+      }
       const txt = typeof m.content === 'string' ? m.content
         : (Array.isArray(m.content) ? (m.content.find(c => c.type === 'text')?.text || '') : '');
       if (txt) parts.push({ text: txt });
@@ -11876,7 +11918,7 @@ function novaFileB64(file) {
     const r = new FileReader();
     r.onload = () => res(r.result.split(',')[1]);
     r.onerror = rej;
-    r.readAsDataURL(file);
+    r.readAsDataURL(file instanceof Blob ? file : file);
   });
 }
 </script>
