@@ -13,6 +13,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root{
   --teal:#0d9488;--green:#16a34a;--dark:#f8fafc;
@@ -821,9 +822,6 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
   background:rgba(255,255,255,.025);
   border-left:1px solid rgba(124,58,237,.15);
   padding:14px 6px;align-items:center}
-@media(max-width:639px){
-  .exam-ai-side-nav{display:none !important}
-}
 .bobi-nav-btn{
   width:40px;height:40px;border-radius:12px;border:none;
   background:rgba(255,255,255,.04);
@@ -2343,16 +2341,6 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
 /* ══ NOVA — Estilos integrados ══ */
 @keyframes nova-pulse{0%,100%{box-shadow:0 0 40px rgba(124,111,255,.3)}50%{box-shadow:0 0 80px rgba(124,111,255,.45)}}
 @keyframes nova-msg-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-
-/* NOVA History Sidebar */
-#novaHistorySidebar{width:240px;min-width:240px;background:#0d0d14;border-right:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;overflow:hidden;transition:width .25s}
-#novaHistorySidebar.collapsed{width:0;min-width:0}
-.nova-hist-item{padding:10px 14px;border-radius:10px;cursor:pointer;transition:all .15s;border:1px solid transparent;margin-bottom:4px}
-.nova-hist-item:hover{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.06)}
-.nova-hist-item.active{background:rgba(124,111,255,.12);border-color:rgba(124,111,255,.25)}
-.nova-hist-title{font-size:13px;font-weight:600;color:#d0d0e8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.nova-hist-date{font-size:11px;color:#404058;margin-top:2px}
-
 #novaScreen{font-family:'DM Sans','Sora',sans-serif}
 .nova-msg-row{display:flex;gap:10px;margin-bottom:18px;max-width:820px;margin-left:auto;margin-right:auto;width:100%;animation:nova-msg-in .28s ease}
 .nova-msg-row.nova-user{flex-direction:row-reverse}
@@ -2397,25 +2385,20 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
 #novaScreen ::-webkit-scrollbar{width:5px}
 #novaScreen ::-webkit-scrollbar-thumb{background:#1e1e28;border-radius:5px}
 /* ── NOVA RESPONSIVE MÓVIL ── */
-#novaTopbar { display:flex; align-items:center; gap:8px; padding:0 12px; height:54px; flex-shrink:0; overflow:hidden; }
-#novaTopbarLeft { display:flex; align-items:center; gap:6px; flex-shrink:0; }
-#novaTopbarModes { display:flex; gap:5px; overflow-x:auto; flex:1; scrollbar-width:none; -ms-overflow-style:none; }
-#novaTopbarModes::-webkit-scrollbar { display:none; }
-#novaTopbarModes button { flex-shrink:0; }
-
 @media(max-width:640px){
-  #novaTopbar { padding:0 8px; height:48px; gap:6px; }
-  #novaTopbarModes button { padding:4px 9px !important; font-size:11px !important; }
-  #novaTopbarLeft button { padding:5px 8px !important; font-size:11px !important; }
+  #novaScreen .nova-topbar-modes{gap:4px}
+  #novaScreen .nova-topbar-modes button{padding:4px 8px;font-size:11px}
   #novaMsgs{padding:14px 12px}
-  .nova-msg-row{max-width:100%;padding:0;gap:7px}
+  .nova-msg-row{max-width:100%;padding:0}
   .nova-bubble{max-width:90%;font-size:13px;padding:9px 12px}
   .nova-exam-card{padding:12px 10px;margin:6px 0}
   .nova-q-opt{font-size:12px;padding:8px 10px}
   #novaInputBox{padding:8px 8px 8px 12px}
   #novaInput{font-size:15px}
+  #novaScreen>div:first-child{padding:0 12px;height:48px}
+  #novaScreen>div:first-child button:first-child{padding:5px 9px;font-size:12px}
+  .nova-msg-row{gap:7px}
   .nova-avatar{width:26px;height:26px;font-size:11px;border-radius:7px}
-  #novaHistorySidebar{display:none !important}
 }
 @media(max-width:600px){
   #novaScreen{overflow:hidden}
@@ -2629,6 +2612,26 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
         <span class="mt-topic-name">Funciones</span>
         <span class="mt-topic-sub">Dominio, rango, graficación</span>
       </button>
+
+      <div style="height:1px;background:var(--b2);margin:10px 0"></div>
+      <div style="font-size:10px;font-weight:800;color:#7c3aed;letter-spacing:1.5px;text-transform:uppercase;padding:2px 4px;margin-bottom:4px">📊 Visualización</div>
+
+      <button class="mt-topic-btn" onclick="setMathTopic(this,'tablas')" data-topic="tablas">
+        <span class="mt-topic-name">Tablas de datos</span>
+        <span class="mt-topic-sub">Organizar y analizar datos</span>
+      </button>
+      <button class="mt-topic-btn" onclick="setMathTopic(this,'grafica-barras')" data-topic="grafica-barras">
+        <span class="mt-topic-name">Gráfica de barras</span>
+        <span class="mt-topic-sub">Comparar categorías</span>
+      </button>
+      <button class="mt-topic-btn" onclick="setMathTopic(this,'grafica-linea')" data-topic="grafica-linea">
+        <span class="mt-topic-name">Gráfica de línea</span>
+        <span class="mt-topic-sub">Tendencias y progresión</span>
+      </button>
+      <button class="mt-topic-btn" onclick="setMathTopic(this,'grafica-pastel')" data-topic="grafica-pastel">
+        <span class="mt-topic-name">Gráfica de pastel</span>
+        <span class="mt-topic-sub">Proporciones y porcentajes</span>
+      </button>
     </div>
 
     <!-- Main panel -->
@@ -2646,6 +2649,53 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
         </div>
         <div class="mt-examples" id="mtExamples">
           <!-- populated by JS -->
+        </div>
+      </div>
+
+      <!-- VISUAL BUILDER (tablas / gráficas) -->
+      <div id="mtVisualPanel" style="display:none;flex-direction:column;gap:12px;padding:16px 0;border-bottom:1px solid var(--b2)">
+        <!-- Tabla builder -->
+        <div id="mtTableBuilder" style="display:none">
+          <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">📋 Construye tu tabla</div>
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+            <label style="font-size:13px;color:var(--muted)">Columnas:</label>
+            <input id="mtTableCols" type="number" min="1" max="8" value="3" style="width:60px;border:1px solid var(--b2);border-radius:6px;padding:4px 8px;font-family:inherit;font-size:13px" oninput="mtRebuildTableInputs()"/>
+            <label style="font-size:13px;color:var(--muted)">Filas:</label>
+            <input id="mtTableRows" type="number" min="1" max="12" value="4" style="width:60px;border:1px solid var(--b2);border-radius:6px;padding:4px 8px;font-family:inherit;font-size:13px" oninput="mtRebuildTableInputs()"/>
+            <button onclick="mtRenderTable()" style="background:var(--teal);color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Generar tabla</button>
+            <button onclick="mtClearTable()" style="background:none;border:1px solid var(--b2);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;color:var(--muted);font-family:inherit">Limpiar</button>
+          </div>
+          <div id="mtTableInputs" style="overflow-x:auto"></div>
+          <div id="mtTableOutput" style="margin-top:12px;overflow-x:auto"></div>
+        </div>
+
+        <!-- Chart builder (barras / línea / pastel) -->
+        <div id="mtChartBuilder" style="display:none">
+          <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px" id="mtChartBuilderLabel">📊 Construye tu gráfica</div>
+
+          <!-- Chart title -->
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
+            <label style="font-size:13px;color:var(--muted);white-space:nowrap">Título:</label>
+            <input id="mtChartTitle" placeholder="Ej. Ventas por mes" style="flex:1;min-width:120px;border:1px solid var(--b2);border-radius:6px;padding:5px 10px;font-family:inherit;font-size:13px"/>
+          </div>
+
+          <!-- Labels -->
+          <div style="margin-bottom:8px">
+            <label style="font-size:12px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px">Etiquetas (separadas por coma):</label>
+            <input id="mtChartLabels" placeholder="Ej. Ene, Feb, Mar, Abr, May" style="width:100%;border:1px solid var(--b2);border-radius:6px;padding:7px 10px;font-family:inherit;font-size:13px"/>
+          </div>
+
+          <!-- Datasets -->
+          <div id="mtDatasetList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px"></div>
+          <button onclick="mtAddDataset()" style="background:none;border:1.5px dashed var(--b2);color:var(--muted);border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:inherit;width:100%;transition:all .15s" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--b2)';this.style.color='var(--muted)'">+ Agregar serie de datos</button>
+
+          <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+            <button onclick="mtRenderChart()" style="background:linear-gradient(135deg,#7c3aed,#5b4fe0);color:#fff;border:none;border-radius:8px;padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;flex:1">📊 Generar gráfica</button>
+            <button onclick="mtDownloadChart()" id="mtDownloadBtn" style="display:none;background:var(--teal);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">💾 Descargar</button>
+          </div>
+          <div style="margin-top:12px;text-align:center">
+            <canvas id="mtChartCanvas" style="max-height:380px;border-radius:12px;background:#fff;padding:10px;border:1px solid var(--b2);display:none"></canvas>
+          </div>
         </div>
       </div>
 
@@ -2990,6 +3040,63 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
             <label class="qed-label">Texto del pasaje</label>
             <textarea id="qedPassage" class="qed-textarea" placeholder="Pega aquí el texto completo del pasaje…" rows="6"></textarea>
           </div>
+        </div>
+      </details>
+
+      <!-- ── MATEMÁTICAS ── -->
+      <details id="qedMathDetails" style="border:1px solid #a78bfa;border-radius:10px;padding:0">
+        <summary style="padding:10px 14px;font-size:12px;font-weight:800;color:#7c3aed;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px">
+          <span>📐</span> Matemáticas (opcional)
+          <span style="margin-left:auto;font-size:10px;color:var(--muted);font-weight:400">▼ expandir</span>
+        </summary>
+        <div style="padding:14px;display:flex;flex-direction:column;gap:14px;border-top:1px solid #a78bfa">
+
+          <!-- Tipo de elemento -->
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="qed-math-type-btn active" onclick="qedSwitchMath(this,'tabla')" data-mtype="tabla"    style="flex:1;padding:8px;border:1.5px solid #7c3aed;border-radius:8px;background:rgba(124,58,237,.1);color:#7c3aed;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit;transition:all .15s">📋 Tabla</button>
+            <button class="qed-math-type-btn"        onclick="qedSwitchMath(this,'barras')" data-mtype="barras"  style="flex:1;padding:8px;border:1.5px solid var(--b2);border-radius:8px;background:#fff;color:var(--muted);font-weight:700;font-size:12px;cursor:pointer;font-family:inherit;transition:all .15s">📊 Barras</button>
+            <button class="qed-math-type-btn"        onclick="qedSwitchMath(this,'linea')" data-mtype="linea"    style="flex:1;padding:8px;border:1.5px solid var(--b2);border-radius:8px;background:#fff;color:var(--muted);font-weight:700;font-size:12px;cursor:pointer;font-family:inherit;transition:all .15s">📈 Línea</button>
+            <button class="qed-math-type-btn"        onclick="qedSwitchMath(this,'pastel')" data-mtype="pastel"  style="flex:1;padding:8px;border:1.5px solid var(--b2);border-radius:8px;background:#fff;color:var(--muted);font-weight:700;font-size:12px;cursor:pointer;font-family:inherit;transition:all .15s">🥧 Pastel</button>
+          </div>
+
+          <!-- ── TABLA ── -->
+          <div id="qedMathTabla">
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+              <label style="font-size:12px;color:var(--muted)">Columnas:</label>
+              <input id="qedTblCols" type="number" min="1" max="8" value="3" style="width:55px;border:1px solid var(--b2);border-radius:6px;padding:4px 6px;font-family:inherit;font-size:13px" oninput="qedRebuildTable()"/>
+              <label style="font-size:12px;color:var(--muted)">Filas:</label>
+              <input id="qedTblRows" type="number" min="1" max="10" value="3" style="width:55px;border:1px solid var(--b2);border-radius:6px;padding:4px 6px;font-family:inherit;font-size:13px" oninput="qedRebuildTable()"/>
+              <button onclick="qedRebuildTable()" style="background:#7c3aed;color:#fff;border:none;border-radius:7px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Actualizar</button>
+              <button onclick="qedRenderMath()" style="background:linear-gradient(135deg,#7c3aed,#5b4fe0);color:#fff;border:none;border-radius:7px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">👁 Previsualizar</button>
+            </div>
+            <div id="qedTblInputs" style="overflow-x:auto"></div>
+          </div>
+
+          <!-- ── GRÁFICAS ── -->
+          <div id="qedMathChart" style="display:none;flex-direction:column;gap:10px">
+            <div>
+              <label style="font-size:12px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px">Título de la gráfica</label>
+              <input id="qedChartTitle" class="qed-input" placeholder="ej. Ventas por mes"/>
+            </div>
+            <div>
+              <label style="font-size:12px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px">Etiquetas (separadas por coma)</label>
+              <input id="qedChartLabels" class="qed-input" placeholder="ej. Ene, Feb, Mar, Abr" oninput="qedUpdateChartHint()"/>
+            </div>
+            <div id="qedChartDatasets" style="display:flex;flex-direction:column;gap:8px"></div>
+            <button onclick="qedAddChartDataset()" style="background:none;border:1.5px dashed var(--b2);color:var(--muted);border-radius:8px;padding:6px;font-size:12px;cursor:pointer;font-family:inherit;transition:all .15s" onmouseover="this.style.borderColor='#7c3aed';this.style.color='#7c3aed'" onmouseout="this.style.borderColor='var(--b2)';this.style.color='var(--muted)'">+ Agregar serie</button>
+            <div id="qedChartHint" style="font-size:11px;color:#7c3aed;background:#f5f3ff;border-radius:6px;padding:6px 10px;display:none">💡 Ingresa <strong id="qedHintCount">N</strong> valores por serie, separados por coma (uno por cada etiqueta)</div>
+            <button onclick="qedRenderMath()" style="background:linear-gradient(135deg,#7c3aed,#5b4fe0);color:#fff;border:none;border-radius:8px;padding:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">👁 Previsualizar gráfica</button>
+          </div>
+
+          <!-- Preview -->
+          <div id="qedMathPreview" style="display:none;flex-direction:column;gap:8px">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div style="font-size:11px;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:.5px">Vista previa</div>
+              <button onclick="qedInsertMathIntoQuestion()" style="background:#7c3aed;color:#fff;border:none;border-radius:7px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">✅ Insertar en pregunta</button>
+            </div>
+            <div id="qedMathPreviewContent" style="background:#f8fafc;border:1px solid #ddd6fe;border-radius:10px;padding:12px;overflow-x:auto;text-align:center"></div>
+          </div>
+
         </div>
       </details>
       <div class="qed-field">
@@ -3830,6 +3937,10 @@ const _mtTopicExamples = {
   'potencias-raices':        ['√(x² + 6x + 9)', '2³ × 2⁴', '(x²)³ / x⁴'],
   'porcentajes':             ['¿Cuánto es 15% de 240?', 'Si hay 30% de descuento en $500', '20 es el 25% de ¿qué número?'],
   'funciones':               ['f(x) = 2x² - 3x + 1', 'Dominio de f(x)=1/(x-2)', 'f(3) si f(x)=x²-x'],
+  'tablas':                  ['Temperatura diaria por semana', 'Calificaciones por materia', 'Ventas semanales por producto'],
+  'grafica-barras':          ['Ventas por mes: Ene=100,Feb=150,Mar=120', 'Alumnos por grado: 1°=30,2°=28,3°=32', 'Colores favoritos: Rojo=10,Azul=15,Verde=8'],
+  'grafica-linea':           ['Temperatura por mes: Ene=15,Feb=17,Mar=22', 'Crecimiento poblacional: 2020=100,2021=110,2022=125', 'Precio mensual: Ene=50,Feb=48,Mar=55'],
+  'grafica-pastel':          ['Materias: Mate=30%,Español=25%,Ciencias=20%,Historia=15%,Arte=10%', 'Transporte: Auto=45%,Bus=30%,Bici=15%,A pie=10%'],
 };
 
 const _mtTopicLabels = {
@@ -3841,7 +3952,13 @@ const _mtTopicLabels = {
   'potencias-raices':       'potencias y raíces',
   'porcentajes':            'porcentajes y proporciones',
   'funciones':              'funciones matemáticas',
+  'tablas':                 'tablas de datos',
+  'grafica-barras':         'gráficas de barras',
+  'grafica-linea':          'gráficas de línea',
+  'grafica-pastel':         'gráficas de pastel',
 };
+
+const _mtVisualTopics = new Set(['tablas','grafica-barras','grafica-linea','grafica-pastel']);
 
 function setMathTopic(btn, topic) {
   document.querySelectorAll('.mt-topic-btn').forEach(b => b.classList.remove('active'));
@@ -3849,11 +3966,291 @@ function setMathTopic(btn, topic) {
   _mtCurrentTopic = topic;
   renderMtExamples();
   $('mtEquationInp').value = '';
-  $('mtEquationInp').focus();
+
+  const isVisual = _mtVisualTopics.has(topic);
+  const visualPanel = $('mtVisualPanel');
+  const solveRow    = document.querySelector('.mt-input-row');
+  const inpLabel    = document.querySelector('.mt-input-label');
+  const chatArea    = $('mtChatArea');
+
+  if (isVisual) {
+    visualPanel.style.display = 'flex';
+    solveRow.style.display    = 'none';
+    inpLabel.style.display    = 'none';
+    chatArea.style.display    = 'none';
+    mtInitVisual(topic);
+  } else {
+    visualPanel.style.display = 'none';
+    solveRow.style.display    = '';
+    inpLabel.style.display    = '';
+    chatArea.style.display    = '';
+    $('mtEquationInp').focus();
+  }
 }
+
+// ── VISUAL MATH: Tablas y Gráficas ──────────────────────────────────────────
+
+let _mtChartInstance = null;
+let _mtDatasetCount  = 0;
+
+const CHART_COLORS = [
+  '#0d9488','#7c3aed','#dc2626','#d97706','#16a34a','#2563eb','#db2777','#0891b2'
+];
+
+function mtInitVisual(topic) {
+  $('mtTableBuilder').style.display = topic === 'tablas' ? 'block' : 'none';
+  $('mtChartBuilder').style.display = topic !== 'tablas' ? 'block' : 'none';
+
+  if (topic === 'tablas') {
+    mtRebuildTableInputs();
+  } else {
+    const labels = {
+      'grafica-barras': '📊 Construye tu gráfica de barras',
+      'grafica-linea':  '📈 Construye tu gráfica de línea',
+      'grafica-pastel': '🥧 Construye tu gráfica de pastel',
+    };
+    $('mtChartBuilderLabel').textContent = labels[topic] || '📊 Construye tu gráfica';
+    $('mtChartTitle').value = '';
+    $('mtChartLabels').value = '';
+    _mtDatasetCount = 0;
+    $('mtDatasetList').innerHTML = '';
+    $('mtChartCanvas').style.display = 'none';
+    $('mtDownloadBtn').style.display = 'none';
+    if (_mtChartInstance) { _mtChartInstance.destroy(); _mtChartInstance = null; }
+    // Default: 1 dataset
+    mtAddDataset();
+    // Pre-fill pastel with 1 dataset hint
+    if (topic === 'grafica-pastel') {
+      const hint = document.createElement('div');
+      hint.style.cssText = 'font-size:11px;color:var(--muted);margin-top:4px';
+      hint.textContent = 'Para gráfica de pastel: usa una sola serie de datos con los valores de cada segmento.';
+      $('mtDatasetList').after ? $('mtDatasetList').after(hint) : $('mtDatasetList').parentNode.appendChild(hint);
+    }
+  }
+}
+
+function mtAddDataset() {
+  const idx   = _mtDatasetCount++;
+  const color = CHART_COLORS[idx % CHART_COLORS.length];
+  const row   = document.createElement('div');
+  row.id = 'mtDs_' + idx;
+  row.style.cssText = 'display:flex;gap:8px;align-items:center;flex-wrap:wrap';
+  row.innerHTML = `
+    <input type="color" value="${color}" id="mtDsColor_${idx}"
+      style="width:32px;height:32px;border:none;border-radius:6px;cursor:pointer;padding:0;background:none;flex-shrink:0"/>
+    <input id="mtDsName_${idx}" placeholder="Nombre de la serie (ej. Ventas)"
+      style="width:130px;border:1px solid var(--b2);border-radius:6px;padding:5px 8px;font-family:inherit;font-size:13px"/>
+    <input id="mtDsValues_${idx}" placeholder="Valores separados por coma: 10,20,15,30"
+      style="flex:1;min-width:180px;border:1px solid var(--b2);border-radius:6px;padding:5px 8px;font-family:inherit;font-size:13px"/>
+    <button onclick="mtRemoveDataset(${idx})" style="background:none;border:1px solid #fca5a5;border-radius:6px;padding:4px 8px;color:#dc2626;cursor:pointer;font-size:13px;flex-shrink:0">✕</button>`;
+  $('mtDatasetList').appendChild(row);
+}
+
+function mtRemoveDataset(idx) {
+  const el = $('mtDs_' + idx);
+  if (el) el.remove();
+}
+
+function mtRenderChart() {
+  const topic  = _mtCurrentTopic;
+  const title  = $('mtChartTitle').value.trim() || 'Mi gráfica';
+  const rawLbl = $('mtChartLabels').value;
+  const labels = rawLbl.split(',').map(s => s.trim()).filter(Boolean);
+
+  // Collect datasets
+  const datasets = [];
+  const dsEls = $('mtDatasetList').querySelectorAll('[id^="mtDs_"]');
+  dsEls.forEach(row => {
+    const idx    = row.id.split('_')[1];
+    const name   = ($('mtDsName_' + idx)?.value || 'Serie').trim();
+    const rawV   = $('mtDsValues_' + idx)?.value || '';
+    const values = rawV.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+    const color  = $('mtDsColor_' + idx)?.value || CHART_COLORS[0];
+    if (values.length) datasets.push({ name, values, color });
+  });
+
+  if (!labels.length || !datasets.length || !datasets[0].values.length) {
+    alert('Por favor ingresa etiquetas y al menos una serie de valores.');
+    return;
+  }
+
+  if (_mtChartInstance) { _mtChartInstance.destroy(); _mtChartInstance = null; }
+
+  const canvas = $('mtChartCanvas');
+  canvas.style.display = 'block';
+  $('mtDownloadBtn').style.display = '';
+
+  const ctx = canvas.getContext('2d');
+
+  let chartType = 'bar';
+  if (topic === 'grafica-linea')  chartType = 'line';
+  if (topic === 'grafica-pastel') chartType = 'pie';
+
+  const chartDatasets = datasets.map((ds, i) => {
+    const isPie = chartType === 'pie';
+    // Pad values to match label count so all bars show
+    const padded = Array.from({length: labels.length}, (_, li) => ds.values[li] ?? 0);
+    const bg = isPie
+      ? labels.map((_,li) => CHART_COLORS[li % CHART_COLORS.length])
+      : ds.color + 'cc';
+    return {
+      label:                ds.name,
+      data:                 padded,
+      backgroundColor:      bg,
+      borderColor:          chartType === 'line' ? ds.color : (Array.isArray(bg) ? bg : ds.color),
+      borderWidth:          chartType === 'line' ? 2.5 : 1.5,
+      fill:                 chartType === 'line' ? false : undefined,
+      tension:              chartType === 'line' ? 0.35 : undefined,
+      pointRadius:          chartType === 'line' ? 5 : undefined,
+      pointBackgroundColor: chartType === 'line' ? ds.color : undefined,
+      borderRadius:         chartType === 'bar' ? 5 : undefined,
+    };
+  });
+
+  _mtChartInstance = new Chart(ctx, {
+    type: chartType,
+    data: { labels, datasets: chartDatasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: { display: true, position: 'top', labels: { usePointStyle: true, font: { size: 12 } } },
+        title:  { display: true, text: title, font: { size: 15, weight: 'bold' }, color: '#1e293b', padding: { bottom: 12 } },
+        tooltip: { mode: 'index', intersect: false },
+      },
+      scales: chartType !== 'pie' ? {
+        y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 12 } } },
+        x: { grid: { display: false }, ticks: { font: { size: 12 } } }
+      } : {},
+    }
+  });
+}
+
+function mtDownloadChart() {
+  const canvas = $('mtChartCanvas');
+  if (!canvas) return;
+  const a = document.createElement('a');
+  a.download = 'grafica.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+}
+
+// ── TABLE BUILDER ────────────────────────────────────────────────────────────
+function mtRebuildTableInputs() {
+  const cols = Math.min(8,  Math.max(1, parseInt($('mtTableCols').value) || 3));
+  const rows = Math.min(12, Math.max(1, parseInt($('mtTableRows').value) || 4));
+  const cont = $('mtTableInputs');
+  let html = '<table style="border-collapse:collapse;font-size:13px">';
+  // Header row
+  html += '<tr>';
+  for (let c = 0; c < cols; c++) {
+    const prev = cont.querySelector(`[data-r="0"][data-c="${c}"]`);
+    const val  = prev ? prev.value : (c === 0 ? 'Categoría' : 'Valor ' + c);
+    html += `<td style="padding:3px 4px"><input data-r="0" data-c="${c}" value="${val}"
+      style="width:90px;border:2px solid var(--teal);border-radius:5px;padding:4px 6px;font-family:inherit;font-size:12px;font-weight:700;background:#f0fdf8;color:var(--teal)"/></td>`;
+  }
+  html += '</tr>';
+  // Data rows
+  for (let r = 1; r <= rows; r++) {
+    html += '<tr>';
+    for (let c = 0; c < cols; c++) {
+      const prev = cont.querySelector(`[data-r="${r}"][data-c="${c}"]`);
+      const val  = prev ? prev.value : '';
+      html += `<td style="padding:3px 4px"><input data-r="${r}" data-c="${c}" value="${val}"
+        placeholder="${c===0?'Nombre':'0'}"
+        style="width:90px;border:1px solid var(--b2);border-radius:5px;padding:4px 6px;font-family:inherit;font-size:12px;background:#fff"/></td>`;
+    }
+    html += '</tr>';
+  }
+  html += '</table>';
+  cont.innerHTML = html;
+}
+
+function mtRenderTable() {
+  const cols = Math.min(8,  Math.max(1, parseInt($('mtTableCols').value) || 3));
+  const rows = Math.min(12, Math.max(1, parseInt($('mtTableRows').value) || 4));
+  const cont  = $('mtTableInputs');
+  const out   = $('mtTableOutput');
+
+  const headers = [];
+  for (let c = 0; c < cols; c++) {
+    headers.push(cont.querySelector(`[data-r="0"][data-c="${c}"]`)?.value || '');
+  }
+  const bodyRows = [];
+  for (let r = 1; r <= rows; r++) {
+    const row = [];
+    for (let c = 0; c < cols; c++) {
+      row.push(cont.querySelector(`[data-r="${r}"][data-c="${c}"]`)?.value || '');
+    }
+    bodyRows.push(row);
+  }
+
+  let html = `<div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Vista previa de la tabla</div>
+  <table style="border-collapse:collapse;font-size:13px;width:100%;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08)">
+    <thead><tr>`;
+  headers.forEach(h => {
+    html += `<th style="background:var(--teal);color:#fff;padding:8px 12px;text-align:left;font-size:12px;letter-spacing:.4px">${escapeHtml(h)}</th>`;
+  });
+  html += '</tr></thead><tbody>';
+  bodyRows.forEach((row, ri) => {
+    const bg = ri % 2 === 0 ? '#ffffff' : '#f8fafc';
+    html += `<tr style="background:${bg}">`;
+    row.forEach((cell, ci) => {
+      const style = ci === 0
+        ? 'padding:7px 12px;font-weight:700;color:var(--text);border-bottom:1px solid #f1f5f9'
+        : 'padding:7px 12px;color:var(--muted);border-bottom:1px solid #f1f5f9;font-family:\'DM Mono\',monospace';
+      html += `<td style="${style}">${escapeHtml(cell)}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+
+  // Add download button
+  html += `<button onclick="mtDownloadTable()" style="margin-top:10px;background:var(--teal);color:#fff;border:none;border-radius:8px;padding:6px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">💾 Guardar tabla como imagen</button>`;
+  out.innerHTML = html;
+}
+
+function mtClearTable() {
+  $('mtTableInputs').querySelectorAll('input').forEach(inp => { inp.value = ''; });
+  $('mtTableOutput').innerHTML = '';
+}
+
+function mtDownloadTable() {
+  const table = $('mtTableOutput').querySelector('table');
+  if (!table) return;
+  // Simple screenshot using html2canvas-like approach via canvas
+  const rows  = table.querySelectorAll('tr');
+  const colCount = rows[0]?.querySelectorAll('th,td').length || 1;
+  const colW  = 120, rowH = 36, pad = 20;
+  const W = colCount * colW + pad * 2;
+  const H = rows.length  * rowH + pad * 2;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+  ctx.font = '13px Sora, sans-serif';
+  rows.forEach((row, ri) => {
+    const cells = row.querySelectorAll('th,td');
+    const y     = pad + ri * rowH;
+    if (ri === 0) { ctx.fillStyle = '#0d9488'; ctx.fillRect(pad, y, W - pad*2, rowH); }
+    else { ctx.fillStyle = ri % 2 === 0 ? '#f8fafc' : '#fff'; ctx.fillRect(pad, y, W - pad*2, rowH); }
+    cells.forEach((cell, ci) => {
+      const x = pad + ci * colW;
+      ctx.fillStyle = ri === 0 ? '#fff' : '#0f172a';
+      ctx.fillText(cell.textContent.trim().slice(0, 16), x + 6, y + rowH/2 + 5);
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.strokeRect(x, y, colW, rowH);
+    });
+  });
+  const a = document.createElement('a'); a.download = 'tabla.png'; a.href = canvas.toDataURL(); a.click();
+}
+
+// ── END VISUAL MATH ──────────────────────────────────────────────────────────
 
 function renderMtExamples() {
   const exArr = _mtTopicExamples[_mtCurrentTopic] || [];
+  const isVisual = _mtVisualTopics.has(_mtCurrentTopic);
+  if (isVisual) { $('mtExamples').innerHTML = ''; return; }
   $('mtExamples').innerHTML = exArr.map(ex =>
     `<button class="mt-example-chip" onclick="useMtExample(this.textContent)">${ex}</button>`
   ).join('');
@@ -4351,12 +4748,8 @@ REGLAS: Sin markdown. Todo anclado al texto. Español mexicano.${m}`,
 
     if (sections.length < 2) { nav.style.display = 'none'; modal && modal.classList.remove('has-response'); return; }
 
-    // Show nav and expand modal — only on desktop (≥640px)
-    if (window.innerWidth >= 640) {
-      nav.style.display = 'flex';
-    } else {
-      nav.style.display = 'none';
-    }
+    // Show nav and expand modal
+    nav.style.display = 'flex';
     modal && modal.classList.add('has-response');
 
     // Scroll to top btn
@@ -5017,7 +5410,105 @@ function _refreshNoteBtn(idx, notes) {
   if (mobBtn) mobBtn.textContent = hasNote ? '📝✏️' : '📝';
 }
 
-// Actualizar indicador de nota al navegar preguntas — llamar desde renderQuestion
+// ── Renderiza texto de pregunta: detecta [TABLA] y [GRÁFICA ...] ──
+function renderQuestionText(raw) {
+  if (!raw) return '';
+  const lines = raw.split('\n');
+  let html = '';
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+    if (line.startsWith('[TABLA]')) {
+      // Parse table: first line is headers (after [TABLA]), next lines are rows
+      const headerLine = line.replace('[TABLA]', '').trim();
+      const headers = headerLine.split('|').map(h => h.trim()).filter(Boolean);
+      const rows = [];
+      i++;
+      while (i < lines.length && !lines[i].startsWith('[')) {
+        const cells = lines[i].split('|').map(c => c.trim()).filter(Boolean);
+        if (cells.length) rows.push(cells);
+        i++;
+      }
+      html += '<div style="overflow-x:auto;margin:10px 0">';
+      html += '<table style="border-collapse:collapse;font-size:13px;width:100%;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(124,58,237,.15)">';
+      html += '<thead><tr>';
+      headers.forEach(h => {
+        html += `<th style="background:#7c3aed;color:#fff;padding:7px 12px;text-align:left;font-size:12px;white-space:nowrap">${escapeHtml(h)}</th>`;
+      });
+      html += '</tr></thead><tbody>';
+      rows.forEach((row, ri) => {
+        html += `<tr style="background:${ri%2===0?'#fff':'#f5f3ff'}">`;
+        row.forEach((cell, ci) => {
+          const s = ci===0
+            ? 'padding:6px 12px;font-weight:600;border-bottom:1px solid #ede9fe;color:#3730a3'
+            : 'padding:6px 12px;border-bottom:1px solid #ede9fe;color:#374151';
+          html += `<td style="${s}">${escapeHtml(cell)}</td>`;
+        });
+        html += '</tr>';
+      });
+      html += '</tbody></table></div>';
+    } else if (line.startsWith('[GRÁFICA')) {
+      // Show chart data as a styled info block (Chart.js not available here easily)
+      // Parse: [GRÁFICA BARRAS] Título, then Etiquetas: ..., then Series: name: vals
+      const typeMatch = line.match(/\[GRÁFICA ([^\]]+)\]\s*(.*)/);
+      const chartType = typeMatch ? typeMatch[1].toLowerCase() : 'barras';
+      const chartTitle = typeMatch ? typeMatch[2].trim() : '';
+      const chartLines = [];
+      i++;
+      let labelsArr = [], datasets = [];
+      while (i < lines.length && !lines[i].startsWith('[')) {
+        const l = lines[i].trim();
+        if (l.startsWith('Etiquetas:')) {
+          labelsArr = l.replace('Etiquetas:','').split(',').map(s=>s.trim()).filter(Boolean);
+        } else if (l) {
+          const colonIdx = l.indexOf(':');
+          if (colonIdx > 0) {
+            const name = l.slice(0, colonIdx).trim();
+            const vals = l.slice(colonIdx+1).split(',').map(s=>parseFloat(s.trim())).filter(n=>!isNaN(n));
+            if (vals.length) datasets.push({name, vals});
+          }
+        }
+        i++;
+      }
+      // Render inline chart using canvas
+      const chartId = 'inlineChart_' + Math.random().toString(36).slice(2,7);
+      const isPie   = chartType.includes('pastel');
+      const isLine  = chartType.includes('línea') || chartType.includes('linea');
+      const cType   = isPie ? 'pie' : isLine ? 'line' : 'bar';
+      const colors  = ['#7c3aed','#0d9488','#dc2626','#d97706','#2563eb','#16a34a','#db2777'];
+      html += `<div style="margin:10px 0;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px">`;
+      if (chartTitle) html += `<div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:8px;text-align:center">${escapeHtml(chartTitle)}</div>`;
+      html += `<canvas id="${chartId}" style="max-height:280px;width:100%"></canvas></div>`;
+      // Defer chart rendering until DOM is ready
+      setTimeout(() => {
+        const canvas = document.getElementById(chartId);
+        if (!canvas || !window.Chart) return;
+        const chartDs = datasets.map((ds, di) => {
+          const padded = labelsArr.map((_,li) => ds.vals[li] ?? 0);
+          const bg = isPie ? labelsArr.map((_,li) => colors[li%colors.length]) : colors[di%colors.length]+'cc';
+          return { label: ds.name, data: padded, backgroundColor: bg, borderColor: isPie ? colors : colors[di%colors.length], borderWidth:1.5, tension:.3, fill:false, borderRadius: cType==='bar'?4:undefined };
+        });
+        new window.Chart(canvas, {
+          type: cType,
+          data: { labels: labelsArr, datasets: chartDs },
+          options: { responsive:true, maintainAspectRatio:true, plugins:{ legend:{position:'top',labels:{font:{size:11},usePointStyle:true}}, title:{display:false} }, scales: isPie?{}:{ y:{beginAtZero:true,grid:{color:'#f1f5f9'},ticks:{font:{size:10}}}, x:{grid:{display:false},ticks:{font:{size:10}}} } }
+        });
+      }, 80);
+    } else {
+      // Regular text line — group consecutive plain lines together
+      const textLines = [];
+      while (i < lines.length && !lines[i].startsWith('[TABLA]') && !lines[i].startsWith('[GRÁFICA')) {
+        textLines.push(lines[i]);
+        i++;
+      }
+      const joined = textLines.join('\n').trim();
+      if (joined) html += `<p style="margin:0 0 8px 0;line-height:1.7">${escapeHtml(joined).replace(/\n/g,'<br>')}</p>`;
+    }
+  }
+  return html || escapeHtml(raw);
+}
+
+
 function _refreshNoteIndicator() {
   const idx = S.current;
   const notes = _loadNotes();
@@ -5577,7 +6068,7 @@ function renderQ() {
       const optsCont = $('optsCont');
       optsCont.parentNode.insertBefore(qInRight, optsCont);
     }
-    qInRight.textContent = q.question;
+    qInRight.innerHTML = renderQuestionText(q.question);
     qInRight.style.display = 'block';
     // Contador de bloque (preguntas del mismo pasaje)
     if (q.passage_id !== undefined) {
@@ -5593,7 +6084,7 @@ function renderQ() {
     colsEl.classList.remove('reading-mode');
     passagePanel.style.display = 'none';
     qTextEl.style.display = 'block';
-    qTextEl.textContent = q.question;
+    qTextEl.innerHTML = renderQuestionText(q.question);
     counterEl.style.display = 'none';
     const qInRight = $('qTextInRight');
     if (qInRight) qInRight.style.display = 'none';
@@ -5878,7 +6369,7 @@ function openExplModal(idx) {
   const letters = ['A','B','C','D','E'];
 
   $('explQNum').textContent    = `PREGUNTA ${idx+1}${q.area ? '  ·  ' + q.area.toUpperCase() : ''}`;
-  $('explQuestion').textContent = q.question;
+  $('explQuestion').innerHTML  = renderQuestionText(q.question);
 
   const imgEl = $('explImg');
   if (q.image && S.images[q.image]) {
@@ -6765,7 +7256,7 @@ function fwRenderPanel() {
     const imgEl = $('qImg');
     if ($('qImgWrap').style.display !== 'none' && imgEl.src && imgEl.src !== window.location.href)
       imgHtml = `<img src="${imgEl.src}" style="max-width:100%;border-radius:10px;border:1px solid var(--b2);margin-top:12px;display:block"/>`;
-    $('fwPanelText').innerHTML = txt.replace(/\n/g,'<br>') + imgHtml;
+    $('fwPanelText').innerHTML = renderQuestionText(txt) + imgHtml;
 
   } else {
     $('fwTitle').textContent = 'Pregunta ' + (window.S.current+1) + '  ·  Opciones';
@@ -7988,6 +8479,109 @@ function deleteBuilderQuestion(idx) {
 }
 
 // ── Abrir editor de pregunta ──
+// ── Variables sección Matemáticas en editor de pregunta ──
+let _qedMathType  = 'tabla';
+let _qedChartInst = null;
+let _qedDsCount   = 0;
+const _qedColors  = ['#7c3aed','#0d9488','#dc2626','#d97706','#2563eb','#16a34a','#db2777'];
+
+// ── Carga datos de [TABLA]/[GRÁFICA] del texto al editor de matemáticas ──
+function qedLoadMathFromText(raw) {
+  if (!raw) return false;
+  const lines = raw.split('\n');
+  const tablaLine = lines.findIndex(l => l.startsWith('[TABLA]'));
+  const graficaLine = lines.findIndex(l => l.startsWith('[GRÁFICA'));
+
+  if (tablaLine === -1 && graficaLine === -1) return false;
+
+  if (tablaLine !== -1) {
+    // Switch to tabla mode
+    const btn = document.querySelector('.qed-math-type-btn[data-mtype="tabla"]');
+    if (btn) qedSwitchMath(btn, 'tabla');
+
+    // Parse header
+    const headerLine = lines[tablaLine].replace('[TABLA]', '').trim();
+    const headers = headerLine.split('|').map(h => h.trim()).filter(Boolean);
+
+    // Parse data rows (lines after [TABLA] line that don't start with [)
+    const dataRows = [];
+    for (let i = tablaLine + 1; i < lines.length; i++) {
+      if (lines[i].startsWith('[') || lines[i].trim() === '') break;
+      const cells = lines[i].split('|').map(c => c.trim());
+      if (cells.filter(Boolean).length) dataRows.push(cells);
+    }
+
+    // Set col/row counts and rebuild
+    $('qedTblCols').value = headers.length || 2;
+    $('qedTblRows').value = dataRows.length || 2;
+    qedRebuildTable();
+
+    // Fill in values
+    setTimeout(() => {
+      const cont = $('qedTblInputs');
+      headers.forEach((h, c) => {
+        const inp = cont.querySelector(`[data-r="0"][data-c="${c}"]`);
+        if (inp) inp.value = h;
+      });
+      dataRows.forEach((row, r) => {
+        row.forEach((cell, c) => {
+          const inp = cont.querySelector(`[data-r="${r+1}"][data-c="${c}"]`);
+          if (inp) inp.value = cell;
+        });
+      });
+      // Auto-preview
+      qedRenderMath();
+    }, 50);
+
+  } else {
+    // Parse gráfica
+    const gLine = lines[graficaLine];
+    const typeMatch = gLine.match(/\[GRÁFICA ([^\]]+)\]\s*(.*)/);
+    const rawType  = typeMatch ? typeMatch[1].toLowerCase() : 'barras';
+    const title    = typeMatch ? typeMatch[2].trim() : '';
+    const mtype    = rawType.includes('pastel') ? 'pastel' : rawType.includes('línea') || rawType.includes('linea') ? 'linea' : 'barras';
+
+    const btn = document.querySelector(`.qed-math-type-btn[data-mtype="${mtype}"]`);
+    if (btn) qedSwitchMath(btn, mtype);
+
+    $('qedChartTitle').value = title;
+
+    let labelsStr = '';
+    const series = [];
+    for (let i = graficaLine + 1; i < lines.length; i++) {
+      const l = lines[i].trim();
+      if (!l || l.startsWith('[')) break;
+      if (l.startsWith('Etiquetas:')) {
+        labelsStr = l.replace('Etiquetas:', '').trim();
+      } else {
+        const colon = l.indexOf(':');
+        if (colon > 0) series.push({ name: l.slice(0, colon).trim(), vals: l.slice(colon+1).trim() });
+      }
+    }
+    $('qedChartLabels').value = labelsStr;
+    qedUpdateChartHint();
+
+    // Add dataset rows
+    $('qedChartDatasets').innerHTML = '';
+    _qedDsCount = 0;
+    series.forEach(s => {
+      qedAddChartDataset();
+      const idx = _qedDsCount - 1;
+      setTimeout(() => {
+        const nameEl = $('qedDsName_' + idx);
+        const valsEl = $('qedDsVals_' + idx);
+        if (nameEl) nameEl.value = s.name;
+        if (valsEl) valsEl.value = s.vals;
+      }, 30);
+    });
+
+    // Auto-preview after datasets are filled
+    setTimeout(() => qedRenderMath(), 120);
+  }
+
+  return true;
+}
+
 function openQuestionEditor(idx) {
   EB.editingIdx = idx;
   EB.qEditorImg = null;
@@ -8006,6 +8600,13 @@ function openQuestionEditor(idx) {
     $('qedPassage').value      = '';
     buildOptionFields([{text:'',correct:true},{text:'',correct:false},{text:'',correct:false}]);
     clearQEditorImage();
+    // Reset sección matemáticas
+    $('qedMathDetails').removeAttribute('open');
+    $('qedMathPreview').style.display = 'none';
+    $('qedChartDatasets').innerHTML = '';
+    $('qedTblInputs').innerHTML = '';
+    if (typeof _qedDsCount !== 'undefined')   _qedDsCount = 0;
+    if (typeof _qedChartInst !== 'undefined' && _qedChartInst) { _qedChartInst.destroy(); _qedChartInst = null; }
   } else {
     // Editar existente
     const q = EB.questions[idx];
@@ -8025,6 +8626,24 @@ function openQuestionEditor(idx) {
       showQEditorImage(q.imageName, q.imageDataUrl);
     } else {
       clearQEditorImage();
+    }
+    // Reset + auto-cargar sección matemáticas si el texto tiene [TABLA] o [GRÁFICA]
+    $('qedMathPreview').style.display = 'none';
+    $('qedChartDatasets').innerHTML = '';
+    $('qedTblInputs').innerHTML = '';
+    if (typeof _qedDsCount !== 'undefined') _qedDsCount = 0;
+    if (typeof _qedChartInst !== 'undefined' && _qedChartInst) { _qedChartInst.destroy(); _qedChartInst = null; }
+    const hasMath = qedLoadMathFromText(q.text || '');
+    if (hasMath) {
+      $('qedMathDetails').setAttribute('open','');
+      // Remove math blocks from textarea — they live in the math editor now
+      let cleanText = (q.text || '');
+      cleanText = cleanText.replace(/\[TABLA\][\s\S]*?(?=\n\n|\[TABLA\]|\[GRÁFICA|$)/g, '');
+      cleanText = cleanText.replace(/\[GRÁFICA[\s\S]*?(?=\n\n|\[TABLA\]|\[GRÁFICA|$)/g, '');
+      cleanText = cleanText.replace(/^\n+/, '').replace(/\n{3,}/g, '\n\n').trim();
+      $('qedText').value = cleanText;
+    } else {
+      $('qedMathDetails').removeAttribute('open');
     }
   }
 
@@ -8149,6 +8768,237 @@ function clearQEditorImage() {
 }
 
 function removeQEditorImage() { clearQEditorImage(); }
+
+// ══════════════════════════════════════════
+//  MATEMÁTICAS EN EDITOR DE PREGUNTA
+// ══════════════════════════════════════════
+
+function qedSwitchMath(btn, type) {
+  _qedMathType = type;
+  document.querySelectorAll('.qed-math-type-btn').forEach(b => {
+    b.style.borderColor = 'var(--b2)';
+    b.style.background  = '#fff';
+    b.style.color       = 'var(--muted)';
+  });
+  btn.style.borderColor = '#7c3aed';
+  btn.style.background  = 'rgba(124,58,237,.1)';
+  btn.style.color       = '#7c3aed';
+
+  $('qedMathTabla').style.display  = type === 'tabla'  ? 'block' : 'none';
+  $('qedMathChart').style.display  = type !== 'tabla'  ? 'flex'  : 'none';
+  $('qedMathPreview').style.display = 'none';
+
+  if (type !== 'tabla' && $('qedChartDatasets').children.length === 0) {
+    qedAddChartDataset();
+  }
+}
+
+function qedRebuildTable() {
+  const cols = Math.min(8,  Math.max(1, parseInt($('qedTblCols').value) || 3));
+  const rows = Math.min(10, Math.max(1, parseInt($('qedTblRows').value) || 3));
+  const cont = $('qedTblInputs');
+  let html = '<table style="border-collapse:collapse">';
+  for (let r = 0; r <= rows; r++) {
+    html += '<tr>';
+    for (let c = 0; c < cols; c++) {
+      const isHeader = r === 0;
+      const prev = cont.querySelector(`[data-r="${r}"][data-c="${c}"]`);
+      const val  = prev ? prev.value : (isHeader ? 'Columna ' + (c+1) : '');
+      const style = isHeader
+        ? 'width:80px;border:2px solid #7c3aed;border-radius:5px;padding:4px 6px;font-size:12px;font-weight:700;background:#f5f3ff;color:#7c3aed;font-family:inherit'
+        : 'width:80px;border:1px solid var(--b2);border-radius:5px;padding:4px 6px;font-size:12px;font-family:inherit';
+      html += `<td style="padding:2px 3px"><input data-r="${r}" data-c="${c}" value="${val.replace(/"/g,'&quot;')}" placeholder="${isHeader?'Encabezado':'Dato'}" style="${style}"/></td>`;
+    }
+    html += '</tr>';
+  }
+  html += '</table>';
+  cont.innerHTML = html;
+}
+
+function qedUpdateChartHint() {
+  const lbls = $('qedChartLabels').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const hint = $('qedChartHint');
+  if (!hint) return;
+  if (lbls.length > 0) {
+    $('qedHintCount').textContent = lbls.length;
+    hint.style.display = 'block';
+    // Update placeholders on existing dataset value inputs
+    document.querySelectorAll('[id^="qedDsVals_"]').forEach(inp => {
+      inp.placeholder = lbls.map((l,i) => i < 4 ? (i+1)*10 : '…').join(',').slice(0,40);
+    });
+  } else {
+    hint.style.display = 'none';
+  }
+}
+
+function qedAddChartDataset() {
+  const idx   = _qedDsCount++;
+  const color = _qedColors[idx % _qedColors.length];
+  const row   = document.createElement('div');
+  row.id = 'qedDs_' + idx;
+  row.style.cssText = 'display:flex;gap:6px;align-items:center;flex-wrap:wrap';
+  row.innerHTML = `
+    <input type="color" value="${color}" id="qedDsCol_${idx}" style="width:28px;height:28px;border:none;border-radius:5px;padding:0;cursor:pointer;flex-shrink:0"/>
+    <input id="qedDsName_${idx}" placeholder="Serie (ej. Ventas)" style="width:110px;border:1px solid var(--b2);border-radius:6px;padding:4px 7px;font-family:inherit;font-size:12px"/>
+    <input id="qedDsVals_${idx}" placeholder="Un valor por etiqueta: 10,20,15,30" style="flex:1;min-width:130px;border:1px solid var(--b2);border-radius:6px;padding:4px 7px;font-family:inherit;font-size:12px"/>
+    <button onclick="document.getElementById('qedDs_${idx}').remove()" style="background:none;border:1px solid #fca5a5;border-radius:5px;padding:3px 7px;color:#dc2626;cursor:pointer;font-size:12px;flex-shrink:0">✕</button>`;
+  $('qedChartDatasets').appendChild(row);
+}
+
+function qedRenderMath() {
+  const preview = $('qedMathPreview');
+  const content = $('qedMathPreviewContent');
+
+  if (_qedMathType === 'tabla') {
+    const cols = Math.min(8,  Math.max(1, parseInt($('qedTblCols').value) || 3));
+    const rows = Math.min(10, Math.max(1, parseInt($('qedTblRows').value) || 3));
+    const cont = $('qedTblInputs');
+    if (!cont.querySelector('input')) { qedRebuildTable(); return; }
+
+    const headers = [];
+    for (let c = 0; c < cols; c++)
+      headers.push(cont.querySelector(`[data-r="0"][data-c="${c}"]`)?.value || '');
+
+    let html = '<table style="border-collapse:collapse;font-size:13px;margin:0 auto;border-radius:8px;overflow:hidden;box-shadow:0 2px 10px rgba(124,58,237,.12)">';
+    html += '<thead><tr>';
+    headers.forEach(h => {
+      html += `<th style="background:#7c3aed;color:#fff;padding:7px 12px;text-align:left;font-size:12px">${escapeHtml(h)}</th>`;
+    });
+    html += '</tr></thead><tbody>';
+    for (let r = 1; r <= rows; r++) {
+      const bg = r % 2 === 0 ? '#f5f3ff' : '#fff';
+      html += `<tr style="background:${bg}">`;
+      for (let c = 0; c < cols; c++) {
+        const v = cont.querySelector(`[data-r="${r}"][data-c="${c}"]`)?.value || '';
+        const s = c === 0 ? 'padding:6px 12px;font-weight:700;border-bottom:1px solid #ede9fe' : 'padding:6px 12px;border-bottom:1px solid #ede9fe;font-family:\'DM Mono\',monospace';
+        html += `<td style="${s}">${escapeHtml(v)}</td>`;
+      }
+      html += '</tr>';
+    }
+    html += '</tbody></table>';
+    content.innerHTML = html;
+
+  } else {
+    // Chart
+    const title  = $('qedChartTitle').value.trim() || 'Gráfica';
+    const labels = $('qedChartLabels').value.split(',').map(s => s.trim()).filter(Boolean);
+    const dsEls  = $('qedChartDatasets').querySelectorAll('[id^="qedDs_"]');
+    const datasets = [];
+    dsEls.forEach(row => {
+      const idx    = row.id.split('_')[1];
+      const name   = ($('qedDsName_' + idx)?.value || 'Serie').trim();
+      const rawV   = $('qedDsVals_' + idx)?.value || '';
+      const values = rawV.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+      const color  = $('qedDsCol_' + idx)?.value || _qedColors[0];
+      if (values.length) datasets.push({ name, values, color });
+    });
+
+    if (!labels.length || !datasets.length) {
+      alert('Agrega etiquetas y al menos una serie de valores.'); return;
+    }
+
+    // Render canvas
+    content.innerHTML = `<canvas id="qedChartPrev" style="width:100%;max-height:320px"></canvas>`;
+    if (_qedChartInst) { _qedChartInst.destroy(); _qedChartInst = null; }
+    const type = _qedMathType === 'pastel' ? 'pie' : (_qedMathType === 'linea' ? 'line' : 'bar');
+    const isPie = type === 'pie';
+
+    // Pad or trim each dataset to match label count
+    const chartDs = datasets.map((ds, i) => {
+      const padded = Array.from({length: labels.length}, (_, li) => ds.values[li] ?? 0);
+      return {
+        label:           ds.name,
+        data:            padded,
+        backgroundColor: isPie ? labels.map((_,li) => _qedColors[li % _qedColors.length]) : ds.color + 'cc',
+        borderColor:     isPie ? _qedColors : ds.color,
+        borderWidth:     1.5,
+        tension:         type === 'line' ? 0.3 : undefined,
+        fill:            false,
+        pointRadius:     type === 'line' ? 5 : undefined,
+        pointBackgroundColor: type === 'line' ? ds.color : undefined,
+        borderRadius:    type === 'bar' ? 4 : undefined,
+      };
+    });
+
+    _qedChartInst = new Chart(document.getElementById('qedChartPrev'), {
+      type,
+      data: { labels, datasets: chartDs },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          title:  { display: true, text: title, font: { size: 14, weight: 'bold' }, color: '#1e293b', padding: { bottom: 10 } },
+          legend: { position: 'top', labels: { font: { size: 12 }, usePointStyle: true } },
+          tooltip: { mode: 'index', intersect: false }
+        },
+        scales: isPie ? {} : {
+          y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 } } },
+          x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+        }
+      }
+    });
+  }
+
+  preview.style.display = 'flex';
+}
+
+function qedInsertMathIntoQuestion() {
+  let desc = '';
+  if (_qedMathType === 'tabla') {
+    const cols = Math.min(8, Math.max(1, parseInt($('qedTblCols').value)||3));
+    const rows = Math.min(10, Math.max(1, parseInt($('qedTblRows').value)||3));
+    const cont = $('qedTblInputs');
+    const headers = [];
+    for (let c=0;c<cols;c++) headers.push(cont.querySelector(`[data-r="0"][data-c="${c}"]`)?.value||'');
+    const dataRows = [];
+    for (let r=1;r<=rows;r++){
+      const row=[];
+      for(let c=0;c<cols;c++) row.push(cont.querySelector(`[data-r="${r}"][data-c="${c}"]`)?.value||'');
+      dataRows.push(row);
+    }
+    desc = '[TABLA] ' + headers.join(' | ');
+    dataRows.forEach(r => { desc += '\n' + r.join(' | '); });
+  } else {
+    const title  = $('qedChartTitle').value.trim() || 'Gráfica';
+    const labels = $('qedChartLabels').value.trim();
+    const type   = {barras:'Barras',linea:'Línea',pastel:'Pastel'}[_qedMathType] || '';
+    const dsEls  = $('qedChartDatasets').querySelectorAll('[id^="qedDs_"]');
+    const series = [];
+    dsEls.forEach(row => {
+      const idx = row.id.split('_')[1];
+      const name = $('qedDsName_'+idx)?.value||'Serie';
+      const vals = $('qedDsVals_'+idx)?.value||'';
+      series.push(`${name}: ${vals}`);
+    });
+    desc = `[GRÁFICA ${type.toUpperCase()}] ${title}\nEtiquetas: ${labels}\n` + series.join('\n');
+  }
+
+  const ta = $('qedText');
+  let current = ta.value;
+
+  // Remove ALL existing [TABLA] and [GRÁFICA] blocks from the text
+  // A block spans from the tag line until the next blank line or next tag
+  current = current.replace(/(\[TABLA\][\s\S]*?)(?=\n\n|\[TABLA\]|\[GRÁFICA|$)/g, '');
+  current = current.replace(/(\[GRÁFICA[\s\S]*?)(?=\n\n|\[TABLA\]|\[GRÁFICA|$)/g, '');
+  // Clean up extra blank lines left behind
+  current = current.replace(/^\n+/, '').replace(/\n{3,}/g, '\n\n').trim();
+
+  // Place the math block ABOVE the question text, separated by blank line
+  ta.value = desc + (current ? '\n\n' + current : '');
+
+  $('qedMathDetails').removeAttribute('open');
+  ta.focus();
+  if (typeof showToast === 'function') showToast('📐 Elemento matemático actualizado');
+}
+
+// Init table on details open
+document.addEventListener('DOMContentLoaded', () => {
+  const det = $('qedMathDetails');
+  if (det) det.addEventListener('toggle', () => {
+    if (det.open && !$('qedTblInputs').querySelector('input')) qedRebuildTable();
+  });
+});
+
 
 function closeQEditorOnBg(e) {
   if (e.target === $('qedOverlay')) $('qedOverlay').classList.remove('show');
@@ -10989,37 +11839,22 @@ window._enterDash = function(user, role, picture, email) {
 <div id="novaScreen" class="screen" style="flex-direction:column;background:#09090f;overflow:hidden">
 
   <!-- Topbar -->
-  <div id="novaTopbar" style="background:rgba(9,9,15,.95);border-bottom:1px solid rgba(255,255,255,.07);backdrop-filter:blur(12px)">
-    <!-- Izquierda: nav fijo -->
-    <div id="novaTopbarLeft">
-      <button onclick="show('dashScreen')" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#a0a0b8;font-size:12px;font-weight:600;padding:5px 9px;cursor:pointer;font-family:inherit;white-space:nowrap">← Dashboard</button>
-      <button onclick="novaToggleSidebar()" id="novaHistBtn" title="Historial" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#a0a0b8;font-size:14px;padding:5px 9px;cursor:pointer;font-family:inherit">☰</button>
-      <button onclick="novaNewChat()" style="background:rgba(124,111,255,.15);border:1px solid rgba(124,111,255,.3);border-radius:8px;color:#c4bbff;font-size:12px;font-weight:700;padding:5px 10px;cursor:pointer;font-family:inherit;white-space:nowrap">✦ Nuevo</button>
-      <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:16px;background:linear-gradient(135deg,#fff 40%,#7c6fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;white-space:nowrap">✦ NOVA</div>
-      <span id="novaBadge" style="font-size:10px;padding:3px 8px;border-radius:20px;font-weight:600;background:rgba(124,111,255,.15);color:#7c6fff;border:1px solid rgba(124,111,255,.25);white-space:nowrap">Chat IA</span>
-    </div>
-    <!-- Modos: scroll horizontal en móvil -->
-    <div id="novaTopbarModes">
-      <button class="nova-mode-btn nova-active" id="novaBtnChat"  onclick="novaSetMode('chat')"  style="background:rgba(124,111,255,.15);border:1px solid rgba(124,111,255,.35);border-radius:8px;padding:5px 11px;font-size:12px;font-weight:600;color:#c4bbff;cursor:pointer;font-family:inherit;transition:all .2s">💬 Chat</button>
-      <button class="nova-mode-btn" id="novaBtnPDF"   onclick="novaSetMode('pdf')"   style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 11px;font-size:12px;font-weight:600;color:#606078;cursor:pointer;font-family:inherit;transition:all .2s">📄 PDF</button>
-      <button class="nova-mode-btn" id="novaBtnFlash" onclick="novaSetMode('flash')" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 11px;font-size:12px;font-weight:600;color:#606078;cursor:pointer;font-family:inherit;transition:all .2s">🃏 Flash</button>
-      <button class="nova-mode-btn" id="novaBtnSaved" onclick="novaSetMode('saved')" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 11px;font-size:12px;font-weight:600;color:#606078;cursor:pointer;font-family:inherit;transition:all .2s">📚 Guardados</button>
-      <button class="nova-mode-btn" id="novaBtnExamen" onclick="novaSetMode('examen')" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 11px;font-size:12px;font-weight:600;color:#606078;cursor:pointer;font-family:inherit;transition:all .2s">📝 Examen</button>
-      <button id="novaBtnExani" onclick="novaToggleExani()" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 11px;font-size:12px;font-weight:600;color:#606078;cursor:pointer;font-family:inherit;transition:all .2s">📖 EXANI</button>
+  <div style="height:54px;background:rgba(9,9,15,.95);border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0;backdrop-filter:blur(12px)">
+    <button onclick="show('dashScreen')" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#a0a0b8;font-size:13px;font-weight:600;padding:6px 12px;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a0a0b8'">← Dashboard</button>
+    <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:17px;background:linear-gradient(135deg,#fff 40%,#7c6fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">✦ NOVA</div>
+    <span style="font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;background:rgba(124,111,255,.15);color:#7c6fff;border:1px solid rgba(124,111,255,.25)" id="novaBadge">Chat IA</span>
+    <div style="flex:1"></div>
+    <!-- Mode buttons -->
+    <div style="display:flex;gap:6px">
+      <button class="nova-mode-btn nova-active" id="novaBtnChat"  onclick="novaSetMode('chat')"  style="background:rgba(124,111,255,.15);border:1px solid rgba(124,111,255,.35);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:#c4bbff;cursor:pointer;font-family:inherit;transition:all .2s">💬 Chat</button>
+      <button class="nova-mode-btn"              id="novaBtnPDF"   onclick="novaSetMode('pdf')"   style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:#606078;cursor:pointer;font-family:inherit;transition:all .2s">📄 PDF</button>
+      <button class="nova-mode-btn"              id="novaBtnFlash" onclick="novaSetMode('flash')" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:#606078;cursor:pointer;font-family:inherit;transition:all .2s">🃏 Flash</button>
+      <button class="nova-mode-btn"              id="novaBtnSaved" onclick="novaSetMode('saved')" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:#606078;cursor:pointer;font-family:inherit;transition:all .2s">📚 Guardados</button>
     </div>
   </div>
 
   <!-- Content -->
   <div style="flex:1;display:flex;min-height:0;overflow:hidden">
-
-    <!-- ── HISTORY SIDEBAR ── -->
-    <div id="novaHistorySidebar" class="collapsed">
-      <div style="padding:14px 14px 8px;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0">
-        <div style="font-size:12px;font-weight:700;color:#606078;letter-spacing:.8px;text-transform:uppercase;margin-bottom:2px">Conversaciones</div>
-      </div>
-      <div id="novaHistList" style="flex:1;overflow-y:auto;padding:10px 8px"></div>
-    </div>
-
 
     <!-- ── CHAT PANEL ── -->
     <div id="novaChatPanel" style="flex:1;display:flex;flex-direction:column;min-height:0">
@@ -11105,7 +11940,7 @@ window._enterDash = function(user, role, picture, email) {
         <div style="width:200px;height:4px;background:#17171f;border-radius:4px;overflow:hidden"><div id="novaFlashFill" style="height:100%;background:linear-gradient(90deg,#7c6fff,#2dd4bf);border-radius:4px;transition:width .4s;width:0%"></div></div>
         <div id="novaFlashCard" onclick="novaFlipCard()" style="width:100%;height:240px;perspective:1000px;cursor:pointer">
           <div id="novaFlashInner" style="width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.4,0,.2,1)">
-            <div id="novaFlashFront" style="position:absolute;inset:0;backface-visibility:hidden;border-radius:20px;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;font-size:16px;line-height:1.6;font-weight:500;background:linear-gradient(135deg,#111118,#17171f);border:1px solid rgba(255,255,255,.1);box-shadow:0 16px 40px rgba(0,0,0,.4);color:#f0f0f5">Haz clic para ver la pregunta</div>
+            <div id="novaFlashFront" style="position:absolute;inset:0;backface-visibility:hidden;border-radius:20px;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;font-size:16px;line-height:1.6;font-weight:500;background:linear-gradient(135deg,#111118,#17171f);border:1px solid rgba(255,255,255,.1);box-shadow:0 16px 40px rgba(0,0,0,.4)">Haz clic para ver la pregunta</div>
             <div id="novaFlashBack" style="position:absolute;inset:0;backface-visibility:hidden;border-radius:20px;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;font-size:15px;line-height:1.6;font-weight:500;background:linear-gradient(135deg,rgba(124,111,255,.12),rgba(45,212,191,.06));border:1px solid rgba(124,111,255,.2);transform:rotateY(180deg);color:#2dd4bf;box-shadow:0 16px 40px rgba(124,111,255,.15)">Respuesta</div>
           </div>
         </div>
@@ -11126,90 +11961,6 @@ window._enterDash = function(user, role, picture, email) {
       </div>
       <div id="novaSavedList"></div>
     </div>
-
-    <!-- ── EXAMEN PANEL ── -->
-    <div id="novaExamenPanel" style="flex:1;display:none;flex-direction:column;min-height:0;overflow-y:auto">
-
-      <!-- Upload zone -->
-      <div id="novaExamenUpload" style="padding:32px;display:flex;flex-direction:column;gap:20px">
-        <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:800;color:#f0f0f5">📝 Generador de Examen</div>
-        <div style="font-size:13px;color:#606078">Sube un PDF, imagen o escribe un tema y NOVA generará un examen completo al instante.</div>
-
-        <!-- Drop zone -->
-        <div id="novaExDrop" ondragover="event.preventDefault();this.style.borderColor='#7c6fff'" ondragleave="this.style.borderColor='rgba(255,255,255,.1)'" ondrop="novaExHandleDrop(event)"
-          style="border:2px dashed rgba(255,255,255,.1);border-radius:16px;padding:40px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(255,255,255,.02)"
-          onclick="document.getElementById('novaExFileInput').click()">
-          <div style="font-size:36px;margin-bottom:12px">📂</div>
-          <div style="font-size:15px;font-weight:700;color:#a0a0b8;margin-bottom:6px">Arrastra tu archivo aquí</div>
-          <div style="font-size:12px;color:#404058">PDF, imagen (JPG/PNG) — o haz clic para seleccionar</div>
-        </div>
-        <input type="file" id="novaExFileInput" accept=".pdf,image/*" style="display:none" onchange="novaExHandleFile(event)">
-
-        <!-- Loaded file chip -->
-        <div id="novaExLoaded" style="display:none;background:#1a1a24;border:1px solid rgba(124,111,255,.3);border-radius:12px;padding:14px 18px;display:none;align-items:center;gap:12px">
-          <div style="font-size:22px">📄</div>
-          <div style="flex:1">
-            <div id="novaExFileName" style="font-size:13px;font-weight:700;color:#f0f0f5"></div>
-            <div id="novaExFileSize" style="font-size:11px;color:#606078;margin-top:2px"></div>
-          </div>
-          <button onclick="novaExClearFile()" style="background:none;border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#606078;font-size:12px;padding:5px 10px;cursor:pointer;font-family:inherit">✕ Quitar</button>
-        </div>
-
-        <!-- Tema de texto -->
-        <div style="display:flex;align-items:center;gap:12px;color:#404058;font-size:12px">
-          <div style="flex:1;height:1px;background:rgba(255,255,255,.06)"></div>o escribe un tema<div style="flex:1;height:1px;background:rgba(255,255,255,.06)"></div>
-        </div>
-        <textarea id="novaExTema" placeholder="Ej: Fotosíntesis, Derivadas, Revolución Mexicana..." rows="3"
-          style="background:#1a1a24;border:1px solid rgba(255,255,255,.08);border-radius:12px;color:#f0f0f5;font-size:14px;font-family:inherit;padding:14px;resize:none;outline:none;transition:border .2s"
-          onfocus="this.style.borderColor='rgba(124,111,255,.4)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'"></textarea>
-
-        <!-- Config -->
-        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
-          <div style="display:flex;flex-direction:column;gap:6px">
-            <div style="font-size:11px;color:#606078;font-weight:600;letter-spacing:.5px">PREGUNTAS</div>
-            <select id="novaExCount" style="background:#1a1a24;border:1px solid rgba(255,255,255,.08);border-radius:8px;color:#f0f0f5;font-size:13px;padding:8px 12px;font-family:inherit;outline:none">
-              <option value="5">5 preguntas</option>
-              <option value="10" selected>10 preguntas</option>
-              <option value="15">15 preguntas</option>
-              <option value="20">20 preguntas</option>
-            </select>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:6px">
-            <div style="font-size:11px;color:#606078;font-weight:600;letter-spacing:.5px">DIFICULTAD</div>
-            <select id="novaExDiff" style="background:#1a1a24;border:1px solid rgba(255,255,255,.08);border-radius:8px;color:#f0f0f5;font-size:13px;padding:8px 12px;font-family:inherit;outline:none">
-              <option value="básica">Básica</option>
-              <option value="media" selected>Media</option>
-              <option value="avanzada">Avanzada</option>
-              <option value="mixta">Mixta</option>
-            </select>
-          </div>
-          <button onclick="novaExGenerar()" id="novaExBtn"
-            style="margin-top:18px;flex:1;min-width:160px;background:linear-gradient(135deg,#7c6fff,#2dd4bf);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:800;padding:14px;cursor:pointer;font-family:inherit;transition:all .2s;letter-spacing:.5px">
-            ⚡ Generar Examen
-          </button>
-        </div>
-      </div>
-
-      <!-- Results zone -->
-      <div id="novaExResults" style="display:none;flex-direction:column;padding:24px;gap:16px">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
-          <div id="novaExResultTitle" style="font-size:18px;font-weight:800;color:#f0f0f5"></div>
-          <div style="display:flex;gap:8px">
-            <button onclick="novaExNuevo()" style="background:#1e1e28;border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#a0a0b8;font-size:12px;font-weight:600;padding:8px 14px;cursor:pointer;font-family:inherit">↺ Nuevo</button>
-            <button onclick="novaExGuardar()" style="background:rgba(124,111,255,.15);border:1px solid rgba(124,111,255,.3);border-radius:8px;color:#c4bbff;font-size:12px;font-weight:600;padding:8px 14px;cursor:pointer;font-family:inherit">💾 Guardar</button>
-          </div>
-        </div>
-        <div id="novaExQList" style="display:flex;flex-direction:column;gap:14px"></div>
-        <div id="novaExScore" style="display:none;margin-top:8px;padding:20px;background:#17171f;border-radius:14px;text-align:center;font-weight:800;font-size:20px;border:1px solid rgba(255,255,255,.06)"></div>
-      </div>
-
-      <!-- Loading -->
-      <div id="novaExLoading" style="display:none;flex:1;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:60px">
-        <div style="width:48px;height:48px;border:3px solid rgba(124,111,255,.2);border-top-color:#7c6fff;border-radius:50%;animation:spin .8s linear infinite"></div>
-        <div style="font-size:14px;color:#606078;font-weight:600">Generando tu examen...</div>
-      </div>
-
-    </div><!-- /novaExamenPanel -->
 
   </div><!-- /content -->
 </div><!-- /novaScreen -->
@@ -11242,90 +11993,10 @@ const NOVA_GEMINI_URL = 'https://gemini-proxy.donniaxel55.workers.dev';
 const NOVA_GROQ_URL   = 'https://grok-mat.donniaxel55.workers.dev'; // worker proxy (sin API key necesaria)
 const NOVA_GROQ_KEY   = ''; // no se necesita — el worker maneja la autenticación
 
-// ── PDFs del EXANI en GitHub ──────────────────────
-// ── Gemini Files API URIs (subidos una sola vez, duran 48h) ──
-// ── PDFs del EXANI — Auto-renovación cada 47h ────
-const NOVA_FILES_WORKER = 'https://nova-files-api.donniaxel55.workers.dev';
-const NOVA_PDF_GITHUB_URLS = [
-  'https://raw.githubusercontent.com/darklight-dk/dash/main/pdfs/premedicina_compressed.pdf',
-  'https://raw.githubusercontent.com/darklight-dk/dash/main/pdfs/guia%20mate%20exani_compressed.pdf'
-];
-let NOVA_PDF_FILE_URIS = [
-  'https://generativelanguage.googleapis.com/v1beta/files/iiti3j27ipfy',
-  'https://generativelanguage.googleapis.com/v1beta/files/a09wc30vr0tb'
-];
-let NOVA_PDF_READY = false;
-
-async function novaPrecargarPDFs() {
-  // 1. Revisar Firestore si hay URIs válidos (menos de 47h)
-  const uid = novaGetUID ? novaGetUID() : null;
-  const storageKey = 'nova_pdf_uris'; // fallback localStorage
-  try {
-    let cached = null;
-    if (uid && window._fbDB) {
-      const { db: _db, ref: _ref, get: _get } = window._fbDB;
-      const snap = await _get(_ref(_db, 'novaConfig/pdfUris'));
-      if (snap.exists()) cached = snap.val();
-    } else {
-      const raw = localStorage.getItem(storageKey);
-      if (raw) cached = JSON.parse(raw);
-    }
-
-    if (cached && cached.uris && cached.uris.length === 2) {
-      const horas = (Date.now() - cached.savedAt) / 3600000;
-      if (horas < 47) {
-        NOVA_PDF_FILE_URIS = cached.uris;
-        NOVA_PDF_READY = true;
-        console.log('✅ PDFs EXANI — URIs válidos desde caché (' + horas.toFixed(1) + 'h)');
-        return;
-      }
-      console.log('⏰ URIs vencidos (' + horas.toFixed(1) + 'h), renovando...');
-    }
-  } catch(e) {
-    console.warn('novaPrecargarPDFs cache error:', e);
-  }
-
-  // 2. Renovar — subir desde GitHub via Worker
-  try {
-    console.log('🔄 Subiendo PDFs a Gemini Files API...');
-    const results = await Promise.all(
-      NOVA_PDF_GITHUB_URLS.map(async (pdfUrl) => {
-        const res = await fetch(NOVA_FILES_WORKER + '/upload', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pdfUrl, mimeType: 'application/pdf' })
-        });
-        const data = await res.json();
-        if (!data.file?.uri) throw new Error('No URI en respuesta: ' + JSON.stringify(data));
-        return data.file.uri;
-      })
-    );
-
-    NOVA_PDF_FILE_URIS = results;
-    NOVA_PDF_READY = true;
-
-    // 3. Guardar nuevos URIs
-    const payload = { uris: results, savedAt: Date.now() };
-    if (uid && window._fbDB) {
-      const { db: _db, ref: _ref, set: _set } = window._fbDB;
-      await _set(_ref(_db, 'novaConfig/pdfUris'), payload);
-    } else {
-      localStorage.setItem(storageKey, JSON.stringify(payload));
-    }
-    console.log('✅ PDFs renovados y guardados:', results);
-  } catch(err) {
-    // Fallback a URIs hardcodeados si falla
-    NOVA_PDF_READY = true;
-    console.warn('⚠️ No se pudieron renovar los PDFs, usando URIs anteriores:', err.message);
-  }
-}
-
 // Indica qué modelo se usó en el último turno
 let NOVA_LAST_MODEL = 'gemini';
 
 const NOVA_SYSTEM = "Eres NOVA, asistente de estudio IA para el EXANI-II (México).\n"
-  + "Tienes acceso directo a dos documentos de estudio: la Guía de Premedicina y la Guía de Matemáticas del EXANI. "
-  + "Úsalos como base principal para responder preguntas del EXANI-II. Si el usuario pregunta algo relacionado, cita y explica con base en esos documentos.\n"
   + "Personalidad: directa, precisa, motivadora. Explicas paso a paso.\n"
   + "Idioma: español mexicano. Sin emojis excesivos, usa símbolos tipográficos (→ · ✓ ✗ ◆).\n\n"
   + "CUANDO TE PIDAN PREGUNTAS O EXAMEN — responde PRIMERO con un mensaje breve (1 línea), luego el bloque JSON COMPLETO:\n"
@@ -11343,192 +12014,8 @@ const NOVA_SYSTEM = "Eres NOVA, asistente de estudio IA para el EXANI-II (Méxic
   + "Inline entre $...$ (ej: $\\frac{1}{4}$, $x^2$, $\\sqrt{x}$). "
   + "En bloque (centrado) entre $$...$$ (ej: $$x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}$$).";
 
-
-// ══════════════════════════════════════════════════
-//  NOVA — Historial de Conversaciones (Firebase)
-// ══════════════════════════════════════════════════
-let NOVA_CURRENT_CHAT_ID = null;
-let NOVA_SIDEBAR_OPEN = false;
-let NOVA_CHATS_CACHE = {};
-
-function novaGetUID() {
-  return window._fbCurrentUser ? window._fbCurrentUser.uid : null;
-}
-
-function novaToggleSidebar() {
-  NOVA_SIDEBAR_OPEN = !NOVA_SIDEBAR_OPEN;
-  const sb = document.getElementById('novaHistorySidebar');
-  if (NOVA_SIDEBAR_OPEN) {
-    sb.classList.remove('collapsed');
-    novaLoadHistory();
-  } else {
-    sb.classList.add('collapsed');
-  }
-}
-
-async function novaLoadHistory() {
-  const uid = novaGetUID();
-  if (!uid) return;
-  const { db: _db, ref: _ref, get: _get } = window._fbDB;
-  try {
-    const snap = await _get(_ref(_db, 'novaChats/' + uid));
-    if (!snap.exists()) {
-      document.getElementById('novaHistList').innerHTML = '<div style="text-align:center;color:#404058;font-size:12px;padding:20px">Sin conversaciones aún</div>';
-      return;
-    }
-    const chats = [];
-    snap.forEach(child => {
-      chats.push({ id: child.key, ...child.val() });
-    });
-    chats.sort((a,b) => (b.updatedAt||0) - (a.updatedAt||0));
-    NOVA_CHATS_CACHE = {};
-    chats.forEach(c => NOVA_CHATS_CACHE[c.id] = c);
-    novaRenderHistory(chats);
-  } catch(e) {
-    console.warn('novaLoadHistory error:', e);
-  }
-}
-
-function novaRenderHistory(chats) {
-  const list = document.getElementById('novaHistList');
-  if (!chats.length) {
-    list.innerHTML = '<div style="text-align:center;color:#404058;font-size:12px;padding:20px">Sin conversaciones aun</div>';
-    return;
-  }
-  list.innerHTML = '';
-  chats.forEach(c => {
-    const item = document.createElement('div');
-    item.className = 'nova-hist-item' + (c.id === NOVA_CURRENT_CHAT_ID ? ' active' : '');
-    item.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;gap:6px">'
-      + '<div class="nova-hist-title">' + novaEsc(c.title || 'Conversacion') + '</div>'
-      + '<div class="nova-hist-del" style="color:#303048;font-size:14px;cursor:pointer;padding:2px 4px;border-radius:4px">x</div>'
-      + '</div><div class="nova-hist-date">' + novaTimeAgo(c.updatedAt) + '</div>';
-    item.addEventListener('click', () => novaLoadChat(c.id));
-    item.querySelector('.nova-hist-del').addEventListener('click', e => {
-      e.stopPropagation();
-      novaDeleteChat(c.id);
-    });
-    item.querySelector('.nova-hist-del').addEventListener('mouseover', function(){ this.style.color='#f87171'; });
-    item.querySelector('.nova-hist-del').addEventListener('mouseout',  function(){ this.style.color='#303048'; });
-    list.appendChild(item);
-  });
-}
-
-function novaTimeAgo(ts) {
-  if (!ts) return '';
-  const diff = Date.now() - ts;
-  const m = Math.floor(diff/60000);
-  const h = Math.floor(diff/3600000);
-  const d = Math.floor(diff/86400000);
-  if (m < 1) return 'ahora';
-  if (m < 60) return 'hace ' + m + 'm';
-  if (h < 24) return 'hace ' + h + 'h';
-  return 'hace ' + d + 'd';
-}
-
-async function novaSaveChat() {
-  const uid = novaGetUID();
-  if (!uid || !NOVA.messages.length) return;
-  const { db: _db, ref: _ref, set: _set } = window._fbDB;
-  if (!NOVA_CURRENT_CHAT_ID) {
-    NOVA_CURRENT_CHAT_ID = 'chat_' + Date.now();
-  }
-  const firstMsg = NOVA.messages.find(m => m.role === 'user');
-  const rawTitle = typeof firstMsg?.content === 'string'
-    ? firstMsg.content
-    : (Array.isArray(firstMsg?.content) ? (firstMsg.content.find(c=>c.type==='text')?.text||'Conversación') : 'Conversación');
-  const title = rawTitle.slice(0,45) + (rawTitle.length > 45 ? '…' : '');
-
-  const payload = {
-    title,
-    updatedAt: Date.now(),
-    createdAt: NOVA_CHATS_CACHE[NOVA_CURRENT_CHAT_ID]?.createdAt || Date.now(),
-    messages: NOVA.messages.map(m => ({
-      role: m.role,
-      content: typeof m.content === 'string' ? m.content : JSON.stringify(m.content)
-    }))
-  };
-
-  try {
-    await _set(_ref(_db, 'novaChats/' + uid + '/' + NOVA_CURRENT_CHAT_ID), payload);
-    if (NOVA_SIDEBAR_OPEN) novaLoadHistory();
-  } catch(e) {
-    console.warn('novaSaveChat error:', e);
-  }
-}
-
-async function novaLoadChat(chatId) {
-  const uid = novaGetUID();
-  if (!uid) return;
-  const { db: _db, ref: _ref, get: _get } = window._fbDB;
-  try {
-    const snap = await _get(_ref(_db, 'novaChats/' + uid + '/' + chatId));
-    if (!snap.exists()) return;
-    const data = snap.val();
-    NOVA_CURRENT_CHAT_ID = chatId;
-    NOVA.messages = (data.messages||[]).map(m => ({
-      role: m.role,
-      content: (() => { try { return JSON.parse(m.content); } catch { return m.content; } })()
-    }));
-    NOVA.pdfBase64 = null; NOVA.attachedImgs = [];
-    // Render messages
-    const msgs = document.getElementById('novaMsgs');
-    msgs.innerHTML = '';
-    document.getElementById('novaEmpty').style.display = 'none';
-    NOVA.messages.forEach(m => {
-      if (m.role === 'user') {
-        const txt = typeof m.content === 'string' ? m.content : (Array.isArray(m.content) ? (m.content.find(c=>c.type==='text')?.text||'') : '');
-        novaAppendUser(txt);
-      } else {
-        novaAppendAI(novaFmt(typeof m.content === 'string' ? m.content : ''));
-      }
-    });
-    novaScrollBottom();
-    // Update sidebar active state
-    novaRenderHistory(Object.values(NOVA_CHATS_CACHE).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0)));
-    // Switch to chat panel
-    novaSetMode('chat');
-  } catch(e) {
-    console.warn('novaLoadChat error:', e);
-  }
-}
-
-async function novaDeleteChat(chatId) {
-  const uid = novaGetUID();
-  if (!uid) return;
-  if (!confirm('¿Eliminar esta conversación?')) return;
-  const { db: _db, ref: _ref } = window._fbDB;
-  const { remove } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js');
-  try {
-    await remove(_ref(_db, 'novaChats/' + uid + '/' + chatId));
-    if (chatId === NOVA_CURRENT_CHAT_ID) novaNewChat();
-    delete NOVA_CHATS_CACHE[chatId];
-    novaRenderHistory(Object.values(NOVA_CHATS_CACHE).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0)));
-  } catch(e) {
-    console.warn('novaDeleteChat error:', e);
-  }
-}
-
-function novaNewChat() {
-  NOVA_CURRENT_CHAT_ID = null;
-  NOVA.messages = [];
-  NOVA.pdfBase64 = null;
-  NOVA.attachedImgs = [];
-  NOVA.flashcards = [];
-  const msgs = document.getElementById('novaMsgs');
-  msgs.innerHTML = '';
-  document.getElementById('novaEmpty').style.display = 'flex';
-  novaSetMode('chat');
-  if (NOVA_SIDEBAR_OPEN) novaLoadHistory();
-  if (typeof showToast === 'function') showToast('✦ Nuevo chat iniciado');
-}
-
 function openNova() {
   show('novaScreen');
-  // Precargar/renovar PDFs del EXANI en background
-  if (!NOVA_PDF_READY) {
-    novaPrecargarPDFs();
-  }
   // Saluda con el nombre del usuario si está disponible
   if (NOVA.messages.length === 0 && typeof S !== 'undefined' && S.user) {
     const nombre = S.user.split(' ')[0];
@@ -11540,51 +12027,14 @@ function openNova() {
   }
 }
 
-
-// ── Modo EXANI-CONOCIMIENTO ───────────────────────
-let NOVA_EXANI_MODE = false;
-
-function novaToggleExani() {
-  NOVA_EXANI_MODE = !NOVA_EXANI_MODE;
-  const btn = document.getElementById("novaBtnExani");
-  if (NOVA_EXANI_MODE) {
-    btn.style.background = "rgba(251,191,36,.15)";
-    btn.style.borderColor = "rgba(251,191,36,.4)";
-    btn.style.color = "#fbbf24";
-    btn.textContent = "📖 EXANI ✓";
-    document.getElementById("novaBadge").textContent = "EXANI-Conocimiento";
-    document.getElementById("novaBadge").style.background = "rgba(251,191,36,.15)";
-    document.getElementById("novaBadge").style.color = "#fbbf24";
-    document.getElementById("novaBadge").style.borderColor = "rgba(251,191,36,.3)";
-    if (!NOVA_PDF_READY) novaPrecargarPDFs();
-    if (typeof showToast === "function") showToast("📖 Modo EXANI activado — NOVA usará las guías como base");
-  } else {
-    btn.style.background = "rgba(255,255,255,.04)";
-    btn.style.borderColor = "rgba(255,255,255,.08)";
-    btn.style.color = "#606078";
-    btn.textContent = "📖 EXANI";
-    document.getElementById("novaBadge").textContent = "Chat IA";
-    document.getElementById("novaBadge").style.background = "rgba(124,111,255,.15)";
-    document.getElementById("novaBadge").style.color = "#7c6fff";
-    document.getElementById("novaBadge").style.borderColor = "rgba(124,111,255,.25)";
-    if (typeof showToast === "function") showToast("💬 Modo normal activado");
-  }
-}
-
-function novaGetSystem() {
-  if (NOVA_EXANI_MODE) {
-    return "Eres NOVA en modo EXANI-CONOCIMIENTO. Tu unica fuente de verdad son las dos guias del EXANI-II (Premedicina y Matematicas).\nREGLAS: Responde SIEMPRE basandote en las guias. Si el usuario pide preguntas, genera reactivos AL ESTILO EXANI-II: opciones a, b, c; redaccion formal; dificultad progresiva. Prioriza temas de mayor peso: razonamiento matematico, comprension lectora, ciencias naturales. Si algo NO esta en las guias, dilo.\nIdioma: espanol mexicano formal. Sin emojis. Usa simbolos tipograficos.\n\nCUANDO TE PIDAN PREGUNTAS — responde con mensaje breve y luego JSON:\n```exam\n{\"titulo\":\"Titulo\",\"preguntas\":[{\"id\":1,\"texto\":\"Pregunta?\",\"opciones\":[{\"letra\":\"a\",\"texto\":\"Opcion A\"},{\"letra\":\"b\",\"texto\":\"Opcion B\"},{\"letra\":\"c\",\"texto\":\"Opcion C\"}],\"correcta\":\"a\",\"explicacion\":\"Explicacion basada en la guia.\"}]}\n```\nREGLAS JSON: completo, 3 opciones siempre, no truncar.\n\nFLASHCARDS:\n```flashcards\n[{\"frente\":\"Concepto\",\"reverso\":\"Definicion de la guia\"}]\n```\nFORMULAS: LaTeX inline $...$ bloque $$...$$";
-  }
-  return NOVA_SYSTEM;
-}
 // ── Modo ──────────────────────────────────────────
 function novaSetMode(mode) {
-  const panels = { chat: 'novaChatPanel', pdf: 'novaPdfPanel', flash: 'novaFlashPanel', saved: 'novaSavedPanel', examen: 'novaExamenPanel' };
+  const panels = { chat: 'novaChatPanel', pdf: 'novaPdfPanel', flash: 'novaFlashPanel', saved: 'novaSavedPanel' };
   Object.entries(panels).forEach(([m, id]) => {
     const el = document.getElementById(id);
     if (el) el.style.display = m === mode ? 'flex' : 'none';
   });
-  const btns = { chat:'novaBtnChat', pdf:'novaBtnPDF', flash:'novaBtnFlash', saved:'novaBtnSaved', examen:'novaBtnExamen' };
+  const btns = { chat:'novaBtnChat', pdf:'novaBtnPDF', flash:'novaBtnFlash', saved:'novaBtnSaved' };
   Object.entries(btns).forEach(([m, id]) => {
     const btn = document.getElementById(id);
     if (!btn) return;
@@ -11593,7 +12043,7 @@ function novaSetMode(mode) {
     btn.style.borderColor = active ? 'rgba(124,111,255,.35)' : 'rgba(255,255,255,.08)';
     btn.style.color = active ? '#c4bbff' : '#606078';
   });
-  const badges = { chat:'Chat IA', pdf:'Lector PDF', flash:'Flashcards', saved:'Guardados', examen:'Generador de Examen' };
+  const badges = { chat:'Chat IA', pdf:'Lector PDF', flash:'Flashcards', saved:'Guardados' };
   const badge = document.getElementById('novaBadge');
   if (badge) badge.textContent = badges[mode];
   if (mode === 'saved') novaRenderSaved();
@@ -11614,66 +12064,21 @@ function novaSendSuggestion(el) {
   novaSendMessage();
 }
 
-// ── Llamada a Gemini con rotación automática de modelos ──
-const NOVA_GEMINI_MODELS = [
-  'gemini-2.5-flash',
-  'gemini-2.0-flash',
-  'gemini-3.1-flash-lite',
-  'gemini-2.5-flash-lite',
-];
-let NOVA_MODEL_IDX = 0; // índice actual
-
+// ── Llamada a Gemini ──────────────────────────────
 async function novaCallGemini(geminiContents, hasImage = false) {
-  const startIdx = NOVA_MODEL_IDX;
-  let lastError = null;
-
-  for (let attempt = 0; attempt < NOVA_GEMINI_MODELS.length; attempt++) {
-    const modelIdx = (startIdx + attempt) % NOVA_GEMINI_MODELS.length;
-    const model = NOVA_GEMINI_MODELS[modelIdx];
-
-    try {
-      const res = await fetch(NOVA_GEMINI_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model,
-          system_instruction: { parts: [{ text: novaGetSystem() }] },
-          contents: geminiContents,
-          generationConfig: { maxOutputTokens: 8192, temperature: 0.25 }
-        })
-      });
-      const data = await res.json();
-
-      // Si es rate limit, rotar al siguiente modelo
-      if (data.error) {
-        const msg = data.error.message || '';
-        const isRateLimit = msg.includes('429') || msg.includes('quota') || msg.includes('rate') || msg.toLowerCase().includes('limit');
-        if (isRateLimit) {
-          console.warn('⚠️ Rate limit en ' + model + ', rotando...');
-          NOVA_MODEL_IDX = (modelIdx + 1) % NOVA_GEMINI_MODELS.length;
-          lastError = new Error('Gemini [' + model + ']: ' + msg);
-          continue; // intenta el siguiente
-        }
-        throw new Error('Gemini [' + model + ']: ' + msg);
-      }
-
-      // Éxito — guardar modelo usado
-      NOVA_LAST_MODEL = 'gemini';
-      NOVA_MODEL_IDX = modelIdx; // quedarse en el que funcionó
-      console.log('✅ Respondió: ' + model);
-      return data.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('') || '';
-
-    } catch(err) {
-      if (err.message.includes('Rate limit') || err.message.includes('rate') || err.message.includes('429')) {
-        lastError = err;
-        NOVA_MODEL_IDX = (modelIdx + 1) % NOVA_GEMINI_MODELS.length;
-        continue;
-      }
-      throw err; // error real, no de rate limit
-    }
-  }
-
-  throw lastError || new Error('Todos los modelos Gemini alcanzaron su límite. Intenta en unos minutos.');
+  const res = await fetch(NOVA_GEMINI_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: hasImage ? 'gemini-2.5-flash' : 'gemini-2.0-flash',
+      system_instruction: { parts: [{ text: NOVA_SYSTEM }] },
+      contents: geminiContents,
+      generationConfig: { maxOutputTokens: 8192, temperature: 0.25 }
+    })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error('Gemini: ' + (data.error.message || JSON.stringify(data.error)));
+  return data.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('') || '';
 }
 
 // ── Llamada a Groq (red de respaldo / verificador) ─
@@ -11740,14 +12145,9 @@ function novaExtractJSON(raw, tipo) {
 
 // ── Mensaje de modelo activo ──────────────────────
 function novaModelBadge(model) {
-  const labels = {
-    'groq': '◆ Groq Llama-3',
-    'gemini': '◆ ' + (NOVA_GEMINI_MODELS[NOVA_MODEL_IDX] || 'Gemini'),
-  };
-  const label = labels[model] || ('◆ ' + model);
   return '<span style="font-size:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);'
     + 'border-radius:20px;padding:2px 8px;color:#606078;margin-left:6px;vertical-align:middle">'
-    + label + '</span>';
+    + (model === 'groq' ? '◆ Groq Llama-3' : '◆ Gemini') + '</span>';
 }
 
 // ── Convertir historial → formato Gemini ──────────
@@ -11755,17 +12155,8 @@ function novaMsgsToGemini(msgs) {
   return msgs.map((m, i) => {
     const geminiRole = m.role === 'assistant' ? 'model' : 'user';
     let parts = [];
-    if (i === 0 && m.role === 'user') {
-      // Inyectar PDFs del EXANI via Gemini Files API (sin gastar tokens extra)
-      if (NOVA_PDF_READY) {
-        NOVA_PDF_FILE_URIS.forEach(uri => {
-          parts.push({ file_data: { mime_type: 'application/pdf', file_uri: uri } });
-        });
-      }
-      // También inyectar PDF subido manualmente si existe
-      if (NOVA.pdfBase64) {
-        parts.push({ inline_data: { mime_type: 'application/pdf', data: NOVA.pdfBase64 } });
-      }
+    if (i === 0 && NOVA.pdfBase64 && m.role === 'user') {
+      parts.push({ inline_data: { mime_type: 'application/pdf', data: NOVA.pdfBase64 } });
       const txt = typeof m.content === 'string' ? m.content
         : (Array.isArray(m.content) ? (m.content.find(c => c.type === 'text')?.text || '') : '');
       if (txt) parts.push({ text: txt });
@@ -11783,7 +12174,7 @@ function novaMsgsToGemini(msgs) {
 
 // ── Convertir historial → formato Groq/OpenAI ────
 function novaMsgsToGroq(msgs) {
-  const result = [{ role: 'system', content: novaGetSystem() }];
+  const result = [{ role: 'system', content: NOVA_SYSTEM }];
   msgs.forEach(m => {
     if (Array.isArray(m.content)) {
       const txt = m.content.filter(c => c.type === 'text').map(c => c.text).join('\n');
@@ -11826,7 +12217,7 @@ async function novaSendMessage(text) {
 
   try {
     // Determinar si el mensaje involucra archivos visuales (PDF/imagen)
-    const hasMedia = NOVA_PDF_READY || NOVA.pdfBase64 || (Array.isArray(userContent) && userContent.some(c => c.type === 'image'));
+    const hasMedia = NOVA.pdfBase64 || (Array.isArray(userContent) && userContent.some(c => c.type === 'image'));
 
     let raw = '';
     let modelUsed = 'gemini';
@@ -11908,7 +12299,6 @@ async function novaSendMessage(text) {
     document.getElementById('novaSendBtn').style.opacity = '';
     document.getElementById('novaSendBtn').style.pointerEvents = '';
     novaScrollBottom();
-    novaSaveChat(); // guardar conversación en Firebase
   }
 }
 
@@ -12002,18 +12392,6 @@ function novaAppendAI(html) {
   d.className = 'nova-msg-row nova-ai';
   d.innerHTML = '<div class="nova-avatar nova-ai-av">✦</div><div class="nova-bubble">' + html + '</div>';
   c.appendChild(d);
-  if (typeof renderMathInElement !== 'undefined') {
-    const bubble = d.querySelector('.nova-bubble');
-    renderMathInElement(bubble, {
-      delimiters: [
-        { left: '$$', right: '$$', display: true },
-        { left: '$',  right: '$',  display: false },
-        { left: '\\(', right: '\\)', display: false },
-        { left: '\\[', right: '\\]', display: true }
-      ],
-      throwOnError: false
-    });
-  }
   novaScrollBottom();
 }
 
@@ -12134,181 +12512,6 @@ function novaSaveExam(eid, data) {
   NOVA.savedExams.push(entry);
   localStorage.setItem('nova_exams', JSON.stringify(NOVA.savedExams));
   if (typeof showToast === 'function') showToast('💾 Examen guardado localmente');
-}
-
-
-// ── EXAMEN PANEL ─────────────────────────────────
-let novaExData = null;
-let novaExAnswers = {};
-let novaExFileB64 = null;
-let novaExFileMime = null;
-
-function novaExHandleFile(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  novaExSetFile(file);
-}
-
-function novaExHandleDrop(event) {
-  event.preventDefault();
-  document.getElementById('novaExDrop').style.borderColor = 'rgba(255,255,255,.1)';
-  const file = event.dataTransfer.files[0];
-  if (file) novaExSetFile(file);
-}
-
-async function novaExSetFile(file) {
-  const b64 = await novaFileB64(file);
-  novaExFileB64 = b64;
-  novaExFileMime = file.type || 'application/pdf';
-  document.getElementById('novaExFileName').textContent = file.name;
-  document.getElementById('novaExFileSize').textContent = (file.size/1024).toFixed(1) + ' KB';
-  document.getElementById('novaExDrop').style.display = 'none';
-  const loaded = document.getElementById('novaExLoaded');
-  loaded.style.display = 'flex';
-}
-
-function novaExClearFile() {
-  novaExFileB64 = null; novaExFileMime = null;
-  document.getElementById('novaExDrop').style.display = '';
-  document.getElementById('novaExLoaded').style.display = 'none';
-  document.getElementById('novaExFileInput').value = '';
-}
-
-function novaExNuevo() {
-  novaExClearFile();
-  document.getElementById('novaExTema').value = '';
-  document.getElementById('novaExResults').style.display = 'none';
-  document.getElementById('novaExamenUpload').style.display = 'flex';
-  novaExData = null; novaExAnswers = {};
-}
-
-async function novaExGenerar() {
-  const tema = document.getElementById('novaExTema').value.trim();
-  const count = document.getElementById('novaExCount').value;
-  const diff  = document.getElementById('novaExDiff').value;
-
-  if (!novaExFileB64 && !tema) {
-    if (typeof showToast === 'function') showToast('⚠️ Sube un archivo o escribe un tema');
-    return;
-  }
-
-  // Show loading
-  document.getElementById('novaExamenUpload').style.display = 'none';
-  document.getElementById('novaExResults').style.display = 'none';
-  document.getElementById('novaExLoading').style.display = 'flex';
-
-  const prompt = `Genera exactamente ${count} preguntas de examen con dificultad ${diff}.`
-    + (tema ? ` Tema: ${tema}.` : ' Basándote en el archivo adjunto.')
-    + ' Responde SOLO con el JSON completo:\n```exam\n{"titulo":"Título del examen","preguntas":[{"id":1,"texto":"¿Pregunta?","opciones":[{"letra":"a","texto":"Opción A"},{"letra":"b","texto":"Opción B"},{"letra":"c","texto":"Opción C"}],"correcta":"a","explicacion":"Explicación de 2-3 oraciones."}]}\n```'
-    + ' REGLAS: exactamente ' + count + ' preguntas, siempre 3 opciones (a,b,c), JSON completo sin truncar.';
-
-  try {
-    let parts = [];
-    if (novaExFileB64) {
-      parts.push({ inline_data: { mime_type: novaExFileMime, data: novaExFileB64 } });
-    }
-    parts.push({ text: prompt });
-
-    const contents = [{ role: 'user', parts }];
-    const raw = await novaCallGemini(contents, !!novaExFileB64);
-    const parsed = novaExtractJSON(raw, 'exam');
-
-    if (parsed && parsed._truncated) {
-      const repaired = await novaRepairJSON(parsed._raw, 'exam');
-      novaExData = JSON.parse(repaired);
-    } else if (parsed && !parsed._truncated) {
-      novaExData = parsed;
-    } else {
-      throw new Error('No se pudo generar el examen. Intenta de nuevo.');
-    }
-
-    novaExRenderResults();
-  } catch(err) {
-    document.getElementById('novaExLoading').style.display = 'none';
-    document.getElementById('novaExamenUpload').style.display = 'flex';
-    if (typeof showToast === 'function') showToast('❌ ' + err.message);
-  }
-}
-
-function novaExRenderResults() {
-  document.getElementById('novaExLoading').style.display = 'none';
-  document.getElementById('novaExamenUpload').style.display = 'none';
-  novaExAnswers = {};
-  const results = document.getElementById('novaExResults');
-  results.style.display = 'flex';
-  document.getElementById('novaExResultTitle').textContent = novaExData.titulo || 'Examen';
-  document.getElementById('novaExScore').style.display = 'none';
-
-  const list = document.getElementById('novaExQList');
-  list.innerHTML = (novaExData.preguntas || []).map((q, i) => {
-    const qid = 'exq_' + i;
-    return '<div style="background:#13131a;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px">'
-      + '<div style="display:flex;gap:10px;align-items:flex-start">'
-      + '<div style="width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#7c6fff,#2dd4bf);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0">' + (i+1) + '</div>'
-      + '<div style="font-size:14px;color:#f0f0f5;font-weight:500;line-height:1.6">' + novaEsc(q.texto) + '</div></div>'
-      + '<div id="' + qid + '_opts" style="display:flex;flex-direction:column;gap:8px">'
-      + (q.opciones||[]).map(op =>
-        '<div id="' + qid + '_' + op.letra + '" data-qid="' + qid + '" data-letra="' + op.letra + '" data-correcta="' + q.correcta + '" onclick="novaExSelect(this.dataset.qid,this.dataset.letra,this.dataset.correcta)"'
-        + ' style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;cursor:pointer;transition:all .15s">'
-        + '<div style="width:22px;height:22px;border-radius:6px;background:#1e1e28;border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#7c6fff;flex-shrink:0">' + op.letra + '</div>'
-        + '<div style="font-size:13px;color:#c0c0d8">' + novaEsc(op.texto) + '</div></div>'
-      ).join('')
-      + '</div>'
-      + '<div id="' + qid + '_exp" style="display:none;background:rgba(45,212,191,.06);border:1px solid rgba(45,212,191,.15);border-radius:10px;padding:12px;font-size:13px;color:#2dd4bf;line-height:1.5"><strong>📖 Explicación:</strong> ' + novaEsc(q.explicacion||'') + '</div>'
-      + '</div>';
-  }).join('');
-}
-
-function novaExSelect(qid, letra, correcta) {
-  const optsEl = document.getElementById(qid + '_opts');
-  if (!optsEl || optsEl.dataset.answered) return;
-  optsEl.dataset.answered = '1';
-  const ok = letra === correcta;
-  novaExAnswers[qid] = ok;
-
-  optsEl.querySelectorAll('[id^="' + qid + '_"]').forEach(el => {
-    el.style.cursor = 'default';
-  });
-
-  const selEl = document.getElementById(qid + '_' + letra);
-  if (selEl) {
-    selEl.style.background = ok ? 'rgba(52,211,153,.1)' : 'rgba(248,113,113,.1)';
-    selEl.style.borderColor = ok ? '#34d399' : '#f87171';
-  }
-  if (!ok) {
-    const corrEl = document.getElementById(qid + '_' + correcta);
-    if (corrEl) { corrEl.style.background = 'rgba(52,211,153,.08)'; corrEl.style.borderColor = '#34d399'; }
-  }
-  const expEl = document.getElementById(qid + '_exp');
-  if (expEl) expEl.style.display = 'block';
-
-  // Check if all answered
-  const total = (novaExData.preguntas || []).length;
-  const answered = Object.keys(novaExAnswers).length;
-  if (answered === total) {
-    const correct = Object.values(novaExAnswers).filter(Boolean).length;
-    const pct = Math.round((correct/total)*100);
-    const scoreEl = document.getElementById('novaExScore');
-    const emoji = pct >= 80 ? '🎉' : pct >= 60 ? '👍' : '💪';
-    scoreEl.textContent = emoji + ' ' + correct + '/' + total + ' correctas — ' + pct + '%';
-    scoreEl.style.color = pct >= 80 ? '#34d399' : pct >= 60 ? '#fbbf24' : '#f87171';
-    scoreEl.style.display = 'block';
-    scoreEl.scrollIntoView({ behavior:'smooth', block:'nearest' });
-  }
-}
-
-function novaExGuardar() {
-  if (!novaExData) return;
-  const entry = {
-    id: Date.now(),
-    title: novaExData.titulo || 'Examen',
-    questions: (novaExData.preguntas||[]).length,
-    data: novaExData,
-    date: new Date().toLocaleDateString('es-MX'),
-  };
-  NOVA.savedExams.push(entry);
-  localStorage.setItem('nova_exams', JSON.stringify(NOVA.savedExams));
-  if (typeof showToast === 'function') showToast('💾 Examen guardado en Mis Guardados');
 }
 
 // ── PDF ───────────────────────────────────────────
@@ -12463,8 +12666,8 @@ function novaRenderFlash() {
   const active = document.getElementById('novaFlashActive');
   active.style.display = 'flex';
   const card = cards[NOVA.flashIdx];
-  const frontEl = document.getElementById('novaFlashFront'); frontEl.innerHTML = card.frente; frontEl.style.color = '#f0f0f5';
-  const backEl = document.getElementById('novaFlashBack'); backEl.innerHTML = card.reverso; backEl.style.color = '#2dd4bf';
+  document.getElementById('novaFlashFront').innerHTML = card.frente;
+  document.getElementById('novaFlashBack').innerHTML  = card.reverso;
   document.getElementById('novaFlashCard').classList.remove('flipped');
   document.getElementById('novaFlashInner').style.transform = '';
   document.getElementById('novaFlashProgress').textContent = 'Tarjeta ' + (NOVA.flashIdx+1) + ' de ' + cards.length + ' · ' + NOVA.flashKnown + ' dominadas';
@@ -12545,7 +12748,7 @@ function novaFileB64(file) {
     const r = new FileReader();
     r.onload = () => res(r.result.split(',')[1]);
     r.onerror = rej;
-    r.readAsDataURL(file instanceof Blob ? file : file);
+    r.readAsDataURL(file);
   });
 }
 </script>
