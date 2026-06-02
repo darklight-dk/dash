@@ -3073,18 +3073,28 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
           </div>
 
           <!-- ── GRÁFICAS ── -->
-          <div id="qedMathChart" style="display:none;flex-direction:column;gap:10px">
+          <div id="qedMathChart" style="display:none;flex-direction:column;gap:12px">
             <div>
               <label style="font-size:12px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px">Título de la gráfica</label>
-              <input id="qedChartTitle" class="qed-input" placeholder="ej. Ventas por mes"/>
+              <input id="qedChartTitle" class="qed-input" placeholder="ej. Promedios por mes"/>
             </div>
-            <div>
-              <label style="font-size:12px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px">Etiquetas (separadas por coma)</label>
-              <input id="qedChartLabels" class="qed-input" placeholder="ej. Ene, Feb, Mar, Abr" oninput="qedUpdateChartHint()"/>
+
+            <!-- Grid de datos tipo hoja de cálculo -->
+            <div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;padding:10px">
+              <div style="font-size:11px;font-weight:700;color:#7c3aed;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">📊 Tabla de datos</div>
+              <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
+                <label style="font-size:12px;color:var(--muted)">Etiquetas (eje X):</label>
+                <input id="qedChartLabels" style="flex:1;min-width:140px;border:1px solid #a78bfa;border-radius:6px;padding:5px 8px;font-family:inherit;font-size:12px;background:#fff" placeholder="ene,feb,mar,abr" oninput="qedRebuildChartGrid()"/>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+                <label style="font-size:12px;color:var(--muted)">Series:</label>
+                <input id="qedSeriesNames" style="flex:1;min-width:140px;border:1px solid #a78bfa;border-radius:6px;padding:5px 8px;font-family:inherit;font-size:12px;background:#fff" placeholder="Serie A,Serie B" oninput="qedRebuildChartGrid()"/>
+                <button onclick="qedRebuildChartGrid()" style="background:#7c3aed;color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">↻ Actualizar</button>
+              </div>
+              <!-- La grilla se genera aquí -->
+              <div id="qedChartGrid" style="overflow-x:auto"></div>
             </div>
-            <div id="qedChartDatasets" style="display:flex;flex-direction:column;gap:8px"></div>
-            <button onclick="qedAddChartDataset()" style="background:none;border:1.5px dashed var(--b2);color:var(--muted);border-radius:8px;padding:6px;font-size:12px;cursor:pointer;font-family:inherit;transition:all .15s" onmouseover="this.style.borderColor='#7c3aed';this.style.color='#7c3aed'" onmouseout="this.style.borderColor='var(--b2)';this.style.color='var(--muted)'">+ Agregar serie</button>
-            <div id="qedChartHint" style="font-size:11px;color:#7c3aed;background:#f5f3ff;border-radius:6px;padding:6px 10px;display:none">💡 Ingresa <strong id="qedHintCount">N</strong> valores por serie, separados por coma (uno por cada etiqueta)</div>
+
             <button onclick="qedRenderMath()" style="background:linear-gradient(135deg,#7c3aed,#5b4fe0);color:#fff;border:none;border-radius:8px;padding:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">👁 Previsualizar gráfica</button>
           </div>
 
@@ -8555,28 +8565,26 @@ function qedLoadMathFromText(raw) {
         labelsStr = l.replace('Etiquetas:', '').trim();
       } else {
         const colon = l.indexOf(':');
-        if (colon > 0) series.push({ name: l.slice(0, colon).trim(), vals: l.slice(colon+1).trim() });
+        if (colon > 0) series.push({ name: l.slice(0, colon).trim(), vals: l.slice(colon+1).trim().split(',').map(s=>s.trim()) });
       }
     }
-    $('qedChartLabels').value = labelsStr;
-    qedUpdateChartHint();
+    $('qedChartLabels').value  = labelsStr;
+    $('qedSeriesNames').value  = series.map(s=>s.name).join(',');
 
-    // Add dataset rows
-    $('qedChartDatasets').innerHTML = '';
-    _qedDsCount = 0;
-    series.forEach(s => {
-      qedAddChartDataset();
-      const idx = _qedDsCount - 1;
+    // Build grid then fill values
+    setTimeout(() => {
+      qedRebuildChartGrid();
       setTimeout(() => {
-        const nameEl = $('qedDsName_' + idx);
-        const valsEl = $('qedDsVals_' + idx);
-        if (nameEl) nameEl.value = s.name;
-        if (valsEl) valsEl.value = s.vals;
-      }, 30);
-    });
-
-    // Auto-preview after datasets are filled
-    setTimeout(() => qedRenderMath(), 120);
+        const lblArr = labelsStr.split(',').map(s=>s.trim()).filter(Boolean);
+        series.forEach((s, si) => {
+          s.vals.forEach((v, li) => {
+            const inp = $('qedChartGrid')?.querySelector(`[data-gs="${li}_${si}"]`);
+            if (inp) inp.value = v;
+          });
+        });
+        qedRenderMath();
+      }, 80);
+    }, 50);
   }
 
   return true;
@@ -8603,7 +8611,10 @@ function openQuestionEditor(idx) {
     // Reset sección matemáticas
     $('qedMathDetails').removeAttribute('open');
     $('qedMathPreview').style.display = 'none';
-    $('qedChartDatasets').innerHTML = '';
+    if ($('qedChartGrid'))    $('qedChartGrid').innerHTML = '';
+    if ($('qedSeriesNames'))  $('qedSeriesNames').value  = '';
+    if ($('qedChartLabels'))  $('qedChartLabels').value  = '';
+    if ($('qedChartTitle'))   $('qedChartTitle').value   = '';
     $('qedTblInputs').innerHTML = '';
     if (typeof _qedDsCount !== 'undefined')   _qedDsCount = 0;
     if (typeof _qedChartInst !== 'undefined' && _qedChartInst) { _qedChartInst.destroy(); _qedChartInst = null; }
@@ -8629,7 +8640,8 @@ function openQuestionEditor(idx) {
     }
     // Reset + auto-cargar sección matemáticas si el texto tiene [TABLA] o [GRÁFICA]
     $('qedMathPreview').style.display = 'none';
-    $('qedChartDatasets').innerHTML = '';
+    if ($('qedChartGrid'))   $('qedChartGrid').innerHTML = '';
+    if ($('qedSeriesNames')) $('qedSeriesNames').value   = '';
     $('qedTblInputs').innerHTML = '';
     if (typeof _qedDsCount !== 'undefined') _qedDsCount = 0;
     if (typeof _qedChartInst !== 'undefined' && _qedChartInst) { _qedChartInst.destroy(); _qedChartInst = null; }
@@ -8788,8 +8800,8 @@ function qedSwitchMath(btn, type) {
   $('qedMathChart').style.display  = type !== 'tabla'  ? 'flex'  : 'none';
   $('qedMathPreview').style.display = 'none';
 
-  if (type !== 'tabla' && $('qedChartDatasets').children.length === 0) {
-    qedAddChartDataset();
+  if (type !== 'tabla' && !$('qedChartGrid').querySelector('[data-gs]')) {
+    setTimeout(qedRebuildChartGrid, 50);
   }
 }
 
@@ -8815,34 +8827,43 @@ function qedRebuildTable() {
   cont.innerHTML = html;
 }
 
-function qedUpdateChartHint() {
-  const lbls = $('qedChartLabels').value.split(',').map(s=>s.trim()).filter(Boolean);
-  const hint = $('qedChartHint');
-  if (!hint) return;
-  if (lbls.length > 0) {
-    $('qedHintCount').textContent = lbls.length;
-    hint.style.display = 'block';
-    // Update placeholders on existing dataset value inputs
-    document.querySelectorAll('[id^="qedDsVals_"]').forEach(inp => {
-      inp.placeholder = lbls.map((l,i) => i < 4 ? (i+1)*10 : '…').join(',').slice(0,40);
-    });
-  } else {
-    hint.style.display = 'none';
-  }
-}
+function qedUpdateChartHint() {} // kept for compatibility
 
-function qedAddChartDataset() {
-  const idx   = _qedDsCount++;
-  const color = _qedColors[idx % _qedColors.length];
-  const row   = document.createElement('div');
-  row.id = 'qedDs_' + idx;
-  row.style.cssText = 'display:flex;gap:6px;align-items:center;flex-wrap:wrap';
-  row.innerHTML = `
-    <input type="color" value="${color}" id="qedDsCol_${idx}" style="width:28px;height:28px;border:none;border-radius:5px;padding:0;cursor:pointer;flex-shrink:0"/>
-    <input id="qedDsName_${idx}" placeholder="Serie (ej. Ventas)" style="width:110px;border:1px solid var(--b2);border-radius:6px;padding:4px 7px;font-family:inherit;font-size:12px"/>
-    <input id="qedDsVals_${idx}" placeholder="Un valor por etiqueta: 10,20,15,30" style="flex:1;min-width:130px;border:1px solid var(--b2);border-radius:6px;padding:4px 7px;font-family:inherit;font-size:12px"/>
-    <button onclick="document.getElementById('qedDs_${idx}').remove()" style="background:none;border:1px solid #fca5a5;border-radius:5px;padding:3px 7px;color:#dc2626;cursor:pointer;font-size:12px;flex-shrink:0">✕</button>`;
-  $('qedChartDatasets').appendChild(row);
+function qedAddChartDataset() {} // kept for compatibility
+
+// ── Nueva grilla de datos tipo hoja de cálculo ──
+function qedRebuildChartGrid() {
+  const labels  = $('qedChartLabels').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const series  = $('qedSeriesNames').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const grid    = $('qedChartGrid');
+  if (!grid) return;
+  if (!labels.length || !series.length) { grid.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:8px">Ingresa etiquetas y nombres de series arriba</div>'; return; }
+
+  // Preserve existing values
+  const prev = {};
+  grid.querySelectorAll('[data-gs]').forEach(inp => { prev[inp.dataset.gs] = inp.value; });
+
+  let html = '<table style="border-collapse:collapse;font-size:12px;width:100%">';
+  // Header row: empty corner + series names
+  html += '<tr><th style="background:#7c3aed;color:#fff;padding:5px 8px;border-radius:6px 0 0 0;font-size:11px">Etiqueta</th>';
+  series.forEach((s,si) => {
+    html += `<th style="background:${_qedColors[si%_qedColors.length]};color:#fff;padding:5px 8px;font-size:11px;white-space:nowrap">${s}</th>`;
+  });
+  html += '</tr>';
+  // Data rows: one per label
+  labels.forEach((lbl, li) => {
+    const bg = li%2===0?'#fff':'#f5f3ff';
+    html += `<tr style="background:${bg}">`;
+    html += `<td style="padding:4px 6px;font-weight:700;color:#7c3aed;border-bottom:1px solid #ede9fe;white-space:nowrap">${lbl}</td>`;
+    series.forEach((s,si) => {
+      const key = `${li}_${si}`;
+      const val = prev[key] || '';
+      html += `<td style="padding:3px 4px;border-bottom:1px solid #ede9fe"><input data-gs="${key}" data-li="${li}" data-si="${si}" value="${val}" placeholder="0" type="number" style="width:60px;border:1px solid #c4b5fd;border-radius:5px;padding:3px 5px;font-family:inherit;font-size:12px;text-align:center"/></td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</table>';
+  grid.innerHTML = html;
 }
 
 function qedRenderMath() {
@@ -8879,46 +8900,46 @@ function qedRenderMath() {
     content.innerHTML = html;
 
   } else {
-    // Chart
-    const title  = $('qedChartTitle').value.trim() || 'Gráfica';
-    const labels = $('qedChartLabels').value.split(',').map(s => s.trim()).filter(Boolean);
-    const dsEls  = $('qedChartDatasets').querySelectorAll('[id^="qedDs_"]');
-    const datasets = [];
-    dsEls.forEach(row => {
-      const idx    = row.id.split('_')[1];
-      const name   = ($('qedDsName_' + idx)?.value || 'Serie').trim();
-      const rawV   = $('qedDsVals_' + idx)?.value || '';
-      const values = rawV.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
-      const color  = $('qedDsCol_' + idx)?.value || _qedColors[0];
-      if (values.length) datasets.push({ name, values, color });
-    });
+    // Chart — read from new grid
+    const title   = $('qedChartTitle').value.trim() || 'Gráfica';
+    const labels  = $('qedChartLabels').value.split(',').map(s=>s.trim()).filter(Boolean);
+    const seriesN = $('qedSeriesNames').value.split(',').map(s=>s.trim()).filter(Boolean);
 
-    if (!labels.length || !datasets.length) {
-      alert('Agrega etiquetas y al menos una serie de valores.'); return;
+    if (!labels.length || !seriesN.length) {
+      alert('Ingresa etiquetas y nombres de series.'); return;
     }
+    if (!$('qedChartGrid').querySelector('[data-gs]')) {
+      qedRebuildChartGrid();
+      alert('Completa los datos en la tabla y presiona Previsualizar de nuevo.'); return;
+    }
+
+    // Build datasets from grid
+    const datasets = seriesN.map((name, si) => {
+      const values = labels.map((_, li) => {
+        const inp = $('qedChartGrid').querySelector(`[data-gs="${li}_${si}"]`);
+        return parseFloat(inp?.value || 0) || 0;
+      });
+      return { name, values, color: _qedColors[si % _qedColors.length] };
+    });
 
     // Render canvas
     content.innerHTML = `<canvas id="qedChartPrev" style="width:100%;max-height:320px"></canvas>`;
     if (_qedChartInst) { _qedChartInst.destroy(); _qedChartInst = null; }
-    const type = _qedMathType === 'pastel' ? 'pie' : (_qedMathType === 'linea' ? 'line' : 'bar');
+    const type  = _qedMathType === 'pastel' ? 'pie' : (_qedMathType === 'linea' ? 'line' : 'bar');
     const isPie = type === 'pie';
 
-    // Pad or trim each dataset to match label count
-    const chartDs = datasets.map((ds, i) => {
-      const padded = Array.from({length: labels.length}, (_, li) => ds.values[li] ?? 0);
-      return {
-        label:           ds.name,
-        data:            padded,
-        backgroundColor: isPie ? labels.map((_,li) => _qedColors[li % _qedColors.length]) : ds.color + 'cc',
-        borderColor:     isPie ? _qedColors : ds.color,
-        borderWidth:     1.5,
-        tension:         type === 'line' ? 0.3 : undefined,
-        fill:            false,
-        pointRadius:     type === 'line' ? 5 : undefined,
-        pointBackgroundColor: type === 'line' ? ds.color : undefined,
-        borderRadius:    type === 'bar' ? 4 : undefined,
-      };
-    });
+    const chartDs = datasets.map((ds, i) => ({
+      label:                ds.name,
+      data:                 ds.values,
+      backgroundColor:      isPie ? labels.map((_,li) => _qedColors[li%_qedColors.length]) : ds.color + 'cc',
+      borderColor:          isPie ? _qedColors : ds.color,
+      borderWidth:          1.5,
+      tension:              type === 'line' ? 0.3 : undefined,
+      fill:                 false,
+      pointRadius:          type === 'line' ? 5 : undefined,
+      pointBackgroundColor: type === 'line' ? ds.color : undefined,
+      borderRadius:         type === 'bar' ? 4 : undefined,
+    }));
 
     _qedChartInst = new Chart(document.getElementById('qedChartPrev'), {
       type,
@@ -8959,16 +8980,19 @@ function qedInsertMathIntoQuestion() {
     desc = '[TABLA] ' + headers.join(' | ');
     dataRows.forEach(r => { desc += '\n' + r.join(' | '); });
   } else {
-    const title  = $('qedChartTitle').value.trim() || 'Gráfica';
-    const labels = $('qedChartLabels').value.trim();
-    const type   = {barras:'Barras',linea:'Línea',pastel:'Pastel'}[_qedMathType] || '';
-    const dsEls  = $('qedChartDatasets').querySelectorAll('[id^="qedDs_"]');
-    const series = [];
-    dsEls.forEach(row => {
-      const idx = row.id.split('_')[1];
-      const name = $('qedDsName_'+idx)?.value||'Serie';
-      const vals = $('qedDsVals_'+idx)?.value||'';
-      series.push(`${name}: ${vals}`);
+    const title   = $('qedChartTitle').value.trim() || 'Gráfica';
+    const labels  = $('qedChartLabels').value.trim();
+    const seriesN = $('qedSeriesNames').value.split(',').map(s=>s.trim()).filter(Boolean);
+    const type    = {barras:'Barras',linea:'Línea',pastel:'Pastel'}[_qedMathType] || 'Barras';
+    const lblArr  = labels.split(',').map(s=>s.trim()).filter(Boolean);
+
+    // Read values from grid
+    const series = seriesN.map((name, si) => {
+      const vals = lblArr.map((_, li) => {
+        const inp = $('qedChartGrid')?.querySelector(`[data-gs="${li}_${si}"]`);
+        return inp?.value || '0';
+      }).join(',');
+      return `${name}: ${vals}`;
     });
     desc = `[GRÁFICA ${type.toUpperCase()}] ${title}\nEtiquetas: ${labels}\n` + series.join('\n');
   }
