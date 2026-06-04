@@ -2227,9 +2227,28 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
   .login-card{padding:36px 24px;margin:16px}
   .logo-text{font-size:30px}
 
-  /* Dashboard topbar */
-  .topbar{padding:10px 14px;flex-wrap:wrap;gap:8px}
-  .logo-sm{font-size:18px}
+  /* Dashboard topbar — una fila compacta en móvil */
+  .topbar{padding:8px 10px;flex-wrap:nowrap;gap:6px;justify-content:space-between}
+  .logo-sm{font-size:16px}
+  /* Ocultar labels, dejar solo iconos */
+  .tb-label{display:none}
+  .tb-icon{font-size:16px}
+  /* Videos link compacto */
+  .topbar a[href="videos.html"]{padding:6px 8px}
+  /* Nova button compacto */
+  button[onclick="openNova()"]{padding:6px 8px;min-width:34px;justify-content:center}
+  /* Ranking solo icono */
+  .ranking-topbar-btn{padding:6px 8px;border-radius:50%;min-width:34px;justify-content:center}
+  .ranking-topbar-btn .tb-ranking-text{display:none}
+  /* Admin solo icono */
+  #btnAdminPanel{padding:6px 8px;border-radius:50%;min-width:34px;justify-content:center}
+  /* Profile — solo círculo */
+  .profile-info{display:none}
+  .profile-chevron{display:none}
+  .profile-btn{padding:3px;border-radius:50%;gap:0}
+  /* Streak compacto */
+  .streak-days-label{display:none}
+  #streakBar{padding:4px 8px!important}
   .dash-body{padding:24px 14px;gap:18px}
   .drop-zone{padding:32px 20px}
   .meta-card{padding:20px 16px}
@@ -2361,18 +2380,6 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
 .streak-sub{font-size:11px;color:#b45309;margin-top:2px}
 .streak-count{font-size:26px;font-weight:900;color:#f97316;font-family:'DM Mono',monospace;flex-shrink:0}
 
-/* ── PREGUNTA DEL DIA ── */
-.qod-card{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1.5px solid #86efac;border-radius:16px;padding:18px 20px;margin-bottom:16px;animation:fadeUp .45s ease both;cursor:default;transition:all .2s}
-.qod-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.qod-icon{font-size:20px}
-.qod-label{font-size:11px;font-weight:800;color:#15803d;letter-spacing:1px;text-transform:uppercase}
-.qod-question{font-size:14px;font-weight:700;color:#14532d;line-height:1.5;margin-bottom:12px}
-.qod-opts{display:flex;flex-direction:column;gap:6px}
-.qod-opt{background:#fff;border:1.5px solid #86efac;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:600;color:#15803d;cursor:pointer;transition:all .15s;text-align:left;font-family:'Sora',sans-serif;width:100%}
-.qod-opt:hover:not([disabled]){background:#dcfce7;border-color:#22c55e}
-.qod-opt.correct{background:#dcfce7;border-color:#16a34a;color:#15803d}
-.qod-opt.wrong{background:#fee2e2;border-color:#dc2626;color:#dc2626}
-.qod-result{font-size:13px;font-weight:700;margin-top:10px;padding:8px 12px;border-radius:10px}
 
 /* ── DIFICULTAD PERSONAL ── */
 .diff-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:800;padding:3px 9px;border-radius:20px;letter-spacing:.4px;text-transform:uppercase;margin-top:4px}
@@ -2870,11 +2877,17 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
   <div class="topbar">
     <div style="display:flex;align-items:center;gap:12px">
       <div class="logo-sm"><span style="color:var(--teal)">DASH</span></div>
-      <a href="videos.html" style="background:var(--card);border:1.5px solid var(--b2);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:5px;transition:all .15s" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--b2)';this.style.color='var(--muted)'">📹 Videos</a>
-      <button onclick="openNova()" style="background:linear-gradient(135deg,#7c6fff,#5b4fe0);border:none;border-radius:8px;padding:5px 14px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s;font-family:inherit;box-shadow:0 2px 10px rgba(124,111,255,.35)" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 16px rgba(124,111,255,.5)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 10px rgba(124,111,255,.35)'">✦ Asistente IA</button>
+      <a href="videos.html" style="background:var(--card);border:1.5px solid var(--b2);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:5px;transition:all .15s" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--b2)';this.style.color='var(--muted)'"><span class="tb-icon">📹</span><span class="tb-label"> Videos</span></a>
+      <button onclick="openNova()" style="background:linear-gradient(135deg,#7c6fff,#5b4fe0);border:none;border-radius:8px;padding:5px 14px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s;font-family:inherit;box-shadow:0 2px 10px rgba(124,111,255,.35)" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 16px rgba(124,111,255,.5)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 10px rgba(124,111,255,.35)'"><span class="tb-icon">✦</span><span class="tb-label"> Asistente IA</span></button>
+    </div>
+    <!-- RACHA topbar -->
+    <div id="streakBar" style="display:none;align-items:center;gap:5px;background:linear-gradient(135deg,#fff7ed,#fef3c7);border:1.5px solid #fed7aa;border-radius:20px;padding:4px 10px 4px 8px;flex-shrink:0">
+      <span id="streakFlame" style="font-size:15px;line-height:1">🔥</span>
+      <span id="streakCount" style="font-size:14px;font-weight:900;color:#f97316;font-family:'DM Mono',monospace">0</span>
+      <span class="streak-days-label" style="font-size:10px;font-weight:700;color:#92400e">días</span>
     </div>
     <div style="display:flex;gap:10px;align-items:center">
-      <button class="ranking-topbar-btn" id="rankingTopbarBtn" onclick="openRanking()">🏆 Ranking</button>
+      <button class="ranking-topbar-btn" id="rankingTopbarBtn" onclick="openRanking()">🏆 <span class="tb-ranking-text">Ranking</span></button>
       <div class="profile-btn" id="profileBtn" onclick="toggleProfileMenu(this)">
         <div class="profile-avatar-initials" id="profileAvatarSmall">?</div>
         <div class="profile-info">
@@ -2903,26 +2916,6 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
   <div class="dash-body">
 
 
-    <!-- ── RACHA DE ESTUDIO ── -->
-    <div class="streak-bar" id="streakBar" style="display:none">
-      <div class="streak-flame">🔥</div>
-      <div class="streak-info">
-        <div class="streak-title">Racha de estudio</div>
-        <div class="streak-sub" id="streakSub">días consecutivos practicando</div>
-      </div>
-      <div class="streak-count" id="streakCount">0</div>
-    </div>
-
-    <!-- ── PREGUNTA DEL DÍA ── -->
-    <div class="qod-card" id="qodCard" style="display:none">
-      <div class="qod-header">
-        <div class="qod-icon">🌟</div>
-        <div class="qod-label">Pregunta del día</div>
-      </div>
-      <div class="qod-question" id="qodQuestion">Cargando…</div>
-      <div class="qod-opts" id="qodOpts"></div>
-      <div class="qod-result" id="qodResult"></div>
-    </div>
 
     <!-- ── EXÁMENES DISPONIBLES ── -->
     <div class="exams-section">
@@ -4059,7 +4052,6 @@ function enterExams() {
   // Nuevas features de engagement — delay para garantizar que las funciones estén definidas
   setTimeout(() => {
     if (typeof updateStreak === 'function') updateStreak();
-    if (typeof initQOD     === 'function') setTimeout(initQOD, 400);
   }, 100);
 }
 
@@ -6538,7 +6530,6 @@ function exitToLogin() {
   stopTimer();
   if (S.user) {
     // Mantener sesión — volver al dashboard
-    _qodAnswered = false; // permitir ver estado QOD actualizado
     updateStreak();
     show('dashScreen');
   } else {
@@ -13128,18 +13119,18 @@ function updateStreak() {
 function renderStreakBar(streak, note) {
   const bar   = document.getElementById('streakBar');
   const cnt   = document.getElementById('streakCount');
-  const sub   = document.getElementById('streakSub');
+  const flame = document.getElementById('streakFlame');
   if (!bar) return;
   if (streak < 1) { bar.style.display = 'none'; return; }
   bar.style.display = 'flex';
-  cnt.textContent   = streak;
-  const emoji = streak >= 7 ? '🔥🔥' : streak >= 3 ? '🔥' : '✨';
-  document.querySelector('.streak-flame').textContent = emoji;
+  if (cnt)   cnt.textContent   = streak;
+  if (flame) flame.textContent = streak >= 7 ? '🔥🔥' : streak >= 3 ? '🔥' : '✨';
+  // Actualizar tooltip/title para mostrar mensaje completo al hover
   const msg = streak === 1 ? 'Primer día · ¡sigue así!'
-            : streak < 3  ? `${streak} días · ¡buen comienzo!`
-            : streak < 7  ? `${streak} días consecutivos · ¡vas muy bien!`
-            : `${streak} días consecutivos · ¡racha impresionante!`;
-  sub.textContent = msg + (note ? ' · ' + note : '');
+            : streak < 3  ? streak + ' días · ¡buen comienzo!'
+            : streak < 7  ? streak + ' días · ¡vas muy bien!'
+            : streak + ' días · ¡racha impresionante!';
+  bar.title = msg + (note ? ' · ' + note : '');
 }
 
 // Registrar día de estudio al terminar un examen
@@ -13157,89 +13148,6 @@ function markStudyDay() {
 // ══════════════════════════════════════════════════════
 //  PREGUNTA DEL DÍA
 // ══════════════════════════════════════════════════════
-let _qodAnswered = false;
-
-function initQOD() {
-  // Solo mostrar si hay exámenes en el catálogo
-  if (!window.CATALOG || !window.CATALOG.length) {
-    // Reintentar una vez más si el catálogo aún no cargó
-    setTimeout(initQOD, 1500);
-    return;
-  }
-
-  // Buscar exámenes con preguntas cargadas
-  const examensConPregs = window.CATALOG.filter(e => e.questions && Array.isArray(e.questions) && e.questions.length > 0);
-  if (!examensConPregs.length) return;
-
-  // Semilla del día: cambiar cada día con seed = fecha
-  const today = new Date().toISOString().slice(0,10);
-  const seed  = today.split('-').reduce((a,b) => a * 31 + parseInt(b), 0);
-  const exam  = examensConPregs[seed % examensConPregs.length];
-  const q     = exam.questions[seed % exam.questions.length];
-  if (!q || !q.question) return;
-
-  // Verificar si ya se respondió hoy
-  const doneKey = 'qod_done_' + today;
-  const doneData = JSON.parse(localStorage.getItem(doneKey) || 'null');
-
-  const card = document.getElementById('qodCard');
-  if (!card) return;
-  card.style.display = 'block';
-  document.getElementById('qodQuestion').textContent = q.question;
-
-  const opts = document.getElementById('qodOpts');
-  const letters = ['A','B','C','D','E'];
-  const options  = q.options || [];
-  opts.innerHTML = '';
-
-  options.forEach((opt, i) => {
-    const letter = letters[i];
-    const btn = document.createElement('button');
-    btn.className = 'qod-opt';
-    btn.textContent = letter + ') ' + opt;
-    btn.dataset.letter = letter;
-
-    if (doneData) {
-      // Ya respondida — mostrar resultado sin interacción
-      btn.disabled = true;
-      if (letter === q.answer) btn.classList.add('correct');
-      else if (letter === doneData.chosen) btn.classList.add('wrong');
-    } else {
-      btn.onclick = () => answerQOD(letter, q.answer, today);
-    }
-    opts.appendChild(btn);
-  });
-
-  const resultEl = document.getElementById('qodResult');
-  if (doneData) {
-    const correct = doneData.chosen === q.answer;
-    resultEl.style.display = 'block';
-    resultEl.style.background = correct ? '#dcfce7' : '#fee2e2';
-    resultEl.style.color = correct ? '#15803d' : '#dc2626';
-    resultEl.textContent = correct ? '✅ ¡Correcto! Respondiste bien hoy.' : '❌ Respuesta incorrecta · La correcta era ' + q.answer;
-    _qodAnswered = true;
-  }
-}
-
-function answerQOD(chosen, correct, today) {
-  if (_qodAnswered) return;
-  _qodAnswered = true;
-  localStorage.setItem('qod_done_' + today, JSON.stringify({ chosen, correct }));
-
-  const opts = document.querySelectorAll('.qod-opt');
-  opts.forEach(btn => {
-    btn.disabled = true;
-    if (btn.dataset.letter === correct) btn.classList.add('correct');
-    else if (btn.dataset.letter === chosen) btn.classList.add('wrong');
-  });
-
-  const resultEl = document.getElementById('qodResult');
-  const isRight  = chosen === correct;
-  resultEl.style.display  = 'block';
-  resultEl.style.background = isRight ? '#dcfce7' : '#fee2e2';
-  resultEl.style.color    = isRight ? '#15803d' : '#dc2626';
-  resultEl.textContent    = isRight ? '✅ ¡Correcto! Vuelve mañana para una nueva pregunta.' : '❌ Incorrecto · La respuesta correcta era ' + correct;
-}
 
 // ══════════════════════════════════════════════════════
 //  INDICADOR DE DIFICULTAD PERSONAL
