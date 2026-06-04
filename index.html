@@ -4056,9 +4056,11 @@ function enterExams() {
   const rfab = $('rankingFab'); if (rfab) rfab.style.display = 'none';
   const rtbBtn = $('rankingTopbarBtn'); if (rtbBtn) rtbBtn.style.display = 'flex';
   show('dashScreen');
-  // Nuevas features de engagement
-  updateStreak();
-  setTimeout(initQOD, 400); // pequeño delay para que CATALOG esté listo
+  // Nuevas features de engagement — delay para garantizar que las funciones estén definidas
+  setTimeout(() => {
+    if (typeof updateStreak === 'function') updateStreak();
+    if (typeof initQOD     === 'function') setTimeout(initQOD, 400);
+  }, 100);
 }
 
 // ── Entrar a ejercicios desde modeScreen ──
@@ -8604,13 +8606,13 @@ function normalizeImportedQ(q) {
     text,
     options,
     answerIdx,
-    area:         q.area || '',
-    explanation:  q.explanation || q.explicacion || '',
-    imageName:    q.image || q.imageName || null,
-    imageDataUrl: null,
-    passage:      q.passage      || '',
-    passage_id:   q.passage_id   || '',
-    passage_title:q.passage_title|| '',
+    area:          q.area || '',
+    explanation:   q.explanation || q.explicacion || '',
+    imageName:     q.image || q.imageName || null,
+    imageDataUrl:  null,
+    passage:       q.passage       || '',
+    passage_id:    q.passage_id    || '',
+    passage_title: q.passage_title || '',
   };
 }
 
