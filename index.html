@@ -408,7 +408,7 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .qed-label{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase}
 .qed-textarea,.qed-input{border:1px solid var(--b2);border-radius:8px;padding:10px 14px;
   font-size:14px;font-family:'Sora',sans-serif;color:var(--text);outline:none;transition:border-color .15s;
-  resize:vertical;background:#fff}
+  resize:vertical;background:#fff;width:100%;box-sizing:border-box}
 .qed-textarea:focus,.qed-input:focus{border-color:var(--teal)}
 .qed-options-list{display:flex;flex-direction:column;gap:8px;margin-bottom:8px}
 .qed-option-row{display:flex;align-items:center;gap:8px}
@@ -867,6 +867,22 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
 .ai-resp-icon{font-size:11px;line-height:1}
 .ai-resp-body{font-size:13.5px;color:#cbd5e1;line-height:1.85;white-space:pre-wrap}
 
+/* ── Diagnóstico modal: tema claro ── */
+.ai-diag-body .exam-ai-response{ color:#1e293b }
+.ai-diag-body .ai-resp-free{ color:#334155;white-space:pre-wrap }
+.ai-diag-body .ai-resp-section{
+  background:#f8f7ff;
+  border-color:#ddd6fe;
+  border-left:3px solid var(--sec-accent,#7c3aed) }
+.ai-diag-body .ai-resp-title{ color:var(--sec-accent,#7c3aed) }
+.ai-diag-body .ai-resp-body{ color:#334155 }
+.ai-diag-body .ai-opt-letter{ color:#7c3aed }
+.ai-diag-body .ai-opt-text{ color:#475569 }
+.ai-diag-body .ai-opt-correct .ai-opt-letter{ color:#059669 }
+.ai-diag-body .ai-opt-correct .ai-opt-text{ color:#065f46;font-weight:600 }
+.ai-diag-body .ai-opt-wrong .ai-opt-letter,
+.ai-diag-body .ai-opt-wrong .ai-opt-text{ color:#dc2626 }
+
 /* Option rows */
 .ai-opt-row{display:flex;gap:8px;margin:3px 0;align-items:baseline}
 .ai-opt-letter{font-weight:800;color:#818cf8;font-size:12.5px;flex-shrink:0;width:22px;font-family:monospace}
@@ -1060,18 +1076,18 @@ button,input{font-family:'Sora',sans-serif;cursor:pointer}
   cursor:pointer;transition:all .16s;font-family:inherit;margin-top:12px;
   box-shadow:0 3px 12px rgba(124,58,237,.28);display:flex;align-items:center;justify-content:center;gap:8px}
 .ai-diag-btn:hover:not(:disabled){background:linear-gradient(135deg,#6d28d9,#4c1d95);transform:translateY(-1px)}
-.ai-diag-overlay{position:fixed;inset:0;background:rgba(10,10,22,.55);backdrop-filter:blur(8px);
+.ai-diag-overlay{position:fixed;inset:0;background:rgba(10,10,22,.75);
   z-index:700;display:none;align-items:flex-end;justify-content:center}
 @media(min-width:640px){.ai-diag-overlay{align-items:center;padding:20px}}
 .ai-diag-overlay.show{display:flex}
-.ai-diag-modal{background:#fff;width:100%;max-width:540px;max-height:88vh;
+.ai-diag-modal{background:#ffffff;width:100%;max-width:540px;max-height:88vh;
   display:flex;flex-direction:column;overflow:hidden;border-radius:20px 20px 0 0;
-  box-shadow:0 -4px 40px rgba(0,0,0,.12);animation:slideUpAI .28s cubic-bezier(.34,1.1,.64,1) both}
-@media(min-width:640px){.ai-diag-modal{border-radius:18px}}
-.ai-diag-header{padding:18px 18px 12px;border-bottom:1px solid #f1f5f9;flex-shrink:0}
+  box-shadow:0 -8px 48px rgba(0,0,0,.35);animation:slideUpAI .28s cubic-bezier(.34,1.1,.64,1) both}
+@media(min-width:640px){.ai-diag-modal{border-radius:18px;box-shadow:0 8px 48px rgba(0,0,0,.35)}}
+.ai-diag-header{padding:18px 18px 12px;border-bottom:1px solid #f1f5f9;flex-shrink:0;background:#ffffff}
 .ai-diag-title{font-size:16px;font-weight:800;color:#0f172a;display:flex;align-items:center;gap:8px}
-.ai-diag-body{flex:1;overflow-y:auto;padding:14px 18px;font-size:13.5px;color:#334155;line-height:1.8}
-.ai-diag-footer{padding:10px 18px 18px;border-top:1px solid #f1f5f9;flex-shrink:0}
+.ai-diag-body{flex:1;overflow-y:auto;padding:14px 18px;font-size:13.5px;color:#334155;line-height:1.8;background:#ffffff}
+.ai-diag-footer{padding:10px 18px 18px;border-top:1px solid #f1f5f9;flex-shrink:0;background:#ffffff}
 .ai-diag-close-btn{width:100%;background:#f1f5f9;border:none;border-radius:11px;
   padding:12px;font-size:13px;font-weight:700;color:#64748b;cursor:pointer;
   font-family:inherit;transition:background .14s}
@@ -2335,6 +2351,50 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
   .expl-modal{padding:24px 18px}
   .expl-ans-row{flex-direction:column;gap:8px}
 }
+
+/* ── RACHA DE ESTUDIO ── */
+.streak-bar{background:linear-gradient(135deg,#fff7ed,#fef3c7);border:1.5px solid #fed7aa;border-radius:16px;padding:14px 20px;display:flex;align-items:center;gap:14px;margin-bottom:16px;animation:fadeUp .4s ease both}
+.streak-flame{font-size:28px;line-height:1;flex-shrink:0;animation:flamePulse 1.4s ease-in-out infinite}
+@keyframes flamePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+.streak-info{flex:1}
+.streak-title{font-size:13px;font-weight:800;color:#92400e}
+.streak-sub{font-size:11px;color:#b45309;margin-top:2px}
+.streak-count{font-size:26px;font-weight:900;color:#f97316;font-family:'DM Mono',monospace;flex-shrink:0}
+
+/* ── PREGUNTA DEL DIA ── */
+.qod-card{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1.5px solid #86efac;border-radius:16px;padding:18px 20px;margin-bottom:16px;animation:fadeUp .45s ease both;cursor:default;transition:all .2s}
+.qod-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.qod-icon{font-size:20px}
+.qod-label{font-size:11px;font-weight:800;color:#15803d;letter-spacing:1px;text-transform:uppercase}
+.qod-question{font-size:14px;font-weight:700;color:#14532d;line-height:1.5;margin-bottom:12px}
+.qod-opts{display:flex;flex-direction:column;gap:6px}
+.qod-opt{background:#fff;border:1.5px solid #86efac;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:600;color:#15803d;cursor:pointer;transition:all .15s;text-align:left;font-family:'Sora',sans-serif;width:100%}
+.qod-opt:hover:not([disabled]){background:#dcfce7;border-color:#22c55e}
+.qod-opt.correct{background:#dcfce7;border-color:#16a34a;color:#15803d}
+.qod-opt.wrong{background:#fee2e2;border-color:#dc2626;color:#dc2626}
+.qod-result{font-size:13px;font-weight:700;margin-top:10px;padding:8px 12px;border-radius:10px}
+
+/* ── DIFICULTAD PERSONAL ── */
+.diff-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:800;padding:3px 9px;border-radius:20px;letter-spacing:.4px;text-transform:uppercase;margin-top:4px}
+.diff-easy{background:rgba(22,163,74,.1);color:#15803d;border:1px solid rgba(22,163,74,.3)}
+.diff-hard{background:rgba(217,119,6,.1);color:#b45309;border:1px solid rgba(217,119,6,.3)}
+.diff-new{background:rgba(99,102,241,.1);color:#4338ca;border:1px solid rgba(99,102,241,.3)}
+
+/* ── DUELO VS PROMEDIO ── */
+.duel-banner{background:linear-gradient(135deg,#1e1b4b,#312e81);border-radius:16px;padding:18px 20px;margin-top:14px;display:none;animation:fadeUp .4s ease both}
+.duel-title{color:#a5b4fc;font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
+.duel-row{display:flex;align-items:center;gap:12px}
+.duel-col{flex:1;text-align:center}
+.duel-col-label{font-size:11px;color:#a5b4fc;font-weight:600;margin-bottom:4px}
+.duel-col-pct{font-size:28px;font-weight:900;font-family:'DM Mono',monospace}
+.duel-col-pct.me{color:#818cf8}
+.duel-col-pct.avg{color:#94a3b8}
+.duel-vs{font-size:18px;font-weight:900;color:#c7d2fe;flex-shrink:0}
+.duel-verdict{margin-top:10px;text-align:center;font-size:13px;font-weight:800;color:#c7d2fe;padding:8px;background:rgba(255,255,255,.06);border-radius:10px}
+
+/* ── HISTORIAL CHART ── */
+.hist-chart-wrap{background:#f8fafc;border:1px solid var(--b2);border-radius:14px;padding:14px;margin-top:14px;display:none}
+.hist-chart-title{font-size:11px;font-weight:800;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
 </style>
 
 <style>
@@ -2694,7 +2754,7 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
             <button onclick="mtDownloadChart()" id="mtDownloadBtn" style="display:none;background:var(--teal);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">💾 Descargar</button>
           </div>
           <div style="margin-top:12px;text-align:center">
-            <canvas id="mtChartCanvas" style="max-height:380px;border-radius:12px;background:#fff;padding:10px;border:1px solid var(--b2);display:none"></canvas>
+            <div id="mtChartContainer" style="display:none;position:relative;width:100%;height:320px;border-radius:12px;background:#fff;padding:10px;border:1px solid var(--b2);box-sizing:border-box"><canvas id="mtChartCanvas"></canvas></div>
           </div>
         </div>
       </div>
@@ -2842,6 +2902,28 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
   </div>
   <div class="dash-body">
 
+
+    <!-- ── RACHA DE ESTUDIO ── -->
+    <div class="streak-bar" id="streakBar" style="display:none">
+      <div class="streak-flame">🔥</div>
+      <div class="streak-info">
+        <div class="streak-title">Racha de estudio</div>
+        <div class="streak-sub" id="streakSub">días consecutivos practicando</div>
+      </div>
+      <div class="streak-count" id="streakCount">0</div>
+    </div>
+
+    <!-- ── PREGUNTA DEL DÍA ── -->
+    <div class="qod-card" id="qodCard" style="display:none">
+      <div class="qod-header">
+        <div class="qod-icon">🌟</div>
+        <div class="qod-label">Pregunta del día</div>
+      </div>
+      <div class="qod-question" id="qodQuestion">Cargando…</div>
+      <div class="qod-opts" id="qodOpts"></div>
+      <div class="qod-result" id="qodResult"></div>
+    </div>
+
     <!-- ── EXÁMENES DISPONIBLES ── -->
     <div class="exams-section">
       <div class="exams-section-title">
@@ -2970,6 +3052,16 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
             <label class="builder-label">&nbsp;</label>
             <div class="builder-time-preview" id="bldTimePreview">= 270 min (4:30 h)</div>
           </div>
+          <div class="builder-field" style="flex-shrink:0;align-self:flex-end;padding-bottom:4px">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none">
+              <div style="position:relative;width:42px;height:24px;flex-shrink:0" onclick="toggleNuevoBadge(this)">
+                <input type="checkbox" id="bldNuevo" style="display:none"/>
+                <div id="bldNuevoTrack" style="position:absolute;inset:0;border-radius:12px;background:#e2e8f0;transition:background .2s"></div>
+                <div id="bldNuevoThumb" style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s"></div>
+              </div>
+              <span style="font-size:12px;font-weight:700;color:var(--muted)">Badge <span style="color:#f97316;font-size:11px;background:#fff7ed;border:1px solid #fed7aa;border-radius:20px;padding:1px 7px">NUEVO</span></span>
+            </label>
+          </div>
         </div>
       </div>
     </div>
@@ -3073,29 +3165,46 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
           </div>
 
           <!-- ── GRÁFICAS ── -->
-          <div id="qedMathChart" style="display:none;flex-direction:column;gap:12px">
+          <div id="qedMathChart" style="display:none;flex-direction:column;gap:10px">
+            <!-- Título -->
             <div>
-              <label style="font-size:12px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px">Título de la gráfica</label>
-              <input id="qedChartTitle" class="qed-input" placeholder="ej. Promedios por mes"/>
+              <label style="font-size:11px;color:var(--muted);font-weight:700;display:block;margin-bottom:3px">TÍTULO</label>
+              <input id="qedChartTitle" class="qed-input" placeholder="ej. Calificaciones de estudiantes"/>
             </div>
+            <!-- Ejes -->
+            <div style="display:flex;gap:8px">
+              <div style="flex:1">
+                <label style="font-size:11px;color:var(--muted);font-weight:700;display:block;margin-bottom:3px">EJE X</label>
+                <input id="qedAxisX" class="qed-input" placeholder="ej. Mes"/>
+              </div>
+              <div style="flex:1">
+                <label style="font-size:11px;color:var(--muted);font-weight:700;display:block;margin-bottom:3px">EJE Y</label>
+                <input id="qedAxisY" class="qed-input" placeholder="ej. Frecuencia"/>
+              </div>
+            </div>
+            <!-- Opciones -->
+            <label style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer">
+              <input type="checkbox" id="qedShowValues" checked style="accent-color:#7c3aed"/> Mostrar valores sobre barras
+            </label>
 
-            <!-- Grid de datos tipo hoja de cálculo -->
+            <!-- Grid de datos -->
             <div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;padding:10px">
               <div style="font-size:11px;font-weight:700;color:#7c3aed;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">📊 Tabla de datos</div>
-              <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
-                <label style="font-size:12px;color:var(--muted)">Etiquetas (eje X):</label>
-                <input id="qedChartLabels" style="flex:1;min-width:140px;border:1px solid #a78bfa;border-radius:6px;padding:5px 8px;font-family:inherit;font-size:12px;background:#fff" placeholder="ene,feb,mar,abr" oninput="qedRebuildChartGrid()"/>
+              <div style="margin-bottom:8px">
+                <label style="font-size:11px;color:var(--muted);font-weight:600;display:block;margin-bottom:3px">Etiquetas eje X (separadas por coma)</label>
+                <input id="qedChartLabels" style="width:100%;border:1px solid #a78bfa;border-radius:6px;padding:6px 8px;font-family:inherit;font-size:12px;background:#fff;box-sizing:border-box" placeholder="5,6,7,8,9,10  ó  Ene,Feb,Mar,Abr" oninput="qedRebuildChartGrid()"/>
               </div>
-              <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
-                <label style="font-size:12px;color:var(--muted)">Series:</label>
-                <input id="qedSeriesNames" style="flex:1;min-width:140px;border:1px solid #a78bfa;border-radius:6px;padding:5px 8px;font-family:inherit;font-size:12px;background:#fff" placeholder="Serie A,Serie B" oninput="qedRebuildChartGrid()"/>
-                <button onclick="qedRebuildChartGrid()" style="background:#7c3aed;color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">↻ Actualizar</button>
+              <div style="margin-bottom:10px">
+                <label style="font-size:11px;color:var(--muted);font-weight:600;display:block;margin-bottom:3px">Nombre(s) de series (separados por coma)</label>
+                <div style="display:flex;gap:6px">
+                  <input id="qedSeriesNames" style="flex:1;border:1px solid #a78bfa;border-radius:6px;padding:6px 8px;font-family:inherit;font-size:12px;background:#fff" placeholder="Frecuencia  ó  Grupo A,Grupo B" oninput="qedRebuildChartGrid()"/>
+                  <button onclick="qedRebuildChartGrid()" style="background:#7c3aed;color:#fff;border:none;border-radius:6px;padding:6px 10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">↻</button>
+                </div>
               </div>
-              <!-- La grilla se genera aquí -->
               <div id="qedChartGrid" style="overflow-x:auto"></div>
             </div>
 
-            <button onclick="qedRenderMath()" style="background:linear-gradient(135deg,#7c3aed,#5b4fe0);color:#fff;border:none;border-radius:8px;padding:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">👁 Previsualizar gráfica</button>
+            <button onclick="qedRenderMath()" style="background:linear-gradient(135deg,#7c3aed,#5b4fe0);color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">👁 Previsualizar gráfica</button>
           </div>
 
           <!-- Preview -->
@@ -3451,6 +3560,28 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
     <div class="review-grid" id="reviewGrid"></div>
     <button class="btn-exit" onclick="exitToLogin()">Volver al inicio</button>
     <button class="btn-exit" style="background:linear-gradient(135deg,#f59e0b,#d97706);margin-top:10px" onclick="openRanking()">🏆 Ver ranking global</button>
+    <!-- ── DUELO VS PROMEDIO ── -->
+    <div class="duel-banner" id="duelBanner">
+      <div class="duel-title">⚔️ Duelo vs el grupo</div>
+      <div class="duel-row">
+        <div class="duel-col">
+          <div class="duel-col-label">Tu resultado</div>
+          <div class="duel-col-pct me" id="duelMe">—%</div>
+        </div>
+        <div class="duel-vs">VS</div>
+        <div class="duel-col">
+          <div class="duel-col-label">Promedio del grupo</div>
+          <div class="duel-col-pct avg" id="duelAvg">—%</div>
+        </div>
+      </div>
+      <div class="duel-verdict" id="duelVerdict"></div>
+    </div>
+
+    <!-- ── HISTORIAL DE INTENTOS ── -->
+    <div class="hist-chart-wrap" id="histChartWrap">
+      <div class="hist-chart-title">📈 Tu progreso en este examen</div>
+      <canvas id="histChart" height="120"></canvas>
+    </div>
     <button class="ai-diag-btn" id="btnAIDiagnosis" onclick="openDiagModal()">&#x25C9; Diagnóstico de BOBI</button>
     <button class="ai-practice-btn" id="btnAIPractice" onclick="openPracticeFromResults()">🧩 Practicar mis temas débiles</button>
     <button class="btn-exit" id="btnResultsAdmin" style="display:none;background:var(--teal);color:#fff;border:none;margin-top:8px" onclick="openAdmin()">⚙️ Editar imágenes del examen</button>
@@ -3925,6 +4056,9 @@ function enterExams() {
   const rfab = $('rankingFab'); if (rfab) rfab.style.display = 'none';
   const rtbBtn = $('rankingTopbarBtn'); if (rtbBtn) rtbBtn.style.display = 'flex';
   show('dashScreen');
+  // Nuevas features de engagement
+  updateStreak();
+  setTimeout(initQOD, 400); // pequeño delay para que CATALOG esté listo
 }
 
 // ── Entrar a ejercicios desde modeScreen ──
@@ -4025,6 +4159,7 @@ function mtInitVisual(topic) {
     _mtDatasetCount = 0;
     $('mtDatasetList').innerHTML = '';
     $('mtChartCanvas').style.display = 'none';
+    if ($('mtChartContainer')) $('mtChartContainer').style.display = 'none';
     $('mtDownloadBtn').style.display = 'none';
     if (_mtChartInstance) { _mtChartInstance.destroy(); _mtChartInstance = null; }
     // Default: 1 dataset
@@ -4086,8 +4221,9 @@ function mtRenderChart() {
 
   if (_mtChartInstance) { _mtChartInstance.destroy(); _mtChartInstance = null; }
 
-  const canvas = $('mtChartCanvas');
-  canvas.style.display = 'block';
+  const container = $('mtChartContainer');
+  const canvas    = $('mtChartCanvas');
+  container.style.display = 'block';
   $('mtDownloadBtn').style.display = '';
 
   const ctx = canvas.getContext('2d');
@@ -4122,15 +4258,16 @@ function mtRenderChart() {
     data: { labels, datasets: chartDatasets },
     options: {
       responsive: true,
-      maintainAspectRatio: true,
+      maintainAspectRatio: false,
+      layout: { padding: { top: 8, right: 8 } },
       plugins: {
         legend: { display: true, position: 'top', labels: { usePointStyle: true, font: { size: 12 } } },
-        title:  { display: true, text: title, font: { size: 15, weight: 'bold' }, color: '#1e293b', padding: { bottom: 12 } },
+        title:  { display: !!title, text: title, font: { size: 14, weight: 'bold' }, color: '#1e293b', padding: { bottom: 10 } },
         tooltip: { mode: 'index', intersect: false },
       },
       scales: chartType !== 'pie' ? {
-        y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 12 } } },
-        x: { grid: { display: false }, ticks: { font: { size: 12 } } }
+        y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 } } },
+        x: { grid: { display: false }, ticks: { font: { size: 11 } } }
       } : {},
     }
   });
@@ -5458,19 +5595,18 @@ function renderQuestionText(raw) {
       });
       html += '</tbody></table></div>';
     } else if (line.startsWith('[GRÁFICA')) {
-      // Show chart data as a styled info block (Chart.js not available here easily)
-      // Parse: [GRÁFICA BARRAS] Título, then Etiquetas: ..., then Series: name: vals
-      const typeMatch = line.match(/\[GRÁFICA ([^\]]+)\]\s*(.*)/);
-      const chartType = typeMatch ? typeMatch[1].toLowerCase() : 'barras';
+      const typeMatch  = line.match(/\[GRÁFICA ([^\]]+)\]\s*(.*)/);
+      const chartType  = typeMatch ? typeMatch[1].toLowerCase() : 'barras';
       const chartTitle = typeMatch ? typeMatch[2].trim() : '';
-      const chartLines = [];
       i++;
-      let labelsArr = [], datasets = [];
+      let labelsArr = [], datasets = [], axisX = '', axisY = '', showVals = false;
       while (i < lines.length && !lines[i].startsWith('[')) {
         const l = lines[i].trim();
-        if (l.startsWith('Etiquetas:')) {
-          labelsArr = l.replace('Etiquetas:','').split(',').map(s=>s.trim()).filter(Boolean);
-        } else if (l) {
+        if      (l.startsWith('Etiquetas:'))      labelsArr  = l.replace('Etiquetas:','').split(',').map(s=>s.trim()).filter(Boolean);
+        else if (l.startsWith('EjeX:'))           axisX      = l.replace('EjeX:','').trim();
+        else if (l.startsWith('EjeY:'))           axisY      = l.replace('EjeY:','').trim();
+        else if (l.startsWith('MostrarValores:')) showVals   = l.includes('si');
+        else if (l) {
           const colonIdx = l.indexOf(':');
           if (colonIdx > 0) {
             const name = l.slice(0, colonIdx).trim();
@@ -5480,28 +5616,48 @@ function renderQuestionText(raw) {
         }
         i++;
       }
-      // Render inline chart using canvas
       const chartId = 'inlineChart_' + Math.random().toString(36).slice(2,7);
       const isPie   = chartType.includes('pastel');
       const isLine  = chartType.includes('línea') || chartType.includes('linea');
       const cType   = isPie ? 'pie' : isLine ? 'line' : 'bar';
       const colors  = ['#7c3aed','#0d9488','#dc2626','#d97706','#2563eb','#16a34a','#db2777'];
-      html += `<div style="margin:10px 0;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px">`;
-      if (chartTitle) html += `<div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:8px;text-align:center">${escapeHtml(chartTitle)}</div>`;
-      html += `<canvas id="${chartId}" style="max-height:280px;width:100%"></canvas></div>`;
-      // Defer chart rendering until DOM is ready
+      html += `<div style="margin:10px 0;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px;box-shadow:0 2px 8px rgba(0,0,0,.06)">`;
+      html += `<div style="position:relative;width:100%;height:280px"><canvas id="${chartId}"></canvas></div></div>`;
       setTimeout(() => {
         const canvas = document.getElementById(chartId);
         if (!canvas || !window.Chart) return;
         const chartDs = datasets.map((ds, di) => {
           const padded = labelsArr.map((_,li) => ds.vals[li] ?? 0);
-          const bg = isPie ? labelsArr.map((_,li) => colors[li%colors.length]) : colors[di%colors.length]+'cc';
-          return { label: ds.name, data: padded, backgroundColor: bg, borderColor: isPie ? colors : colors[di%colors.length], borderWidth:1.5, tension:.3, fill:false, borderRadius: cType==='bar'?4:undefined };
+          const bg = isPie ? labelsArr.map((_,li) => colors[li%colors.length]+'dd') : colors[di%colors.length]+'cc';
+          return { label: ds.name, data: padded, backgroundColor: bg, borderColor: isPie ? colors : colors[di%colors.length], borderWidth:2, tension:.3, fill:false, borderRadius: cType==='bar'?5:undefined, pointRadius: isLine?5:undefined };
         });
+        const valPlugin = {
+          id:'vals', afterDatasetsDraw(chart) {
+            if (!showVals || isPie) return;
+            const ctx = chart.ctx;
+            chart.data.datasets.forEach((ds,di) => {
+              chart.getDatasetMeta(di).data.forEach((bar,idx) => {
+                const v = ds.data[idx]; if (!v) return;
+                ctx.save(); ctx.font='bold 11px sans-serif'; ctx.fillStyle='#1e293b'; ctx.textAlign='center'; ctx.textBaseline='bottom';
+                const p = bar.tooltipPosition(); ctx.fillText(v, p.x, p.y-3); ctx.restore();
+              });
+            });
+          }
+        };
         new window.Chart(canvas, {
-          type: cType,
-          data: { labels: labelsArr, datasets: chartDs },
-          options: { responsive:true, maintainAspectRatio:true, plugins:{ legend:{position:'top',labels:{font:{size:11},usePointStyle:true}}, title:{display:false} }, scales: isPie?{}:{ y:{beginAtZero:true,grid:{color:'#f1f5f9'},ticks:{font:{size:10}}}, x:{grid:{display:false},ticks:{font:{size:10}}} } }
+          type: cType, data: { labels: labelsArr, datasets: chartDs }, plugins:[valPlugin],
+          options: {
+            responsive:true, maintainAspectRatio:false,
+            layout:{ padding:{ top: showVals&&!isPie ? 24 : 8, right:8 } },
+            plugins:{
+              legend:{ position:'top', labels:{ font:{size:11}, usePointStyle:true, padding:10 } },
+              title:{ display:!!chartTitle, text:chartTitle, font:{size:13,weight:'bold'}, color:'#1e293b', padding:{bottom:8} }
+            },
+            scales: isPie ? {} : {
+              y:{ beginAtZero:true, grid:{color:'#f1f5f9'}, ticks:{font:{size:10}}, title: axisY?{display:true,text:axisY,font:{size:11,weight:'600'},color:'#475569'}:{display:false} },
+              x:{ grid:{display:false}, ticks:{font:{size:10}}, title: axisX?{display:true,text:axisX,font:{size:11,weight:'600'},color:'#475569'}:{display:false} }
+            }
+          }
         });
       }, 80);
     } else {
@@ -6357,12 +6513,31 @@ function showResults() {
   // Mostrar botón admin en resultados si corresponde
   const adminResBtn = $('btnResultsAdmin');
   if (adminResBtn) adminResBtn.style.display = S.role === 'Administrador' ? '' : 'none';
+
+  // ── Nuevas features ──
+  const examTitleRes = (window.S.currentExamMeta?.titulo || window.S.meta?.titulo || '').trim();
+  markStudyDay();                              // racha
+  savePersonalScore(examTitleRes, pct);        // dificultad personal
+  renderHistChart(examTitleRes);               // historial visual
+  loadDuelBanner(pct, examTitleRes);           // duelo vs promedio
+
+  // Re-render tras guardar score personal (pequeño delay para localStorage)
+  setTimeout(() => {
+    const duelBannerEl = document.getElementById('duelBanner');
+    if (duelBannerEl) duelBannerEl.style.display = 'none';
+    const histWrapEl = document.getElementById('histChartWrap');
+    if (histWrapEl) histWrapEl.style.display = 'none';
+    renderHistChart(examTitleRes);
+    loadDuelBanner(pct, examTitleRes);
+  }, 300);
 }
 
 function exitToLogin() {
   stopTimer();
   if (S.user) {
     // Mantener sesión — volver al dashboard
+    _qodAnswered = false; // permitir ver estado QOD actualizado
+    updateStreak();
     show('dashScreen');
   } else {
     show('loginScreen');
@@ -6560,14 +6735,20 @@ function buildExamCardHTML(ex, idx) {
   const tags  = (ex.tags || []).map((t, i) =>
     `<span class="exam-tag${i===0?' teal':''}">${t}</span>`).join('');
   const imgCount = ex.imagenes ?? ex.images ?? 0;
+  const isOnline = ex.questions && Array.isArray(ex.questions) && ex.questions.length > 0;
+  const offlineBadge = !isOnline
+    ? `<span style="position:absolute;top:10px;left:10px;background:#f59e0b;color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase">📦 Solo local</span>`
+    : '';
   return `
-    <div class="exam-card">
+    <div class="exam-card" style="position:relative">
+      ${offlineBadge}
       ${ex.nuevo ? '<span class="exam-card-new">NUEVO</span>' : ''}
       <div class="exam-card-head">
         <div class="exam-card-icon">${ex.icono || '📄'}</div>
         <div class="exam-card-info">
           <div class="exam-card-title">${ex.titulo}</div>
           <div class="exam-card-sub">${ex.materia || ex.subtitulo || ''}</div>
+          ${getPersonalDiffBadge(ex.titulo)}
         </div>
       </div>
       <div class="exam-card-tags">${tags}</div>
@@ -6576,7 +6757,9 @@ function buildExamCardHTML(ex, idx) {
         <div class="ec-stat"><div class="ec-val">${horas}</div><div class="ec-lbl">Horas</div></div>
         <div class="ec-stat"><div class="ec-val">${imgCount}</div><div class="ec-lbl">Imágenes</div></div>
       </div>
-      <button class="exam-card-btn" onclick="event.stopPropagation();loadCatalogExam(${idx})">▶ Iniciar examen</button>
+      <button class="exam-card-btn" onclick="event.stopPropagation();loadCatalogExam(${idx})" ${!isOnline ? 'style="background:linear-gradient(135deg,#92400e,#b45309)"' : ''}>
+        ${isOnline ? '▶ Iniciar examen' : '📦 Importar ZIP para iniciar'}
+      </button>
       ${S.role === 'Administrador' ? `<button class="exam-card-btn" style="background:linear-gradient(135deg,#0f766e,#0e7490);margin-top:6px;font-size:12px;padding:9px" onclick="event.stopPropagation();editCatalogExam(${idx})">✏️ Editar examen</button><button class="exam-card-btn" style="background:linear-gradient(135deg,#dc2626,#b91c1c);margin-top:6px;font-size:12px;padding:9px" onclick="event.stopPropagation();deleteCatalogExam(${idx})">🗑 Eliminar del servidor</button>` : ''}
     </div>`;
 }
@@ -6692,7 +6875,27 @@ async function loadCatalogExam(idx) {
     // ── Opción B: cargar desde ZIP (sistema anterior) ──
     const path = ex.path || `exams/${ex.archivo || ex.file}`;
     const resp = await fetch(path);
-    if (!resp.ok) throw new Error('No se pudo cargar: ' + path);
+    if (!resp.ok) {
+      // ZIP no encontrado en servidor — ofrecer importación manual
+      const fileName = path.split('/').pop();
+      const wantImport = confirm(
+        `⚠️ Este examen no está disponible en el servidor.\n\n` +
+        `Archivo esperado: ${fileName}\n\n` +
+        `¿Deseas importarlo manualmente desde tu dispositivo?`
+      );
+      if (wantImport) {
+        // Trigger file picker for manual import
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.zip';
+        input.onchange = async e => {
+          const file = e.target.files[0];
+          if (file) await handleFile(file);
+        };
+        input.click();
+      }
+      return;
+    }
     const blob = await resp.blob();
     const name = path.split('/').pop();
     const file = new File([blob], name, { type: 'application/zip' });
@@ -6828,6 +7031,7 @@ async function editCatalogExam(idx) {
     $('bldAreaTag').value = meta.area    || (ex.tags && ex.tags[0]) || '';
     $('bldHoras').value   = bh;
     $('bldMins').value    = bm;
+    setBldNuevo(ex.nuevo || meta.nuevo || false);
     updateTimePreview();
     renderBuilderQList();
     updateBuilderExportBtn();
@@ -6937,28 +7141,38 @@ async function saveScoreToRanking(pct, ok, total) {
     ts:      Date.now(),
   };
   try {
-    // Usar Firebase SDK (con auth) en lugar de REST abierto
     if (window._fbDB) {
-      const { db: _db, ref: _ref, set: _set } = window._fbDB;
-      const snap = await get(_ref(_db, `ranking/${safeKey}`));
+      // ── Ruta principal: Firebase SDK con auth (siempre disponible) ──
+      const { db: _db, ref: _ref, set: _set, get: _get, push: _push } = window._fbDB;
+
+      // Actualizar ranking solo si es mejor puntaje personal
+      const snap = await _get(_ref(_db, `ranking/${safeKey}`));
       const existing = snap.exists() ? snap.val() : null;
       if (!existing || pct > (existing.pct || 0)) {
         await _set(_ref(_db, `ranking/${safeKey}`), entry);
       }
-      await push(_ref(_db, `history/${safeKey}`), entry);
+
+      // Siempre registrar en historial (cada intento cuenta)
+      await _push(_ref(_db, `history/${safeKey}`), entry);
+
     } else {
-      // Fallback REST si SDK no disponible aún
-      const existing = await fetch(RANKING_REF + '/' + safeKey + '.json').then(r => r.json()).catch(() => null);
+      // ── Fallback REST con token de auth ──
+      const token = window._fbGetToken ? await window._fbGetToken() : null;
+      const authQ = token ? `?auth=${token}` : '';
+
+      const existing = await fetch(RANKING_REF + '/' + safeKey + '.json' + authQ)
+        .then(r => r.json()).catch(() => null);
       if (!existing || pct > (existing.pct || 0)) {
-        await fetch(RANKING_REF + '/' + safeKey + '.json', {
+        await fetch(RANKING_REF + '/' + safeKey + '.json' + authQ, {
           method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(entry),
         });
       }
-      await fetch(FB_URL + '/history/' + safeKey + '.json', {
+      await fetch(FB_URL + '/history/' + safeKey + '.json' + authQ, {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(entry),
       });
     }
-  } catch(e) { console.warn('Ranking save error', e); }
+    console.log('Score guardado:', examTitle, pct + '%');
+  } catch(e) { console.warn('Ranking save error:', e); }
 }
 
 function openRanking() {
@@ -7151,45 +7365,59 @@ loadCatalog();   // carga exams/catalog.json y renderiza las tarjetas
 // ── Restaurar sesión si existe ──
 (async function restoreSession() {
   try {
-    const saved = localStorage.getItem('exani_session');
+    // Intentar localStorage primero, sessionStorage como respaldo
+    let saved = localStorage.getItem('exani_session');
+    if (!saved) {
+      try { saved = sessionStorage.getItem('exani_session_bak'); } catch {}
+    }
     if (!saved) return;
     const sess = JSON.parse(saved);
     if (!sess.user || !sess.role) return;
+
+    // ── Aplicar sesión inmediatamente (sin esperar Firebase) ──
+    // Esto evita el flash de login al refrescar
     window.S.user          = sess.user;
     window.S.role          = sess.role;
     window.S.googlePicture = sess.googlePicture || null;
     window.S.googleEmail   = sess.googleEmail   || '';
     localStorage.setItem('exani_loginTs', Date.now());
     updateProfileUI();
+
     const adminBar = document.getElementById('chatAdminBar');
     if (adminBar) adminBar.classList.toggle('visible', sess.role === 'Administrador');
-    // Actualizar chip de usuario en modeScreen
+
     const mAvatar3 = document.getElementById('modeUserAvatar');
     const mName3   = document.getElementById('modeUserName');
     if (mAvatar3) mAvatar3.textContent = (sess.user||'?').slice(0,2).toUpperCase();
     if (mName3)   mName3.textContent   = sess.user || '—';
+
     enterExams();
     initChat();
-    // Intentar init burbuja con polling hasta que módulo esté listo
+
+    // Polling para burbuja de admin (módulo Firebase puede no estar listo aún)
     let _bubbleAttempts = 0;
     const _tryBubble = () => {
       _bubbleAttempts++;
       if (window._spInitBubble) { window._spInitBubble(); }
-      else if (_bubbleAttempts < 15) { setTimeout(_tryBubble, 200); }
+      else if (_bubbleAttempts < 20) { setTimeout(_tryBubble, 300); }
     };
-    setTimeout(_tryBubble, 300);
+    setTimeout(_tryBubble, 400);
 
-    // Verificar rol y ban en Firebase de forma asíncrona (silenciosa)
-    setTimeout(async () => {
+    // ── Verificación silenciosa en background (no bloquea la UI) ──
+    // Esperar a que Firebase Auth esté listo antes de verificar ban/rol
+    const _waitForFbAndVerify = async (attempts = 0) => {
+      // Si Firebase SDK no está listo aún, reintentar hasta 4s
+      if (!window._fbDB && attempts < 20) {
+        setTimeout(() => _waitForFbAndVerify(attempts + 1), 200);
+        return;
+      }
       try {
         if (sess.googleEmail) {
-          // Usuario Google: verificar en googleUsers
           const gKey = 'g_' + sess.googleEmail.toLowerCase().replace(/[^a-z0-9]/g, '_');
-          const r = await fetch(`https://exani-dash-adeff-default-rtdb.firebaseio.com/googleUsers/${gKey}.json`);
+          const r    = await fetch('https://exani-dash-adeff-default-rtdb.firebaseio.com/googleUsers/' + gKey + '.json');
           const data = await r.json();
           if (data?.banned) { doLogout(); return; }
-          // Actualizar rol si cambió en Firebase
-          if (data?.role && VALID_ROLES && VALID_ROLES.includes(data.role) && data.role !== window.S.role) {
+          if (data?.role && typeof VALID_ROLES !== 'undefined' && VALID_ROLES.includes(data.role) && data.role !== window.S.role) {
             window.S.role = data.role;
             localStorage.setItem('exani_session', JSON.stringify({ ...sess, role: data.role }));
             updateProfileUI();
@@ -7198,13 +7426,11 @@ loadCatalog();   // carga exams/catalog.json y renderiza las tarjetas
             window._spInitBubble && window._spInitBubble();
           }
         } else if (window._fbCurrentUser) {
-          // FIX: Usuario nativo — verificar ban en Firebase también
-          const uid = window._fbCurrentUser.uid;
-          const r = await fetch(`https://exani-dash-adeff-default-rtdb.firebaseio.com/users/${uid}.json`);
+          const uid  = window._fbCurrentUser.uid;
+          const r    = await fetch('https://exani-dash-adeff-default-rtdb.firebaseio.com/users/' + uid + '.json');
           const data = await r.json();
           if (data?.banned) { doLogout(); return; }
-          // Sincronizar rol si cambió
-          if (data?.role && VALID_ROLES && VALID_ROLES.includes(data.role) && data.role !== window.S.role) {
+          if (data?.role && typeof VALID_ROLES !== 'undefined' && VALID_ROLES.includes(data.role) && data.role !== window.S.role) {
             window.S.role = data.role;
             localStorage.setItem('exani_session', JSON.stringify({ ...sess, role: data.role }));
             updateProfileUI();
@@ -7213,10 +7439,14 @@ loadCatalog();   // carga exams/catalog.json y renderiza las tarjetas
             window._spInitBubble && window._spInitBubble();
           }
         }
-      } catch(e) { /* red no disponible, continuar con sesión en memoria */ }
-    }, 1500);
+      } catch(e) { /* sin red — continuar con sesión local */ }
+    };
+
+    // Dar 800ms para que el módulo Firebase arranque, luego verificar
+    setTimeout(() => _waitForFbAndVerify(), 800);
 
   } catch(e) {
+    console.warn('restoreSession error:', e);
     localStorage.removeItem('exani_session');
   }
 })();
@@ -8374,10 +8604,13 @@ function normalizeImportedQ(q) {
     text,
     options,
     answerIdx,
-    area:        q.area || '',
-    explanation: q.explanation || q.explicacion || '',
-    imageName:   q.image || q.imageName || null,
-    imageDataUrl:null,
+    area:         q.area || '',
+    explanation:  q.explanation || q.explicacion || '',
+    imageName:    q.image || q.imageName || null,
+    imageDataUrl: null,
+    passage:      q.passage      || '',
+    passage_id:   q.passage_id   || '',
+    passage_title:q.passage_title|| '',
   };
 }
 
@@ -8396,6 +8629,25 @@ function renderExamBuilder() {
   updateTimePreview();
   renderBuilderQList();
   updateBuilderExportBtn();
+}
+
+function toggleNuevoBadge(wrapper) {
+  const cb    = $('bldNuevo');
+  const track = $('bldNuevoTrack');
+  const thumb = $('bldNuevoThumb');
+  cb.checked = !cb.checked;
+  track.style.background = cb.checked ? '#f97316' : '#e2e8f0';
+  thumb.style.transform  = cb.checked ? 'translateX(18px)' : 'translateX(0)';
+}
+
+function setBldNuevo(val) {
+  const cb    = $('bldNuevo');
+  const track = $('bldNuevoTrack');
+  const thumb = $('bldNuevoThumb');
+  if (!cb) return;
+  cb.checked = !!val;
+  track.style.background = cb.checked ? '#f97316' : '#e2e8f0';
+  thumb.style.transform  = cb.checked ? 'translateX(18px)' : 'translateX(0)';
 }
 
 function updateTimePreview() {
@@ -8558,18 +8810,24 @@ function qedLoadMathFromText(raw) {
 
     let labelsStr = '';
     const series = [];
+    let loadAxisX = '', loadAxisY = '', loadShowVals = false;
     for (let i = graficaLine + 1; i < lines.length; i++) {
       const l = lines[i].trim();
       if (!l || l.startsWith('[')) break;
-      if (l.startsWith('Etiquetas:')) {
-        labelsStr = l.replace('Etiquetas:', '').trim();
-      } else {
+      if      (l.startsWith('Etiquetas:'))      labelsStr    = l.replace('Etiquetas:','').trim();
+      else if (l.startsWith('EjeX:'))           loadAxisX    = l.replace('EjeX:','').trim();
+      else if (l.startsWith('EjeY:'))           loadAxisY    = l.replace('EjeY:','').trim();
+      else if (l.startsWith('MostrarValores:')) loadShowVals = l.includes('si');
+      else {
         const colon = l.indexOf(':');
         if (colon > 0) series.push({ name: l.slice(0, colon).trim(), vals: l.slice(colon+1).trim().split(',').map(s=>s.trim()) });
       }
     }
     $('qedChartLabels').value  = labelsStr;
     $('qedSeriesNames').value  = series.map(s=>s.name).join(',');
+    if ($('qedAxisX'))      $('qedAxisX').value      = loadAxisX;
+    if ($('qedAxisY'))      $('qedAxisY').value      = loadAxisY;
+    if ($('qedShowValues')) $('qedShowValues').checked = loadShowVals;
 
     // Build grid then fill values
     setTimeout(() => {
@@ -8901,9 +9159,12 @@ function qedRenderMath() {
 
   } else {
     // Chart — read from new grid
-    const title   = $('qedChartTitle').value.trim() || 'Gráfica';
-    const labels  = $('qedChartLabels').value.split(',').map(s=>s.trim()).filter(Boolean);
-    const seriesN = $('qedSeriesNames').value.split(',').map(s=>s.trim()).filter(Boolean);
+    const title      = $('qedChartTitle').value.trim() || 'Gráfica';
+    const axisX      = $('qedAxisX')?.value.trim() || '';
+    const axisY      = $('qedAxisY')?.value.trim() || '';
+    const showVals   = $('qedShowValues')?.checked !== false;
+    const labels     = $('qedChartLabels').value.split(',').map(s=>s.trim()).filter(Boolean);
+    const seriesN    = $('qedSeriesNames').value.split(',').map(s=>s.trim()).filter(Boolean);
 
     if (!labels.length || !seriesN.length) {
       alert('Ingresa etiquetas y nombres de series.'); return;
@@ -8922,8 +9183,8 @@ function qedRenderMath() {
       return { name, values, color: _qedColors[si % _qedColors.length] };
     });
 
-    // Render canvas
-    content.innerHTML = `<canvas id="qedChartPrev" style="width:100%;max-height:320px"></canvas>`;
+    // Render canvas — wrap in a sized container so Chart.js has room
+    content.innerHTML = `<div style="position:relative;width:100%;height:300px"><canvas id="qedChartPrev"></canvas></div>`;
     if (_qedChartInst) { _qedChartInst.destroy(); _qedChartInst = null; }
     const type  = _qedMathType === 'pastel' ? 'pie' : (_qedMathType === 'linea' ? 'line' : 'bar');
     const isPie = type === 'pie';
@@ -8931,30 +9192,65 @@ function qedRenderMath() {
     const chartDs = datasets.map((ds, i) => ({
       label:                ds.name,
       data:                 ds.values,
-      backgroundColor:      isPie ? labels.map((_,li) => _qedColors[li%_qedColors.length]) : ds.color + 'cc',
+      backgroundColor:      isPie ? labels.map((_,li) => _qedColors[li%_qedColors.length]+'dd') : ds.color + 'cc',
       borderColor:          isPie ? _qedColors : ds.color,
-      borderWidth:          1.5,
-      tension:              type === 'line' ? 0.3 : undefined,
+      borderWidth:          2,
+      tension:              type === 'line' ? 0.35 : undefined,
       fill:                 false,
       pointRadius:          type === 'line' ? 5 : undefined,
       pointBackgroundColor: type === 'line' ? ds.color : undefined,
-      borderRadius:         type === 'bar' ? 4 : undefined,
+      borderRadius:         type === 'bar' ? 5 : undefined,
     }));
+
+    const datalabelsPlugin = {
+      id: 'qedValueLabels',
+      afterDatasetsDraw(chart) {
+        if (!showVals || isPie) return;
+        const ctx = chart.ctx;
+        chart.data.datasets.forEach((ds, di) => {
+          const meta = chart.getDatasetMeta(di);
+          meta.data.forEach((el, idx) => {
+            const val = ds.data[idx];
+            if (!val) return;
+            try {
+              ctx.save();
+              ctx.font = 'bold 11px sans-serif';
+              ctx.fillStyle = '#1e293b';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'bottom';
+              ctx.fillText(val, el.x, el.y - 4);
+              ctx.restore();
+            } catch(e) {}
+          });
+        });
+      }
+    };
 
     _qedChartInst = new Chart(document.getElementById('qedChartPrev'), {
       type,
       data: { labels, datasets: chartDs },
+      plugins: [datalabelsPlugin],
       options: {
         responsive: true,
-        maintainAspectRatio: true,
+        maintainAspectRatio: false,
+        layout: { padding: { top: showVals && !isPie ? 24 : 8, right: 8, bottom: 4, left: 4 } },
         plugins: {
-          title:  { display: true, text: title, font: { size: 14, weight: 'bold' }, color: '#1e293b', padding: { bottom: 10 } },
-          legend: { position: 'top', labels: { font: { size: 12 }, usePointStyle: true } },
+          title:  { display: !!title, text: title, font: { size: 14, weight: 'bold' }, color: '#1e293b', padding: { bottom: 10 } },
+          legend: { position: 'top', labels: { font: { size: 11 }, usePointStyle: true, padding: 10 } },
           tooltip: { mode: 'index', intersect: false }
         },
         scales: isPie ? {} : {
-          y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 } } },
-          x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+          y: {
+            beginAtZero: true,
+            grid: { color: '#f1f5f9' },
+            ticks: { font: { size: 11 } },
+            title: axisY ? { display: true, text: axisY, font: { size: 11, weight: '600' }, color: '#475569' } : { display: false }
+          },
+          x: {
+            grid: { display: false },
+            ticks: { font: { size: 11 } },
+            title: axisX ? { display: true, text: axisX, font: { size: 11, weight: '600' }, color: '#475569' } : { display: false }
+          }
         }
       }
     });
@@ -8980,11 +9276,14 @@ function qedInsertMathIntoQuestion() {
     desc = '[TABLA] ' + headers.join(' | ');
     dataRows.forEach(r => { desc += '\n' + r.join(' | '); });
   } else {
-    const title   = $('qedChartTitle').value.trim() || 'Gráfica';
-    const labels  = $('qedChartLabels').value.trim();
-    const seriesN = $('qedSeriesNames').value.split(',').map(s=>s.trim()).filter(Boolean);
-    const type    = {barras:'Barras',linea:'Línea',pastel:'Pastel'}[_qedMathType] || 'Barras';
-    const lblArr  = labels.split(',').map(s=>s.trim()).filter(Boolean);
+    const title    = $('qedChartTitle').value.trim() || 'Gráfica';
+    const labels   = $('qedChartLabels').value.trim();
+    const seriesN  = $('qedSeriesNames').value.split(',').map(s=>s.trim()).filter(Boolean);
+    const type     = {barras:'Barras',linea:'Línea',pastel:'Pastel'}[_qedMathType] || 'Barras';
+    const lblArr   = labels.split(',').map(s=>s.trim()).filter(Boolean);
+    const axisX    = $('qedAxisX')?.value.trim() || '';
+    const axisY    = $('qedAxisY')?.value.trim() || '';
+    const showVals = $('qedShowValues')?.checked !== false;
 
     // Read values from grid
     const series = seriesN.map((name, si) => {
@@ -8994,7 +9293,11 @@ function qedInsertMathIntoQuestion() {
       }).join(',');
       return `${name}: ${vals}`;
     });
-    desc = `[GRÁFICA ${type.toUpperCase()}] ${title}\nEtiquetas: ${labels}\n` + series.join('\n');
+    desc  = `[GRÁFICA ${type.toUpperCase()}] ${title}\nEtiquetas: ${labels}\n`;
+    if (axisX)    desc += `EjeX: ${axisX}\n`;
+    if (axisY)    desc += `EjeY: ${axisY}\n`;
+    if (showVals) desc += `MostrarValores: si\n`;
+    desc += series.join('\n');
   }
 
   const ta = $('qedText');
@@ -9116,7 +9419,7 @@ async function saveExamToServer() {
       tiempo_minutos: total,
       imagenes:       EB.questions.filter(q => q.imageName).length,
       version:        ver,
-      nuevo:          true,
+      nuevo:          $('bldNuevo') ? !!$('bldNuevo').checked : false,
       agregado:       new Date().toISOString(),
       updatedAt:      new Date().toISOString(),
       updatedBy:      (typeof S !== 'undefined' && window.S.user) ? window.S.user : 'admin',
@@ -9150,6 +9453,7 @@ async function saveExamToServer() {
         if ($('bldVersion'))  $('bldVersion').value   = '';
         if ($('bldHoras'))    $('bldHoras').value     = '0';
         if ($('bldMins'))     $('bldMins').value      = '0';
+        setBldNuevo(false);
         renderBuilder();
         updateBuilderExportBtn();
       }
@@ -9225,7 +9529,7 @@ async function exportNewExamZip() {
       imagenes:       EB.questions.filter(q => q.imageName).length,
       tiempo_minutos: total, version: ver,
       path:           `exams/${zipFileName}`,
-      nuevo: true, agregado: ts,
+      nuevo: $('bldNuevo') ? !!$('bldNuevo').checked : false, agregado: ts,
     };
     const updatedCatalog = [
       ...window.CATALOG.filter(e => e.path !== newEntry.path),
@@ -9261,7 +9565,7 @@ async function exportNewExamZip() {
         tiempo_minutos: total,
         version:        ver,
         path:           `exams/${zipFileName}`,
-        nuevo:          true,
+        nuevo:          $('bldNuevo') ? !!$('bldNuevo').checked : false,
         agregado:       ts,
         updatedBy:      (typeof S !== 'undefined' && window.S.user) ? window.S.user : 'admin',
         // Guardar preguntas completas en Firebase
@@ -9355,6 +9659,13 @@ const usersRef = ref(db, 'users');
 // Exponer funciones de Firebase al scope global para funciones fuera del módulo
 window._fbDB = { db, ref, set, update, get, push };
 
+// Helper para obtener token de auth del usuario actual (para llamadas REST autenticadas)
+window._fbGetToken = async function() {
+  const u = window._fbCurrentUser;
+  if (!u) return null;
+  try { return await u.getIdToken(); } catch { return null; }
+};
+
 // ══════════════════════════════════════════
 //  EXÁMENES EN TIEMPO REAL — Firebase
 // ══════════════════════════════════════════
@@ -9411,14 +9722,16 @@ window._fbGoogleProvider = GoogleAuthProvider;
 onAuthStateChanged(auth, async (firebaseUser) => {
   if (firebaseUser) {
     window._fbCurrentUser = firebaseUser;
-    // Verificar ban en tiempo real para usuarios nativos
+    // Verificar ban en tiempo real
     const profile = await loadUserProfile(firebaseUser.uid).catch(() => null);
     if (profile?.banned && S.user) {
-      // Usuario baneado — forzar logout
       await signOut(auth);
       if (window.doLogout) window.doLogout();
     }
   } else {
+    // Firebase Auth resolvió null — puede ser timing al cargar (módulo async)
+    // Solo limpiar _fbCurrentUser; NO hacer doLogout automático.
+    // La sesión localStorage es la fuente de verdad al refrescar.
     window._fbCurrentUser = null;
   }
 });
@@ -12775,6 +13088,293 @@ function novaFileB64(file) {
     r.readAsDataURL(file);
   });
 }
+</script>
+
+<script>
+
+// ══════════════════════════════════════════════════════
+//  RACHA DE ESTUDIO
+// ══════════════════════════════════════════════════════
+function getStreakKey() {
+  const u = window.S && window.S.googleEmail ? window.S.googleEmail : (window.S && window.S.user ? window.S.user : 'guest');
+  return 'streak_' + u.replace(/[^a-z0-9]/gi,'_');
+}
+
+function updateStreak() {
+  const key   = getStreakKey();
+  const today = new Date().toISOString().slice(0,10); // YYYY-MM-DD
+  let data = {};
+  try { data = JSON.parse(localStorage.getItem(key) || '{}'); } catch {}
+
+  const lastDay = data.lastDay || '';
+  const streak  = data.streak  || 0;
+
+  let newStreak = streak;
+  if (lastDay === today) {
+    // Ya se registró hoy, no cambiar
+    newStreak = streak;
+  } else {
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+    newStreak = (lastDay === yesterday) ? streak + 1 : 1;
+    data = { streak: newStreak, lastDay: today };
+    localStorage.setItem(key, JSON.stringify(data));
+  }
+
+  renderStreakBar(newStreak, data.lastDay === today ? 'ya estudiaste hoy' : '');
+}
+
+function renderStreakBar(streak, note) {
+  const bar   = document.getElementById('streakBar');
+  const cnt   = document.getElementById('streakCount');
+  const sub   = document.getElementById('streakSub');
+  if (!bar) return;
+  if (streak < 1) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  cnt.textContent   = streak;
+  const emoji = streak >= 7 ? '🔥🔥' : streak >= 3 ? '🔥' : '✨';
+  document.querySelector('.streak-flame').textContent = emoji;
+  const msg = streak === 1 ? 'Primer día · ¡sigue así!'
+            : streak < 3  ? `${streak} días · ¡buen comienzo!`
+            : streak < 7  ? `${streak} días consecutivos · ¡vas muy bien!`
+            : `${streak} días consecutivos · ¡racha impresionante!`;
+  sub.textContent = msg + (note ? ' · ' + note : '');
+}
+
+// Registrar día de estudio al terminar un examen
+function markStudyDay() {
+  const key   = getStreakKey();
+  const today = new Date().toISOString().slice(0,10);
+  let data = {};
+  try { data = JSON.parse(localStorage.getItem(key) || '{}'); } catch {}
+  if (data.lastDay === today) return; // ya registrado
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+  const streak = (data.lastDay === yesterday) ? (data.streak || 0) + 1 : 1;
+  localStorage.setItem(key, JSON.stringify({ streak, lastDay: today }));
+}
+
+// ══════════════════════════════════════════════════════
+//  PREGUNTA DEL DÍA
+// ══════════════════════════════════════════════════════
+let _qodAnswered = false;
+
+function initQOD() {
+  // Solo mostrar si hay exámenes en el catálogo
+  if (!window.CATALOG || !window.CATALOG.length) {
+    // Reintentar una vez más si el catálogo aún no cargó
+    setTimeout(initQOD, 1500);
+    return;
+  }
+
+  // Buscar exámenes con preguntas cargadas
+  const examensConPregs = window.CATALOG.filter(e => e.questions && Array.isArray(e.questions) && e.questions.length > 0);
+  if (!examensConPregs.length) return;
+
+  // Semilla del día: cambiar cada día con seed = fecha
+  const today = new Date().toISOString().slice(0,10);
+  const seed  = today.split('-').reduce((a,b) => a * 31 + parseInt(b), 0);
+  const exam  = examensConPregs[seed % examensConPregs.length];
+  const q     = exam.questions[seed % exam.questions.length];
+  if (!q || !q.question) return;
+
+  // Verificar si ya se respondió hoy
+  const doneKey = 'qod_done_' + today;
+  const doneData = JSON.parse(localStorage.getItem(doneKey) || 'null');
+
+  const card = document.getElementById('qodCard');
+  if (!card) return;
+  card.style.display = 'block';
+  document.getElementById('qodQuestion').textContent = q.question;
+
+  const opts = document.getElementById('qodOpts');
+  const letters = ['A','B','C','D','E'];
+  const options  = q.options || [];
+  opts.innerHTML = '';
+
+  options.forEach((opt, i) => {
+    const letter = letters[i];
+    const btn = document.createElement('button');
+    btn.className = 'qod-opt';
+    btn.textContent = letter + ') ' + opt;
+    btn.dataset.letter = letter;
+
+    if (doneData) {
+      // Ya respondida — mostrar resultado sin interacción
+      btn.disabled = true;
+      if (letter === q.answer) btn.classList.add('correct');
+      else if (letter === doneData.chosen) btn.classList.add('wrong');
+    } else {
+      btn.onclick = () => answerQOD(letter, q.answer, today);
+    }
+    opts.appendChild(btn);
+  });
+
+  const resultEl = document.getElementById('qodResult');
+  if (doneData) {
+    const correct = doneData.chosen === q.answer;
+    resultEl.style.display = 'block';
+    resultEl.style.background = correct ? '#dcfce7' : '#fee2e2';
+    resultEl.style.color = correct ? '#15803d' : '#dc2626';
+    resultEl.textContent = correct ? '✅ ¡Correcto! Respondiste bien hoy.' : '❌ Respuesta incorrecta · La correcta era ' + q.answer;
+    _qodAnswered = true;
+  }
+}
+
+function answerQOD(chosen, correct, today) {
+  if (_qodAnswered) return;
+  _qodAnswered = true;
+  localStorage.setItem('qod_done_' + today, JSON.stringify({ chosen, correct }));
+
+  const opts = document.querySelectorAll('.qod-opt');
+  opts.forEach(btn => {
+    btn.disabled = true;
+    if (btn.dataset.letter === correct) btn.classList.add('correct');
+    else if (btn.dataset.letter === chosen) btn.classList.add('wrong');
+  });
+
+  const resultEl = document.getElementById('qodResult');
+  const isRight  = chosen === correct;
+  resultEl.style.display  = 'block';
+  resultEl.style.background = isRight ? '#dcfce7' : '#fee2e2';
+  resultEl.style.color    = isRight ? '#15803d' : '#dc2626';
+  resultEl.textContent    = isRight ? '✅ ¡Correcto! Vuelve mañana para una nueva pregunta.' : '❌ Incorrecto · La respuesta correcta era ' + correct;
+}
+
+// ══════════════════════════════════════════════════════
+//  INDICADOR DE DIFICULTAD PERSONAL
+// ══════════════════════════════════════════════════════
+function getPersonalDiffBadge(titulo) {
+  if (!titulo) return '';
+  const u = window.S && window.S.googleEmail ? window.S.googleEmail : (window.S && window.S.user ? window.S.user : null);
+  if (!u) return '';
+  const key   = 'pscores_' + u.replace(/[^a-z0-9]/gi,'_');
+  let scores  = {};
+  try { scores = JSON.parse(localStorage.getItem(key) || '{}'); } catch {}
+  const examScores = scores[titulo];
+  if (!examScores || !examScores.length) {
+    return '<span class="diff-badge diff-new">🆕 Sin intentos</span>';
+  }
+  const best = Math.max(...examScores);
+  if (best >= 60) return '<span class="diff-badge diff-easy">✅ Aprobado · ' + best + '%</span>';
+  return '<span class="diff-badge diff-hard">🔥 Retador · Mejor: ' + best + '%</span>';
+}
+
+// Guardar score personal para el indicador de dificultad
+function savePersonalScore(titulo, pct) {
+  const u = window.S && window.S.googleEmail ? window.S.googleEmail : (window.S && window.S.user ? window.S.user : null);
+  if (!u || !titulo) return;
+  const key  = 'pscores_' + u.replace(/[^a-z0-9]/gi,'_');
+  let scores = {};
+  try { scores = JSON.parse(localStorage.getItem(key) || '{}'); } catch {}
+  if (!scores[titulo]) scores[titulo] = [];
+  scores[titulo].push(pct);
+  // Mantener solo los últimos 20 intentos por examen
+  if (scores[titulo].length > 20) scores[titulo] = scores[titulo].slice(-20);
+  localStorage.setItem(key, JSON.stringify(scores));
+}
+
+// ══════════════════════════════════════════════════════
+//  DUELO VS PROMEDIO DEL GRUPO
+// ══════════════════════════════════════════════════════
+async function loadDuelBanner(myPct, examTitle) {
+  const banner = document.getElementById('duelBanner');
+  if (!banner) return;
+  try {
+    // Leer historial global de Firebase para calcular promedio
+    const data = await fetch(FB_URL + '/history.json').then(r => r.json()).catch(() => null);
+    if (!data) return;
+
+    // Agrupar entradas del mismo examen
+    const allEntries = [];
+    Object.values(data).forEach(userHistory => {
+      if (typeof userHistory !== 'object') return;
+      Object.values(userHistory).forEach(entry => {
+        if (entry && entry.exam && entry.exam.trim() === examTitle.trim() && entry.pct != null) {
+          allEntries.push(entry.pct);
+        }
+      });
+    });
+
+    if (allEntries.length < 2) return; // no suficiente data
+
+    const avg = Math.round(allEntries.reduce((a,b) => a + b, 0) / allEntries.length);
+    const diff = myPct - avg;
+
+    document.getElementById('duelMe').textContent  = myPct + '%';
+    document.getElementById('duelAvg').textContent = avg + '%';
+
+    let verdict = '';
+    if (diff >= 20)      verdict = '🏆 ¡Excelente! Superaste al grupo por ' + diff + ' puntos.';
+    else if (diff >= 5)  verdict = '👍 Arriba del promedio por ' + diff + ' puntos.';
+    else if (diff >= 0)  verdict = '✅ Al nivel del grupo. ¡Sigue mejorando!';
+    else if (diff >= -10) verdict = '📚 ' + Math.abs(diff) + ' puntos bajo el promedio. ¡Puedes mejorar!';
+    else                 verdict = '💪 ' + Math.abs(diff) + ' puntos bajo el promedio. ¡El grupo lleva ventaja, a practicar!';
+
+    document.getElementById('duelVerdict').textContent = verdict + ' (' + allEntries.length + ' intentos en total)';
+    banner.style.display = 'block';
+  } catch(e) { console.warn('Duel load error:', e); }
+}
+
+// ══════════════════════════════════════════════════════
+//  HISTORIAL CHART EN RESULTADOS
+// ══════════════════════════════════════════════════════
+let _histChartInstance = null;
+
+function renderHistChart(titulo) {
+  const wrap = document.getElementById('histChartWrap');
+  if (!wrap) return;
+  const u = window.S && window.S.googleEmail ? window.S.googleEmail : (window.S && window.S.user ? window.S.user : null);
+  if (!u) return;
+  const key  = 'pscores_' + u.replace(/[^a-z0-9]/gi,'_');
+  let scores = {};
+  try { scores = JSON.parse(localStorage.getItem(key) || '{}'); } catch {}
+  const arr = scores[titulo];
+  if (!arr || arr.length < 2) return; // necesita al menos 2 intentos
+
+  wrap.style.display = 'block';
+  const ctx = document.getElementById('histChart').getContext('2d');
+  if (_histChartInstance) _histChartInstance.destroy();
+
+  const labels = arr.map((_, i) => 'Intento ' + (i + 1));
+  _histChartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Tu puntaje (%)',
+        data: arr,
+        borderColor: '#0d9488',
+        backgroundColor: 'rgba(13,148,136,.08)',
+        borderWidth: 2.5,
+        pointBackgroundColor: arr.map(v => v >= 60 ? '#16a34a' : '#dc2626'),
+        pointRadius: 5,
+        tension: 0.35,
+        fill: true,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ctx.parsed.y + '% — ' + (ctx.parsed.y >= 60 ? 'Aprobado' : 'Reprobado')
+          }
+        }
+      },
+      scales: {
+        y: {
+          min: 0, max: 100,
+          ticks: { callback: v => v + '%', font: { family: 'DM Mono', size: 11 } },
+          grid: { color: 'rgba(0,0,0,.06)' }
+        },
+        x: {
+          ticks: { font: { family: 'Sora', size: 10 } }
+        }
+      }
+    }
+  });
+}
+
 </script>
 
 </body>
