@@ -2402,6 +2402,58 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
 /* ── HISTORIAL CHART ── */
 .hist-chart-wrap{background:#f8fafc;border:1px solid var(--b2);border-radius:14px;padding:14px;margin-top:14px;display:none}
 .hist-chart-title{font-size:11px;font-weight:800;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
+
+/* ── MODO REVISIÓN POST-EXAMEN ── */
+#reviewScreen{flex-direction:column;align-items:stretch;justify-content:flex-start;padding:0;overflow-y:auto;background:var(--bg)}
+.rev-topbar{position:sticky;top:0;z-index:100;background:var(--card);border-bottom:1.5px solid var(--b2);padding:12px 16px;display:flex;align-items:center;gap:10px}
+.rev-back{background:none;border:1.5px solid var(--b2);border-radius:10px;padding:7px 12px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit;transition:all .15s}
+.rev-back:hover{background:var(--b2)}
+.rev-title{flex:1;font-size:13px;font-weight:800;color:var(--text);text-align:center}
+.rev-progress{font-size:12px;font-weight:700;color:var(--muted);font-family:'DM Mono',monospace;flex-shrink:0}
+
+.rev-filter-bar{display:flex;gap:6px;padding:12px 16px;overflow-x:auto;background:var(--card);border-bottom:1px solid var(--b2)}
+.rev-filter{border:1.5px solid var(--b2);background:none;border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .15s}
+.rev-filter.active-all{background:#e0f2fe;border-color:#38bdf8;color:#0369a1}
+.rev-filter.active-wrong{background:#fee2e2;border-color:#fca5a5;color:#dc2626}
+.rev-filter.active-right{background:#dcfce7;border-color:#86efac;color:#16a34a}
+.rev-filter.active-blank{background:#fef3c7;border-color:#fcd34d;color:#d97706}
+
+.rev-body{padding:16px;display:flex;flex-direction:column;gap:14px}
+
+.rev-card{background:var(--card);border-radius:16px;border:1.5px solid var(--b2);overflow:hidden;transition:all .2s}
+.rev-card-header{padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--b2)}
+.rev-q-num{font-size:11px;font-weight:800;color:var(--muted);font-family:'DM Mono',monospace;background:var(--bg);border-radius:8px;padding:3px 8px}
+.rev-status{font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;flex-shrink:0}
+.rev-status.correct{background:#dcfce7;color:#15803d}
+.rev-status.wrong{background:#fee2e2;color:#dc2626}
+.rev-status.blank{background:#fef3c7;color:#d97706}
+.rev-area{font-size:10px;color:var(--muted);font-weight:600;flex:1;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.rev-q-text{padding:14px 16px;font-size:14px;font-weight:600;color:var(--text);line-height:1.6}
+.rev-q-img{width:100%;max-height:200px;object-fit:contain;border-top:1px solid var(--b2);padding:10px;box-sizing:border-box;display:none}
+.rev-opts{padding:0 16px 14px;display:flex;flex-direction:column;gap:6px}
+.rev-opt{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:1.5px solid transparent;font-size:13px;font-weight:600;color:var(--text);transition:all .15s}
+.rev-opt.opt-correct{background:#dcfce7;border-color:#86efac;color:#15803d}
+.rev-opt.opt-wrong{background:#fee2e2;border-color:#fca5a5;color:#dc2626}
+.rev-opt.opt-user{border-color:#94a3b8}
+.rev-opt-letter{font-family:'DM Mono',monospace;font-size:12px;font-weight:800;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(0,0,0,.06)}
+.rev-opt.opt-correct .rev-opt-letter{background:#16a34a;color:#fff}
+.rev-opt.opt-wrong .rev-opt-letter{background:#dc2626;color:#fff}
+
+.rev-expl{border-top:1px solid var(--b2);padding:12px 16px;background:linear-gradient(135deg,#f8fafc,#f1f5f9)}
+.rev-expl-title{font-size:11px;font-weight:800;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.rev-expl-body{font-size:13px;color:var(--text);line-height:1.6}
+.rev-expl-loading{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);font-style:italic}
+.rev-expl-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);animation:dotPulse .8s ease-in-out infinite}
+.rev-expl-dot:nth-child(2){animation-delay:.15s}
+.rev-expl-dot:nth-child(3){animation-delay:.3s}
+@keyframes dotPulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+
+.rev-nav-footer{position:sticky;bottom:0;background:var(--card);border-top:1.5px solid var(--b2);padding:10px 16px;display:flex;gap:8px}
+.rev-nav-btn{flex:1;padding:12px;border:none;border-radius:12px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;transition:all .15s}
+.rev-nav-prev{background:var(--b2);color:var(--muted)}
+.rev-nav-next{background:var(--teal);color:#fff}
+.rev-nav-btn:disabled{opacity:.4;cursor:default}
 </style>
 
 <style>
@@ -3551,6 +3603,7 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
       <div class="s-box"><div class="s-lbl">Total</div><div class="s-val" id="rTotal" style="color:var(--muted)"></div></div>
     </div>
     <div class="review-grid" id="reviewGrid"></div>
+    <button class="btn-exit" style="background:linear-gradient(135deg,#0d9488,#0f766e);margin-bottom:6px" onclick="openReviewMode()">📖 Revisar respuestas</button>
     <button class="btn-exit" onclick="exitToLogin()">Volver al inicio</button>
     <button class="btn-exit" style="background:linear-gradient(135deg,#f59e0b,#d97706);margin-top:10px" onclick="openRanking()">🏆 Ver ranking global</button>
     <!-- ── DUELO VS PROMEDIO ── -->
@@ -3578,6 +3631,27 @@ input{-webkit-user-select:text;-moz-user-select:text;user-select:text}
     <button class="ai-diag-btn" id="btnAIDiagnosis" onclick="openDiagModal()">&#x25C9; Diagnóstico de BOBI</button>
     <button class="ai-practice-btn" id="btnAIPractice" onclick="openPracticeFromResults()">🧩 Practicar mis temas débiles</button>
     <button class="btn-exit" id="btnResultsAdmin" style="display:none;background:var(--teal);color:#fff;border:none;margin-top:8px" onclick="openAdmin()">⚙️ Editar imágenes del examen</button>
+  </div>
+</div>
+
+
+<!-- ── MODO REVISIÓN POST-EXAMEN ── -->
+<div id="reviewScreen" class="screen">
+  <div class="rev-topbar">
+    <button class="rev-back" onclick="closeReview()">← Resultados</button>
+    <div class="rev-title" id="revTitle">Revisión</div>
+    <div class="rev-progress" id="revProgress">0/0</div>
+  </div>
+  <div class="rev-filter-bar">
+    <button class="rev-filter active-all" id="revFilterAll"   onclick="setRevFilter('all')">📋 Todas</button>
+    <button class="rev-filter"            id="revFilterWrong" onclick="setRevFilter('wrong')">❌ Incorrectas</button>
+    <button class="rev-filter"            id="revFilterRight" onclick="setRevFilter('right')">✅ Correctas</button>
+    <button class="rev-filter"            id="revFilterBlank" onclick="setRevFilter('blank')">➖ Sin responder</button>
+  </div>
+  <div class="rev-body" id="revBody"></div>
+  <div class="rev-nav-footer">
+    <button class="rev-nav-btn rev-nav-prev" id="revPrev" onclick="revNavigate(-1)">← Anterior</button>
+    <button class="rev-nav-btn rev-nav-next" id="revNext" onclick="revNavigate(1)">Siguiente →</button>
   </div>
 </div>
 
@@ -13287,5 +13361,191 @@ function renderHistChart(titulo) {
 
 </script>
 
+<script>
+// ══════════════════════════════════════════════════════
+//  MODO REVISIÓN POST-EXAMEN
+// ══════════════════════════════════════════════════════
+let _revFilter    = 'all';
+let _revFiltered  = [];   // índices de preguntas según filtro
+let _revCurrent   = 0;    // índice dentro de _revFiltered
+let _revExplCache = {};   // cache de explicaciones IA por índice de pregunta
+
+function openReviewMode() {
+  _revFilter   = 'all';
+  _revCurrent  = 0;
+  _revExplCache = {};
+  buildRevFiltered();
+  renderRevQuestion();
+  show('reviewScreen');
+  document.getElementById('reviewScreen').scrollTop = 0;
+}
+
+function closeReview() {
+  show('resultsScreen');
+}
+
+function buildRevFiltered() {
+  const qs  = S.questions;
+  const ans = S.answers;
+  _revFiltered = qs.map((_,i) => i).filter(i => {
+    const ua = ans[i], ca = qs[i].answer;
+    if (_revFilter === 'wrong') return ua && ua !== ca;
+    if (_revFilter === 'right') return ua === ca;
+    if (_revFilter === 'blank') return !ua;
+    return true; // all
+  });
+}
+
+function setRevFilter(f) {
+  _revFilter  = f;
+  _revCurrent = 0;
+  buildRevFiltered();
+  // Update filter button styles
+  ['all','wrong','right','blank'].forEach(key => {
+    const btn = document.getElementById('revFilter' + key.charAt(0).toUpperCase() + key.slice(1));
+    if (btn) {
+      btn.className = 'rev-filter' + (f === key ? ' active-' + key : '');
+    }
+  });
+  renderRevQuestion();
+  document.getElementById('reviewScreen').scrollTop = 0;
+}
+
+function revNavigate(dir) {
+  _revCurrent = Math.max(0, Math.min(_revFiltered.length - 1, _revCurrent + dir));
+  renderRevQuestion();
+  document.getElementById('reviewScreen').scrollTop = 42;
+}
+
+function renderRevQuestion() {
+  const body = document.getElementById('revBody');
+  const qs   = S.questions;
+  const ans  = S.answers;
+  const letters = ['A','B','C','D','E'];
+
+  document.getElementById('revProgress').textContent =
+    _revFiltered.length ? (_revCurrent + 1) + '/' + _revFiltered.length : '0/0';
+  document.getElementById('revTitle').textContent =
+    (S.currentExamMeta?.titulo || S.meta?.titulo || 'Revisión').slice(0, 30);
+
+  // Prev / Next buttons
+  document.getElementById('revPrev').disabled = _revCurrent === 0;
+  document.getElementById('revNext').disabled = _revCurrent >= _revFiltered.length - 1;
+
+  if (!_revFiltered.length) {
+    body.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);font-size:14px">No hay preguntas en este filtro</div>';
+    return;
+  }
+
+  const qIdx = _revFiltered[_revCurrent];
+  const q    = qs[qIdx];
+  const ua   = ans[qIdx];
+  const ca   = q.answer;
+  const correct = ua === ca;
+  const blank   = !ua;
+
+  const statusText  = blank ? '➖ Sin responder' : correct ? '✅ Correcta' : '❌ Incorrecta';
+  const statusClass = blank ? 'blank' : correct ? 'correct' : 'wrong';
+
+  // Build options HTML
+  let optsHtml = '';
+  (q.options || []).forEach((opt, i) => {
+    const letter = letters[i];
+    const isCorrect = letter === ca;
+    const isUser    = letter === ua;
+    let cls = 'rev-opt';
+    let tag = '';
+    if (isCorrect) { cls += ' opt-correct'; tag = ' ✓'; }
+    else if (isUser && !correct) { cls += ' opt-wrong'; tag = ' ✗'; }
+    optsHtml += `<div class="${cls}">
+      <span class="rev-opt-letter">${letter}</span>
+      <span>${opt}${tag}</span>
+    </div>`;
+  });
+
+  // Image
+  let imgHtml = '';
+  if (q.image && S.images && S.images[q.image]) {
+    imgHtml = `<img class="rev-q-img" src="${S.images[q.image]}" style="display:block" alt="imagen"/>`;
+  }
+
+  // Explanation: primero la del autor, luego BOBI como fallback
+  const savedExpl  = (q.explanation || '').trim();
+  const cachedExpl = _revExplCache[qIdx];
+  let explHtml = '';
+  if (savedExpl) {
+    // ✅ Explicación del autor — mostrar directo
+    explHtml = `<div class="rev-expl-body">${savedExpl}</div>`;
+  } else if (cachedExpl === 'loading') {
+    explHtml = `<div class="rev-expl-loading">
+      <div class="rev-expl-dot"></div><div class="rev-expl-dot"></div><div class="rev-expl-dot"></div>
+      BOBI está explicando…
+    </div>`;
+  } else if (cachedExpl) {
+    // Respuesta de BOBI
+    explHtml = `<div class="rev-expl-body" style="font-style:italic;color:var(--muted);font-size:12px;margin-bottom:4px">✦ Generado por BOBI</div>
+      <div class="rev-expl-body">${cachedExpl}</div>`;
+  } else {
+    // Sin explicación — ofrecer BOBI
+    explHtml = `<button onclick="loadRevExpl(${qIdx})" style="background:linear-gradient(135deg,#7c6fff,#5b4fe0);border:none;border-radius:10px;padding:8px 16px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit">✦ Pedir explicación a BOBI</button>`;
+  }
+
+  body.innerHTML = `
+    <div class="rev-card">
+      <div class="rev-card-header">
+        <span class="rev-q-num">P${qIdx + 1}</span>
+        <span class="rev-status ${statusClass}">${statusText}</span>
+        ${q.area ? `<span class="rev-area">${q.area}</span>` : ''}
+      </div>
+      <div class="rev-q-text">${renderQuestionText(q.question)}</div>
+      ${imgHtml}
+      <div class="rev-opts">${optsHtml}</div>
+      <div class="rev-expl">
+        <div class="rev-expl-title">💡 Explicación</div>
+        <div id="revExplContainer">${explHtml}</div>
+      </div>
+    </div>`;
+}
+
+async function loadRevExpl(qIdx) {
+  if (_revExplCache[qIdx]) return;
+  _revExplCache[qIdx] = 'loading';
+  // Re-render para mostrar loading dots
+  renderRevQuestion();
+
+  const q       = S.questions[qIdx];
+  const ua      = S.answers[qIdx];
+  const letters = ['A','B','C','D','E'];
+  const caIdx   = letters.indexOf(q.answer);
+  const caText  = (q.options || [])[caIdx] || q.answer;
+  const uaText  = ua ? ((q.options || [])[letters.indexOf(ua)] || ua) : 'No respondió';
+
+  const prompt = `Eres un tutor experto en el EXANI-II. Explica brevemente (3-5 líneas) por qué la respuesta correcta a esta pregunta es "${q.answer}) ${caText}".
+Pregunta: ${q.question}
+Opciones: ${(q.options||[]).map((o,i)=>letters[i]+') '+o).join(' | ')}
+El estudiante respondió: ${ua ? ua+') '+uaText : 'No respondió'}
+${q.explanation ? 'Pista del autor: ' + q.explanation : ''}
+Responde directo, sin encabezados, en español claro y motivador.`;
+
+  try {
+    const res  = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 300,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const text = (data.content || []).map(c => c.text || '').join('');
+    _revExplCache[qIdx] = text || 'No se pudo obtener la explicación.';
+  } catch(e) {
+    _revExplCache[qIdx] = 'No se pudo conectar con BOBI. Verifica tu conexión.';
+  }
+  renderRevQuestion();
+}
+
+</script>
 </body>
 </html>
