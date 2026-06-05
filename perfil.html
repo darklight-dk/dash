@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Mi Perfil · DASH</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --teal:#0d9488;--teal2:#0f766e;--bg:#f0f4f8;--card:#fff;
+  --text:#1e293b;--muted:#64748b;--b2:#e2e8f0;--red:#dc2626;
+  --amber:#d97706;--green:#16a34a;--purple:#7c3aed;--radius:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:48px}
+
+/* TOPBAR */
+.topbar{background:var(--card);border-bottom:1.5px solid var(--b2);padding:12px 20px;
+  display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.top-back{background:none;border:1.5px solid var(--b2);border-radius:10px;
+  padding:7px 14px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;
+  font-family:inherit;text-decoration:none;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+.top-back:hover{background:var(--b2);color:var(--text)}
+.top-title{font-size:15px;font-weight:800;color:var(--text);flex:1}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#0d9488 0%,#0f766e 50%,#134e4a 100%);
+  padding:32px 20px 88px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 75% 25%,rgba(255,255,255,.1) 0%,transparent 60%)}
+.hero::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:40px;
+  background:var(--bg);border-radius:40px 40px 0 0}
+.avatar-wrap{position:relative;display:inline-block;margin-bottom:14px}
+.avatar{width:90px;height:90px;border-radius:50%;border:3px solid rgba(255,255,255,.5);
+  object-fit:cover;display:block;box-shadow:0 4px 20px rgba(0,0,0,.25)}
+.avatar-initials{width:90px;height:90px;border-radius:50%;border:3px solid rgba(255,255,255,.5);
+  background:linear-gradient(135deg,#134e4a,#0f766e);display:flex;align-items:center;
+  justify-content:center;font-size:32px;font-weight:900;color:#fff;
+  box-shadow:0 4px 20px rgba(0,0,0,.25)}
+.avatar-badge{position:absolute;bottom:0;right:0;width:26px;height:26px;border-radius:50%;
+  background:var(--card);border:2px solid var(--card);display:flex;align-items:center;
+  justify-content:center;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.hero-name{font-size:22px;font-weight:900;color:#fff;margin-bottom:5px;
+  text-shadow:0 1px 8px rgba(0,0,0,.2)}
+.hero-role{font-size:11px;font-weight:800;color:rgba(255,255,255,.8);
+  background:rgba(255,255,255,.15);border-radius:20px;padding:3px 14px;
+  display:inline-block;margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase}
+.hero-email{font-size:11px;color:rgba(255,255,255,.5)}
+
+/* STATS FLOAT */
+.stats-float{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
+  margin:-52px 16px 0;position:relative;z-index:10}
+.stat-box{background:var(--card);border-radius:14px;padding:14px 8px;text-align:center;
+  box-shadow:0 4px 20px rgba(0,0,0,.08);border:1.5px solid var(--b2)}
+.stat-val{font-size:22px;font-weight:900;color:var(--teal);font-family:'DM Mono',monospace;line-height:1}
+.stat-lbl{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.5px;margin-top:5px}
+
+/* SECTION */
+.section{margin:16px 16px 0;background:var(--card);border-radius:var(--radius);
+  border:1.5px solid var(--b2);overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.04)}
+.section-head{padding:14px 16px;border-bottom:1px solid var(--b2);
+  display:flex;align-items:center;gap:8px;background:linear-gradient(90deg,#fafafa,#fff)}
+.section-icon{font-size:16px}
+.section-title{font-size:13px;font-weight:800;color:var(--text)}
+.section-sub{font-size:11px;color:var(--muted);margin-left:auto;font-weight:600}
+.section-body{padding:16px}
+
+/* RACHA */
+.streak-hero{display:flex;align-items:center;gap:16px;padding:16px 16px 8px}
+.streak-flame-big{font-size:52px;line-height:1;animation:flamePulse 1.4s ease-in-out infinite;flex-shrink:0}
+@keyframes flamePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.streak-info-big{flex:1}
+.streak-num{font-size:44px;font-weight:900;color:#f97316;font-family:'DM Mono',monospace;line-height:1}
+.streak-label{font-size:13px;font-weight:800;color:#92400e;margin-top:3px}
+.streak-sub-txt{font-size:11px;color:#b45309;margin-top:3px}
+.streak-calendar{display:flex;gap:4px;padding:0 16px 16px;flex-wrap:wrap}
+.streak-day{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-size:10px;font-weight:700}
+.streak-day.studied{background:linear-gradient(135deg,#fed7aa,#fde68a);color:#92400e}
+.streak-day.today-studied{background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;
+  box-shadow:0 2px 8px rgba(249,115,22,.5)}
+.streak-day.today-empty{background:linear-gradient(135deg,#e2e8f0,#cbd5e1);color:#94a3b8;
+  border:2px dashed #94a3b8}
+.streak-day.empty{background:#f1f5f9;color:#cbd5e1}
+
+/* LOGROS */
+.logros-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.logro{background:var(--bg);border-radius:12px;padding:14px 8px;text-align:center;
+  border:1.5px solid var(--b2);position:relative;transition:all .2s}
+.logro.unlocked{background:linear-gradient(135deg,#fffbeb,#fef3c7);border-color:#fcd34d;
+  box-shadow:0 2px 10px rgba(251,191,36,.2)}
+.logro.unlocked-teal{background:linear-gradient(135deg,#f0fdfa,#ccfbf1);border-color:#5eead4;
+  box-shadow:0 2px 10px rgba(20,184,166,.15)}
+.logro.unlocked-purple{background:linear-gradient(135deg,#faf5ff,#ede9fe);border-color:#c4b5fd;
+  box-shadow:0 2px 10px rgba(139,92,246,.15)}
+.logro-icon{font-size:30px;margin-bottom:6px;display:block;line-height:1}
+.logro.locked .logro-icon{filter:grayscale(1);opacity:.3}
+.logro-name{font-size:10px;font-weight:800;color:var(--text);line-height:1.3}
+.logro.locked .logro-name{color:var(--muted)}
+.logro-desc{font-size:9px;color:var(--muted);margin-top:3px;line-height:1.4}
+.logro-lock{position:absolute;top:6px;right:6px;font-size:11px;opacity:.35}
+
+/* CHARTS */
+.chart-wrap{height:190px;position:relative}
+.no-data{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px}
+
+/* HIST */
+.hist-list{display:flex;flex-direction:column;gap:8px}
+.hist-item{display:flex;align-items:center;gap:10px;padding:10px 12px;
+  background:var(--bg);border-radius:12px;border:1px solid var(--b2)}
+.hist-pct{font-size:18px;font-weight:900;font-family:'DM Mono',monospace;min-width:50px;text-align:center}
+.hist-pct.pass{color:var(--teal)}
+.hist-pct.fail{color:var(--red)}
+.hist-info{flex:1;min-width:0}
+.hist-exam{font-size:12px;font-weight:700;color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hist-date{font-size:10px;color:var(--muted);margin-top:2px}
+.hist-badge{font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;flex-shrink:0}
+.hist-badge.pass{background:#dcfce7;color:#15803d}
+.hist-badge.fail{background:#fee2e2;color:#dc2626}
+
+/* BEST */
+.best-list{display:flex;flex-direction:column;gap:8px}
+.best-item{display:flex;align-items:center;gap:12px;padding:12px 14px;
+  border-radius:12px;border:1.5px solid var(--b2);background:var(--bg)}
+.best-rank{font-size:22px;min-width:28px;text-align:center;flex-shrink:0}
+.best-info{flex:1;min-width:0}
+.best-name{font-size:12px;font-weight:700;color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.best-attempts{font-size:10px;color:var(--muted);margin-top:2px}
+.best-pct{font-size:20px;font-weight:900;font-family:'DM Mono',monospace}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:32px 20px}
+.empty-icon{font-size:38px;margin-bottom:10px}
+.empty-text{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* MOBILE */
+@media(max-width:480px){
+  .stats-float{grid-template-columns:repeat(2,1fr)}
+  .stat-val{font-size:20px}
+  .logros-grid{grid-template-columns:repeat(3,1fr)}
+  .streak-num{font-size:36px}
+  .streak-flame-big{font-size:42px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html" class="top-back">← DASH</a>
+  <div class="top-title">Mi Perfil</div>
+</div>
+
+<div class="hero">
+  <div class="avatar-wrap" id="avatarWrap">
+    <div class="avatar-initials" id="avatarEl">?</div>
+    <div class="avatar-badge" id="avatarBadge">👤</div>
+  </div>
+  <div class="hero-name" id="heroName">Cargando…</div>
+  <div class="hero-role" id="heroRole">—</div>
+  <div class="hero-email" id="heroEmail"></div>
+</div>
+
+<div class="stats-float">
+  <div class="stat-box">
+    <div class="stat-val" id="statExams">—</div>
+    <div class="stat-lbl">Exámenes</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-val" id="statAvg">—</div>
+    <div class="stat-lbl">Promedio</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-val" id="statBest">—</div>
+    <div class="stat-lbl">Mejor</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-val" id="statStreak">—</div>
+    <div class="stat-lbl">Racha 🔥</div>
+  </div>
+</div>
+
+<!-- RACHA -->
+<div class="section" style="margin-top:64px">
+  <div class="section-head">
+    <span class="section-icon">🔥</span>
+    <span class="section-title">Racha de estudio</span>
+    <span class="section-sub" id="streakSubLabel"></span>
+  </div>
+  <div class="streak-hero">
+    <div class="streak-flame-big" id="streakFlameBig">✨</div>
+    <div class="streak-info-big">
+      <div class="streak-num" id="streakNumBig">0</div>
+      <div class="streak-label" id="streakLabelBig">Sin racha aún</div>
+      <div class="streak-sub-txt" id="streakSubBig">¡Haz tu primer examen!</div>
+    </div>
+  </div>
+  <div class="streak-calendar" id="streakCalendar"></div>
+</div>
+
+<!-- LOGROS -->
+<div class="section">
+  <div class="section-head">
+    <span class="section-icon">🏅</span>
+    <span class="section-title">Logros</span>
+    <span class="section-sub" id="logrosCount">0 / 12</span>
+  </div>
+  <div class="section-body">
+    <div class="logros-grid" id="logrosGrid">
+      <div class="logro locked"><span class="logro-icon">⏳</span>
+        <div class="logro-name">Cargando…</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- PROGRESO POR EXAMEN -->
+<div class="section">
+  <div class="section-head">
+    <span class="section-icon">📊</span>
+    <span class="section-title">Mejor puntaje por examen</span>
+  </div>
+  <div class="section-body">
+    <div class="chart-wrap"><canvas id="chartExams"></canvas></div>
+  </div>
+</div>
+
+<!-- APROBADOS VS REPROBADOS -->
+<div class="section">
+  <div class="section-head">
+    <span class="section-icon">🎯</span>
+    <span class="section-title">Aprobados vs Reprobados</span>
+  </div>
+  <div class="section-body" style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+    <div style="width:140px;height:140px;flex-shrink:0"><canvas id="chartPass"></canvas></div>
+    <div id="passLegend" style="flex:1;min-width:120px"></div>
+  </div>
+</div>
+
+<!-- MEJORES RESULTADOS -->
+<div class="section">
+  <div class="section-head">
+    <span class="section-icon">🥇</span>
+    <span class="section-title">Mis mejores resultados</span>
+  </div>
+  <div class="section-body">
+    <div class="best-list" id="bestList">
+      <div class="empty-state">
+        <div class="empty-icon">🎯</div>
+        <div class="empty-text">Aún sin resultados.<br>¡Haz tu primer examen!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORIAL RECIENTE -->
+<div class="section">
+  <div class="section-head">
+    <span class="section-icon">📋</span>
+    <span class="section-title">Historial reciente</span>
+    <span class="section-sub" id="histCount"></span>
+  </div>
+  <div class="section-body">
+    <div class="hist-list" id="histList">
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <div class="empty-text">Sin historial aún.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const FB_URL = 'https://exani-dash-adeff-default-rtdb.firebaseio.com';
+
+function getSession() {
+  try {
+    const s = JSON.parse(localStorage.getItem('exani_session') || 'null');
+    if (s && s.user) return s;
+    const bak = JSON.parse(sessionStorage.getItem('exani_session_bak') || 'null');
+    if (bak && bak.user) return bak;
+  } catch {}
+  return null;
+}
+
+function getSafeKey(sess) {
+  return sess.googleEmail
+    ? sess.googleEmail.replace(/[.#$[\]]/g, '_')
+    : 'u_' + sess.user.toLowerCase().replace(/[^a-z0-9]/g, '_');
+}
+
+// ══ LOGROS ══
+const ALL_LOGROS = [
+  { id:'first',    icon:'🎯', name:'Primer paso',     desc:'Completa tu primer examen',        color:'unlocked-teal',   check: s => s.totalExams >= 1 },
+  { id:'pass5',    icon:'✅', name:'Aprobador',        desc:'Aprueba 5 exámenes',               color:'unlocked',        check: s => s.passed >= 5 },
+  { id:'perfect',  icon:'💯', name:'Perfecto',         desc:'Obtén 100% en un examen',          color:'unlocked',        check: s => s.bestPct >= 100 },
+  { id:'streak3',  icon:'🔥', name:'En racha',         desc:'3 días seguidos estudiando',       color:'unlocked',        check: s => s.streak >= 3 },
+  { id:'streak7',  icon:'🌟', name:'Semana de fuego',  desc:'7 días seguidos estudiando',       color:'unlocked',        check: s => s.streak >= 7 },
+  { id:'streak30', icon:'🏆', name:'Imparable',        desc:'30 días seguidos estudiando',      color:'unlocked-purple', check: s => s.streak >= 30 },
+  { id:'exams10',  icon:'📚', name:'Estudioso',        desc:'Completa 10 exámenes',             color:'unlocked-teal',   check: s => s.totalExams >= 10 },
+  { id:'exams25',  icon:'🎓', name:'Dedicado',         desc:'Completa 25 exámenes',             color:'unlocked-purple', check: s => s.totalExams >= 25 },
+  { id:'avg80',    icon:'⭐', name:'Alto rendimiento', desc:'Promedio general ≥ 80%',           color:'unlocked',        check: s => s.avgPct >= 80 },
+  { id:'avg90',    icon:'🌟', name:'Excelencia',       desc:'Promedio general ≥ 90%',           color:'unlocked-purple', check: s => s.avgPct >= 90 },
+  { id:'variety',  icon:'🗂️', name:'Explorador',       desc:'Prueba 5 exámenes distintos',      color:'unlocked-teal',   check: s => s.uniqueExams >= 5 },
+  { id:'comeback', icon:'💪', name:'Perseverante',     desc:'Mejora tu score en un examen',     color:'unlocked',        check: s => s.hasImproved },
+];
+
+async function init() {
+  const sess = getSession();
+  if (!sess) { window.location.href = 'index.html'; return; }
+
+  renderHero(sess);
+
+  const safeKey = getSafeKey(sess);
+  const idKey   = sess.googleEmail || sess.user;
+  const pKey    = 'pscores_' + idKey.replace(/[^a-z0-9]/gi,'_');
+  const sKey    = 'streak_'  + idKey.replace(/[^a-z0-9]/gi,'_');
+
+  let streakData = { streak:0, lastDay:'' };
+  try { streakData = JSON.parse(localStorage.getItem(sKey) || '{}'); } catch {}
+
+  // Leer historial de Firebase
+  const fbHistory = await fetch(FB_URL + '/history/' + safeKey + '.json')
+    .then(r => r.json()).catch(() => null);
+
+  const entries = [];
+  if (fbHistory && typeof fbHistory === 'object') {
+    Object.values(fbHistory).forEach(e => {
+      if (e && e.pct != null && e.exam) entries.push(e);
+    });
+  }
+  entries.sort((a,b) => (b.ts||0) - (a.ts||0));
+
+  // Agrupar por examen
+  const byExam = {};
+  entries.forEach(e => {
+    if (!byExam[e.exam]) byExam[e.exam] = [];
+    byExam[e.exam].push(e.pct);
+  });
+
+  const totalExams  = entries.length;
+  const avgPct      = totalExams ? Math.round(entries.reduce((s,e) => s+e.pct,0)/totalExams) : 0;
+  const bestPct     = totalExams ? Math.max(...entries.map(e=>e.pct)) : 0;
+  const passed      = entries.filter(e => e.pct >= 60).length;
+  const uniqueExams = Object.keys(byExam).length;
+  const hasImproved = Object.values(byExam).some(arr => arr.length >= 2 && Math.max(...arr) > arr[arr.length-1]);
+  const streak      = streakData.streak || 0;
+
+  const stats = { totalExams, avgPct, bestPct, passed, uniqueExams, streak, hasImproved };
+
+  renderStats(stats);
+  renderStreak(streakData, streak);
+  renderLogros(stats);
+  renderChartExams(byExam);
+  renderChartPass(passed, totalExams - passed);
+  renderBestList(byExam);
+  renderHistList(entries.slice(0,20));
+}
+
+function renderHero(sess) {
+  const roleEmoji = { 'Administrador':'⚙️','Moderador':'🛡️','Profesor':'📖','Estudiante':'🎓','Aspirante':'🌱' };
+  document.getElementById('heroName').textContent  = sess.user || 'Usuario';
+  document.getElementById('heroRole').textContent  = sess.role || 'Estudiante';
+  document.getElementById('heroEmail').textContent = sess.googleEmail || '';
+  document.getElementById('avatarBadge').textContent = roleEmoji[sess.role] || '👤';
+  document.getElementById('avatarEl').textContent = (sess.user||'?').slice(0,2).toUpperCase();
+  if (sess.googlePicture) {
+    document.getElementById('avatarWrap').innerHTML =
+      `<img class="avatar" src="${sess.googlePicture}" onerror="this.style.display='none'" alt=""/>
+       <div class="avatar-badge">${roleEmoji[sess.role]||'👤'}</div>`;
+  }
+}
+
+function renderStats(s) {
+  document.getElementById('statExams').textContent  = s.totalExams || '0';
+  document.getElementById('statAvg').textContent    = s.avgPct  ? s.avgPct  + '%' : '—';
+  document.getElementById('statBest').textContent   = s.bestPct ? s.bestPct + '%' : '—';
+  document.getElementById('statStreak').textContent = s.streak  || '0';
+}
+
+function renderStreak(data, streak) {
+  document.getElementById('streakNumBig').textContent = streak;
+  const flame = streak >= 30 ? '🏆' : streak >= 7 ? '🔥🔥' : streak >= 3 ? '🔥' : '✨';
+  document.getElementById('streakFlameBig').textContent = flame;
+  const label = streak === 0   ? 'Sin racha aún'
+              : streak === 1   ? '¡Primer día! 🌱'
+              : streak < 7    ? streak + ' días seguidos 💪'
+              : streak < 30   ? '¡' + streak + ' días! 🚀'
+              : '¡' + streak + ' días imparable! 🏆';
+  document.getElementById('streakLabelBig').textContent = label;
+  const sub = streak === 0 ? '¡Haz tu primer examen hoy!'
+            : streak < 3  ? '¡Sigue así, vas muy bien!'
+            : streak < 7  ? '¡No rompas tu racha!'
+            : '¡Eres una máquina!';
+  document.getElementById('streakSubBig').textContent = sub;
+
+  // Calendario: últimos 28 días
+  const today = new Date();
+  const lastDay = data.lastDay || '';
+  const todayISO = today.toISOString().slice(0,10);
+  const studiedToday = lastDay === todayISO;
+  const cal = document.getElementById('streakCalendar');
+  cal.innerHTML = '';
+
+  for (let i = 27; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const iso = d.toISOString().slice(0,10);
+    const isToday = i === 0;
+    // Aproximar días estudiados: streak días hacia atrás desde lastDay
+    const lastDate    = lastDay ? new Date(lastDay) : null;
+    const daysFromLast = lastDate ? Math.round((lastDate - d) / 86400000) : 999;
+    const inStreak = daysFromLast >= 0 && daysFromLast < streak;
+    let cls = 'streak-day empty';
+    if (isToday && studiedToday) cls = 'streak-day today-studied';
+    else if (isToday)            cls = 'streak-day today-empty';
+    else if (inStreak)           cls = 'streak-day studied';
+    cal.innerHTML += `<div class="${cls}" title="${iso}">${d.getDate()}</div>`;
+  }
+}
+
+function renderLogros(stats) {
+  const grid = document.getElementById('logrosGrid');
+  let unlocked = 0;
+  grid.innerHTML = ALL_LOGROS.map(l => {
+    const ok = l.check(stats);
+    if (ok) unlocked++;
+    return `<div class="logro ${ok ? l.color : 'locked'}">
+      ${!ok ? '<span class="logro-lock">🔒</span>' : ''}
+      <span class="logro-icon">${l.icon}</span>
+      <div class="logro-name">${l.name}</div>
+      <div class="logro-desc">${l.desc}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('logrosCount').textContent = unlocked + ' / ' + ALL_LOGROS.length;
+}
+
+function renderChartExams(byExam) {
+  const entries = Object.entries(byExam)
+    .map(([exam, scores]) => ({ exam: exam.length > 20 ? exam.slice(0,18)+'…' : exam, best: Math.max(...scores) }))
+    .sort((a,b) => b.best - a.best).slice(0,8);
+  if (!entries.length) {
+    document.querySelector('.chart-wrap').innerHTML = '<div class="no-data">📊 Sin datos aún</div>';
+    return;
+  }
+  new Chart(document.getElementById('chartExams'), {
+    type: 'bar',
+    data: { labels: entries.map(e => e.exam), datasets: [{
+      data: entries.map(e => e.best),
+      backgroundColor: entries.map(e => e.best >= 60 ? 'rgba(13,148,136,.8)' : 'rgba(220,38,38,.7)'),
+      borderRadius: 8, borderSkipped: false,
+    }]},
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c => c.parsed.y+'%'}} },
+      scales:{
+        y:{ min:0, max:100, ticks:{callback:v=>v+'%',font:{family:'DM Mono',size:10}}, grid:{color:'rgba(0,0,0,.04)'} },
+        x:{ ticks:{font:{family:'Sora',size:9},maxRotation:35} }
+      }
+    }
+  });
+}
+
+function renderChartPass(passed, failed) {
+  const total = passed + failed;
+  if (!total) {
+    document.getElementById('chartPass').parentElement.innerHTML = '<div class="no-data">Sin datos</div>';
+    document.getElementById('passLegend').innerHTML = '';
+    return;
+  }
+  new Chart(document.getElementById('chartPass'), {
+    type: 'doughnut',
+    data: { labels:['Aprobados','Reprobados'], datasets:[{ data:[passed,failed],
+      backgroundColor:['rgba(13,148,136,.85)','rgba(220,38,38,.75)'],
+      borderWidth:0, hoverOffset:6
+    }]},
+    options:{ responsive:true, maintainAspectRatio:false, cutout:'68%',
+      plugins:{ legend:{display:false} }
+    }
+  });
+  const rate = Math.round((passed/total)*100);
+  document.getElementById('passLegend').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="width:12px;height:12px;border-radius:4px;background:rgba(13,148,136,.85);flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700">Aprobados</span>
+        <span style="font-size:16px;font-weight:900;color:var(--teal);margin-left:auto;font-family:'DM Mono'">${passed}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="width:12px;height:12px;border-radius:4px;background:rgba(220,38,38,.75);flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700">Reprobados</span>
+        <span style="font-size:16px;font-weight:900;color:var(--red);margin-left:auto;font-family:'DM Mono'">${failed}</span>
+      </div>
+      <div style="margin-top:4px;padding:8px 12px;background:var(--bg);border-radius:10px;text-align:center">
+        <div style="font-size:26px;font-weight:900;font-family:'DM Mono';color:${rate>=60?'var(--teal)':'var(--red)'}">${rate}%</div>
+        <div style="font-size:10px;color:var(--muted);font-weight:700">tasa de aprobación</div>
+      </div>
+    </div>`;
+}
+
+function renderBestList(byExam) {
+  const list = document.getElementById('bestList');
+  const entries = Object.entries(byExam)
+    .map(([exam,scores]) => ({ exam, best:Math.max(...scores), attempts:scores.length }))
+    .sort((a,b) => b.best - a.best).slice(0,8);
+  if (!entries.length) return;
+  const medals = ['🥇','🥈','🥉'];
+  list.innerHTML = entries.map((e,i) => `
+    <div class="best-item">
+      <span class="best-rank">${medals[i] || '#'+(i+1)}</span>
+      <div class="best-info">
+        <div class="best-name">${e.exam}</div>
+        <div class="best-attempts">${e.attempts} intento${e.attempts!==1?'s':''}</div>
+      </div>
+      <span class="best-pct" style="color:${e.best>=60?'var(--teal)':'var(--red)'}">${e.best}%</span>
+    </div>`).join('');
+}
+
+function renderHistList(entries) {
+  const list = document.getElementById('histList');
+  document.getElementById('histCount').textContent = entries.length ? entries.length+' registros' : '';
+  if (!entries.length) return;
+  list.innerHTML = entries.map(e => {
+    const d    = e.ts ? new Date(e.ts) : null;
+    const date = d ? d.toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+    const pass = e.pct >= 60;
+    return `<div class="hist-item">
+      <span class="hist-pct ${pass?'pass':'fail'}">${e.pct}%</span>
+      <div class="hist-info">
+        <div class="hist-exam">${e.exam}</div>
+        <div class="hist-date">${date} · ${e.ok??'?'}/${e.total??'?'} correctas</div>
+      </div>
+      <span class="hist-badge ${pass?'pass':'fail'}">${pass?'✅ Aprobado':'❌ Reprobado'}</span>
+    </div>`;
+  }).join('');
+}
+
+init();
+</script>
+</body>
+</html>
